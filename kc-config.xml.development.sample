@@ -1,0 +1,136 @@
+<config>
+		<param name="application.http.scheme">http</param>
+		<param name="application.host">128.171.128.158</param>
+		<param name="http.port">8080</param>
+		<param name="app.context.name">mygrant</param>
+	
+		<!-- KC Client DB -->
+		<param name="datasource.url">jdbc:oracle:thin:@localhost:1530:KCDEV</param>
+		<param name="datasource.ojb.platform">Oracle9i</param>
+		<param name="datasource.username">mg60</param>
+		<param name="datasource.password">{pw}{</param>
+		
+	        <!-- Rice Server DB -->
+                <!-- Should be the same as KC Client DB when running bundled mode -->
+                <param name="server.datasource.url">jdbc:oracle:thin:@localhost:1530:KCDEV</param>
+	        <param name="server.datasource.ojb.platform">Oracle9i</param>
+                <param name="server.datasource.username">mg60</param>
+                <param name="server.datasource.password">{pw}</param>
+
+		
+		<!-- CAS -->
+		<!-- <param name="cas.url">https://login.its.hawaii.edu/cas</param> -->
+		<param name="server.url">http://${application.host}:${http.port}</param>
+
+		<!-- Prod CAS URL -->
+        	<param name="cas.url">https://authn.hawaii.edu/cas</param>
+		<!-- Dev CAS URL -->
+		<param name="cas.url">https://cas-test.its.hawaii.edu/cas</param>
+		
+		<!-- New KC 6.0 CAS settings -->
+		<param name="filter.logout.class">org.jasig.cas.client.session.SingleSignOutFilter</param>
+		<param name="filter.logout.casServerUrlPrefix">${cas.url}</param>
+		<param name="filtermapping.logout.1">/*</param>
+		<param name="filter.login.class">org.jasig.cas.client.authentication.AuthenticationFilter</param>
+		<param name="filter.login.casServerUrlPrefix">${cas.url}</param>
+		<param name="filter.login.casServerLoginUrl">${cas.url}/login</param>
+		<param name="filter.login.serverName">${appserver.url}</param>
+		<param name="filtermapping.login.2">/*</param>
+		<param name="filter.validation.class">org.jasig.cas.client.validation.Cas20ProxyReceivingTicketValidationFilter</param>
+		<param name="filter.validation.casServerUrlPrefix">${cas.url}</param>
+		<param name="filter.validation.serverName">${appserver.url}</param>
+		<param name="filtermapping.validation.3">/*</param>
+		<param name="filter.caswrapper.class">org.jasig.cas.client.util.HttpServletRequestWrapperFilter</param>
+		<param name="filtermapping.caswrapper.4">/*</param>
+		<param name="listener.logout.class">org.jasig.cas.client.session.SingleSignOutHttpSessionListener</param>
+		<param name="rice.portal.logout.redirectUrl">${cas.url}/logout</param>
+		
+		<!-- S2S Configuration Common DEV/PROD -->
+		<param name="s2s.keystore.password">changeit</param>
+		<param name="s2s.truststore.location">C:\Program Files\Java\jdk1.6.0_34\jre\lib\security\cacerts</param>
+		<param name="s2s.truststore.password">changeit</param>
+		<param name="grants.gov.s2s.port">ApplicantIntegrationSoapPort</param>
+                <param name="research.gov.keystore.password">changeit</param>
+		<param name="research.gov.truststore.location">C:\Program Files\Java\jdk1.6.0_34\jre\lib\security\cacerts</param>
+		<param name="research.gov.truststore.password">changeit</param>
+                <param name="research.gov.s2s.port">ApplicantIntegrationSoapPort</param>
+
+                <!-- Production GG.server CAUTION FOR TESTING NEW CERTS -->
+		<!--
+		<param name="grants.gov.s2s.host">https://ws07.grants.gov:446/app-s2s-server/services/</param>
+		<param name="s2s.keystore.location">C:\Users\ronald\kuali\main\dev\keystore\mygrant.ors.hawaii.edu.multi.keystore</param>
+                <param name="research.gov.s2s.host">https://ws.research.gov/applyws</param>
+		<param name="research.gov.keystore.location">C:\Users\ronald\kuali\main\dev\keystore\mygrant.ors.hawaii.edu.multi.keystore</param>
+		 --> 
+
+                <!-- TEST GG.server -->
+		<!-- NOTE: KC 5.2 uses grants.gove version 2  you need to change the config to the following
+		<param name="grants.gov.s2s.host">https://at07ws.grants.gov:446/grantsws-applicant/services/v2/</param>
+		<param name="grants.gov.s2s.port">ApplicantWebServicesSoapPort</param>
+		-->
+		<param name="grants.gov.s2s.host">https://at07ws.grants.gov:446/app-s2s-server/services/</param>
+		<param name="s2s.keystore.location">C:\Users\ronald\kuali\main\dev\keystore\kcdev.ors.hawaii.edu.multi.keystore</param>
+                <param name="research.gov.s2s.host">https://ws.acpt.research.gov/applyws</param>
+		<param name="research.gov.keystore.location">C:\Users\ronald\kuali\main\dev\keystore\kcdev.ors.hawaii.edu.multi.keystore</param>
+
+		<!-- Java mail properties -->
+                <param name="mail.from">gouldner@hawaii.edu</param>
+                <param name="mail.transport.protocol">smtp</param>
+                <param name="mail.smtp.host">mail.hawaii.edu</param>
+                <param name="mail.smtp.port">25</param>
+                <param name="mail.smtp.user">userId</param>
+                <param name="mail.user.credentials">password</param>
+                <param name="mail.smtp.auth">false</param>
+
+		<!-- Kuali parameters -->
+		<param name="mail.relay.server">mail.hawaii.edu</param>
+		<param name="mailing.list.batch">mailing.list.batch</param>
+		<param name="encryption.key">7IC64w6ksLU</param>
+
+		<!-- Only used for embedded rice
+		<param name="keystore.alias">rice</param>
+		<param name="keystore.file">C:\Users\Ronald\kuali\main\dev\keystore\rice.keystore</param>
+		<param name="keystore.password">changeit</param>
+		-->
+	
+
+		<!-- Configuration for Exception Incident handling and reporting -->
+		<param name="KualiExceptionHandlerAction.EXCEPTION_INCIDENT_REPORT_SERVICE">knsExceptionIncidentService</param>
+		<param name="MailMessage.from">admin@kuali.org</param>
+		<param name="KualiExceptionIncidentServiceImpl.additionalExceptionNameList"></param>
+		<param name="KualiExceptionIncidentServiceImpl.REPORT_MAIL_LIST"></param>
+		<param name="kr.incident.mailing.list"></param>
+		<!-- End of Exception Incident handling and reporting -->
+		<!--
+		<param name="kc.struts.message.resources">ApplicationResources,UhApplicationResources</param>
+		<param name="solr.url">https://kcdev2.ors.hawaii.edu/solr</param>
+                -->
+		
+		<!-- Misc parameters -->
+		<param name="institution">UH</param>
+		<param name="security.directory">/usr/local/rice/</param>
+		<param name="settings.directory">/usr/local/rice/</param>
+		
+		<param name="portal.show.sample.app">false</param>
+		<param name="config.location">classpath:META-INF/uh-config-defaults.xml</param>
+		<!--<param name="rice.additionalSpringFiles">classpath:org/kuali/rice/kim/config/UHSpringBeans.xml, classpath:org/kuali/rice/kim/config/KCUHRiceSpringBeans.xml</param>-->
+		<!--
+		<param name="rice.kew.additionalSpringFiles">classpath:org/kuali/rice/kew/config/UHKEWOverrideSpringBeans.xml</param>
+		<param name="rice.kr.additionalSpringFiles">classpath:org/kuali/rice/krad/config/UHKRADOverrideSpringBeans.xml</param>
+		<param name="rice.kc.award.additionalSpringFiles">classpath:edu/hawaii/UHCustomAwardSpringBeans.xml</param>
+		<param name="rice.kc.ip.additionalSpringFiles">classpath:edu/hawaii/UHCustomInstitutionalProposalSpringBeans.xml</param>
+		<param name="rice.kc.pd.additionalSpringFiles">classpath:edu/hawaii/UHCustomProposalDevelopmentSpringBeans.xml</param>
+		-->
+		<param name="encryption.enabled">false</param>
+		<param name="encryption.key">pMYeNokbbsbTmBmmexk0IA==</param>
+		
+		<param name="environment">dev</param>
+		<param name="filter.profilerNotFoundRedirectUrl">http://kcdev.ors.hawaii.edu/myGRANTwww/profilerNotFound.html</param>
+
+		<!-- KC6.0 added params -->
+		<param name="kim.runmode">bundled</param>
+		<param name="kcb.runmode">bundled</param>
+		<param name="kew.runmode">bundled</param>
+		<param name="ken.runmode">bundled</param>
+
+</config>
