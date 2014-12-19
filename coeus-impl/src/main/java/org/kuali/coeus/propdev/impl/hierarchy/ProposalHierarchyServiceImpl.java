@@ -289,7 +289,9 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             errors.add(new ProposalHierarchyErrorWarningDto(ProposalHierarchyKeyConstants.ERROR_NOT_HIERARCHY_CHILD, Boolean.TRUE, childProposal.getProposalNumber()));
         }
 
-        validateSponsor(childProposal, hierarchyProposal);
+        errors.addAll(validateSponsor(childProposal, hierarchyProposal));
+
+        errors.addAll(validateIsAggregatorOnParent(childProposal,hierarchyProposal));
 
         List<ProposalHierarchyErrorWarningDto> sponsorErrors = validateSponsor(childProposal, hierarchyProposal);
 
@@ -461,13 +463,12 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         finalizeHierarchySync(hierarchyProposal.getProposalDocument());
 
         for (DevelopmentProposal childProposal : getHierarchyChildren(hierarchyProposal.getProposalNumber())) {
-            List<PropScienceKeyword> oldKeywords = getOldKeywords(hierarchyProposal, childProposal);
             ProposalPerson principalInvestigator = hierarchyProposal.getPrincipalInvestigator();
             childProposal.setHierarchyLastSyncHashCode(computeHierarchyHashCode(childProposal));
             
             removeChildElements(hierarchyProposal, childProposal.getProposalNumber());
             
-            synchronizeKeywords(hierarchyProposal, childProposal, oldKeywords);
+            synchronizeKeywords(hierarchyProposal, childProposal);
             synchronizeSpecialReviews(hierarchyProposal, childProposal);
             synchronizePersons(hierarchyProposal, childProposal, principalInvestigator);
             synchronizeNarratives(hierarchyProposal, childProposal);
@@ -513,14 +514,12 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
      * @throws ProposalHierarchyException
      */
     protected boolean synchronizeChildProposal(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal, boolean syncPersonnelAttachments) throws ProposalHierarchyException {
-        
-        List<PropScienceKeyword> oldKeywords = getOldKeywords(hierarchyProposal, childProposal);
         ProposalPerson principalInvestigator = hierarchyProposal.getPrincipalInvestigator();
         childProposal.setHierarchyLastSyncHashCode(computeHierarchyHashCode(childProposal));
         
         removeChildElements(hierarchyProposal, childProposal.getProposalNumber());
         
-        synchronizeKeywords(hierarchyProposal, childProposal, oldKeywords);
+        synchronizeKeywords(hierarchyProposal, childProposal);
         synchronizeSpecialReviews(hierarchyProposal, childProposal);
         synchronizePersonsAndAggregate(hierarchyProposal, childProposal, principalInvestigator);
 
@@ -535,39 +534,31 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         
         return true;
     }
-    
-    /**
-     * Gets the old proposal science keywords before removing them from the parent.
-     * @param hierarchyProposal
-     * @param childProposal
-     * @return
-     */
-    protected List<PropScienceKeyword> getOldKeywords(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal) {
-        List<PropScienceKeyword> oldKeywords = new ArrayList<PropScienceKeyword>();
-        for (PropScienceKeyword keyword : hierarchyProposal.getPropScienceKeywords()) {
-            if (StringUtils.equals(childProposal.getProposalNumber(), keyword.getHierarchyProposalNumber())) {
-                oldKeywords.add(keyword);
-            }
-        }
-        return oldKeywords;
-    }
-    
+
     /**
      * Synchronizes the proposal science keywords from the child proposal to the parent proposal.
      * @param hierarchyProposal
      * @param childProposal
-     * @param oldKeywords
      */
-    protected void synchronizeKeywords(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal, List<PropScienceKeyword> oldKeywords) {
+    protected void synchronizeKeywords(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal) {
         for (PropScienceKeyword keyword : childProposal.getPropScienceKeywords()) {
             PropScienceKeyword newKeyword = new PropScienceKeyword(hierarchyProposal, getScienceKeyword(keyword.getScienceKeyword().getCode()));
-            int index = oldKeywords.indexOf(newKeyword);
-            if (index > -1) {
-                newKeyword = oldKeywords.get(index);
+            if (!doesOldKeyWordExist(hierarchyProposal.getPropScienceKeywords(),newKeyword)) {
+                newKeyword.setHierarchyProposalNumber(childProposal.getProposalNumber());
+                hierarchyProposal.addPropScienceKeyword(newKeyword);
             }
-            newKeyword.setHierarchyProposalNumber(childProposal.getProposalNumber());
-            hierarchyProposal.addPropScienceKeyword(newKeyword);
+
         }
+    }
+
+    protected boolean doesOldKeyWordExist(List<PropScienceKeyword> oldKeywords, PropScienceKeyword newKeyword) {
+        for (PropScienceKeyword oldKeyWord : oldKeywords) {
+           if (oldKeyWord.getScienceKeyword().getCode().equals(newKeyword.getScienceKeyword().getCode()) &&
+                   oldKeyWord.getProposalNumber().equals(newKeyword.getProposalNumber())) {
+               return true;
+           }
+        }
+        return false;
     }
 
     protected ScienceKeyword getScienceKeyword(String code) {
@@ -1228,13 +1219,6 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     }
     
     protected void removeChildElements(DevelopmentProposal parentProposal, String childProposalNumber) {
-        List<PropScienceKeyword> keywords = parentProposal.getPropScienceKeywords();
-        for (int i=keywords.size()-1; i>=0; i--) {
-            if (StringUtils.equals(childProposalNumber, keywords.get(i).getHierarchyProposalNumber())) {
-                keywords.remove(i);
-            }
-        }
-
         List<ProposalSpecialReview> reviews = parentProposal.getPropSpecialReviews();
         for (int i=reviews.size()-1; i>=0; i--) {
             if (StringUtils.equals(childProposalNumber, reviews.get(i).getHierarchyProposalNumber())) {
@@ -1954,6 +1938,15 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         List<ProposalHierarchyErrorWarningDto> errors = new ArrayList<ProposalHierarchyErrorWarningDto>();
         if(!StringUtils.equals(childProposal.getSponsorCode(),parentProposal.getSponsorCode())) {
             errors.add(new ProposalHierarchyErrorWarningDto(ERROR_DIFFERENT_SPONSORS, Boolean.FALSE, new String[0]));
+        }
+        return errors;
+    }
+
+    protected List<ProposalHierarchyErrorWarningDto> validateIsAggregatorOnParent(DevelopmentProposal childProposal, DevelopmentProposal parentProposal) {
+        List<ProposalHierarchyErrorWarningDto> errors = new ArrayList<ProposalHierarchyErrorWarningDto>();
+
+        if(!getKcAuthorizationService().hasDocumentLevelRole(getGlobalVariableService().getUserSession().getPrincipalId(), RoleConstants.AGGREGATOR_DOCUMENT_LEVEL, parentProposal.getDocument())) {
+            errors.add(new ProposalHierarchyErrorWarningDto(ERROR_NOT_PARENT_AGGREGATOR, Boolean.TRUE, new String[]{parentProposal.getProposalNumber()}));
         }
         return errors;
     }

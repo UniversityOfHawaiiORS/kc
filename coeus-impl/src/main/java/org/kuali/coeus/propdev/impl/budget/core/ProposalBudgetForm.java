@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.budget.framework.core.BudgetContainer;
 import org.kuali.coeus.common.budget.framework.income.BudgetPeriodIncomeTotal;
 import org.kuali.coeus.common.budget.framework.nonpersonnel.BudgetJustificationWrapper;
@@ -15,12 +16,15 @@ import org.kuali.coeus.propdev.impl.budget.nonpersonnel.AddProjectBudgetLineItem
 import org.kuali.coeus.propdev.impl.budget.person.AddProjectPersonnelHelper;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
+import org.kuali.coeus.sys.framework.validation.Auditable;
+import org.kuali.coeus.sys.impl.validation.DataValidationItem;
+import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.uif.component.Component;
 import org.kuali.rice.krad.uif.element.Action;
 import org.kuali.rice.krad.uif.element.ToggleMenu;
 import org.kuali.rice.krad.web.form.UifFormBase;
 
-public class ProposalBudgetForm extends UifFormBase implements BudgetContainer {
+public class ProposalBudgetForm extends UifFormBase implements BudgetContainer, Auditable {
 
 	private ProposalDevelopmentBudgetExt budget;
 	private String defaultBudgetPeriodWarningMessage;
@@ -31,12 +35,16 @@ public class ProposalBudgetForm extends UifFormBase implements BudgetContainer {
     private AddProjectBudgetLineItemHelper addProjectBudgetLineItemHelper;
     private BudgetJustificationWrapper budgetJustificationWrapper;
     private BudgetModularSummary budgetModularSummary;
+    private Budget selectedBudget;
+    private boolean auditActivated;
+    private List<DataValidationItem> dataValidationItems;
 
     public void initialize() {
     	editableBudgetLineItems = new HashMap<String,List<String>>();
     	addProjectPersonnelHelper = new AddProjectPersonnelHelper();
     	addProjectBudgetLineItemHelper = new AddProjectBudgetLineItemHelper();
         budgetJustificationWrapper = new BudgetJustificationWrapper (budget.getBudgetJustification());
+        dataValidationItems = new ArrayList<DataValidationItem>();
     }
 
     public ProposalDevelopmentBudgetExt getBudget() {
@@ -50,7 +58,12 @@ public class ProposalBudgetForm extends UifFormBase implements BudgetContainer {
 		return getBudget().getDevelopmentProposal();
 	}
 
-	public List<Action> getOrderedNavigationActions() {
+    @Override
+    public Document getDocument() {
+        return getDevelopmentProposal().getProposalDocument();
+    }
+
+    public List<Action> getOrderedNavigationActions() {
         List<Action> actions = new ArrayList<Action>();
         addAllActions(actions, view.getNavigation().getItems());
         return actions;
@@ -162,5 +175,31 @@ public class ProposalBudgetForm extends UifFormBase implements BudgetContainer {
     }
 
     public BudgetModularSummary getBudgetModularSummary() {return budgetModularSummary;}
+
+    public Budget getSelectedBudget() {
+        return selectedBudget;
+    }
+
+    public void setSelectedBudget(Budget selectedBudget) {
+        this.selectedBudget = selectedBudget;
+    }
+
+    @Override
+    public boolean isAuditActivated() {
+		return auditActivated;
+	}
+
+    @Override
+	public void setAuditActivated(boolean auditActivated) {
+		this.auditActivated = auditActivated;
+	}
+
+	public List<DataValidationItem> getDataValidationItems() {
+		return dataValidationItems;
+	}
+
+	public void setDataValidationItems(List<DataValidationItem> dataValidationItems) {
+		this.dataValidationItems = dataValidationItems;
+	}
 
 }

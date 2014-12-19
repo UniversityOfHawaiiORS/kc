@@ -24,6 +24,7 @@ import org.kuali.rice.krad.web.controller.MethodAccessible;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,7 +36,6 @@ public class ProposalBudgetDistributionController extends ProposalBudgetControll
     @Qualifier("budgetDistributionService")
     private BudgetDistributionService budgetDistributionService;
 
-    @MethodAccessible
     @RequestMapping(value = "/proposalBudget", params={"methodToCall=navigate", "actionParameters[navigateToPageId]=PropBudget-UnrecoveredFandAPage"})
     public ModelAndView navigateToFandA(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
         getBudgetDistributionService().initializeUnrecoveredFandACollectionDefaults(form.getBudget());
@@ -43,7 +43,7 @@ public class ProposalBudgetDistributionController extends ProposalBudgetControll
     }
 
     @MethodAccessible
-    @RequestMapping(value = "/proposalBudget", params={"methodToCall=resetUnrecoveredFandA"})
+    @Transactional @RequestMapping(value = "/proposalBudget", params={"methodToCall=resetUnrecoveredFandA"})
     public ModelAndView resetUnrecoveredFandAToDefault (@ModelAttribute("KualiForm") ProposalBudgetForm form)
             throws Exception{
         Budget budget = form.getBudget();
@@ -52,7 +52,6 @@ public class ProposalBudgetDistributionController extends ProposalBudgetControll
         return getRefreshControllerService().refresh(form);
     }
 
-    @MethodAccessible
     @RequestMapping(value = "/proposalBudget", params={"methodToCall=navigate", "actionParameters[navigateToPageId]=PropBudget-CostSharingPage"})
     public ModelAndView navigateToCostShare(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
         getBudgetDistributionService().initializeCostSharingCollectionDefaults(form.getBudget());
@@ -60,7 +59,7 @@ public class ProposalBudgetDistributionController extends ProposalBudgetControll
     }
 
     @MethodAccessible
-    @RequestMapping(value = "/proposalBudget", params={"methodToCall=resetCostSharing"})
+    @Transactional @RequestMapping(value = "/proposalBudget", params={"methodToCall=resetCostSharing"})
     public ModelAndView resetCostSharingToDefault (@ModelAttribute("KualiForm") ProposalBudgetForm form)
             throws Exception{
         Budget budget = form.getBudget();

@@ -58,7 +58,7 @@
                     <bean parent="Uif-PrimaryActionButton" p:actionLabel="Approve" p:methodToCall="approve" p:order="30"
                           p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_APPROVE]}"/>
 
-                    <bean parent="Uif-SecondaryActionButton" p:methodToCall="Disapprove" p:actionLabel="Disapprove"
+                    <bean parent="Uif-SecondaryActionButton" p:methodToCall="disapproveProposal" p:actionLabel="Disapprove"
                           p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_DISAPPROVE]}" p:order="40">
                         <property name="confirmationDialog">
                             <bean id="DisapproveExplanationDialog" parent="Uif-DialogGroup-OkCancelExpl" p:promptText="Reason for disapprove?"/>
@@ -69,7 +69,7 @@
                           p:render="@{#editModes['rejectProposal']}"/>
 
                     <bean parent="Uif-LinkField" p:linkText="View Route Log"
-                          p:href="@{#ConfigProperties['application.url']}/kew/RouteLog.do?documentId=@{document.developmentProposal.proposalDocument.documentNumber}"  p:order="60"
+                          p:href="@{#ConfigProperties['rice.server.url']}/kew/RouteLog.do?documentId=@{document.developmentProposal.proposalDocument.documentNumber}"  p:order="60"
                     p:link.openInDialog="true" />
                     
                     <bean parent="Uif-RecallAction" p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_RECALL]}"  p:order="70">
@@ -131,12 +131,11 @@
           p:promptText="Are you sure you want to delete this proposal?"/>
 
     <bean id="PropDev-SubmitPage-ReceiveFutureRequests" parent="Uif-DialogGroup-YesNo"
-          p:promptText="Do you want to recieve future approval requests?"/>
+          p:promptText="Do you want to receive future approval requests?"/>
 
     <bean id="PropDev-SubmitPage-RejectDialog" parent="Uif-DialogGroup-YesNo"
           p:fieldBindingObjectPath="proposalDevelopmentRejectionBean"
-          p:readOnly="false"
-          p:omitFromFormPost="false">
+          p:readOnly="false">
         <property name="items">
             <list>
                 <bean parent="Uif-MessageField" p:messageText="Are you sure you want to reject this document?" p:order="10"/>
@@ -166,7 +165,7 @@
                 <bean parent="PropDev-SubmitPage-SupplementalInfo" p:order="70" />
                 <bean parent="PropDev-SubmitPage-Keyword"  p:render="@{#ViewHelper.isSummaryKeywordsPanelEnabled()}" p:order="80" />
                 <bean parent="PropDev-SubmitPage-Hierarchy" p:render="@{document.developmentProposal.isInHierarchy()}" p:order="90"/>
-
+                <bean parent="PropDev-SubmitPage-BudgetSummary" p:render="@{#ViewHelper.isSummaryBudgetPanelEnabled(document.developmentProposal)}" p:order="100"/>
             </list>
         </property>
     </bean>
@@ -230,7 +229,7 @@
         <property name="items">
             <list>
                 <bean parent="Uif-DataField" p:propertyName="fullName" p:fieldLabel.labelText="Key Person" p:order="10"/>
-                <bean parent="Uif-MessageField" p:messageText="@{#line.getRole().getDescription()}" p:fieldLabel.labelText="Role" p:order="20"/>
+                <bean parent="Uif-MessageField" p:messageText="@{#lp.role.description}" p:fieldLabel.labelText="Role" p:order="20"/>
                 <bean parent="Uif-FieldGroupBase" p:fieldLabel.labelText="Unit" p:order="30">
                     <property name="group">
                         <bean parent="PropDev-SubmitPage-UnitCollectionGroup" />
@@ -502,18 +501,6 @@
                     <bean parent="Uif-HeaderFour">
                         <property name="rightGroup">
                             <bean parent="Uif-HorizontalBoxGroup">
-                                <property name="items">
-                                    <list>
-                                        <bean parent="Uif-SecondaryActionButton-Mini" p:methodToCall=""
-                                              p:render="@{#line.isChild() and #ViewHelper.isChildSynchronized(#line)}"
-                                              p:actionLabel="Synced to Parent"  p:order="10"/>
-                                        <bean parent="Uif-SecondaryActionButton-Mini" p:iconClass="icon-warning" p:methodToCall=""
-                                              p:render="@{#line.isChild() and !#ViewHelper.isChildSynchronized(#line)}"
-                                              p:actionLabel="Sync to Parent"  p:order="20"/>
-                                        <bean parent="Uif-SecondaryActionButton-Mini"
-                                              p:actionLabel="Unlink Hierarchy" p:methodToCall="" p:order="30"/>
-                                    </list>
-                                </property>
                             </bean>
                         </property>
                         <property name="headerTagCssClasses">
@@ -539,6 +526,7 @@
                 <bean parent="PropDev-SubmitPage-HierarchyOverview" p:order="20"/>
                 <bean parent="PropDev-SubmitPage-HierarchySponsorProgramInfo" p:order="30"/>
                 <bean parent="PropDev-SubmitPage-HierarchyInvestigatorInfo" p:order="40"/>
+                <bean parent="PropDev-SubmitPage-HierarchyBudgetSummary" p:order="50" p:render="@{!#emptyList(#line.budgets)}"/>
             </list>
         </property>
     </bean>
@@ -558,7 +546,8 @@
                 <bean parent="Uif-DataField" p:propertyName="ownedByUnit.unitName" p:order="70"/>
                 <bean parent="Uif-DataField" p:propertyName="budgetStatusDescription" p:order="80"
                         p:fieldLabel.labelText="Budget:"/>
-                <bean parent="Uif-DataField" p:propertyName="activityType.description" p:order="90"/>
+                <bean parent="Uif-DataField" p:fieldLabel.labelText="Activity Type"
+                      p:propertyName="activityType.description" p:order="90"/>
                 <bean parent="Uif-DataField" p:propertyName="title" p:order="100"/>
             </list>
         </property>
@@ -597,7 +586,7 @@
         <property name="items">
             <list>
                 <bean parent="Uif-DataField" p:propertyName="fullName" p:fieldLabel.labelText="Key Person" p:order="10"/>
-                <bean parent="Uif-MessageField" p:messageText="@{#line.getRole().getDescription()}" p:fieldLabel.labelText="Role" p:order="20"/>
+                <bean parent="Uif-MessageField" p:messageText="@{#lp.role.description}" p:fieldLabel.labelText="Role" p:order="20"/>
                 <bean parent="Uif-FieldGroupBase" p:fieldLabel.labelText="Units" p:order="30">
                     <property name="group">
                         <bean parent="PropDev-SubmitPage-UnitCollectionGroup" />
@@ -605,7 +594,147 @@
                 </bean>
             </list>
         </property>
+    </bean>
 
+
+    <bean id="PropDev-SubmitPage-HierarchyBudgetSummary" parent="PropDev-SubmitPage-HierarchyBudgetSummary-parentBean"/>
+    <bean id="PropDev-SubmitPage-HierarchyBudgetSummary-parentBean" abstract="true"
+          parent="Uif-Disclosure-StackedCollectionSection"
+          p:propertyName="budgets"
+          p:collectionObjectClass="org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt"
+          p:renderAddLine="false" p:renderLineActions="false"
+          p:header.headerText="Budget Summary"
+          p:layoutManager.summaryTitle="@{#line.name} @{#lp.budgetId == #lp.developmentProposal.finalBudget?.budgetId?'(for submission)':''}"
+          p:disclosure.defaultOpen="false">
+        <property name="items">
+            <list>
+                <bean parent="Uif-FieldGroupBase" p:order="10">
+                    <property name="group">
+                        <bean parent="Uif-Disclosure-VerticalBoxSection">
+                            <property name="items">
+                                <list>
+                                    <bean parent="PropDev-SubmitPage-HierarchyBudgetDetails" p:order="10"/>
+                                    <bean parent="Kc-LineItemTable" p:propertyName="budgetSummaryDetails"
+                                          p:order="20"/>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                </bean>
+            </list>
+        </property>
+        <property name="layoutManager.lineGroupPrototype">
+            <bean parent="Uif-CollectionHorizontalBoxItem"
+                  p:disclosure.render="true">
+                <property name="layoutManager">
+                    <bean parent="Uif-SimpleLayout" />
+                </property>
+                <property name="header">
+                    <bean parent="Uif-HeaderFour">
+                        <property name="rightGroup">
+                            <bean parent="Uif-HorizontalBoxGroup">
+                            </bean>
+                        </property>
+                    </bean>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <bean id="PropDev-SubmitPage-HierarchyBudgetDetails" parent="PropDev-SubmitPage-HierarchyBudgetDetails-parentBean"/>
+    <bean id="PropDev-SubmitPage-HierarchyBudgetDetails-parentBean" abstract="true" parent="Uif-GridSection"
+          p:layoutManager.numberOfColumns="4">
+        <property name="items">
+            <list>
+                <bean parent="Uif-DataField" p:propertyName="developmentProposal.proposalNumber" p:order="10"/>
+                <bean parent="Uif-DataField" p:propertyName="budgetStatus" p:order="20"/>
+                <bean parent="Uif-DataField" p:propertyName="budgetVersionNumber" p:order="30"/>
+                <bean parent="Uif-MessageField" p:fieldLabel.labelText="Final"
+                      p:messageText="@{#lp.budgetId == #lp.developmentProposal.finalBudget?.budgetId?'True':'False'}" p:order="40"/>
+                <bean parent="Uif-DataField" p:propertyName="startDate" p:order="50"/>
+                <bean parent="Uif-DataField" p:propertyName="endDate" p:order="60"/>
+                <bean parent="Uif-DataField" p:propertyName="totalCost" p:order="70"/>
+                <bean parent="Uif-DataField" p:propertyName="totalCostLimit" p:order="80"/>
+                <bean parent="Uif-DataField" p:propertyName="totalDirectCost" p:order="90"/>
+                <bean parent="Uif-DataField" p:propertyName="totalIndirectCost" p:order="100"/>
+                <bean parent="Uif-DataField" p:propertyName="underrecoveryAmount" p:order="110"/>
+                <bean parent="Uif-DataField" p:propertyName="costSharingAmount" p:order="120"/>
+                <bean parent="Uif-DataField" p:propertyName="ohRateClassCode" p:order="130"/>
+                <bean parent="Uif-DataField" p:propertyName="urRateClassCode" p:order="140"/>
+                <bean parent="Uif-DataField" p:propertyName="comments" p:order="150"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="PropDev-SubmitPage-BudgetSummary" parent="PropDev-SubmitPage-BudgetSummary-parentBean"/>
+    <bean id="PropDev-SubmitPage-BudgetSummary-parentBean" abstract="true" parent="Uif-VerticalBoxSection"
+            p:headerText="Budget Summary">
+        <property name="items">
+            <list>
+                <bean parent="PropDev-SubmitPage-BudgetTotals" p:order="10" />
+                <bean parent="Kc-LineItemTable" p:propertyName="selectedBudget.budgetSummaryDetails"
+                      p:order="20"/>
+                <bean parent="PropDev-SubmitPage-BudgetRates" p:order="30"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="PropDev-SubmitPage-BudgetTotals" parent="PropDev-SubmitPage-BudgetTotals-parentBean"/>
+    <bean id="PropDev-SubmitPage-BudgetTotals-parentBean" abstract="true" parent="Uif-GridSection"
+          p:layoutManager.numberOfColumns="4">
+        <property name="items">
+            <list>
+                <bean parent="Uif-DataField" p:propertyName="selectedBudget.costSharingAmount" p:order="10">
+                    <property name="propertyEditor">
+                        <ref bean="Kc-ScaleTwoPercentageEditor"/>
+                    </property>
+                </bean>
+                <bean parent="Uif-DataField" p:propertyName="selectedBudget.underrecoveryAmount" p:order="20">
+                    <property name="propertyEditor">
+                        <ref bean="Kc-ScaleTwoPercentageEditor"/>
+                    </property>
+                </bean>
+                <bean parent="Uif-DataField" p:fieldLabel.labelText="Program Income"
+                      p:propertyName="selectedBudget.projectIncomeTotal" p:order="30">
+                    <property name="propertyEditor">
+                        <ref bean="Kc-ScaleTwoPercentageEditor"/>
+                    </property>
+                </bean>
+                <bean parent="Uif-DataField" p:fieldLabel.labelText="F&amp;A Rate Type"
+                      p:propertyName="selectedBudget.rateClass.description" p:order="40"/>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="PropDev-SubmitPage-BudgetRates" parent="PropDev-SubmitPage-BudgetRates-parentBean"/>
+    <bean id="PropDev-SubmitPage-BudgetRates-parentBean" abstract="true" parent="Uif-Disclosure-TableCollectionSection"
+          p:propertyName="selectedBudget.budgetRates"
+          p:collectionObjectClass="org.kuali.coeus.common.budget.framework.rate.BudgetRate"
+          p:renderAddLine="false" p:renderLineActions="false"
+          p:layoutManager.renderSequenceField="false"
+          p:layoutManager.richTable.render="false"
+          p:renderInactiveToggleButton="false" p:disclosure.defaultOpen="false"
+          p:header.headerText="F&amp;A Rates">
+        <property name="items">
+                <list>
+                    <bean parent="Uif-DataField" p:propertyName="rateType.description" p:order="10" p:skipInTabOrder="true"
+                          p:enableAutoInquiry="false" />
+                    <bean parent="Uif-DataField" p:propertyName="onOffCampusFlag" p:readOnlyDisplayReplacement="@{#line.onOffCampusFlag?'Yes':'No'}"
+                          p:skipInTabOrder="true" p:order="20"/>
+                    <bean parent="Uif-DataField" p:propertyName="fiscalYear" p:skipInTabOrder="true" p:order="30" p:enableAutoInquiry="false"/>
+                    <bean parent="Uif-DataField" p:propertyName="startDate" p:skipInTabOrder="true" p:order="40"/>
+                    <bean parent="Uif-DataField" p:propertyName="instituteRate" p:skipInTabOrder="true" p:order="50">
+                        <property name="propertyEditor"><ref bean="Kc-ScaleTwoPercentageEditor"/></property>
+                    </bean>
+                    <bean parent="Uif-DataField" p:propertyName="applicableRate" p:order="60">
+                        <property name="propertyEditor"><ref bean="Kc-ScaleTwoPercentageEditor"/></property>
+                    </bean>
+                </list>
+        </property>
+        <property name="filters">
+            <bean parent="Uif-ConditionalCollectionFilter"
+                  p:expression="#line.rateClass.rateClassTypeCode == '#{T(org.kuali.coeus.common.budget.api.rate.RateClassType).OVERHEAD.getRateClassType()}'"/>
+        </property>
     </bean>
 
     <bean id="PropDev-DocumentAdHocRecipientsSection" parent="PropDev-DocumentAdHocRecipientsSection-parentBean"/>

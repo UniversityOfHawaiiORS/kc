@@ -26,6 +26,7 @@ import org.kuali.coeus.common.framework.unit.Unit;
 import org.kuali.coeus.common.framework.unit.UnitService;
 import org.kuali.coeus.common.questionnaire.framework.answer.ModuleQuestionnaireBean;
 import org.kuali.coeus.propdev.impl.attachment.Narrative;
+import org.kuali.coeus.propdev.impl.attachment.NarrativeAttachment;
 import org.kuali.coeus.propdev.impl.attachment.NarrativeUserRights;
 import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
@@ -37,6 +38,7 @@ import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.coeus.propdev.impl.person.ProposalPersonUnit;
 import org.kuali.coeus.propdev.impl.person.ProposalPersonYnq;
 import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiography;
+import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiographyAttachment;
 import org.kuali.coeus.propdev.impl.person.creditsplit.ProposalUnitCreditSplit;
 import org.kuali.coeus.common.framework.auth.perm.KcAuthorizationService;
 import org.kuali.coeus.propdev.impl.questionnaire.ProposalDevelopmentModuleQuestionnaireBean;
@@ -44,6 +46,7 @@ import org.kuali.coeus.propdev.impl.s2s.*;
 import org.kuali.coeus.propdev.impl.s2s.question.ProposalDevelopmentS2sModuleQuestionnaireBean;
 import org.kuali.coeus.propdev.impl.state.ProposalState;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
+import org.kuali.coeus.sys.framework.model.KcDataObject;
 import org.kuali.kra.bo.*;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.RoleConstants;
@@ -375,15 +378,28 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
     protected void fixS2sUserAttachedForms(ProposalDevelopmentDocument newDoc) {
         DevelopmentProposal developmentProposal = newDoc.getDevelopmentProposal();
+
+        List<S2sUserAttachedForm> newList = new ArrayList<S2sUserAttachedForm>();
         List<S2sUserAttachedForm> userAttachedForms = developmentProposal.getS2sUserAttachedForms();
         for (S2sUserAttachedForm s2sUserAttachedForm : userAttachedForms) {
-            s2sUserAttachedForm.setProposalNumber(newDoc.getDevelopmentProposal().getProposalNumber());
-            s2sUserAttachedForm.setDevelopmentProposal(developmentProposal);
-            List<S2sUserAttachedFormAtt> attachments = s2sUserAttachedForm.getS2sUserAttachedFormAtts();
-            for (S2sUserAttachedFormAtt s2sUserAttachedFormAtt : attachments) {
-                s2sUserAttachedFormAtt.setProposalNumber(newDoc.getDevelopmentProposal().getProposalNumber());
+            if (s2sUserAttachedForm != null) {
+                S2sUserAttachedForm copiedForm;
+                try {
+                    copiedForm = (S2sUserAttachedForm) deepCopy(s2sUserAttachedForm);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error while copying user attached form ", e);
+                }
+                copiedForm.setProposalNumber(newDoc.getDevelopmentProposal().getProposalNumber());
+                copiedForm.setDevelopmentProposal(developmentProposal);
+                List<S2sUserAttachedFormAtt> attachments = copiedForm.getS2sUserAttachedFormAtts();
+                for (S2sUserAttachedFormAtt s2sUserAttachedFormAtt : attachments) {
+                    s2sUserAttachedFormAtt.setProposalNumber(newDoc.getDevelopmentProposal().getProposalNumber());
+                }
+                newList.add(copiedForm);
             }
         }
+
+        developmentProposal.setS2sUserAttachedForms(newList);
     }
 
     /**
@@ -400,7 +416,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         //We need to copy DocumentNextValues to properly handle copied collections
         fixNextValues(oldDoc, newDoc);
         
-        DevelopmentProposal copy = deepCopy(oldDoc.getDevelopmentProposal());
+        DevelopmentProposal copy = (DevelopmentProposal) deepCopy(oldDoc.getDevelopmentProposal());
         
         copy.getBudgets().clear();
         copy.setFinalBudget(null);
@@ -411,7 +427,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
     }
 
-    protected DevelopmentProposal deepCopy(DevelopmentProposal src) throws Exception {
+    protected KcDataObject deepCopy(KcDataObject src) throws Exception {
         return getDataObjectService().copyInstance(src, CopyOption.RESET_PK_FIELDS, CopyOption.RESET_VERSION_NUMBER, CopyOption.RESET_OBJECT_ID );
     }
     
@@ -498,6 +514,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         } else {
             modifyNarrativesStatus(srcDoc.getDevelopmentProposal(), newDoc.getDevelopmentProposal());
             modifyAttachmentPermissions(srcDoc.getDevelopmentProposal(), newDoc.getDevelopmentProposal());
+            copyAttachmentFiles(srcDoc.getDevelopmentProposal(),newDoc.getDevelopmentProposal());
         }
 
         if (criteria.getIncludeQuestionnaire()) {
@@ -580,6 +597,45 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         }
     }
 
+    protected void copyAttachmentFiles(DevelopmentProposal oldProposal, DevelopmentProposal newProposal) {
+        copyNarrativeAttachments(oldProposal.getNarratives(), newProposal.getNarratives());
+        copyNarrativeAttachments(oldProposal.getInstituteAttachments(), newProposal.getInstituteAttachments());
+        copyPropPersonBiosAttachments(oldProposal.getPropPersonBios(),newProposal.getPropPersonBios());
+    }
+
+    protected void copyPropPersonBiosAttachments(List<ProposalPersonBiography> oldBiographies, List<ProposalPersonBiography> newBiographies) {
+        for (ProposalPersonBiography oldBiography : oldBiographies) {
+            for (ProposalPersonBiography newBiography : newBiographies) {
+                if (oldBiography.getProposalPersonNumber().equals(newBiography.getProposalPersonNumber()) &&
+                        oldBiography.getBiographyNumber().equals(newBiography.getBiographyNumber())) {
+                    ProposalPersonBiographyAttachment newBiographyAttachment = new ProposalPersonBiographyAttachment();
+                    newBiographyAttachment.setProposalPersonBiography(newBiography);
+                    newBiographyAttachment.setProposalPersonNumber(oldBiography.getProposalPersonNumber());
+                    newBiographyAttachment.setBiographyNumber(oldBiography.getBiographyNumber());
+                    newBiographyAttachment.setData(oldBiography.getPersonnelAttachment().getData());
+                    newBiographyAttachment.setName(oldBiography.getPersonnelAttachment().getName());
+                    newBiographyAttachment.setType(oldBiography.getPersonnelAttachment().getType());
+                    newBiography.setPersonnelAttachment(newBiographyAttachment);
+                }
+            }
+        }
+    }
+
+    protected void copyNarrativeAttachments(List<Narrative> oldNarratives, List<Narrative> newNarratives) {
+        for (Narrative oldNarrative : oldNarratives) {
+            for (Narrative newNarrative : newNarratives) {
+                if (oldNarrative.getModuleNumber().equals(newNarrative.getModuleNumber())) {
+                    NarrativeAttachment newNarrativeAttachment = new NarrativeAttachment();
+                    newNarrativeAttachment.setNarrative(newNarrative);
+                    newNarrativeAttachment.setModuleNumber(oldNarrative.getModuleNumber());
+                    newNarrativeAttachment.setData(oldNarrative.getNarrativeAttachment().getData());
+                    newNarrativeAttachment.setName(oldNarrative.getNarrativeAttachment().getName());
+                    newNarrativeAttachment.setType(oldNarrative.getNarrativeAttachment().getType());
+                    newNarrative.setNarrativeAttachment(newNarrativeAttachment);
+                }
+            }
+        }
+    }
 
     protected void setPreviousGrantsGovTrackingId(String oldProposalNumber, ProposalDevelopmentDocument newDoc) {
         Map<String, Object> keyMap = new HashMap<String, Object>();

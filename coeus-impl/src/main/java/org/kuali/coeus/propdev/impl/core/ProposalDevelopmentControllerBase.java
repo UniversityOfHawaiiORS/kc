@@ -42,6 +42,7 @@ import org.kuali.coeus.sys.framework.controller.UifExportControllerService;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.propdev.impl.auth.perm.ProposalDevelopmentPermissionsService;
 import org.kuali.coeus.sys.framework.validation.AuditHelper;
+import org.kuali.coeus.sys.impl.validation.DataValidationItem;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.infrastructure.RoleConstants;
@@ -345,9 +346,30 @@ public abstract class ProposalDevelopmentControllerBase {
      
      protected ModelAndView navigate(ProposalDevelopmentDocumentForm form, BindingResult result, HttpServletRequest request, HttpServletResponse response) throws Exception {
          populateAdHocRecipients(form.getProposalDevelopmentDocument());
-         releasePessimisticLocks(form);
-
+         String navigateToPageId = form.getActionParamaterValue(UifParameters.NAVIGATE_TO_PAGE_ID);
+         if (isNavigateToAttachmentsOrBudget(navigateToPageId) ||
+                 isNavigateAwayFromAttachment(navigateToPageId,form.getPageId()) ||
+                 isNavigateAwayFromBudget(navigateToPageId,form.getPageId())) {
+             releasePessimisticLocks(form);
+             form.setEvaluateFlagsAndModes(true);
+             form.setCanEditView(null);
+         }
          return save(form);
+     }
+
+    protected boolean isNavigateToAttachmentsOrBudget(String navigateToPageId) {
+        return StringUtils.equals(navigateToPageId,ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID) ||
+                StringUtils.equals(navigateToPageId,ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID);
+    }
+
+    protected boolean isNavigateAwayFromBudget(String navigateToPageId, String pageId) {
+       return StringUtils.equals(pageId,ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID) &&
+               !StringUtils.equals(navigateToPageId,ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID);
+    }
+
+    protected boolean isNavigateAwayFromAttachment(String navigateToPageId, String pageId) {
+        return StringUtils.equals(pageId,ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID) &&
+                !StringUtils.equals(navigateToPageId,ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID);
      }
 
     protected void releasePessimisticLocks(DocumentFormBase form) {
@@ -590,10 +612,10 @@ public abstract class ProposalDevelopmentControllerBase {
     public AuditHelper.ValidationState getValidationState(ProposalDevelopmentDocumentForm form) {
         AuditHelper.ValidationState severityLevel = AuditHelper.ValidationState.OK;
         form.setAuditActivated(true);
-        List<ProposalDevelopmentDataValidationItem> dataValidationItems = ((ProposalDevelopmentViewHelperServiceImpl)form.getViewHelperService())
-                .populateDataValidation(form,form.getView().getViewIndex());
+        List<DataValidationItem> dataValidationItems = ((ProposalDevelopmentViewHelperServiceImpl)form.getViewHelperService())
+                .populateDataValidation(form);
         if(dataValidationItems != null && dataValidationItems.size() > 0 ) {
-            for(ProposalDevelopmentDataValidationItem validationItem : dataValidationItems) {
+            for(DataValidationItem validationItem : dataValidationItems) {
                 if (StringUtils.endsWith(validationItem.getSeverity(),Constants.AUDIT_ERRORS)) {
                     severityLevel = AuditHelper.ValidationState.ERROR;
                     break;
@@ -644,6 +666,10 @@ public abstract class ProposalDevelopmentControllerBase {
         if (proposalDevelopmentDocumentForm.getDeferredMessages() != null
                 && proposalDevelopmentDocumentForm.getDeferredMessages().hasMessages()){
             MessageMap messageMap = proposalDevelopmentDocumentForm.getDeferredMessages();
+            MessageMap currentMessageMap = getGlobalVariableService().getMessageMap();
+            messageMap.getErrorMessages().putAll(currentMessageMap.getErrorMessages());
+            messageMap.getInfoMessages().putAll(currentMessageMap.getInfoMessages());
+            messageMap.getWarningMessages().putAll(currentMessageMap.getWarningMessages());
             getGlobalVariableService().setMessageMap(messageMap);
         }
         proposalDevelopmentDocumentForm.setDeferredMessages(null);

@@ -160,11 +160,12 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
                                 (StringUtils.equals(newBudgetLineItem.getGroupName(), budgetLineItem.getGroupName()) ||
                                         (StringUtils.isEmpty(newBudgetLineItem.getGroupName()) && StringUtils.isEmpty(budgetLineItem.getGroupName())))) { 
                             //Existing ObjCode / Group Name combo - add the new Person to the Line Item's Person List
-                        	if (getKcBusinessRulesEngine().applyRules(new AddPersonnelLineItemBudgetEvent(budget, "newBudgetPersonnelDetails", budgetLineItem))) {
-                        		if(budgetPersonDetails.getPersonSequenceNumber().intValue() != -1) {
+                            if (budgetPersonDetails.getPersonSequenceNumber().intValue() != -1) {
+                                //This is NOT a Summary entry
+                                if(getKcBusinessRulesEngine().applyRules(new AddPersonnelLineItemBudgetEvent(budget, "newBudgetPersonnelDetails", budgetLineItem))) {
                         			addBudgetPersonnelDetails(budgetForm, budgetPeriod, budgetLineItem, budgetPersonDetails);
                         		}
-                            } else {
+                            } else if (!getKcBusinessRulesEngine().applyRules(new AddSummaryPersonnelLineItemBudgetEvent(budget, "newBudgetPersonnelDetails", budgetLineItem))){
                                 existingCeGroupCombo = true;
                                 break;
                             }
@@ -420,19 +421,19 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
                 for (Iterator iter = rawValues.iterator(); iter.hasNext();) {
                     KcPerson person = (KcPerson) iter.next();
                     BudgetPerson budgetPerson = new BudgetPerson(person);
-                    populateAndAddBudgetPerson(budgetPerson, budgetForm.getBudget(), budgetPersonService);
+                    populateAndAddBudgetPerson(budgetPerson, budgetForm.getBudget());
                 }
             } else if (lookupResultsBOClass.isAssignableFrom(NonOrganizationalRolodex.class)) {
                 for (Iterator iter = rawValues.iterator(); iter.hasNext();) {
                     Rolodex rolodex = (Rolodex) iter.next();
                     BudgetPerson budgetPerson = new BudgetPerson(rolodex);
-                    populateAndAddBudgetPerson(budgetPerson, budgetForm.getBudget(), budgetPersonService);
+                    populateAndAddBudgetPerson(budgetPerson, budgetForm.getBudget());
                 }
             } else if (lookupResultsBOClass.isAssignableFrom(TbnPerson.class)) {
                 for (Iterator iter = rawValues.iterator(); iter.hasNext();) {
                     TbnPerson tbn = (TbnPerson) iter.next();
                     BudgetPerson budgetPerson = new BudgetPerson(tbn);
-                    populateAndAddBudgetPerson(budgetPerson, budgetForm.getBudget(), budgetPersonService);
+                    populateAndAddBudgetPerson(budgetPerson, budgetForm.getBudget());
                 }
             }
         }
@@ -585,10 +586,9 @@ public class BudgetPersonnelAction extends BudgetExpensesAction {
      * 
      * @param budgetPerson
      * @param budget
-     * @param budgetPersonService
      */
-    private void populateAndAddBudgetPerson(BudgetPerson budgetPerson, Budget budget, BudgetPersonService budgetPersonService) {
-        budgetPersonService.addBudgetPerson(budget, budgetPerson);
+    private void populateAndAddBudgetPerson(BudgetPerson budgetPerson, Budget budget) {
+        getBudgetPersonService().addBudgetPerson(budget, budgetPerson);
     }
     
     /**

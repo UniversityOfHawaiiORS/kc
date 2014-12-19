@@ -1,16 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:tx="http://www.springframework.org/schema/tx"
        xmlns:util="http://www.springframework.org/schema/util"
-       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context.xsd
-       http://www.springframework.org/schema/util
-       http://www.springframework.org/schema/util/spring-util.xsd">
+                           http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context.xsd
+                           http://www.springframework.org/schema/tx
+                           http://www.springframework.org/schema/tx/spring-tx.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <tx:annotation-driven transaction-manager="transactionManager" />
     <context:annotation-config />
     <context:component-scan base-package="org.kuali.coeus.propdev" />
 
@@ -18,7 +22,6 @@
         <property name="properties" value="#{T(org.kuali.rice.core.api.config.property.ConfigContext).getCurrentContextConfig().getProperties()}" />
     </bean>
 
-    <import resource="classpath:org/kuali/coeus/sys/framework/ImportDataSourceSpringBeans.xml"/>
     <import resource="classpath:org/kuali/coeus/sys/framework/ImportRiceKradSpringBeans.xml"/>
     <import resource="classpath:org/kuali/coeus/propdev/impl/PropDevImportRiceSpringBeans.xml"/>
     <import resource="classpath:org/kuali/coeus/propdev/impl/PropDevImportModuleSpringBeans.xml"/>
@@ -98,23 +101,8 @@
                 <value>classpath:org/kuali/coeus/propdev/impl/budget/modular/ProposalBudgetModularPage.xml</value>
                 <value>classpath:org/kuali/coeus/propdev/impl/budget/core/ProposalBudgetSummaryPage.xml</value>
 
-                <!-- Budget Mock View -->
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetView.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetIncomePage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetPeriodsPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetRatesPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetFandAPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetCostSharingPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetBudgetNotesPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetNonPersonnelCostsPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetAssignPersonneltoPeriodsPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetProjectPersonnelPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetSubawardsPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetSummaryPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetModularPage.xml</value>
-                <value>classpath:org/kuali/coeus/propdev/impl/budget/mock/ProposalBudgetDataValidationSection.xml</value>
-
                 <!--Common-->
+                <value>classpath:org/kuali/coeus/common/impl/DataValidationSection.xml</value>
                 <value>classpath:org/kuali/coeus/common/wizard/impl/WizardCommon.xml</value>
                 <value>classpath:org/kuali/coeus/common/notification/impl/SendNotificationDialog.xml</value>
             </list>

@@ -22,11 +22,14 @@ import java.util.*;
 
 import org.apache.commons.beanutils.PropertyUtils;
 import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
+import org.kuali.coeus.common.budget.framework.calculator.BudgetCalculationService;
 import org.kuali.coeus.common.framework.auth.KcAuthConstants;
 import org.kuali.coeus.common.framework.custom.DocumentCustomData;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttribute;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocValue;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeService;
+import org.kuali.coeus.common.framework.sponsor.SponsorSearchResult;
+import org.kuali.coeus.common.framework.sponsor.SponsorSearchService;
 import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
 import org.kuali.coeus.common.questionnaire.framework.question.Question;
 import org.kuali.coeus.common.questionnaire.framework.question.QuestionExplanation;
@@ -34,9 +37,9 @@ import org.apache.log4j.Logger;
 import org.kuali.coeus.propdev.impl.attachment.ProposalDevelopmentAttachment;
 import org.kuali.coeus.propdev.impl.attachment.ProposalDevelopmentAttachmentHelper;
 import org.kuali.coeus.propdev.impl.auth.perm.ProposalDevelopmentPermissionsService;
+import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.custom.ProposalDevelopmentCustomDataGroupDto;
 import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants;
-import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationItem;
 import org.kuali.coeus.propdev.impl.hierarchy.ProposalHierarchyService;
 import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationContext;
 import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationRenderer;
@@ -44,7 +47,6 @@ import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.coeus.propdev.impl.person.ProposalPersonUnit;
 import org.kuali.coeus.propdev.impl.s2s.S2sOpportunity;
 import org.kuali.coeus.propdev.impl.s2s.S2sRevisionTypeConstants;
-import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.propdev.impl.person.KeyPersonnelService;
 import org.kuali.coeus.propdev.impl.questionnaire.ProposalDevelopmentQuestionnaireHelper;
 import org.kuali.coeus.propdev.impl.s2s.question.ProposalDevelopmentS2sQuestionnaireHelper;
@@ -56,9 +58,10 @@ import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.document.DocumentStatus;
 import org.apache.commons.lang3.StringUtils;
-import org.kuali.coeus.common.framework.sponsor.Sponsor;
+import org.kuali.coeus.common.impl.KcViewHelperServiceImpl;
 import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract;
 import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
+import org.kuali.coeus.sys.impl.validation.DataValidationItem;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.coeus.propdev.impl.attachment.Narrative;
 import org.kuali.coeus.propdev.impl.location.AddProposalCongressionalDistrictEvent;
@@ -69,8 +72,6 @@ import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiography;
 import org.kuali.coeus.propdev.impl.specialreview.ProposalSpecialReview;
 import org.kuali.coeus.propdev.impl.attachment.LegacyNarrativeService;
 import org.kuali.coeus.propdev.impl.docperm.ProposalUserRoles;
-import org.kuali.rice.core.api.criteria.PredicateFactory;
-import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.krad.util.*;
@@ -83,10 +84,8 @@ import org.kuali.rice.krad.uif.UifConstants;
 import org.kuali.rice.krad.uif.UifParameters;
 import org.kuali.rice.krad.uif.element.Action;
 import org.kuali.rice.krad.uif.lifecycle.ViewLifecycle;
-import org.kuali.rice.krad.uif.service.impl.ViewHelperServiceImpl;
 import org.kuali.rice.krad.uif.util.ObjectPropertyUtils;
 import org.kuali.rice.krad.uif.view.View;
-import org.kuali.rice.krad.uif.view.ViewIndex;
 import org.kuali.rice.krad.uif.view.ViewModel;
 import org.kuali.rice.krad.web.form.DocumentFormBase;
 import org.kuali.rice.krad.web.form.UifFormBase;
@@ -97,7 +96,7 @@ import org.springframework.stereotype.Service;
 
 @Service("proposalDevelopmentViewHelperService")
 @Scope("prototype")
-public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceImpl implements ProposalDevelopmentViewHelperService {
+public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServiceImpl implements ProposalDevelopmentViewHelperService {
 
     private static final long serialVersionUID = -5122498699317873886L;
     private static final Logger LOG = Logger.getLogger(ProposalDevelopmentViewHelperServiceImpl.class);
@@ -121,10 +120,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
     @Autowired
 	@Qualifier("parameterService")
 	private ParameterService parameterService;
-
-    @Autowired
-    @Qualifier("globalVariableService")
-    private GlobalVariableService globalVariableService;
 
     @Autowired
     @Qualifier("personService")
@@ -171,6 +166,14 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
     @Qualifier("proposalTypeService")
     private ProposalTypeService proposalTypeService;
 
+    @Autowired
+    @Qualifier("sponsorSearchService")
+    private SponsorSearchService sponsorSearchService;
+
+    @Autowired
+    @Qualifier("budgetCalculationService")
+    private BudgetCalculationService budgetCalculationService;
+
     @Override
     public void processBeforeAddLine(ViewModel model, Object addLine, String collectionId, final String collectionPath) {
         ProposalDevelopmentDocumentForm form = (ProposalDevelopmentDocumentForm) model;
@@ -198,7 +201,10 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
             }
         } else if (addLine instanceof ProposalPersonUnit) {
             try {
-                ((ProposalPersonUnit)addLine).setProposalPerson((ProposalPerson)PropertyUtils.getNestedProperty(form.getDevelopmentProposal(),StringUtils.replace(collectionPath,".units","")));
+                ProposalPersonUnit unit = (ProposalPersonUnit)addLine;
+                ProposalPerson proposalPerson = (ProposalPerson) PropertyUtils.getNestedProperty(form.getDevelopmentProposal(),StringUtils.replace(collectionPath,".units",""));
+                unit.setProposalPerson(proposalPerson);
+                unit.getCreditSplits().addAll(getKeyPersonnelService().createCreditSplits(unit));
             } catch (Exception e) {
                 throw new RuntimeException("proposal person cannot be retrieved from development proposal",e);
             }
@@ -224,7 +230,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
         } else if (addLine instanceof Note) {
             Note note = (Note) addLine;
             note.setRemoteObjectIdentifier(document.getNoteTarget().getObjectId());
-            note.setAuthorUniversalIdentifier(globalVariableService.getUserSession().getPrincipalId());
+            note.setAuthorUniversalIdentifier(getGlobalVariableService().getUserSession().getPrincipalId());
             note.setNotePostedTimestampToCurrent();
             note.setNoteTypeCode("BO");
         }
@@ -322,7 +328,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
 
     @Override
     public void processAfterSaveLine(ViewModel model, Object lineObject, String collectionId, String collectionPath) {
-           ProposalDevelopmentDocumentForm pdForm = (ProposalDevelopmentDocumentForm) model;
            getDataObjectService().save(lineObject);
            if (lineObject instanceof ProposalPersonBiography) {
                try {
@@ -349,7 +354,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
         if (deleteLine instanceof ProposalUserRoles){
             isValid = getProposalDevelopmentPermissionsService().validateDeletePermissions(document, form.getWorkingUserRoles(),index);
             if (isValid){
-                getProposalDevelopmentPermissionsService().processDeletePermission(document,((ProposalUserRoles)deleteLine));
+                getProposalDevelopmentPermissionsService().processDeletePermission(document, ((ProposalUserRoles) deleteLine));
             }
         }
 
@@ -383,8 +388,8 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
     }
 
     public static class SponsorSuggestResult {
-        private Sponsor sponsor;
-        public SponsorSuggestResult(Sponsor sponsor) {
+        private SponsorSearchResult sponsor;
+        public SponsorSuggestResult(SponsorSearchResult sponsor) {
             this.sponsor = sponsor;
         }
         public String getValue() {
@@ -398,14 +403,14 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
         }
     }
 
-    public List<SponsorSuggestResult> performSponsorFieldSuggest(String sponsorCode) {
-        List<SponsorSuggestResult> result = new ArrayList<SponsorSuggestResult>();
-        List<Sponsor> allSponsors = new ArrayList<Sponsor>();
-        String searchString = "%" + sponsorCode + "%";
-        allSponsors = getDataObjectService().findMatching(Sponsor.class, QueryByCriteria.Builder.fromPredicates(PredicateFactory.or(PredicateFactory.likeIgnoreCase("sponsorCode", searchString),
-                PredicateFactory.likeIgnoreCase("acronym", searchString),
-                PredicateFactory.likeIgnoreCase("sponsorName", searchString)))).getResults();
-        for (Sponsor sponsor : allSponsors) {
+    public List<SponsorSuggestResult> performSponsorFieldSuggest(String sponsorSearchStr) {
+       if (StringUtils.isBlank(sponsorSearchStr)) {
+            return Collections.emptyList();
+        }
+
+        final List<SponsorSearchResult> allSponsors = getSponsorSearchService().findSponsors(sponsorSearchStr);
+        List<SponsorSuggestResult> result = new ArrayList<>();
+        for (SponsorSearchResult sponsor : allSponsors) {
             result.add(new SponsorSuggestResult(sponsor));
         }
         return result;
@@ -571,14 +576,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
 		this.kcWorkflowService = kcWorkflowService;
 	}
 
-	public GlobalVariableService getGlobalVariableService() {
-        return globalVariableService;
-    }
-
-    public void setGlobalVariableService(GlobalVariableService globalVariableService) {
-        this.globalVariableService = globalVariableService;
-    }
-
     public void populateCreditSplits(ProposalDevelopmentDocumentForm form) {
         getKeyPersonnelService().populateDocument(form.getProposalDevelopmentDocument());
         form.setCreditSplitListItems(getKeyPersonnelService().createCreditSplitListItems(form.getDevelopmentProposal().getInvestigators()));
@@ -595,37 +592,13 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
         form.getS2sQuestionnaireHelper().updateChildIndicators();
     }
 
-    public List<ProposalDevelopmentDataValidationItem> populateDataValidation(ProposalDevelopmentDocumentForm form, ViewIndex viewIndex) {
+    public List<DataValidationItem> populateDataValidation(ProposalDevelopmentDocumentForm form) {
         if (StringUtils.equalsIgnoreCase(form.getPageId(), ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID)) {
             populateAttachmentReferences(form.getDevelopmentProposal());
         }
-        List<ProposalDevelopmentDataValidationItem> dataValidationItems = new ArrayList<ProposalDevelopmentDataValidationItem>();
-        GlobalVariables.getAuditErrorMap().clear();
+        getGlobalVariableService().getAuditErrorMap().clear();
         getAuditHelper().auditConditionally(form);
-        for (Map.Entry<String,AuditCluster> entry : GlobalVariables.getAuditErrorMap().entrySet()) {
-            AuditCluster auditCluster = entry.getValue();
-            List<AuditError> auditErrors = auditCluster.getAuditErrorList();
-            String areaName = StringUtils.substringBefore(auditCluster.getLabel(),".");
-            String sectionName = StringUtils.substringAfter(auditCluster.getLabel(),".");
-            for (AuditError auditError : auditErrors) {
-            	ProposalDevelopmentDataValidationItem dataValidationItem = new ProposalDevelopmentDataValidationItem();
-                String pageId = StringUtils.substringBefore(auditError.getLink(),".");
-                String sectionId = StringUtils.substringAfter(auditError.getLink(),".");
-                ErrorMessage errorMessage = new ErrorMessage();
-                errorMessage.setErrorKey(auditError.getMessageKey());
-                errorMessage.setMessageParameters(auditError.getParams());
-
-                dataValidationItem.setArea(areaName);
-                dataValidationItem.setSection(sectionName);
-                dataValidationItem.setDescription(KRADUtils.getMessageText(errorMessage, false));
-                dataValidationItem.setSeverity(auditCluster.getCategory());
-                dataValidationItem.setNavigateToPageId(pageId);
-                dataValidationItem.setNavigateToSectionId(sectionId);
-
-                dataValidationItems.add(dataValidationItem);
-            }
-        }
-        return dataValidationItems;
+        return populateDataValidation();
     }
 
     public void populateAttachmentReferences(DevelopmentProposal developmentProposal) {
@@ -681,16 +654,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
     public void setPersonService(PersonService personService) {
         this.personService = personService;
     }
-
-    public String setErrorCssClass(String severity) {
-        if (severity.endsWith(Constants.AUDIT_ERRORS)) {
-            return "label-danger";
-        } else if (severity.equals(Constants.AUDIT_WARNINGS)) {
-            return "label-warning";
-        }
-        return "label-info";
-    }
-
 
     public boolean isAttachmentFileEditable(ProposalDevelopmentAttachmentHelper helper, String collectionPath, String index){
         if (helper.getEditableFileLineAttachments().get(collectionPath) != null
@@ -776,10 +739,25 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
         if (form.getDevelopmentProposal().isInHierarchy()) {
             form.setHierarchyDevelopmentProposals(getProposalHierarchyService().getHierarchyProposals(form.getDevelopmentProposal()));
         }
-    }
 
-    public boolean isChildSynchronized(DevelopmentProposal proposal) {
-       return getProposalHierarchyService().isSynchronized(proposal);
+        if (form.getDevelopmentProposal().getFinalBudget() != null || form.getDevelopmentProposal().getLatestBudget() != null) {
+            if (form.getDevelopmentProposal().getFinalBudget() != null) {
+                form.setSelectedBudget(form.getDevelopmentProposal().getFinalBudget());
+            } else {
+                form.setSelectedBudget(form.getDevelopmentProposal().getLatestBudget());
+            }
+            if(form.getSelectedBudget().getBudgetSummaryDetails().isEmpty()) {
+               getBudgetCalculationService().populateBudgetSummaryTotals(form.getSelectedBudget());
+            }
+        }
+
+        for (DevelopmentProposal developmentProposal : form.getHierarchyDevelopmentProposals()) {
+            for (ProposalDevelopmentBudgetExt budget : developmentProposal.getBudgets()){
+                if (budget.getBudgetSummaryDetails().isEmpty()){
+                    getBudgetCalculationService().populateBudgetSummaryTotals(budget);
+                }
+            }
+        }
     }
 
     public void populateCustomData(ProposalDevelopmentDocumentForm form) {
@@ -814,9 +792,11 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
     }
 
     public boolean requiresResubmissionPrompt(DevelopmentProposal developmentProposal, String resubmissionOption) {
-       return ( getProposalTypeService().equals(developmentProposal.getProposalTypeCode())
-            || getProposalTypeService().equals(developmentProposal.getProposalTypeCode())
-            || getProposalTypeService().equals(developmentProposal.getProposalTypeCode())
+       return ( getProposalTypeService().getContinuationProposalTypeCode().equals(developmentProposal.getProposalTypeCode())
+            || getProposalTypeService().getRenewProposalTypeCode().equals(developmentProposal.getProposalTypeCode())
+            || getProposalTypeService().getResubmissionProposalTypeCode().equals(developmentProposal.getProposalTypeCode())
+            || getProposalTypeService().getRevisionProposalTypeCode().equals(developmentProposal.getProposalTypeCode())
+            || getProposalTypeService().getS2SSubmissionChangeCorrectedCode().equals(developmentProposal.getProposalTypeCode())
             || isSubmissionChangeCorrected(developmentProposal))
             && resubmissionOption == null;
     }
@@ -848,18 +828,24 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
 		this.proposalDevelopmentService = proposalDevelopmentService;
 	}
 	public boolean isSummaryQuestionsPanelEnabled() {
-		return "Y".equalsIgnoreCase(getProposalDevelopmentService().getProposalDevelopmentParameters().get(ProposalDevelopmentService.SUMMARY_QUESTIONS_INDICATOR).getValue());
+		return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.SUMMARY_QUESTIONS_INDICATOR));
 
 	}
 
     public boolean isSummaryAttachmentsPanelEnabled() {
-    	return "Y".equalsIgnoreCase(getProposalDevelopmentService().getProposalDevelopmentParameters().get(ProposalDevelopmentService.SUMMARY_ATTACHMENTS_INDICATOR).getValue());
+    	return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.SUMMARY_ATTACHMENTS_INDICATOR));
     }
 
 	public boolean isSummaryKeywordsPanelEnabled() {
-		return "Y".equalsIgnoreCase(getProposalDevelopmentService().getProposalDevelopmentParameters().get(ProposalDevelopmentService.SUMMARY_KEYWORDS_INDICATOR).getValue());
+		return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.SUMMARY_KEYWORDS_INDICATOR));
 
 	}
+
+    public boolean isSummaryBudgetPanelEnabled(DevelopmentProposal developmentProposal) {
+        return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.BUDGET_SUMMARY_INDICATOR)) &&
+                (developmentProposal.getLatestBudget() != null || developmentProposal.getFinalBudget() != null);
+
+    }
 	 public String getProtocolStatusCode() {
 			return protocolStatusCode;
 	}
@@ -900,7 +886,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
     }
 
     public String getDisclaimerText() {
-       return getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,"propSummaryDisclaimerText");
+       return getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, "propSummaryDisclaimerText");
     }
 
     public boolean areAllCertificationsComplete(List<ProposalPerson> proposalPersons) {
@@ -979,6 +965,16 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
         GlobalVariables.getUserSession().addObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION, (Object)lockRegion);
     }
 
+    public String getLockRegionFromPage(String pageId) {
+        String pageRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_PROPOSAL;
+        if (StringUtils.equals(pageId, ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID)) {
+            pageRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_BUDGET;
+        } else if (StringUtils.equals(pageId, ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID)) {
+            pageRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_NARRATIVES;
+        }
+        return pageRegion;
+    }
+
 	public ProposalTypeService getProposalTypeService() {
 		return proposalTypeService;
 	}
@@ -986,6 +982,20 @@ public class ProposalDevelopmentViewHelperServiceImpl extends ViewHelperServiceI
 	public void setProposalTypeService(ProposalTypeService proposalTypeService) {
 		this.proposalTypeService = proposalTypeService;
 	}
-    
-    
+
+
+    public SponsorSearchService getSponsorSearchService() {
+        return sponsorSearchService;
+    }
+
+    public void setSponsorSearchService(SponsorSearchService sponsorSearchService) {
+        this.sponsorSearchService = sponsorSearchService;
+    }
+    public BudgetCalculationService getBudgetCalculationService() {
+        return budgetCalculationService;
+    }
+
+    public void setBudgetCalculationService(BudgetCalculationService budgetCalculationService) {
+        this.budgetCalculationService = budgetCalculationService;
+    }
 }

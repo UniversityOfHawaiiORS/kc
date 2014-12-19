@@ -62,7 +62,7 @@
 
     <bean id="PropDev-DataValidationSection-Collection" parent="PropDev-DataValidationSection-Collection-parentBean"/>
     <bean id="PropDev-DataValidationSection-Collection-parentBean" parent="Uif-TableCollectionSection"
-          p:collectionObjectClass="org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationItem"
+          p:collectionObjectClass="org.kuali.coeus.sys.impl.validation.DataValidationItem"
           p:propertyName="dataValidationItems" p:layoutManager.richTable.render="false"
           p:renderAddLine="false" p:layoutManager.renderSequenceField="false">
         <property name="items">
@@ -71,7 +71,7 @@
                 <bean parent="Uif-DataField" p:propertyName="section" p:fieldLabel.labelText="Section" p:order="20"/>
                 <bean parent="Uif-DataField" p:propertyName="description" p:fieldLabel.labelText="Description" p:order="30"/>
                 <bean parent="Uif-DataField" p:propertyName="severity" p:fieldLabel.labelText="Severity" p:order="40"
-                      p:cssClasses="label,@{#ViewHelper.setErrorCssClass(#line.severity)}"/>
+                      p:cssClasses="label,@{#ViewHelper.getErrorCssClass(#line.severity)}"/>
             </list>
         </property>
         <property name="lineActions">

@@ -9,6 +9,7 @@ import org.kuali.coeus.common.framework.ruleengine.KcBusinessRulesEngine;
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
+import org.kuali.coeus.sys.framework.validation.Auditable;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.krad.data.DataObjectService;
 import org.kuali.rice.krad.uif.UifConstants;
@@ -59,6 +60,7 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
 	        props.put("methodToCall", "initiate");
 	        props.put("budgetId", budget.getBudgetId().toString());
 	        props.put("summaryBudget", summaryBudget.toString());
+            props.put("auditActivated", String.valueOf(((Auditable)form).isAuditActivated()));
 	        return getModelAndViewService().performRedirect(form, "proposalBudget", props);
         } else {
         	form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
@@ -68,11 +70,11 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
         
     }
 
-	public ModelAndView copyBudget(String budgetName, Long originalBudgetId, DevelopmentProposal developmentProposal, UifFormBase form) throws Exception {
+	public ModelAndView copyBudget(String budgetName, Long originalBudgetId, Boolean allPeriods, DevelopmentProposal developmentProposal, UifFormBase form) throws Exception {
 		ProposalDevelopmentBudgetExt budget = null;
 		if (kcBusinessRulesEngine.applyRules(new ProposalAddBudgetVersionEvent("copyBudgetDto", developmentProposal, budgetName))) {
 			ProposalDevelopmentBudgetExt originalBudget = getDataObjectService().findUnique(ProposalDevelopmentBudgetExt.class, QueryByCriteria.Builder.forAttribute("budgetId", originalBudgetId).build());
-			budget = (ProposalDevelopmentBudgetExt) getBudgetService().copyBudgetVersion(originalBudget, false);
+			budget = (ProposalDevelopmentBudgetExt) getBudgetService().copyBudgetVersion(originalBudget, !allPeriods.booleanValue());
 		}
         if (budget != null) {
         	budget.setName(budgetName);
@@ -80,6 +82,7 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
 	        Properties props = new Properties();
 	        props.put("methodToCall", "initiate");
 	        props.put("budgetId", budget.getBudgetId().toString());
+            props.put("auditActivated", String.valueOf(((Auditable)form).isAuditActivated()));
 	        return getModelAndViewService().performRedirect(form, "proposalBudget", props);
         } else {
         	form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
@@ -94,6 +97,7 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
 	        Properties props = new Properties();
 	        props.put("methodToCall", "start");
 	        props.put("budgetId", budgetId);
+            props.put("auditActivated", String.valueOf(((Auditable)form).isAuditActivated()));
 	        return getModelAndViewService().performRedirect(form, "proposalBudget", props);
 		} else {
         	form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATEPAGE.getKey());			
