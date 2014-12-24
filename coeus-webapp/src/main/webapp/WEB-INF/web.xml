@@ -9,7 +9,7 @@
     <!-- Rice content Start -->
     <context-param>
         <param-name>environment</param-name>
-        <param-value>dev</param-value>
+        <param-value>dev60</param-value>
     </context-param>
 
     <!-- Change this if you want to use a different Spring file -->
