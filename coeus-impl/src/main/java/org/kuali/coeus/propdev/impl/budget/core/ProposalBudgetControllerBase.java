@@ -9,9 +9,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.budget.framework.calculator.BudgetCalculationService;
 import org.kuali.coeus.common.budget.framework.core.Budget;
+import org.kuali.coeus.common.budget.framework.core.BudgetConstants;
 import org.kuali.coeus.common.framework.ruleengine.KcBusinessRulesEngine;
 import org.kuali.coeus.common.budget.framework.nonpersonnel.BudgetJustificationService;
 import org.kuali.coeus.common.budget.framework.summary.BudgetSummaryService;
+import org.kuali.coeus.common.budget.impl.nonpersonnel.BudgetExpensesRuleEvent;
 import org.kuali.coeus.propdev.impl.budget.ProposalBudgetService;
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.budget.auth.ProposalBudgetAuthorizer;
@@ -113,7 +115,7 @@ public abstract class ProposalBudgetControllerBase {
     @Autowired
     @Qualifier("budgetSummaryService")
     private BudgetSummaryService budgetSummaryService;
-    
+
     protected UifFormBase createInitialForm(HttpServletRequest request) {
         return new ProposalBudgetForm();
     }
@@ -142,7 +144,24 @@ public abstract class ProposalBudgetControllerBase {
         getBudgetJustificationService().preSave(form.getBudget(), form.getBudgetJustificationWrapper());
         getBudgetSummaryService().setupOldStartEndDate(form.getBudget(), false);
         form.setBudgetModularSummary(budgetModularService.generateModularSummary(form.getBudget()));
+        validateBudgetExpenses(form);
+        if (form.isAuditActivated()){
+        	((ProposalBudgetViewHelperServiceImpl)form.getViewHelperService()).applyBudgetAuditRules(form);
+        }
         return getModelAndViewService().getModelAndView(form);
+    }
+    
+    protected void validateBudgetExpenses(ProposalBudgetForm form) {
+    	String errorPath = null;
+    	if(form.getPageId().equalsIgnoreCase(BudgetConstants.BudgetAuditRules.NON_PERSONNEL_COSTS.getPageId())) {
+    		errorPath = BudgetConstants.BudgetAuditRules.NON_PERSONNEL_COSTS.getPageId();
+    	}else if(form.getPageId().equalsIgnoreCase(BudgetConstants.BudgetAuditRules.PERSONNEL_COSTS.getPageId())) {
+    		errorPath = BudgetConstants.BudgetAuditRules.PERSONNEL_COSTS.getPageId();
+    	}
+    	
+    	if(errorPath != null) {
+    		getKcBusinessRulesEngine().applyRules(new BudgetExpensesRuleEvent(form.getBudget(), errorPath));
+    	}
     }
 
     public ModelAndView saveLine(ProposalBudgetForm form) {
@@ -158,10 +177,10 @@ public abstract class ProposalBudgetControllerBase {
     protected ModelAndView navigate(ProposalBudgetForm form) throws Exception {
 		form.setPageId(form.getActionParamaterValue(UifParameters.NAVIGATE_TO_PAGE_ID));
 		form.setDirtyForm(false);
-		if (form.getView().getCurrentPage().getReadOnly() != null && form.getView().getCurrentPage().getReadOnly()) {
-			return getModelAndViewService().getModelAndView(form);
-		} else {
+		if (form.isCanEditView()) {
 			return save(form);
+		} else {
+			return getModelAndViewService().getModelAndView(form);
 		}
     }
     

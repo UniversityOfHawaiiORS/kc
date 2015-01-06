@@ -93,6 +93,9 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
     private SequenceAccessorService sequenceAccessorService;
     private ParameterService parameterService;
     
+    private static final String TRUE_INDICATOR_VALUE = "1";
+	private static final String FALSE_INDICATOR_VALUE = "0";
+    
     @Autowired
     @Qualifier("dataObjectService")
     private DataObjectService dataObjectService;
@@ -115,9 +118,8 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             institutionalProposal.setProposalNumber(getNextInstitutionalProposalNumber());
             
             InstitutionalProposalDocument institutionalProposalDocument = mergeProposals(institutionalProposal, developmentProposal, budget);
-            documentService.routeDocument(institutionalProposalDocument, 
-                    ROUTE_MESSAGE + developmentProposal.getProposalNumber(), 
-                    new ArrayList<AdHocRouteRecipient>());
+            setInstitutionalProposalIndicators(institutionalProposalDocument.getInstitutionalProposal());
+            documentService.routeDocument(institutionalProposalDocument, ROUTE_MESSAGE + developmentProposal.getProposalNumber(), new ArrayList<AdHocRouteRecipient>());
             return institutionalProposalDocument.getInstitutionalProposal().getProposalNumber();
         } catch (WorkflowException ex) {
             throw new InstitutionalProposalCreationException(WORKFLOW_EXCEPTION_MESSAGE, ex);
@@ -138,17 +140,15 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         
         try {
             InstitutionalProposalDocument newInstitutionalProposalDocument = versionProposal(proposalNumber, developmentProposal, budget);
-            documentService.routeDocument(newInstitutionalProposalDocument, 
-                    ROUTE_MESSAGE + developmentProposal.getProposalNumber(), 
-                    new ArrayList<AdHocRouteRecipient>());
-            institutionalProposalVersioningService.updateInstitutionalProposalVersionStatus(
-                    newInstitutionalProposalDocument.getInstitutionalProposal(), VersionStatus.ACTIVE);
+            setInstitutionalProposalIndicators(newInstitutionalProposalDocument.getInstitutionalProposal());
+            documentService.routeDocument(newInstitutionalProposalDocument, ROUTE_MESSAGE + developmentProposal.getProposalNumber(), 
+            		new ArrayList<AdHocRouteRecipient>());
+            institutionalProposalVersioningService.updateInstitutionalProposalVersionStatus(newInstitutionalProposalDocument.getInstitutionalProposal(), 
+            		VersionStatus.ACTIVE);
             return newInstitutionalProposalDocument.getInstitutionalProposal().getSequenceNumber().toString();
-        } catch (WorkflowException we) {
-            throw new InstitutionalProposalCreationException(WORKFLOW_EXCEPTION_MESSAGE, we);
-        } catch (VersionException ve) {
-            throw new InstitutionalProposalCreationException(VERSION_EXCEPTION_MESSAGE, ve);
-        } 
+        } catch (WorkflowException|VersionException e) {
+            throw new InstitutionalProposalCreationException(VERSION_EXCEPTION_MESSAGE, e);
+        }
     }
     
     /**
@@ -225,7 +225,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
                             activeVersion.getInstitutionalProposalDocument().getDocumentHeader().getDocumentDescription());
                     
                     institutionalProposalDocument.setInstitutionalProposal(newVersion);
-                    
+                    setInstitutionalProposalIndicators(institutionalProposalDocument.getInstitutionalProposal());
                     documentService.routeDocument(institutionalProposalDocument, 
                             "Update Proposal Status to Funded", new ArrayList<AdHocRouteRecipient>());
                     
@@ -284,7 +284,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
                             activeVersion.getInstitutionalProposalDocument().getDocumentHeader().getDocumentDescription());
                     
                     institutionalProposalDocument.setInstitutionalProposal(newVersion);
-                    
+                    setInstitutionalProposalIndicators(institutionalProposalDocument.getInstitutionalProposal());
                     documentService.routeDocument(institutionalProposalDocument, 
                             "Update Proposal Status to Pending", new ArrayList<AdHocRouteRecipient>());
                     
@@ -392,7 +392,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             institutionalProposal.addSpecialReview(generateIpSpecialReview(dpSpecialReview));
         }
         if (!institutionalProposal.getSpecialReviews().isEmpty()) {
-            institutionalProposal.setSpecialReviewIndicator("1");
+            institutionalProposal.setSpecialReviewIndicator(TRUE_INDICATOR_VALUE);
         }
         
         institutionalProposal.getInstitutionalProposalScienceKeywords().clear();
@@ -400,7 +400,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             institutionalProposal.addKeyword(dpKeyword.getScienceKeyword());
         }
         if (!institutionalProposal.getInstitutionalProposalScienceKeywords().isEmpty()) {
-            institutionalProposal.setScienceCodeIndicator("1");
+            institutionalProposal.setScienceCodeIndicator(TRUE_INDICATOR_VALUE);
         }
         
         if (budget != null) {
@@ -594,7 +594,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             institutionalProposal.add(ipCostShare);
         }
         if (!institutionalProposal.getInstitutionalProposalCostShares().isEmpty()) {
-            institutionalProposal.setCostSharingIndicator("1");
+            institutionalProposal.setCostSharingIndicator(TRUE_INDICATOR_VALUE);
         }
         
         // Unrecovered F and As (from Budget)
@@ -610,7 +610,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             institutionalProposal.add(ipUfa);
         }
         if (!institutionalProposal.getInstitutionalProposalUnrecoveredFandAs().isEmpty()) {
-            institutionalProposal.setIdcRateIndicator("1");
+            institutionalProposal.setIdcRateIndicator(TRUE_INDICATOR_VALUE);
         }
     }
     
@@ -682,6 +682,34 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         }
         getBusinessObjectService().save(oldIP.getAwardFundingProposals());
         return newFundingProposals;
+    }
+    
+    /**
+     * This function verifies that the indicator fields are set, and if they aren't sets them.
+     * If an IP is being versioned and the home unit or cost shares allocations are changed, there may be problems with these fields.
+     * @param institutionalProposal
+     */
+    protected void setInstitutionalProposalIndicators(InstitutionalProposal institutionalProposal) {
+    	if (!institutionalProposal.getInstitutionalProposalCostShares().isEmpty()) {
+            institutionalProposal.setCostSharingIndicator(TRUE_INDICATOR_VALUE);
+        } else {
+            institutionalProposal.setCostSharingIndicator(FALSE_INDICATOR_VALUE);
+        }
+		if (!institutionalProposal.getSpecialReviews().isEmpty()) {
+			institutionalProposal.setSpecialReviewIndicator(TRUE_INDICATOR_VALUE);
+        } else {
+        	institutionalProposal.setSpecialReviewIndicator(FALSE_INDICATOR_VALUE);
+        }
+		if (!institutionalProposal.getInstitutionalProposalUnrecoveredFandAs().isEmpty()) {
+           institutionalProposal.setIdcRateIndicator(TRUE_INDICATOR_VALUE); 
+        } else {
+            institutionalProposal.setIdcRateIndicator(FALSE_INDICATOR_VALUE);
+        }
+		if (!institutionalProposal.getInstitutionalProposalScienceKeywords().isEmpty()) {
+			institutionalProposal.setScienceCodeIndicator(TRUE_INDICATOR_VALUE);
+        } else {
+        	institutionalProposal.setScienceCodeIndicator(FALSE_INDICATOR_VALUE);
+        }
     }
     
     /* Service injection getters and setters */

@@ -9,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
@@ -27,8 +25,7 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
 
     @Transactional
     @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=createHierarchy"})
-    public ModelAndView createHierarchy(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result, HttpServletRequest request,
-                                        HttpServletResponse response) throws Exception {
+    public ModelAndView createHierarchy(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         DevelopmentProposal initialChildProposal = form.getProposalDevelopmentDocument().getDevelopmentProposal();
         List<ProposalHierarchyErrorWarningDto> errors = getProposalHierarchyService().validateChildCandidate(initialChildProposal);
 
@@ -42,8 +39,7 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
 
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=syncAllHierarchy")
-    public ModelAndView syncAllHierarchy(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
-                                         HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView syncAllHierarchy(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         ProposalDevelopmentDocument hierarchyProposalDoc = form.getProposalDevelopmentDocument();
         List<ProposalHierarchyErrorWarningDto> errors = getProposalHierarchyService().validateParent(hierarchyProposalDoc.getDevelopmentProposal());
         if (!displayErrors(errors)) {
@@ -57,40 +53,42 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
     Link this unlinked child to parent proposal via search
      */
     @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=linkToHierarchy")
-    public ModelAndView linkToHierarchy(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
-                                        HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView linkToHierarchy(@RequestParam("hierarchyProposalNumber") String hierarchyProposalNumber, 
+    		@RequestParam("hierarchyBudgetTypeCode") String hierarchyBudgetTypeCode, 
+    		@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
 
-        DevelopmentProposal hierarchyProposal = getProposalHierarchyService().getDevelopmentProposal(form.getNewHierarchyProposalNumber());
+        DevelopmentProposal hierarchyProposal = getProposalHierarchyService().getDevelopmentProposal(hierarchyProposalNumber);
         DevelopmentProposal newChildProposal = form.getProposalDevelopmentDocument().getDevelopmentProposal();
-        String hierarchyBudgetTypeCode = form.getNewHierarchyBudgetTypeCode();
-        List<ProposalHierarchyErrorWarningDto> errors = getProposalHierarchyService().validateLinkToHierarchy(hierarchyProposal, newChildProposal);
-        if (!displayErrors(errors)) {
-            ProposalDevelopmentBudgetExt childBudget = getProposalHierarchyService().getSyncableBudget(newChildProposal);
-            if(childBudget==null){
-                getGlobalVariableService().getMessageMap().putError(ProposalHierarchyKeyConstants.FIELD_CHILD_NUMBER,ProposalHierarchyKeyConstants.ERROR_LINK_NO_BUDGET_VERSION);
-            }else{
-                getProposalHierarchyService().linkToHierarchy(hierarchyProposal, newChildProposal, hierarchyBudgetTypeCode);
+        ProposalDevelopmentBudgetExt childBudget = getProposalHierarchyService().getSyncableBudget(newChildProposal);
+        if(childBudget == null){
+            getGlobalVariableService().getMessageMap().putError(ProposalHierarchyKeyConstants.FIELD_CHILD_NUMBER,ProposalHierarchyKeyConstants.ERROR_LINK_NO_BUDGET_VERSION);
+        }else{
+	        List<ProposalHierarchyErrorWarningDto> errors = getProposalHierarchyService().validateLinkToHierarchy(hierarchyProposal, newChildProposal);
+	        if (!displayErrors(errors)) {
+	            getProposalHierarchyService().linkToHierarchy(hierarchyProposal, newChildProposal, hierarchyBudgetTypeCode);
                 displayMessage(ProposalHierarchyKeyConstants.MESSAGE_LINK_SUCCESS, new String[]{newChildProposal.getProposalNumber(), hierarchyProposal.getProposalNumber()});
             }
         }
         return getModelAndViewService().getModelAndView(form);
     }
 
+
+
     /*
     Link a child proposal to this parent
      */
     @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=linkChildToHierarchy")
-    public ModelAndView linkChildToHierarchy(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
-                                             HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ProposalDevelopmentDocumentForm pdForm = form;
+    public ModelAndView linkChildToHierarchy(@RequestParam("hierarchyProposalNumber") String hierarchyProposalNumber,
+    		@RequestParam("hierarchyBudgetTypeCode") String hierarchyBudgetTypeCode,
+    		@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         DevelopmentProposal hierarchyProposal = form.getProposalDevelopmentDocument().getDevelopmentProposal();
-        DevelopmentProposal newChildProposal = getProposalHierarchyService().getDevelopmentProposal(pdForm.getNewHierarchyChildProposalNumber());
-        String hierarchyBudgetTypeCode = pdForm.getNewHierarchyBudgetTypeCode();
+        DevelopmentProposal newChildProposal = getProposalHierarchyService().getDevelopmentProposal(hierarchyProposalNumber);
 
         List<ProposalHierarchyErrorWarningDto> errors = getProposalHierarchyService().validateParent(hierarchyProposal);
         errors.addAll(getProposalHierarchyService().validateChildCandidate(newChildProposal));
         errors.addAll(getProposalHierarchyService().validateChildCandidateForHierarchy(hierarchyProposal, newChildProposal, true));
         errors.addAll(getProposalHierarchyService().validateSponsor(newChildProposal, hierarchyProposal));
+        errors.addAll(getProposalHierarchyService().validateIsAggregatorOnChild(newChildProposal));
 
         if (!displayErrors(errors)) {
             getProposalHierarchyService().linkToHierarchy(hierarchyProposal, newChildProposal, hierarchyBudgetTypeCode);
@@ -101,14 +99,12 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
     }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=hierarchyActionCanceled")
-    public ModelAndView hierarchyActionCanceled(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
-                                                HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView hierarchyActionCanceled(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         return getNavigationControllerService().back(form);
     }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=syncToHierarchyParent")
-    public ModelAndView syncToHierarchyParent(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
-                                              HttpServletRequest request, HttpServletResponse response) throws Exception {
+    public ModelAndView syncToHierarchyParent(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         DevelopmentProposal childProposal = form.getProposalDevelopmentDocument().getDevelopmentProposal();
         DevelopmentProposal hierarchy = getProposalHierarchyService().getDevelopmentProposal(childProposal.getHierarchyParentProposalNumber());
         List<ProposalHierarchyErrorWarningDto> errors = getProposalHierarchyService().validateChildForSync(childProposal, hierarchy, false);

@@ -28,6 +28,7 @@ import org.kuali.coeus.common.framework.custom.DocumentCustomData;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttribute;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocValue;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeService;
+import org.kuali.coeus.common.framework.sponsor.Sponsor;
 import org.kuali.coeus.common.framework.sponsor.SponsorSearchResult;
 import org.kuali.coeus.common.framework.sponsor.SponsorSearchService;
 import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
@@ -73,6 +74,7 @@ import org.kuali.coeus.propdev.impl.specialreview.ProposalSpecialReview;
 import org.kuali.coeus.propdev.impl.attachment.LegacyNarrativeService;
 import org.kuali.coeus.propdev.impl.docperm.ProposalUserRoles;
 import org.kuali.rice.core.api.datetime.DateTimeService;
+import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.krad.util.*;
 import org.kuali.rice.krad.bo.Note;
@@ -414,6 +416,15 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
             result.add(new SponsorSuggestResult(sponsor));
         }
         return result;
+    }
+
+    public String getSponsorString(Sponsor sponsor){
+        if (sponsor != null){
+            return sponsor.getSponsorCode() + " - " + sponsor.getSponsorName();
+        }
+        else{
+            return "";
+        }
     }
 
     public boolean isCollectionLineEditable(String selectedCollectionPath, String index, Map<String,List<String>> editableCollectionLines) {
@@ -922,8 +933,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         String lockRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_PROPOSAL;
         if (isNarrativeAction(form)) {
             lockRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_NARRATIVES;
-        } else if (isBudgetVersionsAction(form)) {
-            lockRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_BUDGET;
         }
 
         return lockRegion;
@@ -944,22 +953,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
 
     }
 
-    // Checks whether the action associated with this form instance maps to the BudgetVersions page
-    private boolean isBudgetVersionsAction(ProposalDevelopmentDocumentForm form) {
-        boolean isBudgetVersionsAction = false;
-        String navigateTo = form.getActionParamaterValue(UifParameters.NAVIGATE_TO_PAGE_ID);
-        if (StringUtils.equals(form.getPageId(),ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID)
-                && StringUtils.isEmpty(navigateTo)) {
-            isBudgetVersionsAction = true;
-        }
-        else if (StringUtils.isNotEmpty(navigateTo)
-                && (navigateTo.equalsIgnoreCase(ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID))) {
-            isBudgetVersionsAction = true;
-        }
-
-        return isBudgetVersionsAction;
-    }
-
     public void setupLockRegions(ProposalDevelopmentDocumentForm form) {
         String lockRegion = getLockRegion(form);
         GlobalVariables.getUserSession().addObject(KraAuthorizationConstants.ACTIVE_LOCK_REGION, (Object)lockRegion);
@@ -967,9 +960,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
 
     public String getLockRegionFromPage(String pageId) {
         String pageRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_PROPOSAL;
-        if (StringUtils.equals(pageId, ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID)) {
-            pageRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_BUDGET;
-        } else if (StringUtils.equals(pageId, ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID)) {
+        if (StringUtils.equals(pageId, ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID)) {
             pageRegion = KraAuthorizationConstants.LOCK_DESCRIPTOR_NARRATIVES;
         }
         return pageRegion;
@@ -997,5 +988,23 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
 
     public void setBudgetCalculationService(BudgetCalculationService budgetCalculationService) {
         this.budgetCalculationService = budgetCalculationService;
+    }
+    
+    public String getDefaultOpenTab() {
+        ProposalDevelopmentDocumentForm form = (ProposalDevelopmentDocumentForm)ViewLifecycle.getModel();
+        String openTab = form.getDefaultOpenTab();
+        form.setDefaultOpenTab("");
+        return openTab;
+    }
+
+    public String getPropPersonName(String personId) {
+        if (StringUtils.isNotEmpty(personId)) {
+            Person person= getPersonService().getPerson(personId);
+
+            final String middleName = person.getMiddleName() != null ? person.getMiddleName() + " " : "";
+
+            return (person.getFirstName() + " " + middleName + person.getLastName()).trim();
+        }
+        return StringUtils.EMPTY;
     }
 }

@@ -8,8 +8,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.kuali.coeus.common.budget.framework.core.Budget;
+import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants;
+import org.kuali.coeus.propdev.impl.lock.ProposalBudgetLockService;
 import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.krad.exception.AuthorizationException;
@@ -36,6 +39,7 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	private static final String BUDGET_SUMMARY_DIALOG_ID = "PropBudget-SummaryPage-Dialog";
 	private static final String CONFIRM_RATE_CHANGES_DIALOG_ID = "PropBudget-BudgetSettings-ChangeRateDialog";
 	private static final String BUDGET_SETTINGS_DIALOG_ID = "PropBudget-BudgetSettings-Dialog";
+	private static final String BUDGET_DATA_VALIDATION_DIALOG_ID = "DataValidationSection";
 
 	@Autowired
 	@Qualifier("proposalBudgetSharedControllerService")
@@ -44,6 +48,10 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	@Autowired
 	@Qualifier("parameterService")
 	private ParameterService parameterService;
+
+    @Autowired
+    @Qualifier("proposalBudgetLockService")
+    private ProposalBudgetLockService proposalBudgetLockService;
 	
 	@MethodAccessible
 	@Transactional @RequestMapping(params="methodToCall=defaultMapping")
@@ -56,6 +64,7 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	@Transactional @RequestMapping(params="methodToCall=start")
 	public ModelAndView start(@RequestParam("budgetId") Long budgetId, @RequestParam("auditActivated") String auditActivated, @ModelAttribute("KualiForm") ProposalBudgetForm form) {
 		form.setBudget(loadBudget(budgetId));
+        getProposalBudgetLockService().establishBudgetLock(form.getBudget());
 		form.initialize();
         if (auditActivated != null){
             form.setAuditActivated(Boolean.parseBoolean(auditActivated));
@@ -67,6 +76,7 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	@Transactional @RequestMapping(params="methodToCall=initiate")
 	public ModelAndView initiate(@RequestParam("budgetId") Long budgetId, @RequestParam("auditActivated") String auditActivated, @RequestParam(value = "summaryBudget", required = false) Boolean summaryBudget, @ModelAttribute("KualiForm") ProposalBudgetForm form) {
 		form.setBudget(loadBudget(budgetId));
+        getProposalBudgetLockService().establishBudgetLock(form.getBudget());
 		form.initialize();
         if (auditActivated != null){
             form.setAuditActivated(Boolean.parseBoolean(auditActivated));
@@ -81,8 +91,11 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	
 	@Transactional @RequestMapping(params="methodToCall=openProposal")
 	public ModelAndView openProposal(@ModelAttribute("KualiForm") ProposalBudgetForm form) {
-		save(form);
+		if (form.isCanEditView()) {
+            save(form);
+        }
 		if (getGlobalVariableService().getMessageMap().hasNoErrors()) {
+            getProposalBudgetLockService().deleteBudgetLock(form.getBudget());
 			form.setDirtyForm(false);	
 	        Properties props = new Properties();
 	        props.put("methodToCall", KRADConstants.DOC_HANDLER_METHOD);
@@ -134,23 +147,61 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	
 	@Transactional @RequestMapping(params="methodToCall=completeBudget")
 	public ModelAndView completeBudget(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
-        String budgetStatusCompleteCode = getParameterService().getParameterValueAsString(
+		if(!isAllowedToCompleteBudget(form, form.getPageId())) {
+	   		form.setAjaxReturnType("update-page");
+		   	return getModelAndViewService().getModelAndView(form);
+		}
+		String budgetStatusCompleteCode = getParameterService().getParameterValueAsString(
                 Budget.class, Constants.BUDGET_STATUS_COMPLETE_CODE);
         form.getBudget().setBudgetStatus(budgetStatusCompleteCode);
         getDataObjectService().wrap(form.getBudget()).fetchRelationship("budgetStatusDo");
 		return super.save(form);
 	}
+	
+	protected boolean isAllowedToCompleteBudget(ProposalBudgetForm form, String errorPath) {
+		boolean isRulePassed = ((ProposalBudgetViewHelperServiceImpl)form.getViewHelperService()).applyBudgetAuditRules(form);
+		if(!isRulePassed) {
+	        getGlobalVariableService().getMessageMap().putError(errorPath, KeyConstants.CLEAR_AUDIT_ERRORS_BEFORE_CHANGE_STATUS_TO_COMPLETE);
+	        form.setAuditActivated(true);
+	        return false;
+		}
+		return true;
+	}
 
 	@Transactional @RequestMapping(params="methodToCall=saveBudgetSettings")
 	public ModelAndView saveBudgetSettings(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
-		Budget budget = form.getBudget();
-        Budget originalBudget = getOriginalBudget(form);
+		ProposalDevelopmentBudgetExt budget = form.getBudget();
+		ProposalDevelopmentBudgetExt originalBudget = (ProposalDevelopmentBudgetExt)getOriginalBudget(form);
+		if(budget.isBudgetComplete() && !isAllowedToCompleteBudget(form, "budget.budgetStatus")) {
+			budget.setBudgetStatus(originalBudget.getBudgetStatus());
+	   		return getModelAndViewService().getModelAndView(form);
+		}
     	if(isRateTypeChanged(originalBudget, budget)) {
         	return getModelAndViewService().showDialog(CONFIRM_RATE_CHANGES_DIALOG_ID, true, form);
     	}
     	getBudgetSummaryService().updateOnOffCampusFlag(budget, budget.getOnOffCampusFlag());
         super.save(form);
+        form.setEvaluateFlagsAndModes(true);
 		return getKcCommonControllerService().closeDialog(BUDGET_SETTINGS_DIALOG_ID, form);
+	}
+
+	@Transactional @RequestMapping(params="methodToCall=closeBudgetSettings")
+	public ModelAndView closeBudgetSettings(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
+		processAuditRuleValidation(form);
+		return getKcCommonControllerService().closeDialog(BUDGET_SETTINGS_DIALOG_ID, form);
+	}
+
+	@Transactional @RequestMapping(params="methodToCall=closeBudgetValidation")
+	public ModelAndView closeBudgetValidation(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
+		processAuditRuleValidation(form);
+		return getKcCommonControllerService().closeDialog(BUDGET_DATA_VALIDATION_DIALOG_ID, form);
+	}
+	
+	protected void processAuditRuleValidation(ProposalBudgetForm form) {
+		if(form.isAuditActivated()) {
+			((ProposalBudgetViewHelperServiceImpl)form.getViewHelperService()).applyBudgetAuditRules(form);
+		}
+		form.setAjaxReturnType("update-page");
 	}
 	
 	@Transactional @RequestMapping(params="methodToCall=confirmBudgetSettings")
@@ -158,6 +209,7 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 		Budget budget = form.getBudget();
     	getBudgetSummaryService().updateOnOffCampusFlag(budget, budget.getOnOffCampusFlag());
     	getBudgetCalculationService().resetBudgetLineItemCalculatedAmounts(budget);
+    	form.setEvaluateFlagsAndModes(true);
         return super.save(form);
 	}
 
@@ -367,5 +419,13 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	public void setParameterService(ParameterService parameterService) {
 		this.parameterService = parameterService;
 	}
-	
+
+
+    public ProposalBudgetLockService getProposalBudgetLockService() {
+        return proposalBudgetLockService;
+    }
+
+    public void setProposalBudgetLockService(ProposalBudgetLockService proposalBudgetLockService) {
+        this.proposalBudgetLockService = proposalBudgetLockService;
+    }
 }

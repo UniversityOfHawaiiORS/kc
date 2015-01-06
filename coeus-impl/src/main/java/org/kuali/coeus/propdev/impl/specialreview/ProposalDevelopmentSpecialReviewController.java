@@ -155,9 +155,13 @@ public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopm
             ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument) pdForm.getDocument();
             proposalSpecialReview.setDevelopmentProposal(proposalDevelopmentDocument.getDevelopmentProposal());
             pdForm.getSpecialReviewHelper().prepareProtocolLinkViewFields(proposalSpecialReview);
+            
+            if(proposalSpecialReview.getSpecialReviewNumber() == null) {
+            	proposalSpecialReview.setSpecialReviewNumber(getProposalDevelopmentSpecialReviewService().generateSpecialReviewNumber(proposalDevelopmentDocument));
+            }
 
             // Invalid protrocol trying to be linked so blank out protocol info
-            if (!proposalSpecialReview.isLinkedToProtocol()) {
+            if (protocolNeedsToBeLinked(proposalSpecialReview.getSpecialReviewTypeCode()) && !proposalSpecialReview.isLinkedToProtocol()) {
                 proposalSpecialReview.setProtocolStatus(null);
                 proposalSpecialReview.setProtocolNumber(null);
             }
@@ -188,6 +192,17 @@ public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopm
         pdForm.getNewCollectionLines().clear();
         return getModelAndViewService().getModelAndView(pdForm);
     }
+    
+    protected boolean protocolNeedsToBeLinked(String specialReviewTypeCode) {
+    	if(specialReviewTypeCode.equals(SpecialReviewType.HUMAN_SUBJECTS)) {
+    		return getProposalDevelopmentSpecialReviewService().isIrbLinkingEnabled();
+    	}
+    	if(specialReviewTypeCode.equals(SpecialReviewType.ANIMAL_USAGE) ) {
+    		return getProposalDevelopmentSpecialReviewService().isIacucLinkingEnabled();
+    	}
+    	return true;
+    }
+    
     public ProposalDevelopmentSpecialReviewService getProposalDevelopmentSpecialReviewService() {
  		return proposalDevelopmentSpecialReviewService;
  	}
