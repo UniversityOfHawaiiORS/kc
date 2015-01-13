@@ -3,12 +3,12 @@
 
 	<ruleAttributes xmlns="ns:workflow/RuleAttribute" xsi:schemaLocation="ns:workflow/RuleAttribute resource:RuleAttribute">
 		<ruleAttribute>
-			<name>CopyCustomActionListAttribute</name>
+			<name>NotificationCustomActionListAttribute</name>
 			<className>
-				org.kuali.kra.workflow.CopyCustomActionListAttribute
+				org.kuali.rice.ken.kew.NotificationCustomActionListAttribute
 			</className>
-			<label>Copy Action List Attribute</label>
-			<description>Copy Action List Attribute</description>
+			<label>Notification Action List Attribute</label>
+			<description>Notification Action List Attribute</description>
 			<type>ActionListAttribute</type>
 			<serviceNamespace>KC</serviceNamespace>
 		</ruleAttribute>
@@ -238,92 +238,25 @@
 
 		<!-- custom attribute -->
 		<ruleAttribute>
-            <name>CustomDataAttribute</name>
+            <name>OTTEDCustomDataAttribute</name>
             <className>org.kuali.rice.kew.rule.xmlrouting.StandardGenericXMLRuleAttribute</className>
-            <label>CustomDataAttribute</label>
-            <description>CustomDataAttribute</description>
+            <label>OTTEDCustomDataAttribute</label>
+            <description>OTTEDCustomDataAttribute</description>
             <type>RuleXmlAttribute</type>
 			<serviceNamespace>KC</serviceNamespace>
             <routingConfig>
                 <!-- work in progress -->
-                <fieldDef name="billingElement" title="Billing Element" workflowType="RULE">
+     			<fieldDef name="RouteToOTTED" title="Route to OTTED" workflowType="RULE">
                     <display>
                         <type>text</type>
                     </display>
                     <validation required="false" />
                     <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='billingElement']/value) = wf:ruledata('billingElement')</xpathexpression>
-                    </fieldEvaluation>
-                </fieldDef>
-                <fieldDef name="graduateStudentCount" title="Graduate Student Count" workflowType="RULE">
-                    <display>
-                        <type>text</type>
-                    </display>
-                    <validation required="false" />
-                    <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='graduateStudentCount']/value) = wf:ruledata('graduateStudentCount')</xpathexpression>
-                    </fieldEvaluation>
-                </fieldDef>
-                <fieldDef name="costSharingBudget" title="Cost Sharing Budget" workflowType="RULE">
-                    <display>
-                        <type>text</type>
-                    </display>
-                    <validation required="false" />
-                    <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='costSharingBudget']/value) = wf:ruledata('costSharingBudget')</xpathexpression>
-                    </fieldEvaluation>
-                </fieldDef>
-     			<fieldDef name="numberOfTrainees" title="Number Of Trainees" workflowType="RULE">
-                    <display>
-                        <type>text</type>
-                    </display>
-                    <validation required="false" />
-                    <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='numberOfTrainees']/value) = wf:ruledata('numberOfTrainees')</xpathexpression>
-                    </fieldEvaluation>
-                </fieldDef>
-                <fieldDef name="tenured" title="Tenured" workflowType="RULE">
-                    <display>
-                        <type>text</type>
-                    </display>
-                    <validation required="false" />
-                    <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='tenured']/value) = wf:ruledata('tenured')</xpathexpression>
-                    </fieldEvaluation>
-                </fieldDef>
-                <fieldDef name="exportControls" title="Export Controls" workflowType="RULE">
-                    <display>
-                        <type>text</type>
-                    </display>
-                    <validation required="false" />
-                    <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='exportControls']/value) = wf:ruledata('exportControls')</xpathexpression>
-                    </fieldEvaluation>
-                </fieldDef>
-                <fieldDef name="inventions" title="Inventions" workflowType="RULE">
-                    <display>
-                        <type>text</type>
-                    </display>
-                    <validation required="false" /> 
-                    <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='inventions']/value) = wf:ruledata('inventions')</xpathexpression>
-                    </fieldEvaluation>
-                </fieldDef>
-                <fieldDef name="effDate" title="Effective Date" workflowType="RULE">
-                    <display>
-                        <type>text</type>
-                    </display>
-                    <validation required="false" />
-                    <fieldEvaluation>
-                        <!-- expectation: this is run and evaluates to true -->
-                        <xpathexpression>string(//xmlRouting/field[@name='effDate']/value) = wf:ruledata('effDate')</xpathexpression>
+                        <!-- commented xpath below from demo has strange side effect, it breaks for copied proposals unless custom data tab is touched -->
+                        <!-- xpathexpression>translate(string(//xmlRouting/field[@name='RouteToOTTED']/value),'y','Y') = wf:ruledata('RouteToOTTED')</xpathexpression> -->
+                        <!-- The full xpath I created does not have this side effect  RRG -->
+                        <!-- KC-632 OTTED routing not working -->
+                        <xpathexpression>translate(string(//document/customDataList/org.kuali.kra.bo.CustomAttributeDocValue[customAttributeId="6"]/value),'y','Y') = wf:ruledata('RouteToOTTED')</xpathexpression>                        
                     </fieldEvaluation>
                 </fieldDef>
             </routingConfig>
@@ -344,10 +277,10 @@
 		</ruleAttribute>
 
 		<ruleAttribute>
-			<name>DepartmentRouting-XPathQualifierResolver</name>
+			<name>UnitNumberRouting-XPathQualifierResolver</name>
 			<className>org.kuali.rice.kew.role.XPathQualifierResolver</className>
-			<label>DepartmentRouting-XPathQualifierResolver</label>
-			<description>DepartmentRouting-XPathQualifierResolver</description>
+			<label>UnitNumberRouting-XPathQualifierResolver</label>
+			<description>UnitNumberRouting-XPathQualifierResolver</description>
 			<type>QualifierResolver</type>
 			<serviceNamespace>KC</serviceNamespace>
 			<resolverConfig>
@@ -356,7 +289,6 @@
 				</attributes>
 			</resolverConfig>
 		</ruleAttribute>
-
 	</ruleAttributes>
 
 	<documentTypes xmlns="ns:workflow/DocumentType" xsi:schemaLocation="ns:workflow/DocumentType resource:DocumentType">
@@ -398,7 +330,7 @@
 			</policies>
 			<attributes>
 				<attribute>
-					<name>CopyCustomActionListAttribute</name>
+					<name>NotificationCustomActionListAttribute</name>
 				</attribute>
 				<attribute>
 					<name>AggregatorSearchAttribute</name>
@@ -419,12 +351,14 @@
 						<split name = "isHierarchyChild">
 							<branch name = "False">
 								<!-- The document is a hierarchy parent, or a document that is not part of a hierarchy so it is routed normally. -->
-								<requests name="OSPInitial" nextNode="ProposalPersons" />
-								<requests name="ProposalPersons" nextNode="PeopleFlows" />
-								<requests name="PeopleFlows" nextNode="UnitRouting" />
-								<requests name="UnitRouting" nextNode="DepartmentalRouting" />
-								<requests name="DepartmentalRouting" nextNode="OSPOfficeRouting" />
-								<requests name="OSPOfficeRouting" nextNode = "Join" />
+								<requests name="ProposalPersons" nextNode="PreApprover" />
+								<requests name="PreApprover" nextNode="Initial_FA" />
+								<requests name="Initial_FA" nextNode="Chair" />
+								<requests name="Chair" nextNode="Dean_VC" />
+								<requests name="Dean_VC" nextNode="Final_Unit_Approval" />
+								<requests name="Final_Unit_Approval" nextNode="PeopleFlows" />
+								<requests name="PeopleFlows" nextNode="UH_Central_Final_Approval" />
+								<requests name="UH_Central_Final_Approval" nextNode="Join" />		
 							</branch>
 							<branch name = "True">
 								<!-- The document is a child in a hierarchy. This node will have the system user as an approver.  If the parent moves to final approval, is rejected, or cancelled
@@ -444,39 +378,24 @@
 				<split name="isHierarchyChild">
        			   <type>org.kuali.coeus.sys.framework.workflow.SimpleBooleanSplitNode</type>
         		</split>
-				<role name="OSPInitial">
-					<qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass>
-                    <activationType>S</activationType>
-					<finalApproval>false</finalApproval>
-	            </role>
+
 				<role name="ProposalPersons">
 					<qualifierResolver>ProposalPersons-XPathQualifierResolver</qualifierResolver>
                     <activationType>P</activationType>
 					<finalApproval>false</finalApproval>
 	            </role>
+				
 	            <requests name="PeopleFlows">
                     <activationType>R</activationType>
                     <rulesEngine executorClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentRulesEngineExecutorImpl"/>
                 </requests>
-				<requests name="UnitRouting">
-					<qualifierResolver>DepartmentRouting-XPathQualifierResolver</qualifierResolver>
-					<!--  <qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass> -->
-					<ruleTemplate>CustomApproval</ruleTemplate>
+	            	            
+	            <role name="UH_Central_Final_Approval">
+					<qualifierResolver>UnitNumberRouting-XPathQualifierResolver</qualifierResolver>
                     <activationType>P</activationType>
-					<finalApproval>false</finalApproval>
-	            </requests>
-				<requests name="DepartmentalRouting">
-					<qualifierResolver>DepartmentRouting-XPathQualifierResolver</qualifierResolver>
-					<!--  <qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass> -->
-					<ruleTemplate>DepartmentalApproval</ruleTemplate>
-                    <activationType>P</activationType>
-					<finalApproval>false</finalApproval>
-	            </requests>
-				<role name="OSPOfficeRouting">
-					<qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass>
-                    <activationType>S</activationType>
 					<finalApproval>false</finalApproval>
 	            </role>
+	            
 	            <requests name="WaitForHierarchyDisposition">
 					<activationType>S</activationType>
 					<ruleTemplate>HierarchyParentDispositionApproval</ruleTemplate>
@@ -484,18 +403,55 @@
 					  <ignorePrevious>true</ignorePrevious>
 					<finalApproval>false</finalApproval>
 				</requests>
+				
 				<join name="Join"/>	            
+				
+				<requests name="PreApprover">
+					<activationType>P</activationType>
+					<finalApproval>false</finalApproval>
+					<ruleSelector>Named</ruleSelector>
+					<ruleName>PreApproverRoutingRule</ruleName>
+				</requests>
+				
+				<requests name="Initial_FA">
+					<activationType>P</activationType>
+					<finalApproval>false</finalApproval>
+					<ruleSelector>Named</ruleSelector>
+					<ruleName>InitialFARoutingRule</ruleName>
+				</requests>
+				
+				<requests name="Chair">
+					<activationType>P</activationType>
+					<finalApproval>false</finalApproval>
+					<ruleSelector>Named</ruleSelector>
+					<ruleName>ChairRoutingRule</ruleName>
+				</requests>
+				
+				<requests name="Dean_VC">
+					<activationType>P</activationType>
+					<finalApproval>false</finalApproval>
+					<ruleSelector>Named</ruleSelector>
+					<ruleName>DeanVCRoutingRule</ruleName>
+				</requests>
+				
+				<requests name="Final_Unit_Approval">
+					<activationType>P</activationType>
+					<finalApproval>false</finalApproval>
+					<ruleSelector>Named</ruleSelector>
+					<ruleName>FinalUnitApprovalRoutingRule</ruleName>
+				</requests>
+                        
 			</routeNodes>
 		</documentType>
 	</documentTypes>
 	<ruleTemplates xmlns="ns:workflow/RuleTemplate" xsi:schemaLocation="ns:workflow/RuleTemplate resource:RuleTemplate">
 		
 		<ruleTemplate allowOverwrite="true">
-			<name>CustomApproval</name>
-			<description>Custom Approval Routing Rule</description>
+			<name>OTTEDCustomApproval</name>
+			<description>OTTED Custom Approval Routing Rule</description>
 			<attributes>
 				<attribute>
-					<name>CustomDataAttribute</name>
+					<name>OTTEDCustomDataAttribute</name>
 					<required>false</required>
 				</attribute>
 			</attributes>
@@ -522,11 +478,109 @@
 			<name>HierarchyParentDispositionApproval</name>
 			<description>Approval rule from the hierarchy parent to hierarchy children.</description>
 		</ruleTemplate>
+ 
+        <ruleTemplate allowOverwrite="true">
+             <name>PreApproverRoutingTemplate</name>
+             <description>PreApprover Routing</description>
+        </ruleTemplate>
+        
+        <ruleTemplate allowOverwrite="true">
+             <name>InitialFARoutingTemplate</name>
+             <description>PreApprover Routing</description>
+        </ruleTemplate>
+
+        <ruleTemplate allowOverwrite="true">
+             <name>ChairRoutingTemplate</name>
+             <description>Chair Routing</description>
+        </ruleTemplate> 
+        
+        <ruleTemplate allowOverwrite="true">
+             <name>DeanVCRoutingTemplate</name>
+             <description>Dean/VC Routing</description>
+        </ruleTemplate>
+        
+        <ruleTemplate allowOverwrite="true">
+             <name>FinalUnitApprovalRoutingTemplate</name>
+             <description>Final Unit Approval Routing</description>
+        </ruleTemplate>
+                   
 	</ruleTemplates>
 
 
 	<rules xmlns="ns:workflow/Rule" xsi:schemaLocation="ns:workflow/Rule resource:Rule">
     
+		<rule>
+			<name>PreApproverRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>PreApproverRoutingTemplate</ruleTemplate>
+			<description>PreApprover Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Initial Approvers!JABSOM:GDO:910|UHMC:Personnel Approver:912|KU:GAO:918</roleName> <!-- [Options]...:[Role;AdminCode]... -->
+					<approvePolicy>F</approvePolicy><!-- A[ll] F[irst] -->
+					<actionRequested>A</actionRequested><!-- F[YI] A[PPROVE] [A]K[NOWLADGE] -->
+				</responsibility>
+			</responsibilities>
+		</rule>	
+	
+		<rule>
+			<name>InitialFARoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>InitialFARoutingTemplate</ruleTemplate>
+			<description>Initial FA Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!FA Approvers!JABSOM,EXT:skip:0|DEFAULT:FA:913</roleName>
+					<approvePolicy>F</approvePolicy><!-- A[ll] F[irst] -->
+					<actionRequested>A</actionRequested><!-- F[YI] A[PPROVE] [A]K[NOWLADGE] -->
+				</responsibility>
+			</responsibilities>
+		</rule>
+		
+		<rule>
+			<name>ChairRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>ChairRoutingTemplate</ruleTemplate>
+			<description>Chair Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Chair Approval!JABSOM,HILO,UHMC,WO,UHMANOA:Chair:914</roleName>
+					<approvePolicy>F</approvePolicy>
+					<actionRequested>A</actionRequested>
+				</responsibility>
+			</responsibilities>
+		</rule>
+		
+		<rule>
+			<name>DeanVCRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>DeanVCRoutingTemplate</ruleTemplate>
+			<description>Dean/Vice Chancellor Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Dean/Vice Chancellor!UHMC:Vice Chancellor:916|EXT,WO:skip:0|DEFAULT:Dean:915</roleName>
+					<approvePolicy>F</approvePolicy>
+					<actionRequested>A</actionRequested>
+				</responsibility>
+			</responsibilities>
+		</rule>
+		
+		<!-- Mike is looking into moving JABSOM FA with the standard FA level -->
+		<rule>
+			<name>FinalUnitApprovalRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>FinalUnitApprovalRoutingTemplate</ruleTemplate>
+			<description>Final Unit Approval Routing</description>
+			<responsibilities>
+				<responsibility>
+				<!-- REQ=Y!Final Unit Approval!JABSOM:FA:913|WO:Chancellor/Vice Chancellor:916,917|HILO:Chancellor:917|UHMC:Chancellor:917|CC:Chancellor:917|DEFAULT:skip:0 -->
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Final Approval!JABSOM:FA:913|WO:Chancellor/Vice Chancellor:916,917|DEFAULT:Chancellor:917|EXT,UHMANOA:skip:0</roleName>
+					<approvePolicy>F</approvePolicy>
+					<actionRequested>A</actionRequested>
+				</responsibility>
+			</responsibilities>
+		</rule>
+  
 		<rule>
 			<name>ApprovalForHierarchyChildren</name>
       		<documentType>ProposalDevelopmentDocument</documentType>
@@ -543,18 +597,18 @@
     	</rule>
 
 		<rule>
-			<name>CustomApprovalRouting</name>
+			<name>OTTEDCustomApprovalRouting</name>
 			<documentType>ProposalDevelopmentDocument</documentType>
-			<ruleTemplate>CustomApproval</ruleTemplate>
-			<description>Custom approval routing</description>
+			<ruleTemplate>OTTEDCustomApproval</ruleTemplate>
+			<description>OTTED Custom approval routing</description>
 			<ruleExtensions>
 				<ruleExtension>
-					<attribute>CustomDataAttribute</attribute>
-					<ruleTemplate>CustomApproval</ruleTemplate>
+					<attribute>OTTEDCustomDataAttribute</attribute>
+					<ruleTemplate>OTTEDCustomApproval</ruleTemplate>
 					<ruleExtensionValues>
 						<ruleExtensionValue>
-							<key>numberOfTrainees</key>
-							<value>10</value>
+							<key>RouteToOTTED</key>
+							<value>Y</value>
 						</ruleExtensionValue>
 					</ruleExtensionValues>
 				</ruleExtension>
@@ -562,13 +616,12 @@
 			
 			<responsibilities>
         		<responsibility>
-          			<workgroup>KC-WKFLW:Proposal Development - Custom Approval Reviewers</workgroup>
+          			<workgroup>KC-WKFLW:OTTED</workgroup>
           			<approvePolicy>F</approvePolicy>
           			<actionRequested>A</actionRequested>
           			<priority>1</priority>
         		</responsibility>
       		</responsibilities>
-			
 		</rule>
 		
 		<rule>
@@ -587,19 +640,6 @@
 						</ruleExtensionValue>
 					</ruleExtensionValues>
 				</ruleExtension>
-
-				<!--
-				<ruleExtension>
-					<attribute>DepartmentalBudgetApprovalAttribute</attribute>
-					<ruleTemplate>DepartmentalApproval</ruleTemplate>
-					<ruleExtensionValues>
-						<ruleExtensionValue>
-							<key>totalCost</key>
-							<value>100000</value>
-						</ruleExtensionValue>
-					</ruleExtensionValues>
-				</ruleExtension>
-				-->
 			</ruleExtensions>
 			
 			<responsibilities>
