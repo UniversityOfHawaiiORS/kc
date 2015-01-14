@@ -23,7 +23,7 @@
 		parent="Uif-DocumentPage" p:headerText="Submit">
 		<property name="items">
 			<list>
-		      <bean parent="Uif-StepProgressBar" p:order="10" >
+		      <bean parent="Uif-StepProgressBar" p:order="10" p:render="@{!document.developmentProposal.child}">
 		     <property name="currentStep" value="@{#ViewHelper.displayProposalProgressCode(document.documentHeader.workflowDocument)}"/>
               <property name="steps">
                      <map>
@@ -59,6 +59,7 @@
                           p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_APPROVE]}"/>
 
                     <bean parent="Uif-SecondaryActionButton" p:methodToCall="disapproveProposal" p:actionLabel="Disapprove"
+                          p:preSubmitCall="dirtyFormState.skipDirtyChecks = true; return true;"
                           p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_DISAPPROVE]}" p:order="40">
                         <property name="confirmationDialog">
                             <bean id="DisapproveExplanationDialog" parent="Uif-DialogGroup-OkCancelExpl" p:promptText="Reason for disapprove?"/>
@@ -69,10 +70,11 @@
                           p:render="@{#editModes['rejectProposal']}"/>
 
                     <bean parent="Uif-LinkField" p:linkText="View Route Log"
+                          p:render="@{!document.developmentProposal.child}"
                           p:href="@{#ConfigProperties['rice.server.url']}/kew/RouteLog.do?documentId=@{document.developmentProposal.proposalDocument.documentNumber}"  p:order="60"
                     p:link.openInDialog="true" />
                     
-                    <bean parent="Uif-RecallAction" p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_RECALL]}"  p:order="70">
+                    <bean parent="Uif-RecallAction" p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_RECALL] and !document.developmentProposal.child}"  p:order="70">
               			<property name="confirmationDialog">
              				<bean id="ConfirmRecallDialog" parent="Uif-DialogGroup-OkCancelExpl" p:promptText="Reason for recall?"/>
             			</property>
@@ -97,11 +99,11 @@
 					 </bean>
 					 
 					<bean id="PropDev-Resumbit-SubmitToSponsorButton" parent="Uif-SecondaryActionButton" p:actionLabel="Submit to Sponsor" p:methodToCall="submitToSponsor" p:order="100"
-					 	p:render="@{#actionFlags[#{submitToSponsor}]}" p:onClickScript="jQuery(this).hide();">
+					 	p:render="@{#actionFlags[#{submitToSponsor}] and !document.developmentProposal.child}" p:onClickScript="jQuery(this).hide();">
 					</bean>	
 					
 					<bean parent="Uif-SecondaryActionButton" p:actionLabel="Submit to S2S" p:methodToCall="submitToS2s" p:order="110"
-					 	p:render="@{#actionFlags[#{submitToS2s}]}" p:successCallback="jQuery('#PropDev-OpportunityPage-SubmissionDetailsSection_tab').click()">
+					 	p:render="@{#actionFlags[#{submitToS2s}] and !document.developmentProposal.child}" p:successCallback="jQuery('#PropDev-OpportunityPage-SubmissionDetailsSection_tab').click()">
 					</bean>				
 						
 					<bean parent="Uif-DropdownToggleMenu" p:toggleText="More Actions"  p:align="right" p:order="120">
@@ -114,7 +116,7 @@
 					      	p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_RELOAD]}"/>		
 					      				 
 					      <bean parent="Uif-MenuAction" p:actionLabel="Blanket Approve" p:methodToCall="blanketApprove" p:order="30"
-					      		p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_BLANKET_APPROVE]}"/>
+					      		p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_BLANKET_APPROVE] and !document.developmentProposal.child}"/>
 						  <bean parent="Uif-MenuDivider"/>
 					      
 					    </list>
@@ -414,9 +416,7 @@
 		</property>
         <property name="items">
 			   <list>
-				    <bean id="PropDev-Resumbit-OptionsRadio" parent="Uif-InputField" p:required="true"
-				     p:propertyName="resubmissionOption"
-				     p:order="10" >
+				    <bean id="PropDev-Resumbit-OptionsRadio" parent="Uif-InputField" p:required="true" p:propertyName="resubmissionOption" p:order="10" >
 				     <property name="control">
 					      <bean parent="Uif-VerticalRadioControl">
 					         <property name="options">
@@ -426,27 +426,26 @@
 	                                <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).DO_NOT_GENERATE_NEW_IP}" p:value="Do not generate a new Institutional Proposal or Institutional Proposal version" />
 		                      </list>
 				        	</property>
-					     	<property name="propertyReplacers">
-	            				<list>
-	                				<bean parent="Uif-ConditionalBeanPropertyReplacer"
-	                      				p:propertyName="options"
-	                      				p:condition="@{!#empty(document.developmentProposal.continuedFrom)}">
-					                    <property name="replacement">
-					                    	<bean parent="Uif-VerticalRadioControl">
-					                        	<property name="options">
-						                            <list>
-											            <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).GENERATE_NEW_VERSION_OF_ORIGINAL_IP}" p:value="Generate a new version of Original Institutional Proposal (@{document.developmentProposal.continuedFrom})" />
-								                        <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).GENERATE_NEW_VERSION_OF_IP}" p:value="Generate a new version of Institutional Proposal" />
-						                                <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).GENERATE_NEW_IP}" p:value="Generate a new Institutional Proposal" />
-						                                <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).DO_NOT_GENERATE_NEW_IP}" p:value="Do not generate a new Institutional Proposal or Institutional Proposal version" />
-						                           </list>
-					                            </property>
-					                        </bean>
-	                    				</property>
-	                				</bean>
-	            				</list>
-        					</property>
    						</bean>
+				     </property>
+				     <property name="propertyReplacers">
+				     	<list>
+				     		<bean parent="Uif-ConditionalBeanPropertyReplacer" p:propertyName="control"
+				     			p:condition="@{!#empty(document.developmentProposal.continuedFrom)}">
+				     			<property name="replacement">
+				     				<bean parent="Uif-VerticalRadioControl">
+			                        	<property name="options">
+				                            <list>
+									            <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).GENERATE_NEW_VERSION_OF_ORIGINAL_IP}" p:value="Generate a new version of Original Institutional Proposal (@{document.developmentProposal.continuedFrom})" />
+						                        <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).GENERATE_NEW_VERSION_OF_IP}" p:value="Generate a new version of Institutional Proposal" />
+				                                <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).GENERATE_NEW_IP}" p:value="Generate a new Institutional Proposal" />
+				                                <bean parent="Uif-KeyLabelPair" p:key="#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.ResubmissionOptions).DO_NOT_GENERATE_NEW_IP}" p:value="Do not generate a new Institutional Proposal or Institutional Proposal version" />
+				                           </list>
+			                            </property>
+			                        </bean>
+				     			</property>
+	                      	</bean>
+				     	</list>
 				     </property>
 	    			</bean>
 	    			<bean id="PropDev-Resumbit-Options-InstitutionalProposalToVersion"
@@ -521,7 +520,7 @@
     <bean id="PropDev-SubmitPage-HierarchyDetails-parentBean" abstract="true" parent="Uif-VerticalBoxSection">
         <property name="items">
             <list>
-                <bean parent="Uif-Link" p:linkText="View Document" p:order="10" p:openInDialog="true"
+                <bean parent="Uif-Link" p:linkText="View Document" p:order="10" p:target="_new"
                      p:href="@{#ConfigProperties['application.url']}/kc-pd-krad/proposalDevelopment?methodToCall=docHandler&amp;docId=@{#line.proposalDocument.documentNumber}&amp;command=displayDocSearchView&amp;pageId=PropDev-DetailsPage" />
                 <bean parent="PropDev-SubmitPage-HierarchyOverview" p:order="20"/>
                 <bean parent="PropDev-SubmitPage-HierarchySponsorProgramInfo" p:order="30"/>

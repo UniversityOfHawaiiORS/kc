@@ -793,7 +793,9 @@
                 <property name="items">
                     <list>
                         <bean parent="Rolodex-AddNewAddressButton" p:order="10"
-                              p:render="@{#ViewHelper.allowsMaintenanceNewOrCopyAction()}"/>
+                              p:render="@{#ViewHelper.allowsMaintenanceNewOrCopyAction()}"
+                              p:openInDialog="false"
+                              p:onClickScript="e.preventDefault();parent.openIframeDialog(jQuery(this).attr('href') + '&amp;renderedInDialog=true', 'Rolodex-AddNewAddress-Dialog');"/>
                     </list>
                 </property>
             </bean>
@@ -804,5 +806,17 @@
     <bean id="Rolodex-AddNewAddressButton-parentBean" abstract="true" parent="Uif-Link" p:linkText="Add New Address Book"
           p:href="@{#ConfigProperties['application.url']}/kr-krad/maintenance?viewTypeName=MAINTENANCE&amp;methodToCall=start&amp;dataObjectClassName=org.kuali.coeus.common.framework.rolodex.Rolodex"
           p:openInDialog="true"
+          p:linkDialogId="Rolodex-AddNewAddress-Dialog"
           p:cssClasses="btn,btn-xs"/>
+
+    <bean id="Rolodex-AddNewAddress-Dialog" parent="Uif-DialogGroup-Iframe"
+          p:headerText="Add New Address"
+          p:footer.render="true">
+        <property name="footer.items">
+            <list>
+                <bean parent="Uif-PrimaryActionButton" p:actionLabel="Close"
+                      p:actionScript="dismissDialog('Rolodex-AddNewAddress-Dialog');"/>
+            </list>
+        </property>
+    </bean>
 </beans>

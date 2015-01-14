@@ -28,16 +28,19 @@ import org.kuali.coeus.propdev.impl.attachment.NarrativeType;
 import org.kuali.coeus.propdev.impl.budget.BudgetStatus;
 import org.kuali.coeus.propdev.impl.budget.ProposalBudgetService;
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
+import org.kuali.coeus.propdev.impl.budget.hierarchy.ProposalBudgetHierarchyService;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentService;
 import org.kuali.coeus.propdev.impl.keyword.PropScienceKeyword;
 import org.kuali.coeus.propdev.impl.person.ProposalPerson;
+import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiographyService;
 import org.kuali.coeus.propdev.impl.specialreview.ProposalSpecialReview;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.coeus.sys.framework.util.DateUtils;
 import org.kuali.coeus.sys.framework.workflow.KcDocumentRejectionService;
+import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.kra.test.infrastructure.KcIntegrationTestBase;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
@@ -49,6 +52,7 @@ import org.kuali.rice.krad.bo.DocumentHeader;
 import org.kuali.rice.krad.data.DataObjectService;
 import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
+import org.kuali.rice.krad.service.PessimisticLockService;
 import org.kuali.rice.krad.workflow.service.WorkflowDocumentService;
 
 public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
@@ -58,10 +62,12 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 	private DevelopmentProposal childProposal;
 	private ProposalHierarchyServiceImpl hierarchyService;
 	private DataObjectService dataObjectService;
+    private KcAuthorizationService kcAuthorizationService;
 
 	@Before
 	public void setup() throws Exception {
 		dataObjectService = KcServiceLocator.getService(DataObjectService.class);
+        kcAuthorizationService = KcServiceLocator.getService(KcAuthorizationService.class);
 		pdDocument = initializeProposalDevelopmentDocument();
 		childProposal = getChildProposal(this.pdDocument.getDevelopmentProposal());
 		hierarchyProposal = setDevelopmentProposalAdditionalData(
@@ -106,7 +112,7 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 	@Test
 	public void test_synchronizeChildProposalBudget() {
 		ProposalDevelopmentBudgetExt budget = childProposal.getLatestBudget();
-		hierarchyService.synchronizeChildProposalBudget(budget, childProposal);
+		hierarchyService.synchronizeChildBudget(hierarchyProposal, budget);
 	}
 
 	@Test
@@ -225,6 +231,7 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 
 	@Test
 	public void test_validateRemovePermissions() {
+        hierarchyService.removeFromHierarchy(childProposal);
 		boolean valid = true;
 		valid = hierarchyService.validateRemovePermissions(childProposal, "10000000001");
 		assertFalse(valid);
@@ -363,7 +370,7 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 		List<ProposalHierarchyErrorWarningDto> errors = new ArrayList<ProposalHierarchyErrorWarningDto>();
 		childProposal.setHierarchyStatus(HierarchyStatusConstants.None.code());
 		errors = hierarchyService.validateLinkToHierarchy(hierarchyProposal, childProposal);
-		assertTrue(errors.isEmpty());
+		assertTrue(errors.toString(), errors.isEmpty());
 	}
 
 	@Test
@@ -372,7 +379,7 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 		String errorKey = "error.hierarchy.proposal.not.hierarchy.child";
 		errors = hierarchyService.validateLinkToHierarchy(hierarchyProposal, childProposal);
 		assertNotNull(errors);
-		assertTrue(errors.size() == 1);
+		assertTrue(errors.toString(), errors.size() == 1);
 		assertEquals(errorKey, errors.get(0).getErrorKey());
 	}
 
@@ -396,8 +403,6 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 				.getService(GlobalVariableService.class);
 		DocumentService documentService = KcServiceLocator
 				.getService(DocumentService.class);
-		ProposalBudgetService budgetService = KcServiceLocator
-				.getService(ProposalBudgetService.class);
 		KcAuthorizationService kcAuthorizationService = KcServiceLocator
 				.getService(KcAuthorizationService.class);
 		ParameterService parameterService = KcServiceLocator
@@ -406,25 +411,30 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 				.getService(LegacyNarrativeService.class);
 		ProposalHierarchyDao proposalHierarchyDao = KcServiceLocator
 				.getService(ProposalHierarchyDao.class);
-		BudgetSummaryService budgetSummaryService = KcServiceLocator
-				.getService(BudgetSummaryService.class);
 		ConfigurationService configurationService = KcServiceLocator
 				.getService(ConfigurationService.class);
 		KcDocumentRejectionService kcDocumentRejectionService = KcServiceLocator
 				.getService(KcDocumentRejectionService.class);
+		PessimisticLockService pessimisticLockService = KcServiceLocator
+				.getService(PessimisticLockService.class);
+        ProposalPersonBiographyService proposalPersonBiographyService = KcServiceLocator.
+                getService(ProposalPersonBiographyService.class);
+		ProposalBudgetHierarchyService proposalBudgetHierarchyService = KcServiceLocator
+				.getService(ProposalBudgetHierarchyService.class);
 
 		hierarchyService.setKradWorkflowDocumentService(kradWorkflowDocumentService);
 		hierarchyService.setGlobalVariableService(globalVariableService);
 		hierarchyService.setDocumentService(documentService);
-		hierarchyService.setBudgetService(budgetService);
 		hierarchyService.setKcAuthorizationService(kcAuthorizationService);
 		hierarchyService.setDataObjectService(dataObjectService);
 		hierarchyService.setParameterService(parameterService);
 		hierarchyService.setLegacyNarrativeService(legacyNarrativeService);
 		hierarchyService.setProposalHierarchyDao(proposalHierarchyDao);
-		hierarchyService.setBudgetSummaryService(budgetSummaryService);
 		hierarchyService.setKualiConfigurationService(configurationService);
 		hierarchyService.setKcDocumentRejectionService(kcDocumentRejectionService);
+		hierarchyService.setPessimisticLockService(pessimisticLockService);
+        hierarchyService.setProposalPersonBiographyService(proposalPersonBiographyService);
+		hierarchyService.setProposalBudgetHierarchyService(proposalBudgetHierarchyService);
 	}
 
 	private ProposalDevelopmentDocument initializeProposalDevelopmentDocument()
@@ -448,6 +458,7 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 		ProposalDevelopmentService pdService = getService(ProposalDevelopmentService.class);
 		pdService.initializeUnitOrganizationLocation(pd);
 		pdService.initializeProposalSiteNumbers(pd);
+        kcAuthorizationService.addDocumentLevelRole("10000000001", RoleConstants.AGGREGATOR_DOCUMENT_LEVEL,pd);
 		return pd;
 	}
 
