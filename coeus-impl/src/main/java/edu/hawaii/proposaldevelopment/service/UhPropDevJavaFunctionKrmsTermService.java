@@ -16,7 +16,8 @@
  */
 package edu.hawaii.proposaldevelopment.service;
 
-import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+
 
 /**
  * This interface is to declare all methods which are used as KRMS Terms in KC

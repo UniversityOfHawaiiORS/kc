@@ -17,14 +17,15 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
-import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
-import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
+import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
+import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.rice.kew.actiontaken.ActionTakenValue;
 import org.kuali.rice.kew.api.action.ActionItem;
 import org.kuali.rice.kew.api.util.CodeTranslator;
 import org.kuali.rice.kew.doctype.bo.DocumentType;
 import org.kuali.rice.core.api.mail.EmailContent;
+import org.kuali.rice.kew.mail.service.impl.StyleableEmailContentServiceImpl;
 import org.kuali.rice.kew.routeheader.DocumentRouteHeaderValue;
 import org.kuali.rice.kew.service.KEWServiceLocator;
 import org.kuali.rice.kim.api.identity.Person;
@@ -39,7 +40,7 @@ import com.google.common.base.Preconditions;
  * @author Kuali Rice Team (kuali-rice@googlegroups.com)
  */
 public class KcUHStyleableEmailContentServiceImpl extends
-		UHStyleableEmailContentServiceImpl {
+			StyleableEmailContentServiceImpl {
 	private static final int MAX_SUBJECT_LENGTH = 60;
 	private static final int MAX_TITLE_LENGTH = 60;
 	private static final Logger LOG = Logger

@@ -1,13 +1,14 @@
 package edu.hawaii.award.bo;
 
 import java.sql.Date;
-import org.kuali.kra.bo.KcPerson;
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.service.KcPersonService;
+
+import org.kuali.coeus.common.framework.person.KcPerson;
+import org.kuali.coeus.common.framework.person.KcPersonService;
+import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.krad.bo.PersistableBusinessObjectExtension;
 
-public class UhAwardExtension extends KraPersistableBusinessObjectBase
+public class UhAwardExtension extends KcPersistableBusinessObjectBase
 		implements PersistableBusinessObjectExtension {
 
 	private static final long serialVersionUID = 5451523757235950756L;
@@ -81,7 +82,7 @@ public class UhAwardExtension extends KraPersistableBusinessObjectBase
 	 */
 	protected KcPersonService getKcPersonService() {
 		if (this.kcPersonService == null) {
-			this.kcPersonService = KraServiceLocator
+			this.kcPersonService = KcServiceLocator
 					.getService(KcPersonService.class);
 		}
 

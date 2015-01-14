@@ -18,21 +18,19 @@ package edu.hawaii.negotiations;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.lookup.keyvalue.ExtendedPersistableBusinessObjectValuesFinder;
-import org.kuali.kra.lookup.keyvalue.PrefixValuesFinder;
+import org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinder;
+import org.kuali.coeus.sys.framework.keyvalue.PrefixValuesFinder;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.negotiations.bo.NegotiationActivityType;
-import org.kuali.kra.negotiations.bo.NegotiationAssociationType;
-import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.krad.service.BusinessObjectService;
 
+@SuppressWarnings("deprecation")
 public class UhNegotiationActivityTypeValuesFinder extends ExtendedPersistableBusinessObjectValuesFinder {
     
     /**
@@ -94,7 +92,7 @@ public class UhNegotiationActivityTypeValuesFinder extends ExtendedPersistableBu
 
     protected BusinessObjectService getBusinessObjectService() {
         if (businessObjectService == null) {
-            businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
+            businessObjectService = KcServiceLocator.getService(BusinessObjectService.class);
         }
         return businessObjectService;
     }

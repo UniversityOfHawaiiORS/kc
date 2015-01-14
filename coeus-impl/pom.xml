@@ -596,5 +596,11 @@
             <groupId>com.thoughtworks.xstream</groupId>
             <artifactId>xstream</artifactId>
         </dependency>
+        <!-- KC 530 Lookup screens are too difficult for users, make searches easier by implementing search engine -->
+        <dependency>
+        	<groupId>org.apache.solr</groupId>
+        	<artifactId>solr-solrj</artifactId>
+        	<version>4.0.0</version>
+        </dependency>
     </dependencies>
 </project>

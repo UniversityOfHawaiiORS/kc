@@ -1,11 +1,7 @@
 package edu.hawaii.rice.kew.web;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -13,18 +9,13 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-
-import org.apache.log4j.Logger;
-import org.kuali.rice.kew.web.UserLoginFilter;
+//import org.apache.log4j.Logger;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.kim.api.group.Group;
 import org.kuali.rice.kim.api.group.GroupService;
 import org.kuali.rice.kim.api.identity.principal.Principal;
 import org.kuali.rice.kim.api.services.KimApiServiceLocator;
-import org.kuali.rice.kim.impl.group.GroupBo;
-import org.kuali.rice.kim.impl.group.GroupMemberBo;
-import org.kuali.rice.krad.service.BusinessObjectService;
-import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.rice.krad.web.filter.UserLoginFilter;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 
 /**
@@ -35,7 +26,7 @@ import org.kuali.rice.core.api.config.property.ConfigurationService;
  */
 public class UhKcUserLoginFilter extends UserLoginFilter
 {	
-	private static final Logger LOG = Logger.getLogger(UhKcUserLoginFilter.class);
+	//private static final Logger LOG = Logger.getLogger(UhKcUserLoginFilter.class);
 	
 	private static HashSet<String>kcUsers=new HashSet<String>();
 	private static String kcUserGroupId;
@@ -44,50 +35,21 @@ public class UhKcUserLoginFilter extends UserLoginFilter
 		kcUsers=new HashSet<String>();
 	}
 	
-	private String getKcUserGroupId() {
-		if (kcUserGroupId==null) {
-			//RRG The GroupService Lookup is SOOOOO SLOWWWWW....so writing my own again.....
-			//GroupService groupService = KimApiServiceLocator.getGroupService();
-	        //Group kcUserGroup=groupService.getGroupByNamespaceCodeAndName("KC-GEN", "UH KC Users");
-	        
-			Map<String, String> queryMap = new HashMap<String, String>();
-			queryMap.put("name", "UH KC Users");
-	        queryMap.put("namespaceCode", "KC-GEN");
-	            
-	        List<GroupBo> kcUserGroups = 
-	            (List<GroupBo>) KraServiceLocator.getService(BusinessObjectService.class).findMatching(GroupBo.class, queryMap);
-	        kcUserGroupId = kcUserGroups.get(0).getId();
-	        
-			
+	String getKcUserGroupId() {
+		if (kcUserGroupId == null) {
+			GroupService groupService = KimApiServiceLocator.getGroupService();
+			Group kcUserGroup=groupService.getGroupByNamespaceCodeAndName("KC-GEN", "UH KC Users");
+			kcUserGroupId = kcUserGroup.getId();
 		}
 		return kcUserGroupId;
 	}
 	
-	private boolean isKcUser(String memberId) {		
-        Map<String, String> queryMap = new HashMap<String, String>();
-        queryMap.put("groupId", getKcUserGroupId());
-        queryMap.put("memberId", memberId);
-            
-        List<GroupMemberBo> kcUserGroupMembers = 
-            (List<GroupMemberBo>) KraServiceLocator.getService(BusinessObjectService.class).findMatching(GroupMemberBo.class, queryMap);
-        
-        // The only results returned should be for the correct group and member
-        // So just check if any returned data is active and return true if so.
-        for (GroupMemberBo groupMember : kcUserGroupMembers) {
-            groupMember.isActive();
-            return true;
-        }
-		
-        return false;
-	}
 	
 	// KC-620 Check for user in group "KC Users" not working (5.1 upgrade issue)
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException,
     ServletException {
 		HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) res;
-
-        
+        HttpServletResponse response = (HttpServletResponse) res;  
         
 		String principalName = request.getRemoteUser();
 
@@ -99,7 +61,7 @@ public class UhKcUserLoginFilter extends UserLoginFilter
                 // now since a new user may not yet be processed by UHIMS message but be in cas  rare but possible
         	    // more often this is caused in dev where dev CAS allows you to type anything resulting in no principle data
         	    // This will also block inactive users similar to code in 3.1.1 for KC-487 put in by RBL
-            	ConfigurationService configService = KraServiceLocator.getService(ConfigurationService.class);
+            	ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
 
             	String logoutUrlBase = configService.getPropertyValueAsString("filter.casLogoutUrl");
             	String profilerNotFoundRedirectUrl = configService.getPropertyValueAsString("filter.profilerNotFoundRedirectUrl");
@@ -120,17 +82,16 @@ public class UhKcUserLoginFilter extends UserLoginFilter
                     }
                 }
                 return; 
-			} else  {
-                // RRG this call was really slow so I wrote my own direct Business Object Lookup isKcUser() method
-                //boolean inKcUsersGroup = KimApiServiceLocator.getGroupService().isMemberOfGroup(principal.getPrincipalId(), kcUserGroup.getId());
-                if (isKcUser(principal.getPrincipalId())) {
+			} else  {	
+				boolean inKcUsersGroup = KimApiServiceLocator.getGroupService().isMemberOfGroup(principal.getPrincipalId(), getKcUserGroupId());
+				if (inKcUsersGroup) {
                 	kcUsers.add(principalName);
                 } else {
                 	// User is not in "UH KC Users" group so redirect them to permission denied page.
         	        // Check if request is already forwarded to Permission Denied to prevent redirect loop
         	        String channelTitle=(String)request.getParameter("channelTitle");
         	        if (channelTitle != null && !channelTitle.contains("PermissionDenied")) {
-        		        ConfigurationService configService = KraServiceLocator.getService(ConfigurationService.class);
+        		        ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
         		        String appUrl= configService.getPropertyValueAsString("application.url");
         		        response.sendRedirect("portal.do?channelTitle=PermissionDenied&channelUrl=" + appUrl + "/PermissionDenied.do");
         		        return;

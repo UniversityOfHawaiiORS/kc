@@ -17,9 +17,10 @@
 package edu.hawaii.proposaldevelopment.service.impl;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.budget.core.Budget;
-import org.kuali.kra.krms.service.impl.KcKrmsJavaFunctionTermServiceBase;
-import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
+import org.kuali.coeus.common.budget.framework.core.Budget;
+import org.kuali.coeus.common.impl.krms.KcKrmsJavaFunctionTermServiceBase;
+import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+
 import edu.hawaii.proposaldevelopment.service.UhPropDevJavaFunctionKrmsTermService;
 
 
@@ -34,9 +35,9 @@ public class UhPropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunction
      */
     @Override
     public String hasUnrecoveredFandA(DevelopmentProposal developmentProposal) {
-    	Budget budget=developmentProposal.getProposalDocument().getFinalBudgetForThisProposal();
+    	Budget budget=developmentProposal.getFinalBudget();
     	if (budget != null) {
-    		if (budget.getUnderrecoveryAmount() != null && budget.getUnderrecoveryAmount().getFloatValue() != 0) {
+    		if (budget.getUnderrecoveryAmount() != null && budget.getUnderrecoveryAmount().isNonZero()) {
     			return TRUE;
     		}
     	}
@@ -52,6 +53,4 @@ public class UhPropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunction
         }
     }
     // KC-837 END
-    
-
 }

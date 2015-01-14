@@ -15,19 +15,12 @@
  */
 package edu.hawaii.institutionalproposal.service.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.bo.versioning.VersionStatus;
-import org.kuali.kra.institutionalproposal.contacts.InstitutionalProposalPerson;
 import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.service.impl.InstitutionalProposalLookupableHelperServiceImpl;
 import org.kuali.rice.krad.bo.BusinessObject;
-import org.kuali.rice.kns.lookup.LookupUtils;
 
 /**
  * KC-367: This new search does exactly the old search except it doesn't filter
@@ -35,6 +28,7 @@ import org.kuali.rice.kns.lookup.LookupUtils;
  * 
  */
 
+@SuppressWarnings("deprecation")
 public class InstitutionalProposalAdvancedSearchLookupableHelperServiceImpl
 		extends InstitutionalProposalLookupableHelperServiceImpl {
 

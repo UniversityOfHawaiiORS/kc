@@ -22,9 +22,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.kra.award.home.Award;
-import org.kuali.kra.award.lookup.AwardLookupableHelperServiceImpl;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.krad.bo.BusinessObject;
+import org.kuali.kra.award.lookup.AwardLookupableHelperServiceImpl;
 
 /**
  * KC-367: This new search does exactly the old search except it doesn't filter the results.
@@ -32,6 +32,7 @@ import org.kuali.rice.krad.bo.BusinessObject;
  * 
  * This class provides Award lookup support
  */
+@SuppressWarnings("deprecation")
 class AwardAdvancedSearchLookupableHelperServiceImpl extends
 		AwardLookupableHelperServiceImpl {
 

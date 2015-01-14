@@ -28,7 +28,11 @@ import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 
 import javax.persistence.*;
+
 import java.io.Serializable;
+//KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+import java.sql.Date;
+
 
 @Entity
 @Table(name = "UNIT_ADMINISTRATOR")
@@ -51,14 +55,51 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
     @JoinColumn(name = "UNIT_NUMBER", referencedColumnName = "UNIT_NUMBER", insertable = false, updatable = false)
     private Unit unit;
 
+    // KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+    private Date fromDate;
+    private Date toDate;
+    // KC-679 END
+
     @ManyToOne(cascade = { CascadeType.REFRESH })
     @JoinColumn(name = "UNIT_ADMINISTRATOR_TYPE_CODE", referencedColumnName = "UNIT_ADMINISTRATOR_TYPE_CODE", insertable = false, updatable = false)
     private UnitAdministratorType unitAdministratorType;
 
     @Transient
     private transient KcPersonService kcPersonService;
+    
+    // KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+    public Date getFromDate() {
+		return fromDate;
+	}
 
-    @Override
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+	
+	public Date getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
+	}
+	
+	public boolean isActive() {
+		// Check from and to dates.  Inclusive so need to add/subtract days from today before comparing
+		java.util.Calendar cal = java.util.Calendar.getInstance();
+		long now = cal.getTime().getTime();
+		Date today = new Date(now);
+		
+		// drop time component by converting to yyyy-mm-dd
+		if (fromDate == null || fromDate.toString().compareTo(today.toString()) <= 0)  {
+			if (toDate == null || toDate.toString().compareTo(today.toString()) >= 0) {
+				return true;
+			}
+		}
+		return false;
+	}
+	// KC-679 END
+
     public String getPersonId() {
         return personId;
     }
@@ -86,8 +127,8 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
 
     public KcPerson getPerson() {
         if (personId !=null) {
-            return getKcPersonService().getKcPersonByPersonId(personId);
-        }
+        return getKcPersonService().getKcPersonByPersonId(personId);
+    }
             return null;
     }
 
@@ -118,10 +159,10 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
     public void setUnit(Unit unit) {
         this.unit = unit;
     }
-
-    //KRACOEUS-5499 Implemented Comparable interface. 
+    
+    //KRACOEUS-5499 Implemented Comparable interface.
     @Override
-    public int compareTo(UnitAdministrator unitAdmin) {
+    public int compareTo(UnitAdministrator unitAdmin) {        
         int result = 0;
         if (unitAdmin == null) {
             result = 1;
@@ -131,12 +172,12 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
             } else {
                 if (getPerson() != null && StringUtils.isNotEmpty(getPerson().getLastName()) && unitAdmin.getPerson() != null && StringUtils.isNotEmpty(unitAdmin.getPerson().getLastName())) {
                     result = getPerson().getLastName().compareTo(unitAdmin.getPerson().getLastName());
-                }
+                }             
             }
         }
         return result;
-    }
-
+    } 
+    
     public static final class UnitAdministratorId implements Serializable, Comparable<UnitAdministratorId> {
 
         private String unitNumber;

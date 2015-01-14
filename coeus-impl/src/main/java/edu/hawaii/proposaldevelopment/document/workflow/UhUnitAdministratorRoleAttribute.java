@@ -11,11 +11,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.kuali.kra.bo.Unit;
-import org.kuali.kra.bo.UnitAdministrator;
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.proposaldevelopment.bo.ProposalPersonUnit;
-import org.kuali.kra.service.UnitService;
+import org.kuali.coeus.common.framework.unit.Unit;
+import org.kuali.coeus.common.framework.unit.UnitService;
+import org.kuali.coeus.common.framework.unit.admin.UnitAdministrator;
+import org.kuali.coeus.propdev.impl.person.ProposalPersonUnit;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.core.api.util.xml.XmlHelper;
 import org.kuali.rice.kew.api.identity.Id;
 import org.kuali.rice.kew.api.identity.PrincipalId;
@@ -39,16 +39,13 @@ import edu.hawaii.kra.kew.UhUnitToBranchDecoder;
  * @author Ronald Gouldner (Based on code shared by Omar Soto)
  * UH 5.1.1 Routing
  */
-@SuppressWarnings("unchecked")
+@SuppressWarnings({ "unchecked", "deprecation" })
 public class UhUnitAdministratorRoleAttribute extends GenericRoleAttribute {
 	private static final long serialVersionUID = 2187135270043141363L;
 
-	@SuppressWarnings("unused")
 	private static final Log LOG = LogFactory.getLog(UhUnitAdministratorRoleAttribute.class);
 	private static final String KEYPERSONUNIT = "unitNumber";
 
-	// Default Values 
-	private boolean getHomeUnit = true;
 	private List<String> roleNameStrings;
 	
 	//private List<String> unitIds;
@@ -140,7 +137,6 @@ public class UhUnitAdministratorRoleAttribute extends GenericRoleAttribute {
 		// [Options]:[Roles]
 		// Options opt=val;opt=val...
 		// Roles   Role;AdminCode!Role;AdminCode...
-		String configMsg="UhUnitAdministratorRoleAttribute Configured incorrectly. ";
 		if (roleNameInput != null) {
 			String[] inputSplit = roleNameInput.split("!");
 
@@ -212,7 +208,7 @@ public class UhUnitAdministratorRoleAttribute extends GenericRoleAttribute {
 	
     private UnitService getUnitService() {
     	if (this.unitService == null) {
-    		this.unitService = KraServiceLocator.getService(UnitService.class);
+    		this.unitService = KcServiceLocator.getService(UnitService.class);
     	}
     	
         return unitService;
@@ -225,14 +221,13 @@ public class UhUnitAdministratorRoleAttribute extends GenericRoleAttribute {
     	return unitToBranch;
     }
     
-    public BusinessObjectService getBusinessObjectService() {
+	public BusinessObjectService getBusinessObjectService() {
     	if (this.businessObjectService == null) {
-    		this.businessObjectService = KraServiceLocator.getService(BusinessObjectService.class);
+    		this.businessObjectService = KcServiceLocator.getService(BusinessObjectService.class);
     	}
         return businessObjectService;
     }
 	
-    @SuppressWarnings("unchecked")
     public List<UnitAdministrator> retrieveUnitAdministratorsByUnitNumberAndAdminCode(String unitNumber,String adminCode) {
         Map<String, String> queryMap = new HashMap<String, String>();
         queryMap.put("unitNumber", unitNumber);
@@ -279,7 +274,7 @@ public class UhUnitAdministratorRoleAttribute extends GenericRoleAttribute {
 	    	admins = new ArrayList<Id>();
 	        for ( UnitAdministrator unitAdministrator : unitAdministrators ) {
 	    	    personId = new PrincipalId(unitAdministrator.getPersonId());
-	    	    Person adminPerson = KraServiceLocator.getService(PersonService.class).getPerson(personId.getId());
+	    	    Person adminPerson = KcServiceLocator.getService(PersonService.class).getPerson(personId.getId());
 	    	    if (adminPerson.isActive()) {
 	    	    	List<UhPersonDelegate> uhPersonDelegateList = retreivePersonDelegates(personId);
 	    	        String annotationDesc;
@@ -390,7 +385,7 @@ public class UhUnitAdministratorRoleAttribute extends GenericRoleAttribute {
 		// resolve the lack of
 		// unit admin members
 		if (members.size() == 0 && required) {
-			GroupService groupService = KraServiceLocator
+			GroupService groupService = KcServiceLocator
 					.getService(GroupService.class);
 			Group helpdesk = groupService.getGroupByNamespaceCodeAndName(
 					"KC-WKFLW", "myGRANT Help Desk");
@@ -438,7 +433,6 @@ public class UhUnitAdministratorRoleAttribute extends GenericRoleAttribute {
 		}
 	}
 	
-	@SuppressWarnings({ "unchecked", "unchecked" })
 	private Collection<Element> retrieveKeyPersonnelUnits(RouteContext context) {		
 	    Document document = XmlHelper.buildJDocument(context.getDocumentContent().getDocument());
 	   

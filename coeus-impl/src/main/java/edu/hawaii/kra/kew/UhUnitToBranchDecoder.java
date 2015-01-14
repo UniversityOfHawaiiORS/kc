@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.kuali.kra.bo.Unit;
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.service.UnitService;
+import org.kuali.coeus.common.framework.unit.Unit;
+import org.kuali.coeus.common.framework.unit.UnitService;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 
 import com.google.common.collect.Lists;
@@ -60,7 +60,7 @@ public class UhUnitToBranchDecoder {
         // If unit not found assume UHMANOA branch name
         String branch="UHMANOA";
         if (unitNumber!=null) {
-        	List<Unit> units = KraServiceLocator.getService(UnitService.class).getUnitHierarchyForUnit(unitNumber);
+        	List<Unit> units = KcServiceLocator.getService(UnitService.class).getUnitHierarchyForUnit(unitNumber);
         	if (CollectionUtils.isNotEmpty(units)) {
                 for(Unit unit: Lists.reverse(units)) {
                 	String branchFound=getUnitToBranchMap().get(unit.getUnitNumber());

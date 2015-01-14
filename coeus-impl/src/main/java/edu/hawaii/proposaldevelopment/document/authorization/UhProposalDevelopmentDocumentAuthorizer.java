@@ -15,7 +15,7 @@
  */
 package edu.hawaii.proposaldevelopment.document.authorization;
 
-import org.kuali.kra.proposaldevelopment.document.authorization.ProposalDevelopmentDocumentAuthorizer;
+import org.kuali.coeus.propdev.impl.auth.ProposalDevelopmentDocumentAuthorizer;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.krad.document.Document;
 
@@ -26,7 +26,11 @@ import org.kuali.rice.krad.document.Document;
 public class UhProposalDevelopmentDocumentAuthorizer extends ProposalDevelopmentDocumentAuthorizer {
 
     
-    org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(UhProposalDevelopmentDocumentAuthorizer.class);
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 7944931271831598538L;
+	org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(UhProposalDevelopmentDocumentAuthorizer.class);
     
     
     /**

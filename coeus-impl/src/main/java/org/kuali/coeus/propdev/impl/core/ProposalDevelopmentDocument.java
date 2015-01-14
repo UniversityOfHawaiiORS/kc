@@ -91,9 +91,9 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     private static final String RETURN_TO_PROPOSAL_ALT_TEXT = "return to proposal";
 
     private static final String RETURN_TO_PROPOSAL_METHOD_TO_CALL = "methodToCall.returnToProposal";
-
+    
     private static final String HIERARCHY_CHILD_SPLITNODE_QUESTION = "isHierarchyChild";
-
+    
     @Transient
     private transient DocumentHeaderService documentHeaderService;
 
@@ -135,10 +135,10 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     @OneToMany(orphanRemoval = true, cascade = { CascadeType.ALL })
     @JoinColumn(name = "DOCUMENT_NUMBER", referencedColumnName = "DOCUMENT_NUMBER", insertable = true, updatable = true)
     private List<CustomAttributeDocValue> customDataList;
-
+    
     /* Currently this property is just used for UI display.
- * If it becomes part of the domain, it should probably move to DevelopmentProposal.java
- */
+     * If it becomes part of the domain, it should probably move to DevelopmentProposal.java
+     */
     @Transient
     private String institutionalProposalNumber;
 
@@ -147,7 +147,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
 
     public ProposalDevelopmentDocument() {
         super();
-        DevelopmentProposal newProposal = new DevelopmentProposal();
+        DevelopmentProposal newProposal = new DevelopmentProposal(); 
         newProposal.setProposalDocument(this);
         developmentProposal = newProposal;
         customDataList = new ArrayList<CustomAttributeDocValue>();
@@ -160,7 +160,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     public void setDevelopmentProposal(DevelopmentProposal proposal) {
         developmentProposal = proposal;
     }
-
+    
     public String getInstitutionalProposalNumber() {
         return institutionalProposalNumber;
     }
@@ -279,15 +279,15 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
                 try {
                     if (getKcDocumentRejectionService().isDocumentOnInitialNode(this.getDocumentHeader().getWorkflowDocument())) {
                         DocumentRouteStatusChange dto = new DocumentRouteStatusChange(getDocumentHeader().getWorkflowDocument().getDocumentId(), getDocumentNumber(), KewApiConstants.ROUTE_HEADER_ENROUTE_CD, KewApiConstants.ROUTE_HEADER_ENROUTE_CD);
-                        //DocumentRouteStatusChange.documentEventCode is always returned as rt_status_change 
-                        //dto.setDocumentEventCode("REJECTED_APPROVED"); 
+                        //DocumentRouteStatusChange.documentEventCode is always returned as rt_status_change
+                        //dto.setDocumentEventCode("REJECTED_APPROVED");
                         if (getDevelopmentProposal().isParent()) {
                             getProposalHierarchyService().routeHierarchyChildren(this, dto);
                             getProposalHierarchyService().calculateAndSetProposalAppDocStatus(this, dto);
                         }
                         if (!getDevelopmentProposal().isInHierarchy())
                         	getProposalHierarchyService().calculateAndSetProposalAppDocStatus(this, dto);
-                    }
+                        }
                 } catch (ProposalHierarchyException pe) {
                     throw new RuntimeException(String.format("ProposalHeierachyException encountered trying to re-submit rejected parent document:%s", getDocumentNumber()), pe);
                 } catch (Exception we) {
@@ -312,19 +312,19 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
             }
         }
     }
-
+    
     private boolean isLastSubmitterApprovalAction(ActionTaken actionTaken) {
         return actionTaken.getActionTaken().getCode().equals(KewApiConstants.ACTION_TAKEN_APPROVED_CD) && getWorkflowDocumentActionsService().isFinalApprover(actionTaken.getDocumentId(), actionTaken.getPrincipalId());
     }
-
+    
     private boolean shouldAutogenerateInstitutionalProposal() {
         return getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, KeyConstants.AUTOGENERATE_INSTITUTIONAL_PROPOSAL_PARAM);
     }
-
+    
     protected ConfigurationService getKualiConfigurationService() {
         return CoreApiServiceLocator.getKualiConfigurationService();
     }
-
+    
     protected ParameterService getParameterService() {
         return KcServiceLocator.getService(ParameterService.class);
     }
@@ -332,7 +332,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     protected DateTimeService getDateTimeService() {
         return KcServiceLocator.getService(DateTimeService.class);
     }
-
+    
     public String getFinalrateClassCode() {
         String retVal = "";
         Budget finalBudget = getDevelopmentProposal().getFinalBudget();
@@ -368,9 +368,9 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     @Override
     public void prepareForSave() {
         super.prepareForSave();
-
+    
         documentHeader = getDocumentHeaderService().saveDocumentHeader(documentHeader);
-
+    
         if (!isProposalDeleted()) {
             getProposalBudgetStatusService().saveBudgetFinalVersionStatus(this);
             List<? extends Budget> versions = getBudgetParent().getBudgets();
@@ -411,7 +411,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
         roleNames.add("approver");
         return roleNames;
     }
-
+    
     @Override
     public String getDocumentNumberForPermission() {
         return getDevelopmentProposal().getProposalNumber();
@@ -420,8 +420,8 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     @Override
     public String getDocumentKey() {
         return PermissionableKeys.PROPOSAL_KEY;
-    }
-
+    }    
+    
     @SuppressWarnings("unchecked")
     @Override
     public List buildListOfDeletionAwareLists() {
@@ -453,10 +453,9 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
         return getDevelopmentProposal();
     }
 
-    @Override
     public String getDocumentBoNumber() {
-        return getDevelopmentProposal().getProposalNumber();
-    }
+	    return getDevelopmentProposal().getProposalNumber();
+        }
 
     @Override
     public Permissionable getBudgetPermissionable() {
@@ -486,7 +485,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
             public String getDocumentRoleTypeCode() {
                 return RoleConstants.PROPOSAL_ROLE_TYPE;
             }
-
+            
             public void populateAdditionalQualifiedRoleAttributes(Map<String, String> qualifiedRoleAttributes) {
             }
         };
@@ -498,11 +497,11 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
         if (StringUtils.equals(HIERARCHY_CHILD_SPLITNODE_QUESTION, routeNodeName)) {
             return getDevelopmentProposal().isChild();
         }
-        //defer to the super class. ResearchDocumentBase will throw the UnsupportedOperationException 
-        //if no super class answers the question. 
+        //defer to the super class. ResearchDocumentBase will throw the UnsupportedOperationException
+        //if no super class answers the question.
         return super.answerSplitNodeQuestion(routeNodeName);
     }
-
+    
     public String getNamespace() {
         return Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT;
     }
@@ -518,7 +517,7 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     public String getProposalBudgetFlag() {
         return "true";
     }
-
+    
     /**
      * This method is to check whether rice async routing is ok now.   
      * Close to hack.  called by holdingpageaction
@@ -550,18 +549,23 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
         qualifiers.put("namespaceCode", Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT);
         qualifiers.put("name", KcKrmsConstants.ProposalDevelopment.PROPOSAL_DEVELOPMENT_CONTEXT);
     }
-
+    
     public void addFacts(Facts.Builder factsBuilder) {
     	getProposalDevelopmentFactBuilderService().addFacts(factsBuilder, this);
     }
-
+    
     public void populateAgendaQualifiers(Map<String, String> qualifiers) {
         qualifiers.put(KcKrmsConstants.UNIT_NUMBER, getDevelopmentProposal().getAllUnitNumbers());
     }
 
     public void setDefaultDocumentDescription() {
         DevelopmentProposal proposal = getDevelopmentProposal();
-        String desc = String.format("%s; Proposal No: %s; PI: %s; Sponsor: %s; Due Date: %s", proposal.getTitle() != null ? proposal.getTitle().substring(0, Math.min(proposal.getTitle().length(), 19)) : "null", proposal.getProposalNumber(), proposal.getPrincipalInvestigatorName(), proposal.getSponsorName(), proposal.getDeadlineDate() != null ? getDateTimeService().toDateString(proposal.getDeadlineDate()) : "null");
+        //UH KC-645 remove the project title from doc search results since this information is sensitive and should not be visible by all users
+        String desc = String.format("Proposal No: %s; PI: %s; Sponsor: %s; Due Date: %s",
+                proposal.getProposalNumber(),
+                proposal.getPrincipalInvestigatorName(),
+                proposal.getSponsorName(),
+                proposal.getDeadlineDate() != null ? getDateTimeService().toDateString(proposal.getDeadlineDate()) : "null"); 
         getDocumentHeader().setDocumentDescription(desc);
     }
 
@@ -577,11 +581,11 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     public void setCustomDataList(List<CustomAttributeDocValue> customDataList) {
         this.customDataList = customDataList;
     }
-
+    
     public boolean isDefaultDocumentDescription() {
         return getParameterService().getParameterValueAsBoolean(ProposalDevelopmentDocument.class, Constants.HIDE_AND_DEFAULT_PROP_DEV_DOC_DESC_PARAM);
     }
-
+    
     @Override
     public String getDocumentTitle() {
         if (isDefaultDocumentDescription()) {

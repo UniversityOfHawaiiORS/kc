@@ -18,16 +18,18 @@ package edu.hawaii.proposaldevelopment.rules;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract;
+import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentRule;
+import org.kuali.coeus.propdev.impl.location.SaveProposalSitesEvent;
+import org.kuali.coeus.s2sgen.api.core.AuditError;
 import org.kuali.kra.infrastructure.Constants;
-import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
-import org.kuali.kra.proposaldevelopment.bo.ProposalAbstract;
-import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
-import org.kuali.kra.proposaldevelopment.rule.event.SaveProposalSitesEvent;
-import org.kuali.kra.proposaldevelopment.rules.ProposalDevelopmentDocumentRule;
 import org.kuali.rice.krad.document.Document;
-import org.kuali.rice.kns.util.AuditCluster;
-import org.kuali.rice.kns.util.AuditError;
+import org.kuali.rice.krad.util.AuditCluster;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
+
 import edu.hawaii.infrastructure.UhKeyConstants;
 
 /**
@@ -36,6 +38,7 @@ import edu.hawaii.infrastructure.UhKeyConstants;
  * KC-201 - Make Project Summary Abstract required
  * 
  */
+@SuppressWarnings("deprecation")
 public class UhProposalDevelopmentDocumentRule extends
 		ProposalDevelopmentDocumentRule {
 
@@ -60,7 +63,7 @@ public class UhProposalDevelopmentDocumentRule extends
 		//UH KC-515 BEGIN - rbl improve project summary validation
 		int projSummaryLength = 0;
 		for (ProposalAbstract proposalAbstract : developmentProposal.getProposalAbstracts()) {
-			if(proposalAbstract.getAbstractType().getAbstractTypeCode().equals(PROJECT_SUMMARY_ABSTRACT_TYPE)){
+			if(proposalAbstract.getAbstractTypeCode().equals(PROJECT_SUMMARY_ABSTRACT_TYPE)){
 				projSummaryLength = proposalAbstract.getAbstractDetails().length();
 				if(projSummaryLength > 0 && projSummaryLength <= 1000) {
 					hasProjectSummary = true;
@@ -88,7 +91,7 @@ public class UhProposalDevelopmentDocumentRule extends
 
 		if (auditErrors.size() > 0) {
 			// KC-569 Abstracts and Attachments listed twice under validation errors
-			AuditCluster proposalAuditWarnings = (AuditCluster) KNSGlobalVariables.getAuditErrorMap().get("proposalAttachmentsAuditWarnings");
+			AuditCluster proposalAuditWarnings = (AuditCluster) GlobalVariables.getAuditErrorMap().get("proposalAttachmentsAuditWarnings");
 			if(proposalAuditWarnings == null) {
 				proposalAuditWarnings = new AuditCluster(Constants.ABSTRACTS_AND_ATTACHMENTS_PANEL, auditErrors, Constants.AUDIT_ERRORS);
 			}
@@ -98,7 +101,7 @@ public class UhProposalDevelopmentDocumentRule extends
 				warningList.addAll(auditErrors);
 			}
 			// KC-569 Abstracts and Attachments listed twice under validation errors
-			KNSGlobalVariables.getAuditErrorMap().put("proposalAttachmentsAuditWarnings", proposalAuditWarnings);
+			GlobalVariables.getAuditErrorMap().put("proposalAttachmentsAuditWarnings", proposalAuditWarnings);
 		}
 
 		return valid;

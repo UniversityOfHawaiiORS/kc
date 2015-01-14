@@ -15,11 +15,11 @@
  */
 package edu.hawaii.proposaldevelopment.rules;
 
-import org.kuali.kra.proposaldevelopment.bo.DevelopmentProposal;
-import org.kuali.kra.proposaldevelopment.bo.ProposalSite;
-import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
-import org.kuali.kra.proposaldevelopment.rule.event.SaveProposalSitesEvent;
-import org.kuali.kra.proposaldevelopment.rules.ProposalDevelopmentProposalLocationRule;
+import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
+import org.kuali.coeus.propdev.impl.location.ProposalDevelopmentProposalLocationRule;
+import org.kuali.coeus.propdev.impl.location.ProposalSite;
+import org.kuali.coeus.propdev.impl.location.SaveProposalSitesEvent;
 
 import edu.hawaii.infrastructure.UhKeyConstants;
 

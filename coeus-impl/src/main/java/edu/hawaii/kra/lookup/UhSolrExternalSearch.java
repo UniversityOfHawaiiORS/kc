@@ -10,9 +10,12 @@ import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.params.ModifiableSolrParams;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.lookup.CollectionIncomplete;
+import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.KRADServiceLocator;
+import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 
@@ -30,7 +33,7 @@ public class UhSolrExternalSearch {
 	
 	protected List<? extends BusinessObject> getExternalSearchResults(@SuppressWarnings("rawtypes") Class classObj, Map<String, String> conf, ModifiableSolrParams paramsFromCaller) {
 		
-        ConfigurationService configService = KRADServiceLocator.getKualiConfigurationService();
+        ConfigurationService configService = CoreApiServiceLocator.getKualiConfigurationService();
         String solrUrl = configService.getPropertyValueAsString("solr.url"); 
 		
     	HttpSolrServer solr = new HttpSolrServer(solrUrl);
@@ -86,7 +89,7 @@ public class UhSolrExternalSearch {
 				String id = (String) d.getFieldValue("id");
 		    	dbParams.put(pk, id);
 
-		    	BusinessObject o = KRADServiceLocator.getBusinessObjectService().findByPrimaryKey(classObj, dbParams);
+		    	BusinessObject o = KcServiceLocator.getService(BusinessObjectService.class).findByPrimaryKey(classObj, dbParams);
 
 		    	if (o == null) {
 		    		LOG.warn("UHSEARCH: couldnt find a BusinessObject (" + classObj.getName() + "," + pk + "," + id + ")");

@@ -21,17 +21,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
-import org.kuali.kra.bo.KcPerson;
-import org.kuali.kra.infrastructure.KraServiceLocator;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.maintenance.KraMaintainableImpl;
-import org.kuali.kra.rules.ErrorReporter;
-import org.kuali.kra.service.KcPersonService;
 import org.kuali.rice.kim.api.KimConstants;
 import org.kuali.rice.kns.document.MaintenanceDocument;
 import org.kuali.rice.kns.maintenance.Maintainable;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
-
 import org.kuali.rice.kns.web.ui.Section;
 import org.kuali.rice.kns.web.ui.Field;
 import org.kuali.rice.kns.web.ui.Row;
@@ -39,6 +35,7 @@ import org.kuali.rice.kns.web.ui.Row;
 /**
  * This class...
  */
+@SuppressWarnings("deprecation")
 public class UhPersonDelegateMaintainableImpl extends KraMaintainableImpl implements Maintainable {
 
     /**
@@ -56,7 +53,7 @@ public class UhPersonDelegateMaintainableImpl extends KraMaintainableImpl implem
     public void setGenerateDefaultValues(String docTypeName) {
          super.setGenerateDefaultValues(docTypeName);
          UhPersonDelegate delegate = (UhPersonDelegate) getBusinessObject();
-         delegate.setUhPersonDelegateId(KraServiceLocator.getService(SequenceAccessorService.class).getNextAvailableSequenceNumber(PERSON_DELEGATE_SEQUENCE, UhPersonDelegate.class));
+         delegate.setUhPersonDelegateId(KcServiceLocator.getService(SequenceAccessorService.class).getNextAvailableSequenceNumber(PERSON_DELEGATE_SEQUENCE, UhPersonDelegate.class));
      }
   
     // KC-742 BEGIN Delegation Maintenance lookups not working for Delegatee and Delegator during edit/add

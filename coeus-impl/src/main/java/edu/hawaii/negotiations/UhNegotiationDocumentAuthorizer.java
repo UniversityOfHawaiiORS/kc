@@ -26,6 +26,11 @@ import org.kuali.rice.krad.document.Document;
 public class UhNegotiationDocumentAuthorizer extends NegotiationDocumentAuthorizer {
     
     /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6664736026374378313L;
+
+	/**
      * 
      * Constructs a NegotiationDocumentAuthorizer.java.
      */

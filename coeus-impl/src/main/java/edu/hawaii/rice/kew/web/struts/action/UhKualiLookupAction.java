@@ -18,6 +18,7 @@ import org.apache.solr.common.SolrException;
 	        KualiLookup.jsp can report an error.
 */
 
+@SuppressWarnings("deprecation")
 public class UhKualiLookupAction extends KualiLookupAction {
 	
 	public ActionForward search(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response)

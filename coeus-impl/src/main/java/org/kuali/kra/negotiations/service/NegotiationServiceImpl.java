@@ -30,8 +30,13 @@ import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+// KC-840 Hide Negotiation link button in Award page if not in group "All ORS"
+import org.kuali.rice.kim.api.group.Group;
+import org.kuali.rice.kim.api.services.KimApiServiceLocator;
+// KC-840 End
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.krad.service.BusinessObjectService;
+import org.kuali.rice.krad.util.GlobalVariables;
 
 import java.sql.Date;
 import java.util.*;
@@ -288,6 +293,9 @@ public class NegotiationServiceImpl implements NegotiationService {
                     setBeanStuff(bean, null, null, "0 Days");
                     //leave previous alone
                 } else if (isDateBetween(bean.getStartDate(), previousStartDate, previousEndDate) 
+                		// KC-822 Screen fails to completely display when adding negotiation assigned activity which prevents save
+                		//        Caused by null exception during call to bean.getEndDate().after(previousEndDate) adding null checks
+                        && bean.getEndDate() != null && previousEndDate != null
                         && bean.getEndDate().after(previousEndDate)) {
                     //current date range starts within the previous range, but finishes past it.
                     Date previousEndDatePlusOneDay = new Date(previousEndDate.getTime() + NegotiationActivity.MILLISECS_PER_DAY);                    
@@ -421,5 +429,26 @@ public class NegotiationServiceImpl implements NegotiationService {
         this.versionHistoryService = versionHistoryService;
     }
     
+    // KC-821 Only allow one Negotiation per child award.
+    @SuppressWarnings("unchecked")
+    public NegotiationAgreementType getNegotiationAgreementType(String agreementCode) {
+        Map params = new HashMap();
+        params.put("code", agreementCode);
+        return (NegotiationAgreementType) this.getBusinessObjectService().findMatching(NegotiationAgreementType.class, params).iterator().next();
+    }
+    // KC-821 END
+    
+    
+    // KC-840 Hide Negotiation link button in Award page if not in group "All ORS"
+    public Boolean isAuthorizedToOpenNegotiations() {
+    	Boolean inOrsCentralGroup = false;
+    	String userId = GlobalVariables.getUserSession().getPrincipalId();
+    	Group orsCentralGroup = KimApiServiceLocator.getGroupService().getGroupByNamespaceCodeAndName("KR-WKFLW", "All ORS");
+    	if (orsCentralGroup != null) {
+        	inOrsCentralGroup = KimApiServiceLocator.getGroupService().isMemberOfGroup(userId, orsCentralGroup.getId());
+    	}
+        return inOrsCentralGroup;
+    }
+    // KC-840 END
     
 }

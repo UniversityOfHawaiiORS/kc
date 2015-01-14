@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.kuali.kra.bo.Organization;
+import org.kuali.coeus.common.framework.org.Organization;
 import org.kuali.rice.krad.bo.BusinessObject;
 import org.kuali.rice.kns.lookup.KualiLookupableHelperServiceImpl;
+
 import edu.hawaii.kra.lookup.UhSolrExternalSearch;
 
 
+@SuppressWarnings("deprecation")
 public class UhOrganizationLookupableHelperServiceImpl extends KualiLookupableHelperServiceImpl{
 	
 	private static final long serialVersionUID = -1006355566366882023L;

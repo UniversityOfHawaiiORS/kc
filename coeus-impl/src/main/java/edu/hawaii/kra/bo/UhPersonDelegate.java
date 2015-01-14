@@ -3,17 +3,17 @@ package edu.hawaii.kra.bo;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
-import org.kuali.kra.bo.KcPerson;
-import org.kuali.kra.bo.KraPersistableBusinessObjectBase;
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.service.KcPersonService;
+import org.kuali.coeus.common.framework.person.KcPerson;
+import org.kuali.coeus.common.framework.person.KcPersonService;
+import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.krad.bo.PersistableBusinessObjectExtension;
 
 import com.ibm.icu.util.Calendar;
 
-public class UhPersonDelegate extends KraPersistableBusinessObjectBase
+public class UhPersonDelegate extends KcPersistableBusinessObjectBase
 		implements PersistableBusinessObjectExtension {
 
 	private static final long serialVersionUID = -3045593545793330990L;
@@ -55,7 +55,7 @@ public class UhPersonDelegate extends KraPersistableBusinessObjectBase
 		// KC-747 Inactive users are appearing in new routing
 		// First check that delegateePersonId is still an active user.  If not then consider the
 		// delegation inactive.
-		Person adminPerson = KraServiceLocator.getService(PersonService.class).getPerson(delegateePersonId);
+		Person adminPerson = KcServiceLocator.getService(PersonService.class).getPerson(delegateePersonId);
 	    if (adminPerson.isActive()) {	
 		    // Check from and to dates.  Inclusive so need to add/subtract days from today before comparing
 		    java.util.Calendar cal = java.util.Calendar.getInstance();
@@ -116,7 +116,7 @@ public class UhPersonDelegate extends KraPersistableBusinessObjectBase
 	 */
 	protected KcPersonService getKcPersonService() {
 		if (this.kcPersonService == null) {
-			this.kcPersonService = KraServiceLocator
+			this.kcPersonService = KcServiceLocator
 					.getService(KcPersonService.class);
 		}
 

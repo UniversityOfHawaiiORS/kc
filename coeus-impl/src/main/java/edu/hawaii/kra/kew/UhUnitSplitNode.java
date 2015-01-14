@@ -21,13 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.kuali.kra.bo.Unit;
-import org.kuali.kra.document.ResearchDocumentBase;
-import org.kuali.kra.infrastructure.KraServiceLocator;
-import org.kuali.kra.proposaldevelopment.bo.ProposalPerson;
-import org.kuali.kra.proposaldevelopment.bo.ProposalPersonUnit;
-import org.kuali.kra.proposaldevelopment.document.ProposalDevelopmentDocument;
-import org.kuali.kra.service.UnitService;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
+import org.kuali.coeus.propdev.impl.person.ProposalPerson;
+import org.kuali.coeus.propdev.impl.person.ProposalPersonUnit;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.kew.engine.RouteContext;
 import org.kuali.rice.kew.engine.RouteHelper;
@@ -70,7 +67,7 @@ public class UhUnitSplitNode implements SplitNode {
         // Note: this split node was only written for PD documents.  If used for other documents then the cast
         //       needs to be replaced with logic to determine the correct document type.
         ProposalDevelopmentDocument document = (ProposalDevelopmentDocument) 
-            KraServiceLocator.getService(DocumentService.class).getByDocumentHeaderIdSessionless(documentID);
+            KcServiceLocator.getService(DocumentService.class).getByDocumentHeaderIdSessionless(documentID);
         
         String nodeBranch = context.getNodeInstance().getRouteNode().getBranchName();
         List<String> branches = new ArrayList<String>();
