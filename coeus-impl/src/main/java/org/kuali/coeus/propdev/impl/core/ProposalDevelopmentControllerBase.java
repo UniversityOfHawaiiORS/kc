@@ -25,7 +25,6 @@ import org.kuali.coeus.common.framework.person.PropAwardPersonRole;
 import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
 import org.kuali.coeus.common.framework.compliance.core.SaveDocumentSpecialReviewEvent;
 import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants;
-import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationItem;
 import org.kuali.coeus.propdev.impl.docperm.ProposalRoleTemplateService;
 import org.kuali.coeus.propdev.impl.docperm.ProposalUserRoles;
 import org.kuali.coeus.propdev.impl.keyword.PropScienceKeyword;
@@ -355,7 +354,9 @@ public abstract class ProposalDevelopmentControllerBase {
          if (isNavigateAwayFromAttachment(navigateToPageId, form.getPageId())) {
              prepareLocks(form);
              return narrativePageSave(form, canEdit);
-         } else if (isNavigateToBudget(navigateToPageId) || isNavigateToAttachments(navigateToPageId)) {
+         } else if (isNavigateToAttachments(navigateToPageId) ||
+                  isNavigateAwayFromAccess(navigateToPageId,form.getPageId()) ||
+                  isNavigateToAccess(navigateToPageId)) {
              prepareLocks(form);
          }
          return proposalDevelopmentPageSave(form, canEdit);
@@ -373,13 +374,15 @@ public abstract class ProposalDevelopmentControllerBase {
             //when saving on page in the proposal development locking region we don't want to over write attachments that
             //may have been alter concurrently.  So we retrieve the latest proposal data from the db, and replace the attachment
             //collections with the values from the db.
-            form.getDevelopmentProposal().setNarratives(document.getDevelopmentProposal().getNarratives());
-            form.getDevelopmentProposal().setInstituteAttachments(document.getDevelopmentProposal().getInstituteAttachments());
-            form.getDevelopmentProposal().setPropPersonBios(document.getDevelopmentProposal().getPropPersonBios());
-            form.getDevelopmentProposal().setProposalAbstracts(document.getDevelopmentProposal().getProposalAbstracts());
-            form.getDocument().setNotes(document.getNotes());
+            if (!StringUtils.equals(form.getPageId(),Constants.PROP_DEV_PERMISSIONS_PAGE)) {
+                form.getDevelopmentProposal().setNarratives(document.getDevelopmentProposal().getNarratives());
+                form.getDevelopmentProposal().setInstituteAttachments(document.getDevelopmentProposal().getInstituteAttachments());
+                form.getDevelopmentProposal().setPropPersonBios(document.getDevelopmentProposal().getPropPersonBios());
+                form.getDevelopmentProposal().setProposalAbstracts(document.getDevelopmentProposal().getProposalAbstracts());
+                form.getDocument().setNotes(document.getNotes());
 
-            form.getDocument().setDocumentHeader(document.getDocumentHeader());
+                form.getDocument().setDocumentHeader(document.getDocumentHeader());
+            }
             return save(form);
         } else {
             form.setDocument(document);
@@ -390,15 +393,20 @@ public abstract class ProposalDevelopmentControllerBase {
     protected ModelAndView narrativePageSave(ProposalDevelopmentDocumentForm form, boolean canEdit) throws Exception {
         ProposalDevelopmentDocument document = (ProposalDevelopmentDocument) getDocumentService().getByDocumentHeaderId(form.getDocument().getDocumentNumber());
         if (canEdit) {
-            //when saving on a page in the narrative locking region we don't want to over write proposal locking region data,
-            //so we retrieve the latest proposal from the db, and replace the current propopsal with that, and then copy the attachments
-            document.getDevelopmentProposal().setNarratives(form.getDevelopmentProposal().getNarratives());
-            document.getDevelopmentProposal().setInstituteAttachments(form.getDevelopmentProposal().getInstituteAttachments());
-            document.getDevelopmentProposal().setPropPersonBios(form.getDevelopmentProposal().getPropPersonBios());
-            document.getDevelopmentProposal().setProposalAbstracts(form.getDevelopmentProposal().getProposalAbstracts());
-            document.setNotes(form.getDocument().getNotes()); 
-            form.setDocument(document);
-            return save(form);
+            if (new ProposalDevelopmentDocumentRule().processAttachmentRules(form.getProposalDevelopmentDocument())) {
+                //when saving on a page in the narrative locking region we don't want to over write proposal locking region data,
+                //so we retrieve the latest proposal from the db, and replace the current propopsal with that, and then copy the attachments
+                document.getDevelopmentProposal().setNarratives(form.getDevelopmentProposal().getNarratives());
+                document.getDevelopmentProposal().setInstituteAttachments(form.getDevelopmentProposal().getInstituteAttachments());
+                document.getDevelopmentProposal().setPropPersonBios(form.getDevelopmentProposal().getPropPersonBios());
+                document.getDevelopmentProposal().setProposalAbstracts(form.getDevelopmentProposal().getProposalAbstracts());
+                document.setNotes(form.getDocument().getNotes());
+                form.setDocument(document);
+                return save(form);
+            } else {
+                return getModelAndViewService().getModelAndView(form);
+            }
+
         } else {
             form.setDocument(document);
             return getNavigationControllerService().navigate(form);
@@ -409,13 +417,13 @@ public abstract class ProposalDevelopmentControllerBase {
         return StringUtils.equals(navigateToPageId,ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID);
     }
 
-    protected boolean isNavigateToBudget(String navigateToPageId) {
-        return StringUtils.equals(navigateToPageId,ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID);
+    protected boolean isNavigateToAccess(String navigateToPageId) {
+        return StringUtils.equals(navigateToPageId,Constants.PROP_DEV_PERMISSIONS_PAGE);
     }
 
-    protected boolean isNavigateAwayFromBudget(String navigateToPageId, String pageId) {
-       return StringUtils.equals(pageId,ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID) &&
-               !StringUtils.equals(navigateToPageId,ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID);
+    protected boolean isNavigateAwayFromAccess(String navigateToPageId, String pageId) {
+        return StringUtils.equals(pageId,Constants.PROP_DEV_PERMISSIONS_PAGE) &&
+                !StringUtils.equals(navigateToPageId,Constants.PROP_DEV_PERMISSIONS_PAGE);
     }
 
     protected boolean isNavigateAwayFromAttachment(String navigateToPageId, String pageId) {
@@ -428,8 +436,8 @@ public abstract class ProposalDevelopmentControllerBase {
 
         if (!document.getPessimisticLocks().isEmpty()) {
             Person user = getGlobalVariableService().getUserSession().getPerson();
-            getPessimisticLockService().releaseAllLocksForUser(document.getPessimisticLocks(), user);
             document.refreshPessimisticLocks();
+            getPessimisticLockService().releaseAllLocksForUser(document.getPessimisticLocks(), user);
         }
     }
     

@@ -23,7 +23,6 @@ import java.util.*;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
 import org.kuali.coeus.common.budget.framework.calculator.BudgetCalculationService;
-import org.kuali.coeus.common.framework.auth.KcAuthConstants;
 import org.kuali.coeus.common.framework.custom.DocumentCustomData;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttribute;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocValue;
@@ -31,6 +30,7 @@ import org.kuali.coeus.common.framework.custom.attr.CustomAttributeService;
 import org.kuali.coeus.common.framework.sponsor.Sponsor;
 import org.kuali.coeus.common.framework.sponsor.SponsorSearchResult;
 import org.kuali.coeus.common.framework.sponsor.SponsorSearchService;
+import org.kuali.coeus.common.questionnaire.framework.answer.Answer;
 import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
 import org.kuali.coeus.common.questionnaire.framework.question.Question;
 import org.kuali.coeus.common.questionnaire.framework.question.QuestionExplanation;
@@ -52,7 +52,6 @@ import org.kuali.coeus.propdev.impl.person.KeyPersonnelService;
 import org.kuali.coeus.propdev.impl.questionnaire.ProposalDevelopmentQuestionnaireHelper;
 import org.kuali.coeus.propdev.impl.s2s.question.ProposalDevelopmentS2sQuestionnaireHelper;
 import org.kuali.coeus.sys.framework.validation.AuditHelper;
-import org.kuali.coeus.sys.framework.workflow.KcWorkflowService;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
 import org.kuali.kra.protocol.actions.ProtocolStatusBase;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
@@ -87,10 +86,7 @@ import org.kuali.rice.krad.uif.UifParameters;
 import org.kuali.rice.krad.uif.element.Action;
 import org.kuali.rice.krad.uif.lifecycle.ViewLifecycle;
 import org.kuali.rice.krad.uif.util.ObjectPropertyUtils;
-import org.kuali.rice.krad.uif.view.View;
 import org.kuali.rice.krad.uif.view.ViewModel;
-import org.kuali.rice.krad.web.form.DocumentFormBase;
-import org.kuali.rice.krad.web.form.UifFormBase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Scope;
@@ -142,10 +138,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     @Autowired
     @Qualifier("proposalDevelopmentPermissionsService")
     private ProposalDevelopmentPermissionsService proposalDevelopmentPermissionsService;
-
-    @Autowired
-    @Qualifier("kcWorkflowService")
-    private KcWorkflowService kcWorkflowService;
 
     @Autowired
     @Qualifier("proposalDevelopmentService")
@@ -553,6 +545,19 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         return false;
     }
 
+    public boolean areAnsweredQuestionnaires(List<AnswerHeader> answerHeaders) {
+        for (AnswerHeader answerHeader : answerHeaders) {
+            if (answerHeader.isActive()) {
+                for (Answer answer : answerHeader.getAnswers()) {
+                    if (StringUtils.isNotEmpty(answer.getAnswer())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
     public String getQuestionMoreInfo(Question question) {
         StringBuilder moreInfo = new StringBuilder();
         moreInfo.append("\n" + "Question Id : " + question.getQuestionSeqId() + "\n");
@@ -569,26 +574,8 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         return moreInfo.toString();
     }
 
-    @Override
-    public void retrieveEditModesAndActionFlags() {
-    	super.retrieveEditModesAndActionFlags();
-    	View view = ViewLifecycle.getView();
-        UifFormBase model = (UifFormBase) ViewLifecycle.getModel();
-    	if(! getKcWorkflowService().isInWorkflow(((DocumentFormBase) model).getDocument())) {
-    		view.getActionFlags().put(KcAuthConstants.DocumentActions.DELETE_DOCUMENT, Boolean.TRUE);
-    	}
-    }
-
-    public KcWorkflowService getKcWorkflowService() {
-		return kcWorkflowService;
-	}
-
-	public void setKcWorkflowService(KcWorkflowService kcWorkflowService) {
-		this.kcWorkflowService = kcWorkflowService;
-	}
-
     public void populateCreditSplits(ProposalDevelopmentDocumentForm form) {
-        getKeyPersonnelService().populateDocument(form.getProposalDevelopmentDocument());
+        getKeyPersonnelService().populateCreditSplit(form.getProposalDevelopmentDocument());
         form.setCreditSplitListItems(getKeyPersonnelService().createCreditSplitListItems(form.getDevelopmentProposal().getInvestigators()));
     }
 
@@ -736,6 +723,14 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
             return (proposal.isParent()) ? inMultiple : !inMultiple;
         }
         return true;
+    }
+
+    public String getProposalStatusForDisplay(DevelopmentProposal proposal) {
+        if (proposal.isChild()) {
+            return getProposalHierarchyService().getProposalState(proposal.getHierarchyParentProposalNumber());
+        } else {
+            return proposal.getProposalState().getDescription();
+        }
     }
 
     public void prepareSummaryPage(ProposalDevelopmentDocumentForm form) {
@@ -965,6 +960,15 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         }
         return pageRegion;
     }
+    
+    public boolean syncRequiresEndDateExtension(DevelopmentProposal proposal) {
+    	DevelopmentProposal hierarchyProposal = getProposalHierarchyService().getDevelopmentProposal(proposal.getHierarchyParentProposalNumber());
+    	return getProposalHierarchyService().needToExtendProjectDate(hierarchyProposal, proposal);
+    }
+    
+    public boolean syncAllRequiresEndDateExtension(DevelopmentProposal hierarchyProposal) {
+    	return getProposalHierarchyService().needToExtendProjectDate(hierarchyProposal);
+    }   
 
 	public ProposalTypeService getProposalTypeService() {
 		return proposalTypeService;
