@@ -655,6 +655,16 @@
         	<groupId>org.apache.solr</groupId>
         	<artifactId>solr-solrj</artifactId>
         	<version>4.0.0</version>
+		<exclusions>
+		    <exclusion>
+		        <groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		    </exclusion>
+		    <exclusion>
+		        <groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpcore</artifactId>
+		    </exclusion>
+		</exclusions>
         </dependency>
     </dependencies>
 </project>

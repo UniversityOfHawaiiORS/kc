@@ -16,26 +16,18 @@
 package edu.hawaii.kra.kew;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.coeus.propdev.impl.person.ProposalPersonUnit;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
-import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.kew.engine.RouteContext;
 import org.kuali.rice.kew.engine.RouteHelper;
 import org.kuali.rice.kew.engine.node.RouteNode;
-import org.kuali.rice.kew.engine.node.RouteNodeConfigParam;
 import org.kuali.rice.kew.engine.node.SplitNode;
 import org.kuali.rice.kew.engine.node.SplitResult;
-import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.service.DocumentService;
-
-import com.google.common.collect.Lists;
 
 /**
  *  UH Unit Split Node.  Generates a Branch Name based on the unit's hierarchy
