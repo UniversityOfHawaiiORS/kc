@@ -86,6 +86,7 @@ import java.util.*;
  * Also we have provided convenient getter and setter methods so that to the outside world;
  * Award and AwardDocument can have a 1:1 relationship.
  */
+@SuppressWarnings("deprecation")
 @NAMESPACE(namespace=Constants.PARAMETER_MODULE_AWARD)
 @COMPONENT(component=ParameterConstants.DOCUMENT_COMPONENT)
 public class AwardDocument extends BudgetParentDocument<Award> implements  Copyable, SessionDocument, KrmsRulesContext {
@@ -303,7 +304,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         }
     }    
 
-	void removeKeyPersonRoleForNoneKeyPerson() {
+    void removeKeyPersonRoleForNoneKeyPerson() {
         for ( AwardPerson person : this.getAward().getProjectPersons() ) {
             if ( !StringUtils.equalsIgnoreCase(person.getContactRole().getRoleCode(), ContactRole.KEY_PERSON_CODE) &&
                     StringUtils.isNotEmpty(person.getKeyPersonRole()) ) {
@@ -347,7 +348,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         managedLists.add(personSplits);
     }
     
-
+    
     protected VersionHistoryService getVersionHistoryService() {
         return KcServiceLocator.getService(VersionHistoryService.class);
     }
@@ -358,7 +359,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
 
     public List<AwardBudgetExt> getBudgetDocumentVersions() {
     	 return this.getAward().getBudgets();
-    }
+        }
 
     public List<AwardBudgetExt> getBudgets() {
         return budgets;
@@ -440,7 +441,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     private ConfigurationService lookupKualiConfigurationService() {
         return CoreApiServiceLocator.getKualiConfigurationService();
     }
-
+    
     @Override
     public Award getBudgetParent() {
         return getAward();
@@ -473,7 +474,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
     }
     
     public String getDocumentBoNumber() {
-        return getAward().getAwardNumber();
+    	return getAward().getAwardNumber();
     }
 
     public String getNamespace() {
@@ -521,7 +522,7 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
                         && (budget.getBudgetVersionNumber() == null || 
                             (budget.getBudgetVersionNumber() != null && version.getBudgetVersionNumber() > budget.getBudgetVersionNumber()))) {
                     budget = version;
-                }
+            }
         }
         return budget;
     }
@@ -651,4 +652,12 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
         WorkflowDocument workflow = getDocumentHeader().getWorkflowDocument();
         return workflow.isCanceled();
     }
+    
+    // KC-883 Document Locks not removed when opening negotiations from action buttons
+    public List<String> getLockClearningMethodNames() {
+        List<String> methodToCalls = super.getLockClearningMethodNames();
+        methodToCalls.add("openNegotiations");
+        return methodToCalls;
+    }
+    // KC-883 END
 }

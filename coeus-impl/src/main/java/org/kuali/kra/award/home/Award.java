@@ -90,15 +90,25 @@ import org.kuali.rice.kim.api.role.Role;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.springframework.util.AutoPopulatingList;
 
+import edu.hawaii.award.bo.UhAwardExtension;
+
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
+
+/**
+ * UH MODIFICATIONS:
+ * KC-154 - added afterInsert method. This might have been possible to do with an extension to Award.java rather
+ * 			than through the overlay, but it started to get a little complicated.  We can revisit later.
+ * 
+ */
 
 /**
  * 
  * This class is Award Business Object.
  * It implements ProcessKeywords to process all operations related to AwardScenceKeywords.
  */
+@SuppressWarnings("deprecation")
 public class Award extends KcPersistableBusinessObjectBase implements KeywordsManager<AwardScienceKeyword>, Permissionable,
         SequenceOwner<Award>, BudgetParent, Sponsorable, Negotiable, Disclosurable {
     public static final String DEFAULT_AWARD_NUMBER = "000000-00000";
@@ -803,7 +813,15 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
      * @return
      */
     public Date getProjectEndDate() {
-        return awardAmountInfos.get(0).getFinalExpirationDate();
+        // KC-489 Project Ends Dates displayed incorrectly in Award Search results
+    	try {
+    		int i = this.getIndexOfAwardAmountInfoForDisplay();
+			return this.awardAmountInfos.get(i).getFinalExpirationDate();
+    	} catch (WorkflowException e) {
+    		e.printStackTrace();
+			return null;
+    	}
+        // END KC-489
     }
 
     /**
@@ -3160,6 +3178,19 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
     @Override
     public String getAdminPersonName() {
+    	// KC-819 Display UH Assigned To field on the Negotiations Attributes Tab and Default negotiator
+    	Map<String, String> fieldValues = new HashMap<String,String>();
+        fieldValues.put("awardId", getAwardId().toString());
+    	BusinessObjectService businessObjectService =  KcServiceLocator.getService(BusinessObjectService.class);
+        List<UhAwardExtension> awardExtentions = (List<UhAwardExtension>)businessObjectService.findMatching(UhAwardExtension.class, fieldValues);
+        if (awardExtentions!=null && awardExtentions.size() !=0 && awardExtentions.get(0).getAssignedToPersonId() != null) {
+        	KcPerson assignedTo =  awardExtentions.get(0).getAssignedToPerson();
+        	if (assignedTo != null) {
+        		String adminPerson=assignedTo.getFullName();
+        	    return adminPerson;
+        	}
+        }
+        // KC-819
         return EMPTY_STRING;
     }
 
@@ -3483,5 +3514,5 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     public void setAwardCgbList(List<AwardCgb> awardCgbList) {
         this.awardCgbList = awardCgbList;
     }
-
+    
 }
