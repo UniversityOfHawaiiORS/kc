@@ -130,6 +130,8 @@ public class Organization extends KcPersistableBusinessObjectBase implements Org
 
     @Column(name = "VENDOR_CODE")
     private String vendorCode;
+    // KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+	private String organizationSearchInput;
 
     @ManyToOne(cascade = { CascadeType.REFRESH })
     @JoinColumn(name = "CONTACT_ADDRESS_ID", referencedColumnName = "ROLODEX_ID", insertable = false, updatable = false)
@@ -425,6 +427,16 @@ public class Organization extends KcPersistableBusinessObjectBase implements Org
     public void setVendorCode(String vendorCode) {
         this.vendorCode = vendorCode;
     }
+
+    // KC-530 BEGIN Lookup screens are too difficult for users, make searches easier by implementing search engine
+	public String getOrganizationSearchInput() {
+		return organizationSearchInput;
+	}
+
+	public void setOrganizationSearchInput(String organizationSearchInput) {
+		this.organizationSearchInput = organizationSearchInput;
+	}
+	// KC-530 END
 
     public Rolodex getRolodex() {
         return rolodex;

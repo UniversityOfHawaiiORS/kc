@@ -1,7 +1,10 @@
 package edu.hawaii.rice.kew.web;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashSet;
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -9,6 +12,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+
 //import org.apache.log4j.Logger;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.rice.kim.api.group.Group;
@@ -30,6 +35,48 @@ public class UhKcUserLoginFilter extends UserLoginFilter
 	
 	private static HashSet<String>kcUsers=new HashSet<String>();
 	private static String kcUserGroupId;
+	// KC-901 Add ability for help desk to run the uhims process on demand
+	private static Boolean uhimsRunning=false;
+		
+	// KC-901 Add ability for help desk to run the uhims process on demand
+	public static synchronized String executeShellCommand() {
+		ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
+		String cmd = configService.getPropertyValueAsString("uh.uhims.cmd");
+		
+		if (cmd==null) {
+			return "uh.uhims.cmd not configured";
+		}
+		
+		if (uhimsRunning!=true) {
+			uhimsRunning=true;
+		} else {
+			return "Already Running";
+		}
+			
+		String result;
+					
+		try {
+			ProcessBuilder procBuilder = new ProcessBuilder(cmd.split(" "));
+			procBuilder.redirectErrorStream(true);
+			Process proc = procBuilder.start();
+			String line;
+			
+			BufferedReader reader = new BufferedReader (new InputStreamReader(proc.getInputStream()));
+			
+			StringBuffer stdOut = new StringBuffer();
+			while ((line = reader.readLine ()) != null) {
+				stdOut.append(line);
+				stdOut.append("<br>");
+			}
+		    
+		    result = stdOut.toString();
+		} catch (IOException e) {
+			result = "IOException " + e.getMessage();
+		}
+		uhimsRunning=false;
+		return result;
+	}
+	// KC-901 END
 	
 	public static void flushKcUserGroupCache() {
 		kcUsers=new HashSet<String>();

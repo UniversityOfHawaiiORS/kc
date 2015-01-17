@@ -108,7 +108,7 @@ import java.util.*;
  * This class is Award Business Object.
  * It implements ProcessKeywords to process all operations related to AwardScenceKeywords.
  */
-@SuppressWarnings("deprecation")
+@SuppressWarnings({ "deprecation", "unchecked" })
 public class Award extends KcPersistableBusinessObjectBase implements KeywordsManager<AwardScienceKeyword>, Permissionable,
         SequenceOwner<Award>, BudgetParent, Sponsorable, Negotiable, Disclosurable {
     public static final String DEFAULT_AWARD_NUMBER = "000000-00000";
@@ -401,7 +401,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardAmountInfos.get(getIndexOfLastAwardAmountInfo());
     }
 
-    public int getIndexOfAwardAmountInfoForDisplay() throws WorkflowException {
+	public int getIndexOfAwardAmountInfoForDisplay() throws WorkflowException {
         AwardAmountInfo aai = getAwardAmountInfoService().fetchLastAwardAmountInfoForAwardVersionAndFinalizedTandMDocumentNumber(this);
         int returnVal = 0;
         int index = 0;

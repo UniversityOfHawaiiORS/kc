@@ -69,7 +69,7 @@ public class KcPerson extends TransientBusinessObjectBase implements Contactable
     private KcPersonExtendedAttributes extendedAttributes;
     
     private transient CountryService countryService;
-    
+
     private static final Log LOG = LogFactory.getLog(KcPerson.class);
 
     /**
@@ -669,7 +669,8 @@ public class KcPerson extends TransientBusinessObjectBase implements Contactable
      */
     @Override
     public Boolean getFacultyFlag() {      
-        return Boolean.valueOf(this.hasAffiliation("FCLTY"));
+        // RL KC-487 UH-RICE change, check based on our affiliation name     
+        return Boolean.valueOf(this.hasAffiliation("faculty"));
     }
      
     /**

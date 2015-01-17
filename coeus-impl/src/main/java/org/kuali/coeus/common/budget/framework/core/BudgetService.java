@@ -48,8 +48,11 @@ public interface BudgetService<T extends BudgetParent>  {
     public boolean ValidInflationCeRate(BudgetLineItemBase budgetLineItem);
     
     public String getActivityTypeForBudget(Budget budget);
-
-    public Collection<BudgetRate> getSavedProposalRates(Budget budgetToOpen);
+    
+    public Collection<BudgetRate> getSavedProposalRates(Budget budgetToOpen);  
+    
+    // KC-764 If the modular budget checkbox is checked, the proposal cannot be "submitted to sponsor" for non S2S
+    public boolean checkModularBudgetBeforeSave(BudgetParentDocument<T> parentDoc) throws Exception;
 
     /**
      * Determine if the names of a {@link BudgetVersionOverview} instances in the given {@link  ProposalDevelopmentDocument} instance is valid
