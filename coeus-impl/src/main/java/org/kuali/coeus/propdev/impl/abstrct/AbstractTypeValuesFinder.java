@@ -47,22 +47,29 @@ public class AbstractTypeValuesFinder extends UifKeyValuesFinderBase {
     @Autowired
     @Qualifier("dataObjectService")
     private DataObjectService dataObjectService;
-
+    
     @Override
     public List<KeyValue> getKeyValues(ViewModel model, InputField field){
         ProposalDevelopmentDocumentForm form = (ProposalDevelopmentDocumentForm) model;
         String selectedAbstractType = getFieldValue(model,field);
         Collection<AbstractType> abstractTypes = getDataObjectService().findAll(AbstractType.class).getResults();
         List<KeyValue> keyValues = new ArrayList<KeyValue>();
-        keyValues.add(new ConcreteKeyValue("", "select"));
+        // UH KC-480 BEGIN make "Project Summary" the default abstract selection choice
+        ProposalDevelopmentDocument doc = form.getProposalDevelopmentDocument();
         for (AbstractType abstractType : abstractTypes) {
+            //UH KC-480 BEGIN make "Project Summary" the default abstract selection choice
+        	if(abstractType.getDescription().equalsIgnoreCase("Project Summary") && hasAbstract(doc, abstractType)) {
+        keyValues.add(new ConcreteKeyValue("", "select"));
+        	}
+            //UH KC-480 END
+        	
             if (!hasAbstract(form.getProposalDevelopmentDocument(), abstractType) || StringUtils.equals(abstractType.getCode(),selectedAbstractType)) {
                 keyValues.add(new ConcreteKeyValue(abstractType.getCode(), abstractType.getDescription()));
             }
         }
         return keyValues;
     }
-
+    
     private boolean hasAbstract(ProposalDevelopmentDocument doc, AbstractType abstractType) {
         if (doc != null) {
             List<ProposalAbstract> proposalAbstracts = doc.getDevelopmentProposal().getProposalAbstracts();

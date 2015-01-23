@@ -22,6 +22,7 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,13 +33,196 @@ public final class DateUtils {
 
     private static final Pattern TIME_PATTERN_12_HOUR = Pattern.compile("(0?[1-9]|1[0-2])" + // hour
             "(?:(?::|\\.)([0-5][0-9]))?" + // minute (optional)
-            "(?:\\s*(([ap]m?|[ap]\\.m\\.)))?", // AM/PM (optional)
+            "(?:\\s*(\\b[ap]m?\\b|\\b[ap]\\.m\\.\\s?))?" + // AM/PM (optional)
+            "(?:\\s*([a-z]{2,5}))?", //time zone abbreviation (optional)
             Pattern.CASE_INSENSITIVE);
     private static final Pattern TIME_PATTERN_24_HOUR = Pattern.compile("([01][0-9]|2[0-3])" + // hour
             "(?:(?::|\\.)?([0-5][0-9]))" + // minute (optional)
-            "(?:\\s*(([ap]m?|[ap]\\.m\\.)))?", // AM/PM (optional, tecnhincally irrelevant, but the user might put it in)
+            "(?:\\s*(\\b[ap]m?\\b|\\b[ap]\\.m\\.\\s?))?" + // AM/PM (optional)
+            "(?:\\s*([a-z]{2,5}))?", //time zone abbreviation (optional)
             Pattern.CASE_INSENSITIVE);
 
+  //time zone abbreviation list data from http://www.timeanddate.com/library/abbreviations/timezones/
+    // also added some commonly used alternative acronyms such as HST, PDST
+    private static final HashMap<String, String> tz_abbreviations = new HashMap<String,String>(192) {{
+    	put("ACDT","ACDT");
+    	put("ACST","ACST");
+    	put("ADT","ADT");
+    	put("AEDT","AEDT");
+    	put("AEST","AEST");
+    	put("AFT","AFT");
+    	put("AKDT","AKDT");
+    	put("AKST","AKST");
+    	put("ALMT","ALMT");
+    	put("AMST","AMST");
+    	put("AMT","AMT");
+    	put("ANAST","ANAST");
+    	put("ANAT","ANAT");
+    	put("AQTT","AQTT");
+    	put("ART","ART");
+    	put("AST","AST");
+    	put("AWDT","AWDT");
+    	put("AWST","AWST");
+    	put("AZOST","AZOST");
+    	put("AZOT","AZOT");
+    	put("AZST","AZST");
+    	put("AZT","AZT");
+    	put("BNT","BNT");
+    	put("BOT","BOT");
+    	put("BRST","BRST");
+    	put("BRT","BRT");
+    	put("BST","BST");
+    	put("BTT","BTT");
+    	put("CAST","CAST");
+    	put("CAT","CAT");
+    	put("CCT","CCT");
+    	put("CDT","CDT");
+    	put("CEST","CEST");
+    	put("CET","CET");
+    	put("CHADT","CHADT");
+    	put("CHAST","CHAST");
+    	put("CKT","CKT");
+    	put("CLST","CLST");
+    	put("CLT","CLT");
+    	put("COT","COT");
+    	put("CST","CST");
+    	put("CVT","CVT");
+    	put("CXT","CXT");
+    	put("CHST","CHST");
+    	put("DAVT","DAVT");
+    	put("EASST","EASST");
+    	put("EAST","EAST");
+    	put("EAT","EAT");
+    	put("ECT","ECT");
+    	put("EDT","EDT");
+    	put("EEST","EEST");
+    	put("EET","EET");
+    	put("EGST","EGST");
+    	put("EGT","EGT");
+    	put("EST","EST");
+    	put("FJST","FJST");
+    	put("FJT","FJT");
+    	put("FKST","FKST");
+    	put("FKT","FKT");
+    	put("FNT","FNT");
+    	put("GALT","GALT");
+    	put("GAMT","GAMT");
+    	put("GET","GET");
+    	put("GFT","GFT");
+    	put("GILT","GILT");
+    	put("GMT","GMT");
+    	put("GST","GST");
+    	put("GYT","GYT");
+    	put("HADT","HADT");
+    	put("HAST","HAST");
+    	put("HKT","HKT");
+    	put("HLV","HLV");
+    	put("HOVT","HOVT");
+    	put("HST","HST");
+    	put("ICT","ICT");
+    	put("IDT","IDT");
+    	put("IOT","IOT");
+    	put("IRDT","IRDT");
+    	put("IRKST","IRKST");
+    	put("IRKT","IRKT");
+    	put("IRST","IRST");
+    	put("IST","IST");
+    	put("JST","JST");
+    	put("KGT","KGT");
+    	put("KRAST","KRAST");
+    	put("KRAT","KRAT");
+    	put("KST","KST");
+    	put("KUYT","KUYT");
+    	put("LHDT","LHDT");
+    	put("LHST","LHST");
+    	put("LINT","LINT");
+    	put("MAGST","MAGST");
+    	put("MAGT","MAGT");
+    	put("MART","MART");
+    	put("MAWT","MAWT");
+    	put("MDT","MDT");
+    	put("MHT","MHT");
+    	put("MMT","MMT");
+    	put("MSD","MSD");
+    	put("MSK","MSK");
+    	put("MST","MST");
+    	put("MUT","MUT");
+    	put("MVT","MVT");
+    	put("MYT","MYT");
+    	put("NCT","NCT");
+    	put("NDT","NDT");
+    	put("NFT","NFT");
+    	put("NOVST","NOVST");
+    	put("NOVT","NOVT");
+    	put("NPT","NPT");
+    	put("NST","NST");
+    	put("NUT","NUT");
+    	put("NZDT","NZDT");
+    	put("NZST","NZST");
+    	put("OMSST","OMSST");
+    	put("OMST","OMST");
+    	put("PDT","PDT");
+       	put("PDST","PDST");
+    	put("PET","PET");
+    	put("PETST","PETST");
+    	put("PETT","PETT");
+    	put("PGT","PGT");
+    	put("PHOT","PHOT");
+    	put("PHT","PHT");
+    	put("PKT","PKT");
+    	put("PMDT","PMDT");
+    	put("PMST","PMST");
+    	put("PONT","PONT");
+    	put("PST","PST");
+    	put("PT","PT");
+    	put("PWT","PWT");
+    	put("PYST","PYST");
+    	put("PYT","PYT");
+    	put("RET","RET");
+    	put("SAMT","SAMT");
+    	put("SAST","SAST");
+    	put("SBT","SBT");
+    	put("SCT","SCT");
+    	put("SGT","SGT");
+    	put("SRT","SRT");
+    	put("SST","SST");
+    	put("TAHT","TAHT");
+    	put("TFT","TFT");
+    	put("TJT","TJT");
+    	put("TKT","TKT");
+    	put("TLT","TLT");
+    	put("TMT","TMT");
+    	put("TVT","TVT");
+    	put("ULAT","ULAT");
+    	put("UTC","UTC");
+    	put("UYST","UYST");
+    	put("UYT","UYT");
+    	put("UZT","UZT");
+    	put("VET","VET");
+    	put("VLAST","VLAST");
+    	put("VLAT","VLAT");
+    	put("VUT","VUT");
+    	put("WAST","WAST");
+    	put("WAT","WAT");
+    	put("WEST","WEST");
+    	put("WET","WET");
+    	put("WFT","WFT");
+    	put("WGST","WGST");
+    	put("WGT","WGT");
+    	put("WIB","WIB");
+    	put("WIT","WIT");
+    	put("WITA","WITA");
+    	put("WST","WST");
+    	put("WT","WT");
+    	put("YAKST","YAKST");
+    	put("YAKT","YAKT");
+    	put("YAPT","YAPT");
+    	put("YEKST","YEKST");
+    	put("YEKT","YEKT");
+    }};
+
+    //KC-605 END
+    
     /** private ctor. */
     private DateUtils() {
         throw new UnsupportedOperationException("do not call");
@@ -256,7 +440,27 @@ public final class DateUtils {
             }
         }
 
-        return hour + ":" + minute + " " + amPmMarker;
+        //KC-605 BEGIN rbl add time zone to sponsor deadline time
+        String timeZone =  matcher.group(4);
+        if(timeZone == null) {
+        	timeZone = "";
+        }
+        else {
+        	timeZone = timeZone.toUpperCase();
+        }
+        
+        if(timeZone.length() > 0) {
+        	if(tz_abbreviations.get(timeZone) != null) {
+        		return hour + ":" + minute + " " + amPmMarker + " " + timeZone;
+        	}
+        	else {
+        		return Constants.INVALID_TIME;
+        	}
+        }
+        else {
+            return hour + ":" + minute + " " + amPmMarker;
+        }
+        //KC-605 END
     }
 
     private static String parseTwentyFourHourTime(Matcher matcher) {
@@ -276,6 +480,26 @@ public final class DateUtils {
             minute = "00";
         }
 
-        return intHour + ":" + minute + " " + amPmMarker;
+        // KC-605 BEGIN
+        String timeZone =  matcher.group(4);
+        if(timeZone == null) {
+        	timeZone = "";
+        }
+        else {
+        	timeZone = timeZone.toUpperCase();
+        }
+        
+        if(timeZone.length() > 0) {
+        	if(tz_abbreviations.get(timeZone) != null) {
+        		return hour + ":" + minute + " " + amPmMarker + " " + timeZone;
+        	}
+        	else {
+        		return Constants.INVALID_TIME;
+        	}
+        }
+        else {
+        	return hour + ":" + minute + " " + amPmMarker;
+        }
+        //KC-605 END
     }
 }

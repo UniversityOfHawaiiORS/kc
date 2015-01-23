@@ -23,13 +23,13 @@ import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.GlobalVariables;
 
-
 public class InstitutionalProposalUnitContactAddRuleImpl {
 
     public static final String INSTITUTIONAL_PROPOSAL_UNIT_CONTACT_LIST_ERROR_KEY = "unitContactsBean.unitContact.unitAdministratorTypeCode";
     public static final String ERROR_INSTITUTIONAL_PROPOSAL_UNIT_CONTACT_EXISTS = "error.institutionalProposalUnitContact.person.exists";
     public static final String ERROR_INSTITUTIONAL_PROPOSAL_CONTACT_REQUIRED = "error.institutionalProposal.contact.person.required";
     public static final String ERROR_INSTITUTIONAL_PROPOSAL_CONTACT_ROLE_REQUIRED = "error.institutionalProposal.contact.person.role.required";
+    public static final String ERROR_INSTITUTIONAL_PROPOSAL_CONTACT_MISSING_UNIT = "error.unitContact.missing.primary.unit";
     private static final String PERSON_ERROR_KEY = "unitContactsBean.newInstitutionalProposalContact.fullName";
     
     /**
@@ -41,7 +41,21 @@ public class InstitutionalProposalUnitContactAddRuleImpl {
         boolean valid = checkForSelectedContactAdministratorTypeCode(newUnitContact);
         valid &= checkForDuplicatePerson(institutionalProposal, newUnitContact);
         valid &= checkForSelectedPerson(newUnitContact);
+        /* UH-KC-418 Modification add check for primary unit */ 
+        valid &= UHcheckForPrimaryUnit(newUnitContact);
         return  valid; 
+    }
+
+    /* UH-KC-418 Modification add check for primary unit */ 
+    private boolean UHcheckForPrimaryUnit(InstitutionalProposalUnitContact newContact) {
+        boolean valid = true;
+
+        if (newContact.getPerson().getUnit() == null) {
+        	GlobalVariables.getMessageMap().putError(PERSON_ERROR_KEY,  ERROR_INSTITUTIONAL_PROPOSAL_CONTACT_MISSING_UNIT);
+        	valid = false;
+        }
+
+        return valid;
     }
 
     public boolean checkForSelectedContactAdministratorTypeCode(InstitutionalProposalUnitContact newContact) {

@@ -91,6 +91,11 @@ public class BudgetCostShareAuditRule extends CostShareRuleResearchDocumentBase 
         for (BudgetCostShare costShare : costShares) {
             source = costShare.getSourceAccount();
             fiscalYear = costShare.getProjectPeriod();
+            /* KC-800 Add Questionnaire to capture Unrecovered F and A information
+             *        Remove requirement for Source Account
+             *
+             *
+             *
             if (null == source || source.length() == 0) {
                 retval = false;
                 getAuditErrors(BUDGET_COST_SHARE_ERROR_KEY, Constants.BUDGET_COST_SHARE_PANEL_NAME)
@@ -100,6 +105,9 @@ public class BudgetCostShareAuditRule extends CostShareRuleResearchDocumentBase 
                                     Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_COST_SHARE_PANEL_ANCHOR,
                                     params));
             }
+            *
+            *
+            * END KC-800 */
             int numberOfProjectPeriods = -1;
             if (budget.getBudgetPeriods() != null) {
                 numberOfProjectPeriods = budget.getBudgetPeriods().size();
