@@ -15,11 +15,14 @@
  */
 package org.kuali.coeus.sys.impl.workflow;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.kuali.coeus.sys.framework.workflow.KcDocumentRejectionService;
 import org.kuali.rice.kew.api.WorkflowDocument;
+import org.kuali.rice.kew.api.action.ActionRequest;
 import org.kuali.rice.kew.api.doctype.DocumentTypeService;
 import org.kuali.rice.kew.api.doctype.RoutePath;
 import org.kuali.rice.kew.api.document.WorkflowDocumentService;
@@ -66,10 +69,53 @@ public class KcDocumentRejectionServiceImpl implements KcDocumentRejectionServic
     public boolean isDocumentOnInitialNode(WorkflowDocument document)  {
         boolean ret = false;
         if (document != null) {
-            ret = isDocumentOnNode(document.getDocumentId(), getWorkflowInitialNodeName(document.getDocumentTypeName()));
+            ret = isDocumentOnNode(document.getDocumentId(), getWorkflowInitialNodeName(document.getDocumentTypeName()))
+            		 // KC-396 - Proposal opens in edit mode during routing when ad-hoc recipient 
+            		 //          is added, status automatically changes to "revisions requested" 
+            	     && !documentIsCurrentlyAtAdHocApprovalRequested(document);
         }
         return ret;
     }
+    
+    // KC-396 - Proposal opens in edit mode during routing when ad-hoc recipient is added, status automatically changes to "revisions requested" 
+    public boolean documentIsCurrentlyAtAdHocApprovalRequested(WorkflowDocument document)
+    {
+    	
+    
+        boolean isAdHocRequested = false;
+
+        List<ActionRequest> actionRequests = document.getRootActionRequests();
+             for(ActionRequest actionRequest : actionRequests) {
+            	 if (actionRequest.isActivated() && actionRequest.isAdHocRequest()) {
+            		 if (actionRequest.isApprovalRequest())
+                        isAdHocRequested = true;
+                }
+            }
+        return isAdHocRequested;
+    }
+    // End KC-396 
+  
+    
+    
+    /*
+     * 
+      public boolean isDocumentOnInitialNode(Document document)  {
+        boolean ret = false;
+        if (document!=null)
+	        ret = isDocumentOnNode(document,getWorkflowInitialNodeName(document.getDocumentHeader().getWorkflowDocument().getDocumentTypeName()));
+        return ret;
+        
+      public boolean isDocumentOnInitialNode(Document document)  {
+        boolean ret = false;
+        if (document!=null)
+	        ret = isDocumentOnNode(document,getWorkflowInitialNodeName(document.getDocumentHeader().getWorkflowDocument().getDocumentTypeName()))
+	        		&& !documentIsCurrentlyAtAdHocApprovalRequested(document);
+	        ;
+        return ret;
+          }
+    }
+     * 
+     */
 
     protected boolean isDocumentOnNode(String documentNumber,String nodeName) {
         if (StringUtils.isNotBlank(documentNumber) && StringUtils.isNotBlank(nodeName)) {

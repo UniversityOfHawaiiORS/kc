@@ -35,17 +35,17 @@ import java.util.*;
 
 @Component("unitHierarchyRoleTypeService")
 public class UnitHierarchyRoleTypeServiceImpl extends RoleTypeServiceBase {
-
+    
     private static final String KIM_UI_CHECKBOX_DEFAULT_VALUE = "no";
 
     @Autowired
     @Qualifier("unitService")
     private UnitService unitService;
-
+    
     @Autowired
     @Qualifier("kualiConfigurationService")
     private ConfigurationService kualiConfigurationService;
-    
+
     @Override
     public boolean performMatch(Map<String,String> qualification, Map<String,String> roleQualifier) {        
         if (roleQualifiedByUnitHierarchy(roleQualifier) && qualification.containsKey(KcKimAttributes.UNIT_NUMBER)) {
@@ -90,6 +90,11 @@ public class UnitHierarchyRoleTypeServiceImpl extends RoleTypeServiceBase {
     
     protected boolean unitQualifierMatchesHierarchy(Map<String,String> qualification, Map<String,String> roleQualifier) {
         boolean qualifierMatches = false;
+        
+        // KC-629 Performance issue with routing 
+        // no point in looping up the hierarchy if descendsSubunits is false 
+        // the original logic (commented out below) always returned false.
+        if (descendsSubunits(roleQualifier)) {
         String unitNumber = qualification.get(KcKimAttributes.UNIT_NUMBER);
         
         while (!qualifierMatches) {
@@ -101,10 +106,13 @@ public class UnitHierarchyRoleTypeServiceImpl extends RoleTypeServiceBase {
             if (parentUnitNumber == null) {
                 break;
             }
-            qualifierMatches = ( StringUtils.equals(parentUnitNumber, roleQualifier.get(KcKimAttributes.UNIT_NUMBER)) && descendsSubunits(roleQualifier));
+            // KC-629 Performance issue with routing 
+            // moved subunits check to start of method
+            // qualifierMatches = ( StringUtils.equals(parentUnitNumber, roleQualifier.get(KcKimAttributes.UNIT_NUMBER)) && descendsSubunits(roleQualifier));
+            qualifierMatches = StringUtils.equals(parentUnitNumber, roleQualifier.get(KcKimAttributes.UNIT_NUMBER));
             unitNumber = parentUnitNumber;
         }
-        
+        }
         return qualifierMatches;
     }
     

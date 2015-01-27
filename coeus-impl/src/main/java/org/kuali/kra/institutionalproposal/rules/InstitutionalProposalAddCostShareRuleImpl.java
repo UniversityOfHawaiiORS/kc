@@ -62,7 +62,10 @@ public class InstitutionalProposalAddCostShareRuleImpl extends CostShareRuleRese
         // test if commitment amount is entered and valid
         isValid &= validateAmount(institutionalProposalCostShare.getAmount());
         
-        isValid &= validateSourceAccount(institutionalProposalCostShare.getSourceAccount());
+        /* KC-800 Add Questionnaire to capture Unrecovered F and A information 
+                  as a part of this chage we made Source Account Optional in Cost Sharing and Unrecovered F & A 
+                  therefore for submit to sponsor which creates an IP we need to remove the requirement of this value from IP */
+        //isValid &= validateSourceAccount(institutionalProposalCostShare.getSourceAccount());
         
         return isValid;
     }

@@ -98,7 +98,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
 
     private static final String TRUE_INDICATOR_VALUE = "1";
 	private static final String FALSE_INDICATOR_VALUE = "0";
-
+    
     @Autowired
     @Qualifier("dataObjectService")
     private DataObjectService dataObjectService;
@@ -145,13 +145,13 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             InstitutionalProposalDocument newInstitutionalProposalDocument = versionProposal(proposalNumber, developmentProposal, budget);
             setInstitutionalProposalIndicators(newInstitutionalProposalDocument.getInstitutionalProposal());
             documentService.routeDocument(newInstitutionalProposalDocument, ROUTE_MESSAGE + developmentProposal.getProposalNumber(), 
-            		new ArrayList<AdHocRouteRecipient>());
+                    new ArrayList<AdHocRouteRecipient>());
             institutionalProposalVersioningService.updateInstitutionalProposalVersionStatus(newInstitutionalProposalDocument.getInstitutionalProposal(), 
             		VersionStatus.ACTIVE);
             return newInstitutionalProposalDocument.getInstitutionalProposal().getSequenceNumber().toString();
         } catch (WorkflowException|VersionException e) {
             throw new InstitutionalProposalCreationException(VERSION_EXCEPTION_MESSAGE, e);
-        }
+        } 
     }
     
     /**
@@ -307,9 +307,9 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             throw new InstitutionalProposalCreationException(VERSION_EXCEPTION_MESSAGE, ve);
         }
     }
-
+    
     public List<InstitutionalProposal> getProposalsForProposalNumber(String proposalNumber) {
-        List<InstitutionalProposal> results = new ArrayList<InstitutionalProposal>(businessObjectService.findMatchingOrderBy(InstitutionalProposal.class,
+        List<InstitutionalProposal> results = new ArrayList<InstitutionalProposal>(businessObjectService.findMatchingOrderBy(InstitutionalProposal.class, 
                 Collections.singletonMap(PROPOSAL_NUMBER, proposalNumber),
                                                                 SEQUENCE_NUMBER,
                                                                 true));
@@ -459,8 +459,11 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         List<InstitutionalProposalCustomData> ipCustomDataList = institutionalProposalDocument.getInstitutionalProposal().getInstitutionalProposalCustomDataList();
         InstitutionalProposalCustomData ipCustomData;
         CustomAttributeDocument dpCustomAttributeDocument;
-        for (String key : dpCustomAttributes.keySet()) {
-            if (ipCustomAttributes.containsKey(key)) {
+        //UH KC-454 begin - RBL modified code so that all the custom attributes needed by Institutional Proposal such as project summary, are added
+        //to a new Institutional Proposal that is generated from a Development Proposal
+        CustomAttributeDocument ipCustomAttributeDocument;
+        for (String key : ipCustomAttributes.keySet()) {
+            if (dpCustomAttributes.containsKey(key)) {
                 dpCustomAttributeDocument = dpCustomAttributes.get(key);
                 ipCustomAttributes.put(key, dpCustomAttributeDocument);
                 ipCustomData = new InstitutionalProposalCustomData();
@@ -471,8 +474,20 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
                 ipCustomData.setValue(getCustomAttributeValue(developmentProposal.getProposalDocument().getCustomDataList(),key));
                 ipCustomDataList.add(ipCustomData);
             }
+            
+            else {
+                ipCustomAttributeDocument = ipCustomAttributes.get(key);
+                ipCustomData = new InstitutionalProposalCustomData();
+                ipCustomData.setCustomAttribute(new CustomAttribute());
+                ipCustomData.getCustomAttribute().setId(ipCustomAttributeDocument.getCustomAttribute().getId());
+                ipCustomData.setCustomAttributeId((long) ipCustomAttributeDocument.getCustomAttribute().getId());
+                ipCustomData.setInstitutionalProposal(institutionalProposalDocument.getInstitutionalProposal());
+                ipCustomData.setValue(ipCustomAttributeDocument.getCustomAttribute().getValue());
+                ipCustomDataList.add(ipCustomData);
+            }
         }
     }
+        //UH KC-454 end
 
     protected String getCustomAttributeValue(List<CustomAttributeDocValue> values, String key) {
         for (CustomAttributeDocValue value : values) {
@@ -482,7 +497,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         }
         return null;
     }
-    
+
     protected InstitutionalProposalPerson generateInstitutionalProposalPerson(ProposalPerson pdPerson) {
         InstitutionalProposalPerson ipPerson = new InstitutionalProposalPerson();
         if (ObjectUtils.isNotNull(pdPerson.getPersonId())) {
@@ -686,7 +701,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         getBusinessObjectService().save(oldIP.getAwardFundingProposals());
         return newFundingProposals;
     }
-
+    
     /**
      * This function verifies that the indicator fields are set, and if they aren't sets them.
      * If an IP is being versioned and the home unit or cost shares allocations are changed, there may be problems with these fields.
@@ -771,7 +786,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
     public BusinessObjectService getBusinessObjectService() {
         return businessObjectService;
     }
-
+    
 	public DataObjectService getDataObjectService() {
 		return dataObjectService;
 	}
