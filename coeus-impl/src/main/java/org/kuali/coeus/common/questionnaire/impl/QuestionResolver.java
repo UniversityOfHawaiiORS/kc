@@ -24,10 +24,13 @@ import org.kuali.rice.krms.api.engine.TermResolver;
 import java.util.*;
 
 public class QuestionResolver implements TermResolver<Object> {
-
+    
     public static final String MODULE_CODE = "moduleCode";
     public static final String MODULE_ITEM_KEY = "moduleItemKey";
-    public static final String QUESTIONNAIRE_REF_ID = "Questionnaire Ref ID";
+    // KC-845 Editing a questionnaire breaks KRMS rules that use it (KRACOEUS-7230)
+    //        Note, Fixed in KC 5.2, broken again in KC 6.0 fixing again by changing to  
+    //        new 6.0 attribute QUESTIONNAIRE_SEQ_ID which really maps to QUESTIONNAIRE_ID in DB
+    public static final String QUESTIONNAIRE_SEQ_ID = "Questionnaire Seq ID";
     public static final String QUESTION_SEQ_ID = "Question Seq ID";
     public static final String MODULE_ITEM_CODE = "moduleItemCode";
     private String outputName;
@@ -64,13 +67,19 @@ public class QuestionResolver implements TermResolver<Object> {
     
     @Override
     public String resolve(Map<String, Object> resolvedPrereqs, Map<String, String> parameters) {
-        String questionnaireId = parameters.get(QUESTIONNAIRE_REF_ID);
+        // KC-845 Editing a questionnaire breaks KRMS rules that use it (KRACOEUS-7230)
+        //        Note, Fixed in KC 5.2, broken again in KC 6.0 fixing again by changing to
+        //        new 6.0 attribute QUESTIONNAIRE_SEQ_ID which really maps to QUESTIONNAIRE_ID in DB  
+        String questionnaireId = parameters.get(QUESTIONNAIRE_SEQ_ID);
         String questionId = parameters.get(QUESTION_SEQ_ID);
         String moduleCode = (String) resolvedPrereqs.get(MODULE_CODE);
         String moduleItemKey = (String) resolvedPrereqs.get(MODULE_ITEM_KEY);
         List<AnswerHeader> answerHeaders = getQuestionnaireAnswers(moduleCode, moduleItemKey);
         for (AnswerHeader answerHeader : answerHeaders) {
-            if (answerHeader.getQuestionnaireId().equals(questionnaireId)) {
+            // KC-845 Editing a questionnaire breaks KRMS rules that use it (KRACOEUS-7230)
+            //        Note, Fixed in KC 5.2, broken again in KC 6.0 fixing again by changing to
+            //        new 6.0 attribute QUESTIONNAIRE_SEQ_ID which really maps to QUESTIONNAIRE_ID in DB
+            if (answerHeader.getQuestionnaire().getQuestionnaireSeqId().equals(questionnaireId)) {
                 for (Answer answer : answerHeader.getAnswers()) {
                     if (answer.getQuestion().getQuestionSeqId().equals(questionId)) {
                         return answer.getAnswer();
