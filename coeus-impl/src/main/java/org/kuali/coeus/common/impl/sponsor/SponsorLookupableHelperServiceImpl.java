@@ -22,13 +22,16 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.framework.sponsor.Sponsor;
 import org.kuali.coeus.sys.framework.lookup.KcKualiLookupableHelperServiceImpl;
+
 import edu.hawaii.kra.lookup.UhSolrExternalSearch;
+
 import org.kuali.rice.kns.lookup.LookupUtils;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
 import org.kuali.rice.kns.web.struts.form.MultipleValueLookupForm;
 import org.kuali.rice.kns.web.ui.Field;
 import org.kuali.rice.kns.web.ui.Row;
+import org.kuali.rice.krad.bo.BusinessObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;

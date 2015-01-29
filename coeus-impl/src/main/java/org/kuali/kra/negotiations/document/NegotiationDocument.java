@@ -156,4 +156,18 @@ public class NegotiationDocument extends KcTransactionalDocumentBase implements 
         return getNegotiation().getNegotiationId().toString();
         
     }
+    
+    // KC-821 Only allow one Negotiation per child award.
+    public void setAssociatedDocumentId(String associatedDocumentId) {	
+        getNegotiation().setAssociatedDocumentId(associatedDocumentId);
+    }
+    // KC-821 END
+    
+    // KC-883 Document Locks not removed when opening negotiations from action buttons
+    public List<String> getLockClearningMethodNames() {
+        List<String> methodToCalls = super.getLockClearningMethodNames();
+        methodToCalls.add("openAward");
+        return methodToCalls;
+    }
+    // KC-883 END
 }

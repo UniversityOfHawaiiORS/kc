@@ -21,6 +21,7 @@ import org.apache.struts.action.ActionMapping;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
 import org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
+import org.kuali.kra.award.home.Award;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.negotiations.bo.Negotiation;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
@@ -29,13 +30,19 @@ import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.negotiations.web.struts.form.NegotiationForm;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
+import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.rules.rule.event.DocumentEvent;
 import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
+import org.kuali.rice.krad.util.GlobalVariables;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 
 public class NegotiationAction extends KcTransactionalDocumentActionBase {
@@ -150,4 +157,56 @@ public class NegotiationAction extends KcTransactionalDocumentActionBase {
         return kualiRuleService;
     }
     
+    // KC-821 Only allow one Negotiation per child award.
+    //        Link back to the award document from negotiation document
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public ActionForward openAward(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    	NegotiationForm negotiationForm = (NegotiationForm) form;
+        NegotiationDocument negotiationDocument = negotiationForm.getNegotiationDocument();
+        ActionForward actionForward;
+        
+        //if ((!negotiationDocument.getEditingMode().containsKey("viewOnly") || negotiationDocument.getEditingMode().containsKey("fullEntry")) &&
+        //        !negotiationDocument.getDocumentHeader().getWorkflowDocument().isFinal()) {
+            this.save(mapping, form, request, response);
+        //}
+                
+        if(GlobalVariables.getMessageMap().hasNoErrors()){
+        	Map<String, Object> fieldValues = new HashMap<String, Object>();
+            String awardNumber = negotiationDocument.getNegotiation().getAssociatedDocumentId();
+            // Populate search field values with award Number which is found in associatedDocumentId in negotiations document
+            fieldValues.put("awardNumber", awardNumber);
+            BusinessObjectService businessObjectService =  KcServiceLocator.getService(BusinessObjectService.class);
+
+            List<Award> awards = 
+                (List<Award>)businessObjectService.findMatching(Award.class, fieldValues);
+            
+            // Get the award with the highest document number (newest)
+            Long lastDocumentNumber= new Long(0);
+            for (Award award:awards) {
+            	Long thisDocNumber = Long.parseLong(award.getAwardDocument().getDocumentNumber());
+        	    if (lastDocumentNumber.compareTo(thisDocNumber) < 0) {
+        	    	lastDocumentNumber = thisDocNumber;
+        	    }
+            }
+
+            // If lastDocumentNumer is not equal to 0 then we found the award so open it.
+        	if (!lastDocumentNumber.equals(0)) {
+                String routeHeaderId = lastDocumentNumber.toString();
+        	
+                // KC-883 Document Locks not removed when opening negotiations from action buttons
+                setupDocumentExit();
+                
+        	    String forward = buildForwardUrl(routeHeaderId);
+                actionForward = new ActionForward(forward, true);
+                //add this to session for return to award action.
+                GlobalVariables.getUserSession().addObject(Constants.AWARD_DOCUMENT_STRING_FOR_SESSION + "-" + routeHeaderId, negotiationDocument.getDocumentNumber());
+        	} else {
+        		actionForward = mapping.findForward(Constants.MAPPING_AWARD_BASIC);
+        	}
+        } else {
+            actionForward = mapping.findForward(Constants.MAPPING_AWARD_BASIC);
+        }
+        return actionForward;
+    }
+    // KC-821 END
 }

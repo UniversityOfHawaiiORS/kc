@@ -23,6 +23,11 @@ import java.util.Comparator;
  * Activity Sorting Enum for displaying and choosing the correct comparator.
  */
 public enum ActivitySortingType {
+    // KC-874 Change Default sort order of negotiation activities to As Entered
+    @SuppressWarnings("unchecked")
+    AE ("As Entered", 
+            new NegotiationActivityIdComparator()),
+    // KC-874 END
     @SuppressWarnings("unchecked")
     ST ("Activity Start Date, Activity Type", 
             new MultiComparator<NegotiationActivity>(new Comparator[]{new StartDateComparator(), new ActivityTypeComparator()})),
@@ -54,6 +59,20 @@ public enum ActivitySortingType {
     }
 }
 
+// KC-874 Change Default sort order of negotiation activities to As Entered
+class NegotiationActivityIdComparator implements Comparator<NegotiationActivity> {
+    @Override
+    public int compare(NegotiationActivity o1, NegotiationActivity o2) {
+    	if (o1.getActivityId() == null ^ o2.getActivityId() == null) {
+            return (o1 == null) ? -1 : 1;
+        }
+    	if (o1.getActivityId() == null && o2.getActivityId() == null) {
+            return 0;
+        }
+        return o1.getActivityId().compareTo(o2.getActivityId());
+    }
+}
+// KC-874 END
 class StartDateComparator implements Comparator<NegotiationActivity> {
     @Override
     public int compare(NegotiationActivity o1, NegotiationActivity o2) {
