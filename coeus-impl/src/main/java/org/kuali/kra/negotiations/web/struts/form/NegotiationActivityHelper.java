@@ -234,9 +234,13 @@ public class NegotiationActivityHelper implements Serializable {
     }
     
     public void sortActivities() {
-        if (getActivitySortingType() != null) {
+        // KC-874 Change Default sort order of negotiation activities to As Entered
+    	if (getActivitySortingType() == null) {
+    	    // Default to AS Entered Sorting Type which uses activity id sequence number
+    	    setActivitySortingType(ActivitySortingType.AE);
+    	}
             Collections.sort(getForm().getNegotiationDocument().getNegotiation().getActivities(), 
                     getActivitySortingType().getComparator());
-        }
+        // KC-874 END
     }
 }
