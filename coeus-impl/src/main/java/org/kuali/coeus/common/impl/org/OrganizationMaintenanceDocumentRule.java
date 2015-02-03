@@ -76,6 +76,7 @@ public class OrganizationMaintenanceDocumentRule  extends MaintenanceDocumentRul
         for (OrganizationYnq organizationYnq : newOrganization.getOrganizationYnqs()) {
             organizationYnq.refreshReferenceObject("ynq");
             
+            /* KC-729 Make YNQ Questions not required in Organization
             if( StringUtils.isBlank(organizationYnq.getAnswer()) ) {
                 errorReporter.reportError(String.format( "document.newMaintainableObject.organizationYnqs[%s].answer", i ), 
                         KeyConstants.ERROR_ORGANIZATION_QUESTIONYNQ_ANSWER_REQUIRED,
@@ -83,6 +84,7 @@ public class OrganizationMaintenanceDocumentRule  extends MaintenanceDocumentRul
                     );
                 valid=false;
             }
+            */
             
             if (StringUtils.isNotBlank(organizationYnq.getAnswer()) && 
                     organizationYnq.getAnswer().equalsIgnoreCase(organizationYnq.getYnq().getExplanationRequiredFor()) && StringUtils.isBlank(organizationYnq.getExplanation())) {
