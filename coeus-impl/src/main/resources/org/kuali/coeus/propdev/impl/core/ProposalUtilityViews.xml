@@ -1,3 +1,21 @@
+<!--
+   - Kuali Coeus, a comprehensive research administration system for higher education.
+   - 
+   - Copyright 2005-2015 Kuali, Inc.
+   - 
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU Affero General Public License as
+   - published by the Free Software Foundation, either version 3 of the
+   - License, or (at your option) any later version.
+   - 
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   - GNU Affero General Public License for more details.
+   - 
+   - You should have received a copy of the GNU Affero General Public License
+   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:p="http://www.springframework.org/schema/p"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
@@ -6,6 +24,7 @@
     <bean id="PropDev-CopyView" parent="PropDev-CopyView-parentBean"/>
     <bean id="PropDev-CopyView-parentBean" abstract="true"
           parent="Uif-FormView" p:header.render="false" p:breadcrumbs.render="false"
+          p:viewHelperService="#{#getService('proposalDevelopmentViewHelperService')}"
           p:formClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentForm">
         <property name="stickyFooter" value="@{renderedInDialog}"/>
         <property name="applicationHeader.render" value="@{!renderedInDialog}"/>
@@ -82,6 +101,7 @@
     <bean id="PropDev-SummaryView" parent="PropDev-SummaryView-parentBean"/>
     <bean id="PropDev-SummaryView-parentBean" abstract="true"
           parent="Uif-FormView" p:header.render="false" p:breadcrumbs.render="false"
+          class="org.kuali.coeus.propdev.impl.core.ProposalDocumentSummaryView"
           p:formClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentForm"
           p:authorizer="#{#getService('proposalDevelopmentDocumentViewAuthorizer')}"
           p:viewHelperService="#{#getService('proposalDevelopmentViewHelperService')}"
@@ -99,7 +119,18 @@
                             <property name="items">
                                 <list>
                                     <bean parent="PropDev-SubmitPage-ProposalSummary"/>
-                                    <bean p:headerText="Budget (placeholder)" parent="Uif-VerticalBoxSection"/>
+                                    <bean parent="PropDev-BudgetPage-Collection" p:headerText="Budget Summary"
+                                            p:renderLineActions="false">
+                                        <property name="header.rightGroup">
+                                            <null/>
+                                        </property>
+                                        <property name="items">
+                                            <list merge="true">
+                                                <bean parent="Uif-DataField" p:label="Name" p:propertyName="name" p:order="10" />
+
+                                            </list>
+                                        </property>
+                                    </bean>
                                 </list>
                             </property>
                         </bean>

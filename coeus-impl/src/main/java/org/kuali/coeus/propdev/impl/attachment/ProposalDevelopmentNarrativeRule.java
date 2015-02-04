@@ -1,17 +1,20 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.osedu.org/licenses/ECL-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.attachment;
 
@@ -50,7 +53,8 @@ public class ProposalDevelopmentNarrativeRule extends KcTransactionalDocumentRul
     private static final String DOCUMENT_NARRATIVES = "document.developmentProposal.narratives";
     private static final String PROPOSAL = "Proposal";
     private static final String MODULE_STATUS_CODE_COMPLETED = "C";
-    
+    private static final String ERROR_PREFIX_FOR_ATTACHMENTS = "multipartFile";
+
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(ProposalDevelopmentNarrativeRule.class);
     
     private transient KcPersonService kcPersonService;
@@ -84,7 +88,8 @@ public class ProposalDevelopmentNarrativeRule extends KcTransactionalDocumentRul
         rulePassed &= getDictionaryValidationService().isBusinessObjectValid(narrative);
         rulePassed &= checkNarrative(document.getDevelopmentProposal().getNarratives(), narrative);
         rulePassed &= validFileNameCharacters(narrative);
-        
+        rulePassed &= getKcFileService().validPDFFile(narrative, getErrorReporter(), ERROR_PREFIX_FOR_ATTACHMENTS);
+
         return rulePassed;
     }
     private boolean validFileNameCharacters(Narrative narrative) {
@@ -96,21 +101,20 @@ public class ProposalDevelopmentNarrativeRule extends KcTransactionalDocumentRul
         if (ObjectUtils.isNotNull(invalidCharacters)) {
             String parameter = getParameterService().
                                getParameterValueAsString(ProposalDevelopmentDocument.class, Constants.INVALID_FILE_NAME_CHECK_PARAMETER);
-           
+
             if (Constants.INVALID_FILE_NAME_ERROR_CODE.equals(parameter)) {
                 rulePassed &= false;
-                reportError("multipartFile", KeyConstants.INVALID_FILE_NAME,
+                reportError(ERROR_PREFIX_FOR_ATTACHMENTS, KeyConstants.INVALID_FILE_NAME,
                         attachmentFileName, invalidCharacters);
             } else {
                 rulePassed &= true;
-                reportWarning("multipartFile",KeyConstants.INVALID_FILE_NAME,
+                reportWarning(ERROR_PREFIX_FOR_ATTACHMENTS, KeyConstants.INVALID_FILE_NAME,
                         attachmentFileName, invalidCharacters);
-                GlobalVariables.getMessageMap().getErrorPath().clear();
-                GlobalVariables.getMessageMap().putWarning(DOCUMENT_NARRATIVES, KeyConstants.INVALID_FILE_NAME, attachmentFileName, invalidCharacters);
             }
         }
         return rulePassed;
     }
+
     /**
      * This method is used to validate narratives and institute proposal attachments before saving.
      * It checks whether the narratives are duplicated for those of which have allowMultiple flag set as false.
@@ -152,7 +156,8 @@ public class ProposalDevelopmentNarrativeRule extends KcTransactionalDocumentRul
             rulePassed = false;
         
         rulePassed &= validFileNameCharacters(narrative);
-        
+        rulePassed &= getKcFileService().validPDFFile(narrative, getErrorReporter(), ERROR_PREFIX_FOR_ATTACHMENTS);
+
         map.addToErrorPath(replaceNarrativeEvent.getErrorPathPrefix());
         rulePassed &= getDictionaryValidationService().isBusinessObjectValid(narrative);
         map.removeFromErrorPath(replaceNarrativeEvent.getErrorPathPrefix());

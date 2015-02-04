@@ -1,10 +1,25 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.hierarchy;
 
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
-import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
-import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentControllerBase;
-import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
-import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentForm;
+import org.kuali.coeus.propdev.impl.core.*;
 import org.kuali.rice.krad.web.form.DialogResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -15,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -34,6 +50,7 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
             String userId = getGlobalVariableService().getUserSession().getPrincipalId();
             String hierarchyProposalNumber = getProposalHierarchyService().createHierarchy(initialChildProposal, userId);
             displayMessage(ProposalHierarchyKeyConstants.MESSAGE_CREATE_SUCCESS, new String[]{hierarchyProposalNumber});
+            form.setAuditActivated(false);
             form.setEvaluateFlagsAndModes(true);
             form.setCanEditView(null);
         }
@@ -50,7 +67,9 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
             getProposalHierarchyService().synchronizeAllChildren(hierarchyProposalDoc.getDevelopmentProposal());
             displayMessage(ProposalHierarchyKeyConstants.MESSAGE_SYNC_SUCCESS, new String[]{});
         }
-        return getModelAndViewService().getModelAndView(form);
+
+        ((ProposalDevelopmentViewHelperServiceImpl)form.getViewHelperService()).prepareSummaryPage(form);
+        return getRefreshControllerService().refresh(form);
     }
 
     /*
@@ -75,6 +94,7 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
 		        if (!displayErrors(errors)) {
 	                getProposalHierarchyService().linkToHierarchy(hierarchyProposal, newChildProposal, hierarchyBudgetTypeCode);
 	                displayMessage(ProposalHierarchyKeyConstants.MESSAGE_LINK_SUCCESS, new String[]{newChildProposal.getProposalNumber(), hierarchyProposal.getProposalNumber()});
+                    form.setAuditActivated(false);
 	                form.setEvaluateFlagsAndModes(true);
 	                form.setCanEditView(null);
 		        }
@@ -94,17 +114,20 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
     		@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         DevelopmentProposal hierarchyProposal = form.getProposalDevelopmentDocument().getDevelopmentProposal();
         DevelopmentProposal newChildProposal = getProposalHierarchyService().getDevelopmentProposal(hierarchyProposalNumber);
-
         DialogResponse response = form.getDialogResponse(ProposalHierarchyKeyConstants.HIERARCHY_CONFIRMATION_DIALOG);
-        if (response == null && getProposalHierarchyService().needToExtendProjectDate(hierarchyProposal, newChildProposal)) {
+        List<ProposalHierarchyErrorWarningDto> errors = new ArrayList<ProposalHierarchyErrorWarningDto>();
+        if (newChildProposal == null) {
+            errors.add(new ProposalHierarchyErrorWarningDto(ProposalHierarchyKeyConstants.ERROR_PROPOSAL_DOES_NOT_EXIST, Boolean.TRUE, new String[0]));
+            displayErrors(errors);
+        } else if (response == null && getProposalHierarchyService().needToExtendProjectDate(hierarchyProposal, newChildProposal)) {
         	return getModelAndViewService().showDialog(ProposalHierarchyKeyConstants.HIERARCHY_CONFIRMATION_DIALOG, true, form);
         } else if (response == null || response.getResponseAsBoolean()) {
-            List<ProposalHierarchyErrorWarningDto> errors = getProposalHierarchyService().validateParent(hierarchyProposal);
+            errors.addAll(getProposalHierarchyService().validateParent(hierarchyProposal));
             errors.addAll(getProposalHierarchyService().validateChildCandidate(newChildProposal));
             errors.addAll(getProposalHierarchyService().validateChildCandidateForHierarchy(hierarchyProposal, newChildProposal, true));
             errors.addAll(getProposalHierarchyService().validateSponsor(newChildProposal, hierarchyProposal));
             errors.addAll(getProposalHierarchyService().validateIsAggregatorOnChild(newChildProposal));
-	
+
 	        if (!displayErrors(errors)) {
 	            getProposalHierarchyService().linkToHierarchy(hierarchyProposal, newChildProposal, hierarchyBudgetTypeCode);
 	            displayMessage(ProposalHierarchyKeyConstants.MESSAGE_LINK_SUCCESS, new String[]{hierarchyProposal.getProposalNumber(), newChildProposal.getProposalNumber()});
@@ -141,6 +164,8 @@ public class ProposalDevelopmentHierarchyController extends ProposalDevelopmentC
             childProposal = getProposalHierarchyService().removeFromHierarchy(childProposal);
             form.getProposalDevelopmentDocument().setDevelopmentProposal(childProposal);
             displayMessage(ProposalHierarchyKeyConstants.MESSAGE_REMOVE_SUCCESS);
+            form.setEvaluateFlagsAndModes(true);
+            form.setCanEditView(null);
         }
 
         return getModelAndViewService().getModelAndView(form);

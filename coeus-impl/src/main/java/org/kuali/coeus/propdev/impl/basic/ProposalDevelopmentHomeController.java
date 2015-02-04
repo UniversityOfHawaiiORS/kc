@@ -1,17 +1,20 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.opensource.org/licenses/ecl1.php
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.basic;
 
@@ -27,6 +30,7 @@ import org.kuali.coeus.common.framework.sponsor.Sponsor;
 import org.kuali.coeus.common.framework.compliance.core.SaveDocumentSpecialReviewEvent;
 import org.kuali.coeus.propdev.impl.copy.ProposalCopyCriteria;
 import org.kuali.coeus.propdev.impl.core.*;
+import org.kuali.coeus.propdev.impl.docperm.ProposalUserRoles;
 import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.coeus.propdev.impl.state.ProposalState;
 import org.kuali.rice.kew.api.WorkflowDocument;
@@ -108,10 +112,12 @@ public class ProposalDevelopmentHomeController extends ProposalDevelopmentContro
             props.put(UifConstants.UrlParams.VIEW_ID, "PropDev-DeletedView");
             return getModelAndViewService().performRedirect(form, "proposalDevelopment", props);
         } else {
+            form.initialize();
             form.setDocument(document);
             WorkflowDocument workflowDocument = document.getDocumentHeader().getWorkflowDocument();
             form.setDocTypeName(workflowDocument.getDocumentTypeName());
             form.setProposalCopyCriteria(new ProposalCopyCriteria(document));
+            ((ProposalDevelopmentViewHelperServiceImpl)form.getView().getViewHelperService()).populateQuestionnaires(form);
 
             if (!this.getDocumentDictionaryService().getDocumentAuthorizer(document).canOpen(document,
                     getGlobalVariableService().getUserSession().getPerson())) {
@@ -136,13 +142,31 @@ public class ProposalDevelopmentHomeController extends ProposalDevelopmentContro
    public ModelAndView save(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
        return super.save(form);
    }
-   
 
-   @Transactional @RequestMapping(value ="/proposalDevelopment", params = "methodToCall=navigate")
-   public ModelAndView navigate(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
-		   HttpServletRequest request, HttpServletResponse response) throws Exception {
-       return super.navigate(form, result, request, response);
-   }
+
+    @Transactional @RequestMapping(value ="/proposalDevelopment", params = "methodToCall=navigate")
+    public ModelAndView navigate(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
+                                 HttpServletRequest request, HttpServletResponse response) throws Exception {
+
+        refreshDocumentLevelPermissions(form);
+
+        return super.navigate(form, result, request, response);
+    }
+
+    protected void refreshDocumentLevelPermissions(ProposalDevelopmentDocumentForm form) {
+        final List<ProposalUserRoles> currentRoles = form.getWorkingUserRoles();
+        final List<ProposalUserRoles> newRoles = getProposalDevelopmentPermissionsService().getPermissions(form.getProposalDevelopmentDocument());
+
+        form.setWorkingUserRoles(newRoles);
+
+        if (isDocumentLevelRolesDirty(currentRoles, newRoles)) {
+            form.setEvaluateFlagsAndModes(true);
+        }
+    }
+
+    protected boolean isDocumentLevelRolesDirty(List<ProposalUserRoles> currentRoles, List<ProposalUserRoles> newRoles) {
+        return currentRoles.equals(newRoles);
+    }
 
    @MethodAccessible
    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=getSponsor")
@@ -212,7 +236,7 @@ public class ProposalDevelopmentHomeController extends ProposalDevelopmentContro
 
    @MethodAccessible
    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=docHandler")
-   public ModelAndView docHandler(@ModelAttribute("KualiForm") DocumentFormBase form, @RequestParam(required = false) String auditActivated,
+   public ModelAndView docHandler(@ModelAttribute("KualiForm") DocumentFormBase form, @RequestParam(required = false) String auditActivated, @RequestParam(required = false) String viewOnly,
                                   @RequestParam(required = false) String navigateToPageId, @RequestParam(required = false) String defaultOpenTab) throws Exception {
        ProposalDevelopmentDocument document;
        boolean isDeleted = false;
@@ -269,7 +293,7 @@ public class ProposalDevelopmentHomeController extends ProposalDevelopmentContro
                propDevForm.setDefaultOpenTab(defaultOpenTab);
            }
 
-            if (StringUtils.equals(form.getRequest().getParameter("viewDocument"),"true")) {
+            if (StringUtils.equals(form.getRequest().getParameter("viewDocument"),"true") || StringUtils.equals(viewOnly, "true")) {
                 propDevForm.setViewOnly(true);
             }
 

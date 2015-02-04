@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2005-2013 The Kuali Foundation Licensed under the Educational 
-	Community License, Version 2.0 (the "License"); you may not use this file 
-	except in compliance with the License. You may obtain a copy of the License 
-	at http://www.opensource.org/licenses/ecl2.php Unless required by applicable 
-	law or agreed to in writing, software distributed under the License is distributed 
-	on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-	express or implied. See the License for the specific language governing permissions 
-	and limitations under the License. -->
+<!--
+   - Kuali Coeus, a comprehensive research administration system for higher education.
+   - 
+   - Copyright 2005-2015 Kuali, Inc.
+   - 
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU Affero General Public License as
+   - published by the Free Software Foundation, either version 3 of the
+   - License, or (at your option) any later version.
+   - 
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   - GNU Affero General Public License for more details.
+   - 
+   - You should have received a copy of the GNU Affero General Public License
+   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -223,7 +233,8 @@
 			<bean parent="Uif-ActionBar">
 				<property name="items">
 					<list>
-                        <bean parent="Uif-Message" p:renderWrapperTag="false" p:refreshWhenChangedPropertyNames="auditActivated" p:order="10">
+                        <bean parent="Uif-Message" p:renderWrapperTag="false" p:refreshWhenChangedPropertyNames="auditActivated" p:order="10"
+                                p:render="@{!document.developmentProposal.child}">
                             <property name="messageText" value="[0] @{auditActivated?'[color=#090](on)[/color]':'[color=red](off)[/color]'}"/>
                             <property name="inlineComponents">
                                 <list>
@@ -295,5 +306,53 @@
     <bean id="PropDev-MenuAction" parent="PropDev-MenuAction-parentBean"/>
     <bean id="PropDev-MenuAction-parentBean" abstract="true" parent="Uif-MenuAction"
           p:performClientSideValidation="true"/>
+
+    <bean id="PropDev-HelpMenu" parent="PropDev-HelpMenu-parentBean"/>
+    <bean id="PropDev-HelpMenu-parentBean" abstract="true" p:toggleText="Help"
+          parent="Uif-DropdownToggleMenu" p:iconClass="icon-question">
+        <property name="wrapperCssClasses">
+            <list merge="true">
+                <value>kc-help-menu</value>
+            </list>
+        </property>
+        <property name="menuItems">
+            <list>
+                <bean parent="Uif-MenuHeader" p:messageText="Basics"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Proposal Details" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenproposaldetails.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="S2S Opportunity Search" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenpres2sopportunitysearch.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Delivery Information" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreendeliveryinformation.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Sponsor &amp; Program Information" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreensponsorprograminformation.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Organization &amp; Location" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenorganizationslocations.htm"/>
+                <bean parent="Uif-MenuDivider"/>
+                <bean parent="Uif-MenuHeader" p:messageText="Key Personnel"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Personnel" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenpersonnel.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Credit Allocation" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/creditallocation.htm"/>
+                <bean parent="Uif-MenuDivider"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Compliance"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreencompliance.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Attachments"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/proposalattachmentstab.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Questionnaire"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenquestionnaire.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Budget"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/budgetversionsscreen.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Access"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenaccessakapermissions.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Supplemental Information"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreensupplementalinformation.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Summary/Submit"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreensubmit.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Glossary of Terms"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/glossaryofterms.htm"/>
+            </list>
+        </property>
+    </bean>
 
 </beans>

@@ -1,3 +1,21 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.budget.core;
 
 import java.util.ArrayList;
@@ -38,6 +56,7 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
 	
     private static final String BUDGET_SUMMARY_DIALOG_ID = "PropBudget-SummaryPage-Dialog";
     private static final String BUDGET_PRINT_FORMS_DIALOG_ID = "PropBudget-PrintForms-Dialog";
+    private static final String BUDGET_PRINT_FORMS_REPORT_NAME = "Proposal Budget Reports";
 	
 	@Autowired
 	@Qualifier("proposalBudgetService")
@@ -114,12 +133,13 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
         }		
 	}
 
-	public ModelAndView openBudget(String budgetId, UifFormBase form) throws Exception {
+	public ModelAndView openBudget(String budgetId, boolean viewOnly, UifFormBase form) throws Exception {
 		if (getGlobalVariableService().getMessageMap().hasNoErrors()) {
 			form.setDirtyForm(false);
 	        Properties props = new Properties();
 	        props.put("methodToCall", "start");
 	        props.put("budgetId", budgetId);
+	        props.put("viewOnly", String.valueOf(viewOnly));
             props.put("auditActivated", String.valueOf(((Auditable)form).isAuditActivated()));
 	        return getModelAndViewService().performRedirect(form, "proposalBudget", props);
 		} else {
@@ -173,8 +193,7 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
 		}
 		if (selectedBudgetPrintForms != null
 				&& selectedBudgetPrintForms.size() > 0) {
-			String reportName = BudgetPrintType.BUDGET_SUMMARY_REPORT
-					.getBudgetPrintType();
+			String reportName = selectedBudgetPrintForms.size() > 1 ? BUDGET_PRINT_FORMS_REPORT_NAME : selectedBudgetPrintForms.get(0).getBudgetReportName();
 			AttachmentDataSource dataStream = 
 					getBudgetPrintService().readBudgetSelectedPrintStreams(selectedBudget,
 							selectedBudgetPrintForms, reportName);

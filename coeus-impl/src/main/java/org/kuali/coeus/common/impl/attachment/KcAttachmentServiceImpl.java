@@ -1,21 +1,28 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.opensource.org/licenses/ecl1.php
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.common.impl.attachment;
 
 import org.kuali.coeus.common.framework.attachment.KcAttachmentService;
+import org.kuali.coeus.sys.framework.validation.ErrorReporter;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.rice.krad.file.FileMeta;
 import org.kuali.rice.krad.util.ObjectUtils;
 import org.springframework.stereotype.Component;
 
@@ -86,23 +93,6 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
         return null;    
     }
 
-    /**
-     * This method checks string for invalid characters and replaces with underscores.
-     */
-    @Override
-    public String checkAndReplaceInvalidCharacters(String text) {     
-        String cleanText = text;
-        if (ObjectUtils.isNotNull(text)) {
-            Pattern pattern = Pattern.compile(REGEX_TITLE_FILENAME_PATTERN);
-            Matcher matcher = pattern.matcher(text);
-            cleanText = matcher.replaceAll(REPLACEMENT_CHARACTER);
-            if(cleanText.length() > 50){
-               cleanText = cleanText.substring(0, 50);
-            }
-        }
-        return cleanText;
-    }
-
     @Override
     public boolean getSpecialCharacter(String text) {
         if (ObjectUtils.isNotNull(text)) {
@@ -136,6 +126,15 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
         } else {
             return format.format((((double)size) / 1000)) + " KB";
         }
+    }
+
+    @Override
+    public boolean validPDFFile(FileMeta fileInQuestion, ErrorReporter errorReporter, String errorPrefix) {
+        if (!Constants.PDF_REPORT_CONTENT_TYPE.equals(fileInQuestion.getContentType())) {
+           errorReporter.reportWarning(errorPrefix, KeyConstants.INVALID_FILE_TYPE,
+                    fileInQuestion.getName(), Constants.PDF_REPORT_CONTENT_TYPE);
+        }
+        return true;
     }
 
 }

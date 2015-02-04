@@ -1,3 +1,21 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.budget.hierarchy;
 
 import static org.kuali.coeus.propdev.impl.hierarchy.ProposalHierarchyKeyConstants.ERROR_BUDGET_PERIOD_DURATION_INCONSISTENT;
@@ -389,7 +407,12 @@ public class ProposalBudgetHierarchyServiceImpl implements ProposalBudgetHierarc
         for (Iterator<BudgetSubAwards> iter = parentBudget.getBudgetSubAwards().iterator(); iter.hasNext();) {
         	BudgetSubAwards subAward = iter.next();
         	if (StringUtils.equals(childProposalNumber, subAward.getHierarchyProposalNumber())) {
-        		parentBudget.removeBudgetLineItems(subAward.getBudgetLineItems());
+        		List<BudgetLineItem> lineItems = getDataObjectService().findMatching(BudgetLineItem.class, QueryByCriteria.Builder.fromPredicates(
+    				PredicateFactory.equal("budgetId", subAward.getBudgetId()), 
+    				PredicateFactory.equal("subAwardNumber", subAward.getSubAwardNumber()))).getResults();
+	    		for (BudgetPeriod period : parentBudget.getBudgetPeriods()) {
+	    			period.getBudgetLineItems().removeAll(lineItems);
+	    		}
         		iter.remove();
         	}
         }

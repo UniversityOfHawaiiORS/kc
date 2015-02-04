@@ -1,17 +1,20 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.opensource.org/licenses/ecl1.php
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.kra.protocol;
 
@@ -168,8 +171,7 @@ public abstract class ProtocolDocumentBase extends KcTransactionalDocumentBase i
             // after merge is done, then reset to the original usersession person.  
             // this is workaround for async.  There will be rice enhancement to resolve this issue.
             try {
-                DocumentRouteHeaderValue document = KcServiceLocator.getService(RouteHeaderService.class).getRouteHeader(
-                        this.getDocumentHeader().getWorkflowDocument().getDocumentId());
+                DocumentRouteHeaderValue document = getDocumentRouteHeaderValue();
                 String principalId = document.getActionsTaken().get(document.getActionsTaken().size() - 1).getPrincipalId();
                 String asyncPrincipalId = GlobalVariables.getUserSession().getPrincipalId();
                 String asyncPrincipalName = GlobalVariables.getUserSession().getPrincipalName();
@@ -206,7 +208,16 @@ public abstract class ProtocolDocumentBase extends KcTransactionalDocumentBase i
         }
     }
     
+    protected DocumentRouteHeaderValue getDocumentRouteHeaderValue() {
+        return KcServiceLocator.getService(RouteHeaderService.class).getRouteHeader(
+                this.getDocumentHeader().getWorkflowDocument().getDocumentId());
+    }
   
+    protected void setProtocolDocumentToApproveByDefault() {
+        DocumentRouteHeaderValue document = getDocumentRouteHeaderValue();
+        document.getDocumentType().getDefaultApprovePolicy().setPolicyValue(true);
+    }
+    
     // we will  record actions, update statuses, version protocol doc/bo and send out notifications only for 
     // non-committee disapprovals, i.e. those that happen in routing or via superuser actions
     protected void performVersioningOperationsOnProtocolAfterDisapproval() throws Exception {

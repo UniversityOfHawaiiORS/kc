@@ -1,3 +1,21 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.hierarchy;
 
 import org.kuali.coeus.propdev.impl.budget.ProposalBudgetStatus;
@@ -45,10 +63,11 @@ public class ProposalHierarchyDaoJpa implements ProposalHierarchyDao {
         if (childProposalNumbers.isEmpty()) {
             return false;
         }
+
         QueryByCriteria.Builder builder = QueryByCriteria.Builder.create();
         List<Predicate> predicates = new ArrayList<Predicate>();
         predicates.add(equal("personId", personId));
-        predicates.add(in("developmentProposal.proposalNumber", getHierarchyChildProposalNumbers(hierarchyProposalNumber)));
+        predicates.add(in("developmentProposal.proposalNumber", childProposalNumbers));
 
         Predicate[] preds = predicates.toArray(new Predicate[predicates.size()]);
         builder.setCountFlag(CountFlag.ONLY);
@@ -82,6 +101,19 @@ public class ProposalHierarchyDaoJpa implements ProposalHierarchyDao {
         ProposalState state = (ProposalState) entityManager.createQuery(PROPOSAL_STATE_QUERY).setParameter("proposalNumber", proposalNumber).getSingleResult();
         return state == null ? "" : state.getDescription();
      }
+
+    public List<ProposalPerson> isPersonOnProposal(String proposalNumber, String personId) {
+        QueryByCriteria.Builder builder = QueryByCriteria.Builder.create();
+        List<Predicate> predicates = new ArrayList<Predicate>();
+        predicates.add(equal("developmentProposal.proposalNumber", proposalNumber));
+        predicates.add(equal("personId", personId));
+
+        Predicate[] preds = predicates.toArray(new Predicate[predicates.size()]);
+        builder.setPredicates(preds);
+
+        QueryResults<ProposalPerson> list= getDataObjectService().findMatching(ProposalPerson.class, builder.build());
+        return list.getResults();
+    }
 
     @Override
     public List<String> getHierarchyChildProposalNumbers(String parentProposalNumber) {

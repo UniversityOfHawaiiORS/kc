@@ -1,3 +1,21 @@
+########################################
+# Kuali Coeus, a comprehensive research administration system for higher education.
+# 
+# Copyright 2005-2015 Kuali, Inc.
+# 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+# 
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+########################################
 #!/bin/sh
 
 if [ ! -d LOGS ]
@@ -151,6 +169,12 @@ case "${dbtype}" in
         mv *.log ../LOGS/
         cd ..
         
+        cd KC-RELEASE-6_0_0-SCRIPT
+        sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-6_0_0-Demo-ORACLE.sql
+        
+        mv *.log ../LOGS/
+        cd ..
+        
         cd KC-RELEASE-99_9_9-SCRIPT
         sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-99_9_9-Demo-ORACLE.sql
 
@@ -218,7 +242,13 @@ case "${dbtype}" in
 
         mv *.log ../LOGS/
         cd ..
-               
+
+        cd KC-RELEASE-6_0_0-SCRIPT
+        mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-6_0_0-Demo-MYSQL.sql > KC-RELEASE-6_0_0-Demo-MYSQL-Install.log 2>&1
+
+        mv *.log ../LOGS/
+        cd ..
+                       
         cd KC-RELEASE-99_9_9-SCRIPT
         mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-99_9_9-Demo-MYSQL.sql > KR-RELEASE-99_9_9-Demo-MYSQL-Install.log 2>&1
 

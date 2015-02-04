@@ -1,17 +1,20 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.opensource.org/licenses/ecl1.php
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.common.impl.rpt;
 
@@ -88,21 +91,22 @@ public class ReportGenerationAction extends ReportGenerationBaseAction {
                     KeyConstants.INVALID_BIRT_REPORT, "select");
             return mapping.findForward(MAPPING_BASIC);
         }       
-        ArrayList<BirtParameterBean> parameterList = new ArrayList<BirtParameterBean>();
-        String printReportFormat = Constants.PDF_REPORT_CONTENT_TYPE;
+
         String printReportNameAndExtension = Constants.PDF_FILE_EXTENSION;
-        boolean isValid = Boolean.TRUE;
 
         ReportGenerationForm reportGenerationForm = (ReportGenerationForm) form;
         reportDesignInputStream = KcServiceLocator.getService(BirtReportService.class).getReportDesignFileStream(reportId);
         iReportRunnableDesign = BirtHelper.getEngine().openReportDesign(reportDesignInputStream);
         designHandle = (ReportDesignHandle) iReportRunnableDesign.getDesignHandle();
-        designHandle.getDataSources().add(BirtHelper.getDataSourceHandle());
+        if (designHandle.getDataSources().canContain(BirtHelper.getDataSourceHandle())) {
+            designHandle.getDataSources().add(BirtHelper.getDataSourceHandle());
+        }
+
         designHandle.close();
         iReportRunnableDesign.setDesignHandle(designHandle);
         IRunAndRenderTask reportTask = BirtHelper.getEngine().createRunAndRenderTask(iReportRunnableDesign);
-        HashMap parameters = new HashMap();
-        parameterList = KcServiceLocator.getService(BirtReportService.class).getInputParametersFromTemplateFile(reportId);
+        HashMap<String, Object> parameters = new HashMap<>();
+        ArrayList<BirtParameterBean> parameterList = KcServiceLocator.getService(BirtReportService.class).getInputParametersFromTemplateFile(reportId);
         CustReportDetails reportDetails = KcServiceLocator.getService(BusinessObjectService.class).findBySinglePrimaryKey(
                 CustReportDetails.class, reportId);
         reportGenerationForm.setReportParameterList(parameterList);
@@ -129,13 +133,13 @@ public class ReportGenerationAction extends ReportGenerationBaseAction {
         HashMap contextMap = new HashMap();
         reportTask.setAppContext(contextMap);
         reportTask.setParameterValues(parameters);
-        isValid = reportTask.validateParameters();
+        boolean isValid = reportTask.validateParameters();
         if (!isValid) {
             (KcServiceLocator.getService(ErrorReporter.class)).reportError("reportParameterList[0].inputParameterText",
                     KeyConstants.ERROR_BIRT_REPORT_INPUT_MISSING, "select");
         } else {
             RenderOption renderOption = null;
-
+            final String printReportFormat;
             if (reportGenerationForm.getReportFormat().equalsIgnoreCase(Constants.REPORT_FORMAT_PDF)) {
                 renderOption = new PDFRenderOption();
                 printReportFormat = Constants.PDF_REPORT_CONTENT_TYPE;
