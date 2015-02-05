@@ -1,7 +1,28 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.budget;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import java.sql.Date;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,9 +40,18 @@ public class ProposalBudgetNumberOfMonthsServiceTest {
 		Date endDate = java.sql.Date.valueOf("1990-12-30");
 		double resultValue = proposalBudgetNumberOfMonthsService
 				.getNumberOfMonth(startDate, endDate);
-		assertEquals(resultValue, 1, 0);
+		assertEquals(resultValue, 1.03, 0);
 	}
 
+	@Test
+	public void test_getNumberOfMonthInDecimal() {
+		Date startDate = java.sql.Date.valueOf("2015-01-01");
+		Date endDate = java.sql.Date.valueOf("2016-03-31");
+		double resultValue = proposalBudgetNumberOfMonthsService
+				.getNumberOfMonth(startDate, endDate);
+		assertEquals(resultValue, 15.0, 0);
+	}
+	
 	@Test
 	public void test_getNumberOfMonth_emptyDate() {
 		Double dateDifference = proposalBudgetNumberOfMonthsService
@@ -30,110 +60,12 @@ public class ProposalBudgetNumberOfMonthsServiceTest {
 	}
 
 	@Test
-	public void test_countMonthsStepOne() {
-		Date startDate = java.sql.Date.valueOf("1990-11-30");
-		Date endDate = java.sql.Date.valueOf("1990-12-30");
+	public void test_getNumberOfMonthsInvalid() {
+		Date startDate = java.sql.Date.valueOf("2015-01-20");
+		Date endDate = java.sql.Date.valueOf("2016-01-13");
 		double resultValue = proposalBudgetNumberOfMonthsService
-				.countMonthsStepOne(startDate, endDate);
-		assertEquals(resultValue, 1, 0);
-	}
-
-	@Test
-	public void test_countMonthsStepOne_startDateGreaterThanEndDate() {
-		Date startDate = java.sql.Date.valueOf("1990-12-30");
-		Date endDate = java.sql.Date.valueOf("1990-11-30");
-		double resultValue = proposalBudgetNumberOfMonthsService
-				.countMonthsStepOne(startDate, endDate);
-		assertEquals(resultValue, 0, 0);
-	}
-
-	@Test
-	public void test_countMonthsStepOne_equalDates() {
-		Date startDate = java.sql.Date.valueOf("1990-11-30");
-		Date endDate = java.sql.Date.valueOf("1990-11-30");
-		double resultValue = proposalBudgetNumberOfMonthsService
-				.countMonthsStepOne(startDate, endDate);
-		assertEquals(resultValue, 0, 0);
-	}
-
-	@Test
-	public void test_countMonthsStepTwo_startDateGreaterThanEndDate() {
-		Date startDate = java.sql.Date.valueOf("1990-12-30");
-		Date endDate = java.sql.Date.valueOf("1990-11-30");
-		double resultValue = proposalBudgetNumberOfMonthsService
-				.countMonthsStepOne(startDate, endDate);
-		assertEquals(resultValue, 0, 0);
-	}
-
-	@Test
-	public void test_countMonthsStepTwo_equalDates() {
-		Date startDate = java.sql.Date.valueOf("1990-11-30");
-		Date endDate = java.sql.Date.valueOf("1990-11-30");
-		double resultValue = proposalBudgetNumberOfMonthsService
-				.countMonthsStepOne(startDate, endDate);
-		assertEquals(resultValue, 0, 0);
-	}
-
-	@Test
-	public void test_countMonthsStepTwo() {
-		Date startDate = java.sql.Date.valueOf("1990-10-30");
-		Date endDate = java.sql.Date.valueOf("1990-12-30");
-		double resultValue = proposalBudgetNumberOfMonthsService
-				.countMonthsStepOne(startDate, endDate);
-		assertEquals(resultValue, 2, 0);
-	}
-
-	@Test
-	public void test_getMonthDailyPercentageArray() {
-		double[] dailyPercentageArray = proposalBudgetNumberOfMonthsService
-				.getMonthDailyPercentageArray(1, false);
-		assertEquals(dailyPercentageArray.length, 28, 0);
-	}
-
-	@Test
-	public void test_getMonthDailyPercentageArray_leapYear() {
-		double[] dailyPercentageArray = proposalBudgetNumberOfMonthsService
-				.getMonthDailyPercentageArray(1, true);
-		assertEquals(dailyPercentageArray.length, 29, 0);
-	}
-
-	@Test
-	public void test_rollMonths() {
-		Date startDate = java.sql.Date.valueOf("1990-12-30");
-		Date rollMonthDate = ProposalBudgetNumberOfMonthsServiceImpl
-				.rollMonths(startDate, 5);
-		assertEquals(rollMonthDate, java.sql.Date.valueOf("1991-05-30"));
-	}
-
-	@Test
-	public void test_rollMonths_increasedYear() {
-		Date startDate = java.sql.Date.valueOf("1990-12-30");
-		Date rollMonthDate = ProposalBudgetNumberOfMonthsServiceImpl
-				.rollMonths(startDate, 14);
-		assertEquals(rollMonthDate, java.sql.Date.valueOf("1992-02-29"));
-	}
-
-	@Test
-	public void test_rollDays() {
-		Date startDate = java.sql.Date.valueOf("1990-12-30");
-		Date rollDate = ProposalBudgetNumberOfMonthsServiceImpl.rollDays(
-				startDate, 5);
-		assertEquals(rollDate, java.sql.Date.valueOf("1991-01-04"));
-	}
-
-	@Test
-	public void test_rollDays_increasedDays() {
-		Date startDate = java.sql.Date.valueOf("1990-12-30");
-		Date rollDate = ProposalBudgetNumberOfMonthsServiceImpl.rollDays(
-				startDate, 400);
-		assertEquals(rollDate, java.sql.Date.valueOf("1992-02-03"));
-	}
-
-	@Test
-	public void test_rollDate() {
-		Date startDate = java.sql.Date.valueOf("1990-12-30");
-		Date rollDate = ProposalBudgetNumberOfMonthsServiceImpl.rollDate(
-				startDate, 5, 5);
-		assertEquals(rollDate, java.sql.Date.valueOf("1991-01-04"));
+				.getNumberOfMonth(startDate, endDate);
+		assertNotEquals(resultValue, 12.13, 0);
+		assertEquals(resultValue, 11.81, 0);
 	}
 }

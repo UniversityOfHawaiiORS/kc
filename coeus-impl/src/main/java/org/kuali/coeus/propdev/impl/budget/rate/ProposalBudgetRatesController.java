@@ -1,8 +1,27 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.budget.rate;
 
 import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.budget.framework.core.BudgetParentDocument;
 import org.kuali.coeus.common.budget.framework.rate.BudgetRatesService;
+import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.budget.core.ProposalBudgetControllerBase;
 import org.kuali.coeus.propdev.impl.budget.core.ProposalBudgetForm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,16 +43,15 @@ public class ProposalBudgetRatesController extends ProposalBudgetControllerBase 
 
     @Transactional @RequestMapping(params="methodToCall=syncAllRates")
 	public ModelAndView syncAllRates(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
-        Budget budget = form.getBudget();
+        ProposalDevelopmentBudgetExt budget = form.getBudget();
         budget.setRateClassTypesReloaded(true);
         getBudgetRatesService().syncAllBudgetRates(budget);
         
         budget.setRateSynced(true);
-        BudgetParentDocument parentDocument = budget.getBudgetParent().getDocument();
-        if (!budget.getActivityTypeCode().equals(parentDocument.getBudgetParent().getActivityTypeCode())) {
-            budget.setActivityTypeCode(parentDocument.getBudgetParent().getActivityTypeCode());
+        if (!budget.getActivityTypeCode().equals(budget.getDevelopmentProposal().getActivityTypeCode())) {
+            budget.setActivityTypeCode(budget.getDevelopmentProposal().getActivityTypeCode());
         }
-       return getModelAndViewService().getModelAndView(form);
+       return super.save(form);
 	}
 	
 	@Transactional @RequestMapping(params="methodToCall=refreshAllRates")

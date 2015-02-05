@@ -1,17 +1,20 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.opensource.org/licenses/ecl1.php
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.hierarchy;
 
@@ -331,7 +334,6 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             hierarchyProposal.setHierarchyOriginatingChildProposalNumber(lowestProposalNumber);
             dataObjectService.save(childProposal);
             dataObjectService.save(hierarchyProposal);
-            synchronizeAllChildren(hierarchyProposal);
             return childProposal;
         }
     }
@@ -405,7 +407,9 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         DevelopmentProposal hierarchy = getHierarchy(childProposal.getHierarchyParentProposalNumber());
 
         prepareHierarchySync(hierarchy);
-        synchronizeChildProposal(hierarchy, childProposal, true);
+        boolean isNewChild = false;
+        boolean syncPersonnelAttachments = true;
+        synchronizeChildProposal(hierarchy, childProposal, syncPersonnelAttachments, isNewChild);
         finalizeHierarchySync(hierarchy);
     }
     
@@ -421,7 +425,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         childProposal.setHierarchyParentProposalNumber(hierarchyProposal.getProposalNumber());
         childProposal.setHierarchyBudgetType(hierarchyBudgetTypeCode);
         // call synchronize
-        synchronizeChildProposal(hierarchyProposal, childProposal, syncPersonnelAttachments);
+        boolean isNewChild = true;
+        synchronizeChildProposal(hierarchyProposal, childProposal, syncPersonnelAttachments, isNewChild);
     }
 
     protected void copyInitialData(DevelopmentProposal hierarchyProposal, DevelopmentProposal srcProposal)
@@ -520,7 +525,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             synchronizeNarratives(hierarchyProposal, childProposal);
             // we deleted all internal at the beginning so just add now.
             addInternalAttachments(hierarchyProposal, childProposal);
-            syncAllPersonnelAttachments(hierarchyProposal, childProposal);
+            boolean isNewChild = false;
+            syncAllPersonnelAttachments(hierarchyProposal, childProposal, isNewChild);
             proposalBudgetHierarchyService.synchronizeChildBudget(hierarchyProposal, childProposal, oldBudgetPeriods);
             dataObjectService.save(childProposal);
             changed = true;
@@ -548,7 +554,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     /**
      * Synchronizes the given child proposal to the parent.  
      * <p>
-     * If a key protocol person appears in multiple child proposals and is removed from the given child 
+     * If a key proposal person appears in multiple child proposals and is removed from the given child
      * proposal, then this also aggregates that key person back to the parent proposal from a different child proposal, making sure that all the key persons
      * in all of the child proposals are represented in the parent proposal.
      *  
@@ -557,7 +563,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
      * @return
      * @throws ProposalHierarchyException
      */
-    protected boolean synchronizeChildProposal(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal, boolean syncPersonnelAttachments) throws ProposalHierarchyException {
+    protected boolean synchronizeChildProposal(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal,
+                                               boolean syncPersonnelAttachments, boolean isNewChild) throws ProposalHierarchyException {
         List<BudgetPeriod> oldBudgetPeriods = getOldBudgetPeriods(proposalBudgetHierarchyService.getHierarchyBudget(hierarchyProposal));
         ProposalPerson principalInvestigator = hierarchyProposal.getPrincipalInvestigator();
         childProposal.setHierarchyLastSyncHashCode(computeHierarchyHashCode(childProposal));
@@ -571,7 +578,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         if (syncPersonnelAttachments) {
             synchronizeNarratives(hierarchyProposal, childProposal);
             synchronizeInternalAttachments(hierarchyProposal, childProposal);
-            syncAllPersonnelAttachments(hierarchyProposal, childProposal);
+            syncAllPersonnelAttachments(hierarchyProposal, childProposal, isNewChild);
         }
 
         proposalBudgetHierarchyService.synchronizeChildBudget(hierarchyProposal, childProposal, oldBudgetPeriods);
@@ -727,7 +734,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         return getLegacyNarrativeService().doesProposalHaveNarrativeType(hierarchyProposal, narrativeType);
      }
 
-    protected void syncAllPersonnelAttachments(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal) {
+    protected void syncAllPersonnelAttachments(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal, boolean isNewChild) {
 
         Map<String, Boolean> personInMultipleProp = new HashMap<String, Boolean>();
         List<ProposalPersonBiography> newList = new ArrayList<ProposalPersonBiography>();
@@ -736,36 +743,48 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
          Go thro list of personBios in child, if it is not in multiple proposals, then remove instance from parent so you
          can copy over again.
          */
-        for (Iterator<ProposalPersonBiography> iteratorChild = childProposal.getPropPersonBios().iterator(); iteratorChild.hasNext();) {
-            ProposalPersonBiography srcPropPersonBio = iteratorChild.next();
 
-            if (!personInMultipleProposals(srcPropPersonBio.getPersonId(), hierarchyProposal)) {
-                // mark those persons that are not in multiple proposals since they will be copied over later
-                personInMultipleProp.put(srcPropPersonBio.getPersonId(), false);
-                for (Iterator<ProposalPersonBiography> iteratorParent = hierarchyProposal.getPropPersonBios().iterator(); iteratorParent.hasNext();) {
-                    ProposalPersonBiography parentPropPersonBio = iteratorParent.next();
-                    if (StringUtils.equals(srcPropPersonBio.getPersonId(), parentPropPersonBio.getPersonId())) {
-                        iteratorParent.remove();
-                    }
+            for (Iterator<ProposalPersonBiography> iteratorChild = childProposal.getPropPersonBios().iterator(); iteratorChild.hasNext(); ) {
+                ProposalPersonBiography srcPropPersonBio = iteratorChild.next();
+                // if the proposal is JUST being linked to a hierarchy and if this proposal has bios for
+                // people that exist on the parent, ignore those bios.
+                if (!isBioInNewChildDuplicate(isNewChild, hierarchyProposal, srcPropPersonBio)
+                        && !personInMultipleProposals(srcPropPersonBio.getPersonId(), hierarchyProposal)) {
+                        // mark those persons that are not in multiple proposals
+                        // and remove this persons bio from parent
+                        // since they will be copied over again later. We need to do this so if a bio is updated at the
+                        // child it will sync up.
+                        personInMultipleProp.put(srcPropPersonBio.getPersonId(), false);
+                        for (Iterator<ProposalPersonBiography> iteratorParent = hierarchyProposal.getPropPersonBios().iterator(); iteratorParent.hasNext(); ) {
+                            ProposalPersonBiography parentPropPersonBio = iteratorParent.next();
+                            if (StringUtils.equals(srcPropPersonBio.getPersonId(), parentPropPersonBio.getPersonId())) {
+                                iteratorParent.remove();
+                            }
+                        }
                 }
             }
-        }
 
-        // go over the child bios list and if person is not in multiple proposals, add that bio
-        for (ProposalPersonBiography srcPropPersonBio : childProposal.getPropPersonBios()) {
-            if (personInMultipleProp.get(srcPropPersonBio.getPersonId()) != null &&
+            // go over the child bios list and if person is not in multiple proposals add it
+            for (ProposalPersonBiography srcPropPersonBio : childProposal.getPropPersonBios()) {
+                // if the proposal is JUST being linked to a hierarchy and if this proposal has bios for
+                // people that exist on the parent, ignore those bios.
+                if (!isBioInNewChildDuplicate(isNewChild, hierarchyProposal, srcPropPersonBio)
+                    && personInMultipleProp.get(srcPropPersonBio.getPersonId()) != null &&
                     !personInMultipleProp.get(srcPropPersonBio.getPersonId())) {
-                ProposalPersonBiography destPropPersonBio;
-                destPropPersonBio = (ProposalPersonBiography) deepCopy(srcPropPersonBio);
-                destPropPersonBio.setDevelopmentProposal(hierarchyProposal);
-                destPropPersonBio.setProposalNumber(hierarchyProposal.getProposalNumber());
-                destPropPersonBio.setProposalPersonNumber(getProposalPersonNumber(destPropPersonBio.getPersonId(), hierarchyProposal));
-                destPropPersonBio.setVersionNumber(0L);
-                newList.add(destPropPersonBio);
-
+                        ProposalPersonBiography destPropPersonBio;
+                        destPropPersonBio = (ProposalPersonBiography) deepCopy(srcPropPersonBio);
+                        destPropPersonBio.setDevelopmentProposal(hierarchyProposal);
+                        destPropPersonBio.setProposalNumber(hierarchyProposal.getProposalNumber());
+                        destPropPersonBio.setProposalPersonNumber(getProposalPersonNumber(destPropPersonBio.getPersonId(), hierarchyProposal));
+                        destPropPersonBio.setVersionNumber(0L);
+                        newList.add(destPropPersonBio);
+                }
             }
-        }
-        hierarchyProposal.getPropPersonBios().addAll(newList);
+            hierarchyProposal.getPropPersonBios().addAll(newList);
+    }
+
+    protected boolean isBioInNewChildDuplicate(boolean isNewChild, DevelopmentProposal hierarchyProposal, ProposalPersonBiography srcPropPersonBio) {
+        return isNewChild && isPersonOnParent(hierarchyProposal, srcPropPersonBio.getPersonId(), srcPropPersonBio);
     }
 
     protected Integer getProposalPersonNumber(String personId, DevelopmentProposal hierarchyProposal) {
@@ -785,15 +804,12 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         }
     }
 
-
-
-    protected boolean isPersonOnProposal(DevelopmentProposal proposal, String id) {
-        for (ProposalPerson proposalPerson : proposal.getProposalPersons()) {
-               if(StringUtils.equals(id, proposalPerson.getPersonId())) {
-                return true;
-            }
-        }
-        return false;
+    protected boolean isPersonOnParent(DevelopmentProposal proposal, String id, ProposalPersonBiography srcPropPersonBio) {
+        List<ProposalPerson> persons = getProposalHierarchyDao().isPersonOnProposal(proposal.getProposalNumber(), id);
+        // if person is on parent, then check if the person has been added by the same proposal linked to
+        // the current bio. If latter is true, the srcBio can be added, if not, bio has been added by a different proposal
+        // and needs to be maintained at the parent.
+        return persons.size() > 0 && persons.get(0).getHierarchyProposalNumber() != srcPropPersonBio.getDevelopmentProposal().getProposalNumber();
     }
 
  /**
@@ -1126,17 +1142,17 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     protected void rejectProposal( ProposalDevelopmentDocument proposalDoc, String reason, String principalId, String appDocStatus ) throws WorkflowException  {
         kcDocumentRejectionService.reject(proposalDoc.getDocumentHeader().getWorkflowDocument(), reason, principalId, appDocStatus );
     }
-    
-    
+
+
     /**
-     * Reject an entire proposal hierarchy.  This works by first rejecting each child, and then rejecting the parent.
+     * Reject an entire proposal hierarchy.
      * @param hierarchyParent The hierarchy to reject
      * @param reason the reason to be applied to the annotation field.  The reason will be pre-pended with static text indicating if it was a child or the parent.
      * @param principalId the id of the principal that is rejecting the document.
      * @throws ProposalHierarchyException If hierarchyParent is not a hierarchy, or there was a problem rejecting one of the documents.
      */
     protected void rejectProposalHierarchy(ProposalDevelopmentDocument hierarchyParent, String reason, String principalId ) throws ProposalHierarchyException {
-        
+
       //1. reject the parent.
         try {
             rejectProposal( hierarchyParent, renderMessage( PROPOSAL_ROUTING_REJECTED_ANNOTATION, reason ), principalId, renderMessage( HIERARCHY_REJECTED_APPSTATUS ) );
@@ -1144,16 +1160,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         catch (WorkflowException e) {
             throw new ProposalHierarchyException( String.format( "WorkflowException encountered rejecting proposal hierarchy parent %s", hierarchyParent.getDevelopmentProposal().getProposalNumber() ),e);
         }
-        
-        //2. Try to reject all of the children.
-        for( ProposalDevelopmentDocument child : getChildProposalDevelopmentDocuments(hierarchyParent.getDevelopmentProposal().getProposalNumber())) {
-            try {
-                rejectProposal( child, renderMessage( HIERARCHY_ROUTING_PARENT_REJECTED_ANNOTATION, reason ), identityService.getPrincipalByPrincipalName(KRADConstants.SYSTEM_USER ).getPrincipalId(), renderMessage( HIERARCHY_CHILD_REJECTED_APPSTATUS ) );
-            } catch (WorkflowException e) {
-                throw new ProposalHierarchyException( String.format( "WorkflowException encountered rejecting child document %s", child.getDevelopmentProposal().getProposalNumber()), e );
-            }
-        }
-     
+
     }
     
     
@@ -1161,16 +1168,16 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     public void rejectProposalDevelopmentDocument( String proposalNumber, String reason, String principalName, MultipartFile rejectFile )
     throws WorkflowException, ProposalHierarchyException, IOException {
         DevelopmentProposal pbo = getDevelopmentProposal(proposalNumber);
-        ProposalDevelopmentDocument pDoc = (ProposalDevelopmentDocument)documentService.getByDocumentHeaderId(pbo.getProposalDocument().getDocumentNumber());
-        if( !pbo.isInHierarchy() ) {
-            rejectProposal( pDoc, renderMessage( PROPOSAL_ROUTING_REJECTED_ANNOTATION, reason ), principalName, renderMessage( HIERARCHY_REJECTED_APPSTATUS ) );
-        } else if ( pbo.isParent() ) {
-            rejectProposalHierarchy( pDoc, reason, principalName );
+        ProposalDevelopmentDocument pDoc = (ProposalDevelopmentDocument) documentService.getByDocumentHeaderId(pbo.getProposalDocument().getDocumentNumber());
+        if (!pbo.isInHierarchy()) {
+            rejectProposal(pDoc, renderMessage(PROPOSAL_ROUTING_REJECTED_ANNOTATION, reason), principalName, renderMessage(HIERARCHY_REJECTED_APPSTATUS));
+        } else if (pbo.isParent()) {
+            rejectProposalHierarchy(pDoc, reason, principalName);
         } else {
             //it is a child or in some unknown state, either way we do not support rejecting it.
-            throw new UnsupportedOperationException( String.format( "Cannot reject proposal %s it is a hierarchy child or ", proposalNumber ));
+            throw new UnsupportedOperationException(String.format("Cannot reject proposal %s it is a hierarchy child or ", proposalNumber));
         }
-        
+
         if (rejectFile != null && rejectFile.getBytes().length > 0) {
             Narrative narrative = new Narrative();
             narrative.setName(rejectFile.getOriginalFilename());
@@ -1178,7 +1185,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             try {
                 narrative.init(rejectFile);
             } catch (Exception e) {
-               throw new RuntimeException("Error Initializing narrative attachment file",e);
+                throw new RuntimeException("Error Initializing narrative attachment file", e);
             }
             narrative.setNarrativeTypeCode(getParameterService().getParameterValueAsString(ProposalDevelopmentDocument.class, Constants.REJECT_NARRATIVE_TYPE_CODE_PARAM));
             NarrativeStatus status = (NarrativeStatus) dataObjectService.findUnique(NarrativeStatus.class, QueryByCriteria.Builder.forAttribute("code", "C").build());
@@ -1188,134 +1195,11 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             narrative.setContactName(globalVariableService.getUserSession().getPrincipalName());
             narrative.setPhoneNumber(globalVariableService.getUserSession().getPerson().getPhoneNumber());
             narrative.setEmailAddress(globalVariableService.getUserSession().getPerson().getEmailAddress());
-            getLegacyNarrativeService().prepareNarrative(pDoc,narrative);
+            getLegacyNarrativeService().prepareNarrative(pDoc, narrative);
             pDoc.getDevelopmentProposal().getInstituteAttachments().add(narrative);
             dataObjectService.save(pDoc);
         }
-        
-    }
-    
-    
-    /**
-     * Based on the hierarchy, and route status change of the parent, calculate what route action should be taken on the children.
-     * @param hierarchy the heirarchy being routed
-     * @param dto the route status change information.
-     * @return The route action to take on the children.
-     */
-    protected String calculateChildRouteStatus( ProposalDevelopmentDocument hierarchy, DocumentRouteStatusChange dto ) {
-        
-        String parentOldStatus = dto.getOldRouteStatus();
-        String parentNewStatus = dto.getNewRouteStatus();
-        String newChildStatusTarget = "";
 
-        if (StringUtils.equals(parentOldStatus, KewApiConstants.ROUTE_HEADER_INITIATED_CD)) {
-            // nothing to do here.
-        }
-        else if (StringUtils.equals(parentOldStatus, KewApiConstants.ROUTE_HEADER_SAVED_CD)) {
-            // previous status was saved
-            newChildStatusTarget = parentNewStatus;
-            if (StringUtils.equals(parentNewStatus, KewApiConstants.ROUTE_HEADER_ENROUTE_CD)) {
-                // nothing to do
-            }
-            else if (StringUtils.equals(parentNewStatus, KewApiConstants.ROUTE_HEADER_CANCEL_CD)) {
-                // nothing to do.
-            }
-            else {
-                throw new UnsupportedOperationException(String.format(
-                        "Do not know how to handle children of hierarchy for route status chnage from %s to %s", parentOldStatus,
-                        parentNewStatus));
-            }
-        }
-        else if (StringUtils.equals(parentOldStatus, KewApiConstants.ROUTE_HEADER_ENROUTE_CD)) {
-            // we are moving from enroute to some other state.
-
-            if (StringUtils.equals(parentNewStatus, KewApiConstants.ROUTE_HEADER_CANCEL_CD)
-                    || StringUtils.equals(parentNewStatus, KewApiConstants.ROUTE_HEADER_DISAPPROVED_CD)) {
-                newChildStatusTarget = parentNewStatus;
-            }
-            else if (StringUtils.equals(parentNewStatus, KewApiConstants.ROUTE_HEADER_PROCESSED_CD)) {
-                // nothing to do here, wait for the document to go final.
-            } else if( StringUtils.equals(parentNewStatus, KewApiConstants.ROUTE_HEADER_ENROUTE_CD)) {
-                //special case, document has been rejected and being approved again to simulate entry into workflow.
-                //this value will trigger an approve.
-                newChildStatusTarget = KewApiConstants.ROUTE_HEADER_ENROUTE_CD;
-            }
-            else {
-                throw new UnsupportedOperationException(String.format("Do not know how to handle children of hierarchy for route status chnage from %s to %s", parentOldStatus,parentNewStatus));
-            }
-
-        }
-        else if (StringUtils.equals(parentOldStatus, KewApiConstants.ROUTE_HEADER_PROCESSED_CD)) {
-            // nothing to do here.
-        }
-        else if (StringUtils.equals(parentOldStatus, KewApiConstants.ROUTE_HEADER_PROCESSED_CD)) {
-            if (StringUtils.equals(parentNewStatus, KewApiConstants.ROUTE_HEADER_FINAL_CD)) {
-                newChildStatusTarget = parentNewStatus;
-            }
-            else {
-                throw new UnsupportedOperationException(String.format("Do not know how to handle children of hierarchy for route status chnage from %s to %s", parentOldStatus,parentNewStatus));
-            }
-        }
-        else {
-            throw new UnsupportedOperationException(String.format(
-                    "Do not know how to handle children of hierarchy for route status chnage from %s to %s", parentOldStatus,parentNewStatus));
-        }
-        return newChildStatusTarget;
-    }
-
-    @Override
-    public void routeHierarchyChildren(ProposalDevelopmentDocument proposalDevelopmentDocument, DocumentRouteStatusChange dto ) throws ProposalHierarchyException {
-        
-        String childStatusTarget = calculateChildRouteStatus(proposalDevelopmentDocument, dto );
-        WorkflowDocument workdoc;
-        ProposalDevelopmentDocument child = null;
-        try {
-            LOG.info(  IdentityService.class );
-            for (ProposalDevelopmentDocument c : getChildProposalDevelopmentDocuments(proposalDevelopmentDocument.getDevelopmentProposal().getProposalNumber() )) {
-                child = c;
-                if (!StringUtils.equals("", childStatusTarget)) {
-
-                    if (StringUtils.equals(KewApiConstants.ROUTE_HEADER_ENROUTE_CD, childStatusTarget)) {
-                        //The user currently must initially route the child documents in order for them to hold in the system users action list.
-
-                        workdoc = WorkflowDocumentFactory.loadDocument(child.getDocumentHeader().getWorkflowDocument().getInitiatorPrincipalId(), child.getDocumentHeader().getWorkflowDocument().getDocumentId() );
-                        workdoc.setApplicationDocumentStatus(getHierarchyChildRouteStatus( dto.getOldRouteStatus(), dto.getNewRouteStatus() ));
-                        if( !workdoc.isEnroute() ) {
-                            workdoc.route(renderMessage( HIERARCHY_ROUTING_PARENT_SUBMITTED_ANNOTATION ));
-
-                        } else {
-                            //this means the status change is actually in the form of an approve action on a document that was moved back to the initial node.
-                            //we need to do an approval.
-                            workdoc.approve(renderMessage( HIERARCHY_ROUTING_PARENT_RESUBMITTED_ANNOTATION ));
-                            workdoc.setApplicationDocumentStatus(renderMessage( HIERARCHY_CHILD_ENROUTE_APPSTATUS ) );
-                        }
-
-                    } else {
-                        workdoc = WorkflowDocumentFactory.loadDocument( identityService.getPrincipalByPrincipalName(KRADConstants.SYSTEM_USER ).getPrincipalId(),child.getDocumentHeader().getWorkflowDocument().getDocumentId() );
-                        workdoc.setApplicationDocumentStatus(getHierarchyChildRouteStatus( dto.getOldRouteStatus(), dto.getNewRouteStatus() ));
-
-                        if (StringUtils.equals(KewApiConstants.ROUTE_HEADER_CANCEL_CD,childStatusTarget)) {
-                            workdoc.cancel(renderMessage( HIERARCHY_ROUTING_PARENT_CANCELLED_ANNOTATION));
-                            workdoc.setApplicationDocumentStatus(renderMessage( HIERARCHY_CHILD_CANCEL_APPSTATUS  ));
-
-                        } else if (StringUtils.equals(KewApiConstants.ROUTE_HEADER_FINAL_CD, childStatusTarget)) {
-                            workdoc.approve(renderMessage( HIERARCHY_ROUTING_PARENT_APPROVED_ANNOTATION ));
-                            workdoc.setApplicationDocumentStatus(renderMessage( HIERARCHY_CHILD_FINAL_APPSTATUS ));
-
-                        } else if (StringUtils.equals(KewApiConstants.ROUTE_HEADER_DISAPPROVED_CD, childStatusTarget)) {
-                            workdoc.disapprove(renderMessage( HIERARCHY_ROUTING_PARENT_DISAPPROVED_ANNOTATION ));
-                            workdoc.setApplicationDocumentStatus(renderMessage( HIERARCHY_CHILD_DISAPPROVE_APPSTATUS ));
-                        } else {
-                            throw new UnsupportedOperationException(String.format("Do not know how to handle new child status of %s", childStatusTarget));
-                        }
-
-                    }
-                }
-            }
-        } catch ( Exception we ) {
-            throw new ProposalHierarchyException( String.format( "Exception encountrered while attempting to route child proposal %s ( document #%s ) of proposal hierarchy %s ( document #%s )", child.getDevelopmentProposal().getProposalNumber(), child.getDocumentNumber(), proposalDevelopmentDocument.getDevelopmentProposal().getProposalNumber(), proposalDevelopmentDocument.getDocumentNumber() ), we);
-        }
-        
     }
     
     public void calculateAndSetProposalAppDocStatus( ProposalDevelopmentDocument doc, DocumentRouteStatusChange dto  ) throws ProposalHierarchyException {

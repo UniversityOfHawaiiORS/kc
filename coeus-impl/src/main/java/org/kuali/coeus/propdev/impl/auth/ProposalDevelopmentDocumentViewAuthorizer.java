@@ -1,3 +1,21 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.auth;
 
 import java.util.*;
@@ -65,6 +83,7 @@ public class ProposalDevelopmentDocumentViewAuthorizer extends KcKradTransaction
 	public Set<String> getActionFlags(View view, ViewModel model, Person user, Set<String> actions) {
 
 		Document document = ((DocumentFormBase) model).getDocument();
+        DevelopmentProposal developmentProposal = ((ProposalDevelopmentDocument)document).getDevelopmentProposal();
 
 		if (actions.contains(ProposalDevelopmentConstants.PropDevDocumentActions.SUBMIT_TO_SPONSOR) && ! canCreateInstitutionalProposal(document, user)) {
             actions.remove(ProposalDevelopmentConstants.PropDevDocumentActions.SUBMIT_TO_SPONSOR);
@@ -77,6 +96,19 @@ public class ProposalDevelopmentDocumentViewAuthorizer extends KcKradTransaction
         if (canNotifyProposalPerson(document,user)) {
             actions.add(ProposalDevelopmentConstants.PropDevDocumentActions.NOTIFY_PROPOSAL_PERSONS);
         }
+
+        if (actions.contains(KRADConstants.KUALI_ACTION_CAN_SUPER_USER_APPROVE) && developmentProposal.isChild()) {
+            actions.remove(KRADConstants.KUALI_ACTION_CAN_SUPER_USER_APPROVE);
+        }
+
+        if (actions.contains(KRADConstants.KUALI_ACTION_CAN_SUPER_USER_DISAPPROVE) && developmentProposal.isChild()) {
+            actions.remove(KRADConstants.KUALI_ACTION_CAN_SUPER_USER_DISAPPROVE);
+        }
+
+        if (actions.contains(KRADConstants.KUALI_ACTION_CAN_SUPER_USER_TAKE_ACTION) && developmentProposal.isChild()) {
+            actions.remove(KRADConstants.KUALI_ACTION_CAN_SUPER_USER_TAKE_ACTION);
+        }
+
 		return super.getActionFlags(view, model, user, actions);
 	}
 

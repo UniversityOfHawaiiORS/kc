@@ -1,3 +1,21 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.kuali.coeus.propdev.impl.budget.core;
 
 import java.util.ArrayList;
@@ -8,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.kuali.coeus.common.budget.framework.core.Budget;
+import org.kuali.coeus.common.budget.framework.rate.BudgetRatesService;
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants;
 import org.kuali.coeus.propdev.impl.lock.ProposalBudgetLockService;
@@ -39,6 +58,8 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	private static final String CONFIRM_RATE_CHANGES_DIALOG_ID = "PropBudget-BudgetSettings-ChangeRateDialog";
 	private static final String BUDGET_SETTINGS_DIALOG_ID = "PropBudget-BudgetSettings-Dialog";
 	private static final String BUDGET_DATA_VALIDATION_DIALOG_ID = "DataValidationSection";
+	private static final String ACTIVITY_RATE_CHANGE_DIALOG_ID = "PropBudget-ActivityTypeChanged-Dialog";
+	private static final String NO_RATES_DIALOG_ID = "PropBudget-NoRates-Dialog";
 
 	@Autowired
 	@Qualifier("proposalBudgetSharedControllerService")
@@ -51,6 +72,10 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
     @Autowired
     @Qualifier("proposalBudgetLockService")
     private ProposalBudgetLockService proposalBudgetLockService;
+    
+    @Autowired
+    @Qualifier("budgetRatesService")
+    private BudgetRatesService budgetRatesService;
 	
 	@MethodAccessible
 	@Transactional @RequestMapping(params="methodToCall=defaultMapping")
@@ -61,14 +86,33 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 
 	@MethodAccessible
 	@Transactional @RequestMapping(params="methodToCall=start")
-	public ModelAndView start(@RequestParam("budgetId") Long budgetId, @RequestParam("auditActivated") String auditActivated, @ModelAttribute("KualiForm") ProposalBudgetForm form) {
+	public ModelAndView start(@RequestParam("budgetId") Long budgetId, @RequestParam("viewOnly") String viewOnly, @RequestParam("auditActivated") String auditActivated, @ModelAttribute("KualiForm") ProposalBudgetForm form) {
+		boolean inViewMode = Boolean.parseBoolean(viewOnly);
 		form.setBudget(loadBudget(budgetId));
-        getProposalBudgetLockService().establishBudgetLock(form.getBudget());
+		if(!inViewMode) {
+	        getProposalBudgetLockService().establishBudgetLock(form.getBudget());
+		}
+
 		form.initialize();
         if (auditActivated != null){
             form.setAuditActivated(Boolean.parseBoolean(auditActivated));
         }
-        return getModelAndViewService().getModelAndViewWithInit(form, ProposalBudgetConstants.KradConstants.BUDGET_DEFAULT_VIEW);
+        //call getModelAndViewWithInit to make sure view is initialized regardless of whether this modelAndView is returned
+        ModelAndView result = getModelAndViewService().getModelAndViewWithInit(form, ProposalBudgetConstants.KradConstants.BUDGET_DEFAULT_VIEW);
+        form.setViewOnly(inViewMode);
+        form.setCanEditView(!inViewMode);
+    	boolean canModify = false;
+    	if(!inViewMode) {
+    		canModify = getProposalBudgetAuthorizer().canModifyBudget(form.getBudget(), getGlobalVariableService().getUserSession().getPerson());
+    	}
+        
+        if (canModify && budgetRatesService.checkActivityTypeChange(form.getBudget().getBudgetRates(), form.getDevelopmentProposal().getActivityTypeCode())) {
+        	return getModelAndViewService().showDialog(ACTIVITY_RATE_CHANGE_DIALOG_ID, true, form);
+        } else if (canModify && form.getBudget().getBudgetRates().isEmpty()) {
+        	return getModelAndViewService().showDialog(NO_RATES_DIALOG_ID, true, form);
+        } else {
+        	return result;
+        }
 	}
 	
 	@MethodAccessible
@@ -102,6 +146,7 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	        props.put("pageId", ProposalDevelopmentConstants.KradConstants.BUDGET_PAGE);
 	        props.put("docId", form.getBudget().getDevelopmentProposal().getProposalDocument().getDocumentNumber());
             props.put("auditActivated", String.valueOf(form.isAuditActivated()));
+            props.put("viewOnly", String.valueOf(form.isViewOnly()));
 	        return getModelAndViewService().performRedirect(form, "proposalDevelopment", props);
 		} else {
         	form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATEPAGE.getKey());			
@@ -110,9 +155,11 @@ public class ProposalBudgetCommonController extends ProposalBudgetControllerBase
 	}
 	
 	@Transactional @RequestMapping(params="methodToCall=openBudget")
-	public ModelAndView openBudget(@RequestParam("budgetId") String budgetId, @ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
-		save(form);
-		return getProposalBudgetSharedController().openBudget(budgetId, form);
+	public ModelAndView openBudget(@RequestParam("budgetId") String budgetId, @RequestParam("viewOnly") boolean viewOnly, @ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
+		if(!viewOnly) {
+			save(form);
+		}
+		return getProposalBudgetSharedController().openBudget(budgetId, viewOnly, form);
 	}	
 	
 	@Transactional @RequestMapping(params="methodToCall=save")

@@ -1,12 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2005-2013 The Kuali Foundation Licensed under the Educational 
-	Community License, Version 2.0 (the "License"); you may not use this file 
-	except in compliance with the License. You may obtain a copy of the License 
-	at http://www.opensource.org/licenses/ecl2.php Unless required by applicable 
-	law or agreed to in writing, software distributed under the License is distributed 
-	on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either 
-	express or implied. See the License for the specific language governing permissions 
-	and limitations under the License. -->
+<!--
+   - Kuali Coeus, a comprehensive research administration system for higher education.
+   - 
+   - Copyright 2005-2015 Kuali, Inc.
+   - 
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU Affero General Public License as
+   - published by the Free Software Foundation, either version 3 of the
+   - License, or (at your option) any later version.
+   - 
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   - GNU Affero General Public License for more details.
+   - 
+   - You should have received a copy of the GNU Affero General Public License
+   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -190,7 +200,6 @@
 							p:iconClass="icon-money" p:order="50" />
 						<bean parent="Uif-ActionLink" p:actionLabel="Autocalculate Periods" p:methodToCall="generateAllPeriods"
 							p:iconClass="icon-stack" p:order="60" />
-
 					</list>
 				</property>
 			</bean>
@@ -262,12 +271,77 @@
 	
 	<bean id="PropBudget-BudgetVersions-Collection" parent="PropBudget-BudgetVersions-Collection-parentBean"/>
 	<bean id="PropBudget-BudgetVersions-Collection-parentBean" abstract="true" parent="PropDev-BudgetVersions-GenericCollection"
-		p:propertyName="budget.budgetParent.budgets" p:headerText="" p:readOnly="false">
+		p:propertyName="budget.budgetParent.budgets" p:headerText="" p:readOnly="@{#parent.readOnly}">
 		<property name="layoutManager.conditionalRowCssClasses">
            <map>
                <entry key="@{#line.budgetId == developmentProposal.finalBudget?.budgetId}" value="finalBudget"/>
            </map>
 		</property>
-	</bean>	
-		
+	</bean>
+	
+	<bean id="PropBudget-ActivityTypeChanged-Dialog" parent="PropBudget-ActivityTypeChanged-Dialog-parentBean"/>
+	<bean id="PropBudget-ActivityTypeChanged-Dialog-parentBean" abstract="true" parent="PropBudget-PromptToSyncRates-Dialog"
+		p:promptText="The Activity Type has been changed. Do you want to sync budget rates?"/>
+	<bean id="PropBudget-NoRates-Dialog" parent="PropBudget-NoRates-Dialog-parentBean"/>
+	<bean id="PropBudget-NoRates-Dialog-parentBean" abstract="true" parent="PropBudget-PromptToSyncRates-Dialog"
+		p:promptText="There are no rates associated with this budget.  Do you want to attempt syncing the rates?"/>
+	<bean id="PropBudget-PromptToSyncRates-Dialog" abstract="true" parent="PropBudget-PromptToSyncRates-Dialog-parentBean"/>
+	<bean id="PropBudget-PromptToSyncRates-Dialog-parentBean" abstract="true" parent="Uif-DialogGroup"
+		p:headerText="Sync Budget Rates?"
+		p:dialogCssClass="modal-sm">	
+		<property name="footer.items">
+      		<list>
+				<bean parent="Uif-DialogDismissButton" p:actionLabel="No" p:order="10"/>
+				<bean parent="Uif-PrimaryActionButton" p:actionLabel="Yes" p:order="20" p:dialogDismissOption="REQUEST"
+					p:methodToCall="syncAllRates" p:ajaxSubmit="false"/>
+			</list>
+		</property>
+	</bean>
+
+    <bean id="PropBudget-HelpMenu" parent="PropBudget-HelpMenu-parentBean"/>
+    <bean id="PropBudget-HelpMenu-parentBean" abstract="true" p:toggleText="Help"
+          parent="Uif-DropdownToggleMenu" p:iconClass="icon-question">
+        <property name="wrapperCssClasses">
+            <list merge="true">
+                <value>kc-help-menu</value>
+            </list>
+        </property>
+        <property name="menuItems">
+            <list>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Periods &amp; Totals"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenperiodstotals.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Rates"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenrates.htm"/>
+                <bean parent="Uif-MenuDivider"/>
+                <bean parent="Uif-MenuHeader" p:messageText="Personnel Costs"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Project Personnel" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenprojectpersonnel.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Assign Personnel to Periods" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenprojectpersonnel1.htm"/>
+                <bean parent="Uif-MenuDivider"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Non-Personnel Costs"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreennonpersonnel.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Subawards"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreensubawards.htm"/>
+                <bean parent="Uif-MenuDivider"/>
+                <bean parent="Uif-MenuHeader" p:messageText="Institutional Commitments"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Cost Sharing" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreencostsharing.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Unrecovered F&amp;A" p:style="padding-left:1em;"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenunrecoveredfa.htm"/>
+                <bean parent="Uif-MenuDivider"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Project Income"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenprojectincome.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Modular"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenmodularbudget.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Budget Notes"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenbudgetnotes.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Budget Summary"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenbudgetsummary.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Glossary of Terms"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/glossaryofterms.htm"/>
+            </list>
+        </property>
+    </bean>
+
 </beans>

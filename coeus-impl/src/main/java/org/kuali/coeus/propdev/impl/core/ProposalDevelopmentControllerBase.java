@@ -1,17 +1,20 @@
 /*
- * Copyright 2005-2010 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.opensource.org/licenses/ecl1.php
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.core;
 
@@ -255,11 +258,12 @@ public abstract class ProposalDevelopmentControllerBase {
          ((ProposalDevelopmentViewHelperServiceImpl)form.getViewHelperService()).setOrdinalPosition(form.getDevelopmentProposal().getProposalPersons());
          saveAnswerHeaders(form, form.getPageId());
 
+         getTransactionalDocumentControllerService().save(form);
          if (form.isAuditActivated()){
              getAuditHelper().auditConditionally(form);
          }
 
-         getTransactionalDocumentControllerService().save(form);
+         
          populateAdHocRecipients(form.getProposalDevelopmentDocument());
 
          if (StringUtils.equalsIgnoreCase(form.getPageId(), Constants.CREDIT_ALLOCATION_PAGE)) {
@@ -393,12 +397,11 @@ public abstract class ProposalDevelopmentControllerBase {
     protected ModelAndView narrativePageSave(ProposalDevelopmentDocumentForm form, boolean canEdit) throws Exception {
         ProposalDevelopmentDocument document = (ProposalDevelopmentDocument) getDocumentService().getByDocumentHeaderId(form.getDocument().getDocumentNumber());
         if (canEdit) {
-            if (new ProposalDevelopmentDocumentRule().processAttachmentRules(form.getProposalDevelopmentDocument())) {
-                //when saving on a page in the narrative locking region we don't want to over write proposal locking region data,
-                //so we retrieve the latest proposal from the db, and replace the current propopsal with that, and then copy the attachments
-                document.getDevelopmentProposal().setNarratives(form.getDevelopmentProposal().getNarratives());
-                document.getDevelopmentProposal().setInstituteAttachments(form.getDevelopmentProposal().getInstituteAttachments());
-                document.getDevelopmentProposal().setPropPersonBios(form.getDevelopmentProposal().getPropPersonBios());
+            if ((new ProposalDevelopmentDocumentRule().processAttachmentRules(form.getProposalDevelopmentDocument()))
+                    && (new ProposalDevelopmentDocumentRule().processPersonnelAttachmentDuplicates(form.getProposalDevelopmentDocument()))) {
+            	form.getProposalDevelopmentAttachmentHelper().handleNarrativeUpdates(form, document);
+            	form.getProposalDevelopmentAttachmentHelper().handleInstAttachmentUpdates(form, document);
+            	form.getProposalDevelopmentAttachmentHelper().handlePersonBioUpdates(form, document);
                 document.getDevelopmentProposal().setProposalAbstracts(form.getDevelopmentProposal().getProposalAbstracts());
                 document.setNotes(form.getDocument().getNotes());
                 form.setDocument(document);

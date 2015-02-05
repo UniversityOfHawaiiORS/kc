@@ -1,11 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+   - Kuali Coeus, a comprehensive research administration system for higher education.
+   - 
+   - Copyright 2005-2015 Kuali, Inc.
+   - 
+   - This program is free software: you can redistribute it and/or modify
+   - it under the terms of the GNU Affero General Public License as
+   - published by the Free Software Foundation, either version 3 of the
+   - License, or (at your option) any later version.
+   - 
+   - This program is distributed in the hope that it will be useful,
+   - but WITHOUT ANY WARRANTY; without even the implied warranty of
+   - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   - GNU Affero General Public License for more details.
+   - 
+   - You should have received a copy of the GNU Affero General Public License
+   - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kuali.coeus</groupId>
     <artifactId>coeus</artifactId>
-    <version>6.0.0-s13</version>
+    <version>6.0.0</version>
     <packaging>pom</packaging>
     <name>Kuali Coeus</name>
     <description>
@@ -23,8 +41,8 @@
 
     <licenses>
         <license>
-            <name>Educational Community License, Version 2.0</name>
-            <url>${kuali.ecl.license.url}</url>
+            <name>GNU Affero General Public License, Version 3</name>
+            <url>${kuali.agpl3.license.url}</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -48,8 +66,8 @@
         <avalon-framework.version>4.3.1</avalon-framework.version>
         <bouncycastle.version>1.51</bouncycastle.version>
         <cglib-nodep.version>3.1</cglib-nodep.version>
-        <coeus-api-all.version>6.0.0-s13</coeus-api-all.version>
-        <coeus-s2sgen.version>6.0.0-s13</coeus-s2sgen.version>
+        <coeus-api-all.version>6.0.0.1</coeus-api-all.version>
+        <coeus-s2sgen.version>6.0.0</coeus-s2sgen.version>
         <commons-beanutils.version>1.8.3-kuali-4</commons-beanutils.version>
         <commons-codec.version>1.9</commons-codec.version>
         <commons-collections.version>3.2.1</commons-collections.version>
@@ -104,7 +122,7 @@
         <org.eclipse.persistence.version>2.5.2</org.eclipse.persistence.version>
         <pdfbox.version>1.8.6</pdfbox.version>
         <quartz.version>1.8.4</quartz.version>
-        <rice.version>2.5.2-r49445</rice.version>
+        <rice.version>2.5.2</rice.version>
         <servlet.version>3.0.1</servlet.version>
         <slf4j.version>1.7.7</slf4j.version>
         <spring.version>3.2.12.RELEASE</spring.version>
@@ -198,7 +216,7 @@
         <build.environment>dev</build.environment>
 
         <!-- This is used in the licenses section as well as the jar/war plugins -->
-        <kuali.ecl.license.url>http://maven.kuali.org/external/org/opensource/ecl/2.0/ecl-2.0.txt</kuali.ecl.license.url>
+        <kuali.agpl3.license.url>http://www.gnu.org/licenses/agpl-3.0.txt</kuali.agpl3.license.url>
 
         <maven.skip.packaging>false</maven.skip.packaging>
 
@@ -477,7 +495,7 @@
                             <manifestEntries>
                                 <Bundle-Version>${project.version}</Bundle-Version>
                                 <Bundle-Name>${project.name}</Bundle-Name>
-                                <Bundle-License>${kuali.ecl.license.url}</Bundle-License>
+                                <Bundle-License>${kuali.gpl.license.url}</Bundle-License>
                                 <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
                                 <Bundle-DocURL>${project.organization.url}</Bundle-DocURL>
                                 <Bundle-Timestamp>${maven.build.timestamp}</Bundle-Timestamp>
@@ -582,7 +600,7 @@
                             <manifestEntries>
                                 <Bundle-Version>${project.version}</Bundle-Version>
                                 <Bundle-Name>${project.name}</Bundle-Name>
-                                <Bundle-License>${kuali.ecl.license.url}</Bundle-License>
+                                <Bundle-License>${kuali.gpl.license.url}</Bundle-License>
                                 <Bundle-Vendor>${project.organization.name}</Bundle-Vendor>
                                 <Bundle-DocURL>${project.organization.url}</Bundle-DocURL>
                                 <Bundle-Timestamp>${maven.build.timestamp}</Bundle-Timestamp>
@@ -1573,6 +1591,10 @@
                         <groupId>xml-apis</groupId>
                         <artifactId>xml-apis</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>org.eclipse.persistence.oracle</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -1692,6 +1714,10 @@
                     <exclusion>
                         <groupId>org.opensaml</groupId>
                         <artifactId>opensaml</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>org.eclipse.persistence.oracle</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1954,6 +1980,16 @@
                 <db.artifactId>${oracle.artifactId}</db.artifactId>
                 <db.version>${oracle.version}</db.version>
             </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.eclipse.persistence</groupId>
+                        <artifactId>org.eclipse.persistence.oracle</artifactId>
+                        <version>${org.eclipse.persistence.version}</version>
+                        <scope>runtime</scope>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
 
         <!-- enables the error prone compiler for strict compilation-->

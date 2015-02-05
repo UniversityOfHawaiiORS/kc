@@ -1,17 +1,20 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.osedu.org/licenses/ECL-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.copy;
 
@@ -201,7 +204,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
                 copyNotes(doc, newDoc);
 
-                List<ProposalAbstract>abstracts = getAbstracts(newDoc);
+                List<ProposalAbstract>abstracts = copyAbstracts(doc, newDoc);
 
                 if (criteria.getIncludeBudget()) {
                     copyBudgets(doc, newDoc, criteria.getBudgetVersions());
@@ -215,7 +218,8 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
                 newDoc = (ProposalDevelopmentDocument) getDocumentService().saveDocument(newDoc);
 
-                newDoc.getDevelopmentProposal().setProposalAbstracts(abstracts);
+                // add abstracts now since proposal number has been generated now.
+                addAbstracts(abstracts, newDoc);
 
                 modifyNewProposal(doc, newDoc, criteria);
 
@@ -235,6 +239,14 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         return newDoc;
     }
 
+    protected void addAbstracts(List<ProposalAbstract> abstracts, ProposalDevelopmentDocument newDoc) {
+        for(ProposalAbstract abs : abstracts) {
+            abs.setProposalNumber(newDoc.getDevelopmentProposal().getProposalNumber());
+        }
+
+        newDoc.getDevelopmentProposal().setProposalAbstracts(abstracts);
+    }
+
     protected void clearSubmitFlag(DevelopmentProposal developmentProposal) {
         developmentProposal.setSubmitFlag(Boolean.FALSE);
     }
@@ -251,9 +263,14 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         newDoc.setNotes(newNotes);
     }
 
-    protected List<ProposalAbstract> getAbstracts(ProposalDevelopmentDocument newDoc) {
-        List<ProposalAbstract> abstracts = newDoc.getDevelopmentProposal().getProposalAbstracts();
+    protected List<ProposalAbstract> copyAbstracts(ProposalDevelopmentDocument oldDoc, ProposalDevelopmentDocument newDoc) throws Exception {
         newDoc.getDevelopmentProposal().setProposalAbstracts(null);
+        List<ProposalAbstract> abstracts = new ArrayList<ProposalAbstract>();
+        for (ProposalAbstract abs : oldDoc.getDevelopmentProposal().getProposalAbstracts()) {
+            ProposalAbstract absCopy = (ProposalAbstract) deepCopy(abs);
+            absCopy.setAbstractType(abs.getAbstractType());
+            abstracts.add(absCopy);
+        }
         return abstracts;
     }
 
@@ -415,7 +432,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
         //We need to copy DocumentNextValues to properly handle copied collections
         fixNextValues(oldDoc, newDoc);
-        
+
         DevelopmentProposal copy = (DevelopmentProposal) deepCopy(oldDoc.getDevelopmentProposal());
         
         copy.getBudgets().clear();
@@ -750,7 +767,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             }
         }
 
-        getKeyPersonnelService().populateDocument(doc);
+        getKeyPersonnelService().populateCreditSplit(doc);
     }
     
     protected ProposalPersonUnit createProposalPersonUnit(ProposalPerson person, String unitNumber, boolean isLeadUnit, boolean isDeletable, List<ProposalPersonUnit> oldProposalPersonUnits) {

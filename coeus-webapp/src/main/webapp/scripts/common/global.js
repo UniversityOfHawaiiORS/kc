@@ -1,3 +1,21 @@
+/*
+ * Kuali Coeus, a comprehensive research administration system for higher education.
+ * 
+ * Copyright 2005-2015 Kuali, Inc.
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 var Kc = Kc || {};
 Kc.Global = Kc.Global || {};
 (function (namespace, $) {
@@ -55,6 +73,15 @@ Kc.Global = Kc.Global || {};
                 return false;
             }
         });
+    }
+    namespace.makeApplicationFooterSticky = function() {
+        var docHeight = $(window).height();
+        var footerHeight = $('#Uif-ApplicationFooter-Wrapper').height();
+        var footerTop = $('#Uif-ApplicationFooter-Wrapper').position().top + footerHeight;
+
+        if (footerTop < docHeight) {
+            $('#Uif-ApplicationFooter-Wrapper').css('margin-top', (docHeight - footerTop) + 'px');
+        }
     }
 })(Kc.Global, jQuery);
 
@@ -305,4 +332,13 @@ function validateFieldValue(fieldControl) {
     }
 
     return valid;
+}
+
+/**
+ * Close an open iframe dialog by using post message to pass a message event.
+ */
+function closeIframeDialog() {
+    window.parent.postMessage(kradVariables.MODAL.MODAL_CLOSE_DIALOG, "*");
+    // Fix for persistent loading message in IE
+    hideLoading();
 }

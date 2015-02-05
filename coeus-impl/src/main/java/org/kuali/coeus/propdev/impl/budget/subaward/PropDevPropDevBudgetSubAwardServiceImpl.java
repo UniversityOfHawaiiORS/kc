@@ -1,30 +1,36 @@
 /*
- * Copyright 2005-2014 The Kuali Foundation
+ * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Licensed under the Educational Community License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright 2005-2015 Kuali, Inc.
  * 
- * http://www.osedu.org/licenses/ECL-2.0
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.budget.subaward;
 
 
 import com.lowagie.text.pdf.*;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xpath.XPathAPI;
+import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.s2sgen.api.core.InfastructureConstants;
 import org.kuali.coeus.s2sgen.api.hash.GrantApplicationHashService;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
+import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
 import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.budget.framework.core.BudgetService;
 import org.kuali.coeus.common.budget.framework.nonpersonnel.BudgetLineItem;
@@ -42,6 +48,7 @@ import org.springframework.stereotype.Component;
 import org.w3c.dom.*;
 
 import javax.xml.transform.TransformerException;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -83,6 +90,10 @@ public class PropDevPropDevBudgetSubAwardServiceImpl implements PropDevBudgetSub
     @Autowired
     @Qualifier("globalVariableService")
     private GlobalVariableService globalVariableService;
+    
+    @Autowired
+    @Qualifier("sponsorHierarchyService")
+    private SponsorHierarchyService sponsorHierarchyService;
 
     public void populateBudgetSubAwardFiles(Budget budget, BudgetSubAwards subAward, String newFileName, byte[] newFileData) {
         subAward.setSubAwardStatusCode(1);
@@ -155,12 +166,13 @@ public class PropDevPropDevBudgetSubAwardServiceImpl implements PropDevBudgetSub
         }
     }
     
-    public void generateSubAwardLineItems(BudgetSubAwards subAward, Budget budget) {
+    public void generateSubAwardLineItems(BudgetSubAwards subAward, ProposalDevelopmentBudgetExt budget) {
         ScaleTwoDecimal amountChargeFA = new ScaleTwoDecimal(25000);
+        boolean isNihProposal = getSponsorHierarchyService().isSponsorNihMultiplePi(budget.getDevelopmentProposal().getSponsorCode());
         String directLtCostElement = getParameterService().getParameterValueAsString(Budget.class, Constants.SUBCONTRACTOR_DIRECT_LT_25K_PARAM);
         String directGtCostElement = getParameterService().getParameterValueAsString(Budget.class, Constants.SUBCONTRACTOR_DIRECT_GT_25K_PARAM);
         String inDirectLtCostElement = getParameterService().getParameterValueAsString(Budget.class, Constants.SUBCONTRACTOR_F_AND_A_LT_25K_PARAM);
-        String inDirectGtCostElement = getParameterService().getParameterValueAsString(Budget.class, Constants.SUBCONTRACTOR_F_AND_A_GT_25K_PARAM);
+        String inDirectGtCostElement = getParameterService().getParameterValueAsString(Budget.class, Constants.SUBCONTRACTOR_F_AND_A_GT_25K_PARAM);        	
         for (BudgetSubAwardPeriodDetail detail : subAward.getBudgetSubAwardPeriodDetails()) {
             BudgetPeriod budgetPeriod = findBudgetPeriod(detail, budget);
             List<BudgetLineItem> currentLineItems = findSubAwardLineItems(budgetPeriod, subAward.getSubAwardNumber());
@@ -172,9 +184,14 @@ public class PropDevPropDevBudgetSubAwardServiceImpl implements PropDevBudgetSub
                 item.setBudgetSubAward(subAward);
                 item.setLineItemDescription(subAward.getOrganizationName());
             }
-            if (ScaleTwoDecimal.returnZeroIfNull(detail.getDirectCost()).isNonZero() || hasBeenChanged(detail, true)) {
-                ScaleTwoDecimal ltValue = lesserValue(detail.getDirectCost(), amountChargeFA);
-                ScaleTwoDecimal gtValue = detail.getDirectCost().subtract(ltValue);
+            ScaleTwoDecimal directCost = ScaleTwoDecimal.returnZeroIfNull(detail.getDirectCost());
+            //we only create separate line items for indirect if the proposal is nih
+            if (!isNihProposal) {
+            	directCost = directCost.add(ScaleTwoDecimal.returnZeroIfNull(detail.getIndirectCost()));
+            }
+            if (directCost.isNonZero()) {
+                ScaleTwoDecimal ltValue = lesserValue(directCost, amountChargeFA);
+                ScaleTwoDecimal gtValue = directCost.subtract(ltValue);
                 if (ltValue.isNonZero()) {
                     BudgetLineItem lt = findOrCreateLineItem(currentLineItems, detail, subAward, budgetPeriod, directLtCostElement);
                     lt.setLineItemCost(ltValue);
@@ -185,7 +202,7 @@ public class PropDevPropDevBudgetSubAwardServiceImpl implements PropDevBudgetSub
                 }
                 amountChargeFA = amountChargeFA.subtract(ltValue);
             }
-            if (ScaleTwoDecimal.returnZeroIfNull(detail.getIndirectCost()).isNonZero() || hasBeenChanged(detail, false)) {
+            if (ScaleTwoDecimal.returnZeroIfNull(detail.getIndirectCost()).isNonZero() && isNihProposal) {
                 ScaleTwoDecimal ltValue = lesserValue(detail.getIndirectCost(), amountChargeFA);
                 ScaleTwoDecimal gtValue = detail.getIndirectCost().subtract(ltValue);
                 if (ltValue.isNonZero()) {
@@ -219,27 +236,6 @@ public class PropDevPropDevBudgetSubAwardServiceImpl implements PropDevBudgetSub
                 currentLineItems.get(0).setCostSharingAmount(detail.getCostShare());
             }
         }
-    }
-    
-    /**
-     * 
-     * This method checks to see if the BudgetSubAwardPeriodDetail has changed from the database version.  If checkDirect is true then it checks on the value of direct cost.
-     * If checkDirect is false, it is checked based on the value of indirect cost.
-     * @param detail
-     * @param checkDirect
-     * @return
-     */
-    private boolean hasBeenChanged(BudgetSubAwardPeriodDetail detail, boolean checkDirect) {
-        boolean changed = false;
-        if (detail != null && detail.getId() != null) {
-            BudgetSubAwardPeriodDetail dbDetail = getDataObjectService().find(BudgetSubAwardPeriodDetail.class, detail.getId());
-            if (checkDirect) {
-                changed = !ScaleTwoDecimal.returnZeroIfNull(detail.getDirectCost()).equals(ScaleTwoDecimal.returnZeroIfNull(dbDetail.getDirectCost()));
-            } else {
-                changed = !ScaleTwoDecimal.returnZeroIfNull(detail.getIndirectCost()).equals(ScaleTwoDecimal.returnZeroIfNull(dbDetail.getIndirectCost()));
-            }
-        }
-        return changed;
     }
     
     protected BudgetPeriod findBudgetPeriod(BudgetSubAwardPeriodDetail detail, Budget budget) {
@@ -484,7 +480,7 @@ public class PropDevPropDevBudgetSubAwardServiceImpl implements PropDevBudgetSub
                     budgetPeriod = budgetPeriodNode.getTextContent();
                 }
                 LOG.debug("Unable to find matching period for uploaded period '" + budgetPeriod + "' -- " + startDateNode.getTextContent() + " - " + endDateNode.getTextContent());
-                errors.add(new String[]{Constants.SUBAWARD_FILE_PERIOD_NOT_FOUND, budgetPeriod, startDateNode.getTextContent(), endDateNode.getTextContent()});
+                errors.add(new String[]{Constants.SUBAWARD_FILE_PERIOD_NOT_FOUND, (budgetPeriod == null ? "" : budgetPeriod), startDateNode.getTextContent(), endDateNode.getTextContent()});
             }
         }
         return result;
@@ -783,5 +779,14 @@ public class PropDevPropDevBudgetSubAwardServiceImpl implements PropDevBudgetSub
 
 	public void setDataObjectService(DataObjectService dataObjectService) {
 		this.dataObjectService = dataObjectService;
+	}
+
+	public SponsorHierarchyService getSponsorHierarchyService() {
+		return sponsorHierarchyService;
+	}
+
+	public void setSponsorHierarchyService(
+			SponsorHierarchyService sponsorHierarchyService) {
+		this.sponsorHierarchyService = sponsorHierarchyService;
 	}
 }
