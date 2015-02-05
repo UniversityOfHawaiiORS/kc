@@ -229,6 +229,16 @@ public class AwardHierarchyUIServiceImpl implements AwardHierarchyUIService {
         if (input != null) {
             input = input.replaceAll("\\\\", "\\\\\\\\");
             input = input.replaceAll("\"", "\\\\\"");
+            /* 
+             * KC-476 Error loading Award Hierarchy occurs for some Awards when using Firefox or Chrome
+             *   Cut/Paste from MS products is placing MS CRLF into the database for example in Award Title
+             *   Need to escape these because IE is OK but chrome and firefox have issues.
+             */
+            input = input.replaceAll("\r", "\\\\\r");
+            input = input.replaceAll("\n", "\\\\\n");
+            /*
+             * KC-476 END
+             */
         }
         return input;
     }    

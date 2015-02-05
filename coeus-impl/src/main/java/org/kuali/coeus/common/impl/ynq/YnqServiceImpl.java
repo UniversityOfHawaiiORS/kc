@@ -100,7 +100,10 @@ public class YnqServiceImpl implements YnqService {
         /* get YNQ for person */
         boolean certificationRequired = false;
         
-        if(proposalPerson.getRole() != null && proposalPerson.getRole().getCertificationRequired()) {
+        // KC-505 Make Certification Questions required for Key Persons
+        // don't require for all non-employee personnel unless opted in (rolodex Id is null for employees)
+        if(proposalPerson.getRole() != null && proposalPerson.getRole().getCertificationRequired() && proposalPerson.getRolodexId() == null)
+        {
             certificationRequired = true;
         } else if (proposalPerson.getOptInCertificationStatus()) {
             certificationRequired = true;
@@ -280,7 +283,7 @@ public class YnqServiceImpl implements YnqService {
         }
         return retValue;
     }
-    
+
     /**
      * Gets the businessObjectService attribute.
      * @return Returns the businessObjectService.

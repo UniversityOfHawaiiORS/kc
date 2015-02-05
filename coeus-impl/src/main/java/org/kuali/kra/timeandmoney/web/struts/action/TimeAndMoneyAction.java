@@ -307,7 +307,10 @@ public class TimeAndMoneyAction extends KcTransactionalDocumentActionBase {
         if (timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode() == null) {
             isNoCostExtension = false;
         }else {
-            isNoCostExtension = timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(TEN);//Transaction type code for No Cost Extension
+	        // KC-733 No Cost Extension hard coded to trans code of 10
+	        // (found during KC-727 investigation)
+            //isNoCostExtension = timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(TEN);//Transaction type code for No Cost Extension
+            isNoCostExtension = timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(7) || timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(8);
         }       
         //if Dates have changed in a node in hierarchy view and the Transaction Type is a No Cost Extension,
         //we need to record this as a transaction in history.
@@ -510,6 +513,13 @@ public class TimeAndMoneyAction extends KcTransactionalDocumentActionBase {
                  needToSave = true;
              }
          }
+         // KC-727 TimeAndMoney, Direct/F&A Funds Distribution fields not saving
+         // The above check works as long as the lists are of the same length.  If one or the
+         // other are different in size then it fails.  A quick check for size match covers
+         // this condition
+         if (awardFandADistributions.size() != tAndMFandADistributions.size()) {
+       	     needToSave = true;
+         }
          return needToSave;
      }
     
@@ -626,7 +636,7 @@ public class TimeAndMoneyAction extends KcTransactionalDocumentActionBase {
         Award award = timeAndMoneyDocument.getAward();
         getReportTrackingService().generateReportTrackingAndSave(award, true);
     }
-        
+    
     /**
      * override to call save before we blanket approve.
      * @see org.kuali.rice.kns.web.struts.action.KualiDocumentActionBase#blanketApprove(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -784,7 +794,7 @@ public class TimeAndMoneyAction extends KcTransactionalDocumentActionBase {
         GlobalVariables.getUserSession().addObject(GlobalVariables.getUserSession().getKualiSessionId()+Constants.TIME_AND_MONEY_DOCUMENT_STRING_FOR_SESSION, timeAndMoneyDocument);
         
         populateOtherPanels(timeAndMoneyForm.getTransactionBean().getNewAwardAmountTransaction(), timeAndMoneyForm, rootAwardNumber);
-
+        
         return forward;
     }
          
@@ -844,10 +854,9 @@ public class TimeAndMoneyAction extends KcTransactionalDocumentActionBase {
     public ActionForward addTransaction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         captureDateChangeTransactions(form);
         TimeAndMoneyForm timeAndMoneyForm = (TimeAndMoneyForm) form;
-        if (timeAndMoneyForm.getTransactionBean().addPendingTransactionItem()) {
-            timeAndMoneyForm.setToPendingView();
-            refreshView(mapping, form, request, response);
-        }
+        //UH KC-656 BEGIN - remove the call to refresh view because it was causing the parent award obligated/anticipated amounts to double - possible race condition?
+        timeAndMoneyForm.getTransactionBean().addPendingTransactionItem();
+        //UH KC-656 END
         return mapping.findForward(Constants.MAPPING_BASIC);        
     }
     
@@ -1204,7 +1213,7 @@ public class TimeAndMoneyAction extends KcTransactionalDocumentActionBase {
         }
         
     }
-
+ 
     public TimeAndMoneyVersionService getTimeAndMoneyVersionService() {
         if (timeAndMoneyVersionService == null) {
             timeAndMoneyVersionService = KcServiceLocator.getService(TimeAndMoneyVersionService.class);

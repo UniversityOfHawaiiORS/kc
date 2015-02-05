@@ -48,12 +48,12 @@ public class KcEmailServiceImpl implements KcEmailService {
 
     @Autowired
     @Qualifier("mailSender")
-    private JavaMailSenderImpl mailSender;
+    private JavaMailSenderImpl mailSender;    
     
     @Autowired
     @Qualifier("parameterService")
     private ParameterService parameterService;
-
+    
     @Autowired
     @Qualifier("kualiConfigurationService")
     private ConfigurationService configurationService;
@@ -173,10 +173,21 @@ public class KcEmailServiceImpl implements KcEmailService {
         
     }
     private boolean isEmailTestEnabled() {
-        Boolean emailTestEnabled = parameterService.getParameterValueAsBoolean(Constants.KC_GENERIC_PARAMETER_NAMESPACE,  
-                Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, "EMAIL_NOTIFICATIONS_TEST_ENABLED");
-        return emailTestEnabled==null?false:emailTestEnabled;
+	// Begin KC-584 New Notification Emails need to have UH reroute enhancement added
+	boolean reroute = true; // Default to re-route so we don't accidentally send emails
+
+        try {
+            // Use same param as workflow emails so we don't have to worry about two settings.
+            reroute = parameterService.getParameterValueAsBoolean("KR-WKFLW", 
+                                                   "ActionList", "REROUTE_EMAIL_NOTIFICATION_TO_TEST_ADDRESS");
+        } catch (Exception e) {
+            LOG.warn("Email reroute email Notifications parameter not configured, defaulting to rerouting for saftey.");
     }
+        
+        return reroute;	
+	// END KC-584
+    }
+
     public String getDefaultFromAddress() {
         String fromAddress = parameterService.getParameterValueAsString(Constants.KC_GENERIC_PARAMETER_NAMESPACE,  
                 Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, "EMAIL_NOTIFICATION_FROM_ADDRESS");
