@@ -84,6 +84,11 @@
             <artifactId>coeus-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
+	<!-- RRG Adding Oracle persistence dependency so I don't have to use oracle profile -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.oracle</artifactId>
+        </dependency>
     </dependencies>
 
 
@@ -476,7 +481,6 @@
                 </dependency>
             </dependencies>
         </profile>
-
         <profile>
             <id>oracle</id>
             <dependencies>
