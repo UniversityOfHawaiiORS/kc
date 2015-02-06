@@ -137,8 +137,8 @@
         <xmlsec.version>1.5.6</xmlsec.version>
         <xstream.version>1.2.2</xstream.version>
         <extra-enforcer-rules.version>1.0-beta-2</extra-enforcer-rules.version>
-	<cas-client-core.version>3.3.3</cas-client-core.version>
-	<!-- Note: Travis says use 3.2.5 but rice uses 3.2.4 so for now I am sticking with it so I don't have to add the exclusions -->
+	    <cas-client-core.version>3.3.3</cas-client-core.version>
+	    <!-- Note: Travis says use 3.2.5 but rice uses 3.2.4 so for now I am sticking with it so I don't have to add the exclusions -->
         <spring.security.version>3.2.4.RELEASE</spring.security.version>
 
         <!-- plugin versions -->
@@ -1957,16 +1957,24 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-	    <dependency>
-	      <groupId>org.jasig.cas.client</groupId>
-	      <artifactId>cas-client-core</artifactId>
-	      <version>${cas-client-core.version}</version>
-	      <exclusions>
+	        <!-- RRG Adding CAS dependencies
+            <dependency>
+	          <groupId>org.jasig.cas.client</groupId>
+	          <artifactId>cas-client-core</artifactId>
+	          <version>${cas-client-core.version}</version>
+	          <exclusions>
 	          <exclusion>
 	               <artifactId>commons-logging</artifactId>
 	               <groupId>commons-logging</groupId>
 	          </exclusion>
                </exclusions>
+            </dependency>
+            <!-- RRG Adding Oracle persistence dependency so I don't have to use oracle profile -->
+            <dependency>
+               <groupId>org.eclipse.persistence</groupId>
+               <artifactId>org.eclipse.persistence.oracle</artifactId>
+               <version>${org.eclipse.persistence.version}</version>
+               <scope>runtime</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
