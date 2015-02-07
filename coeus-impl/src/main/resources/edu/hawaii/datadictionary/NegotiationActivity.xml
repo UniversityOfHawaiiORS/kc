@@ -1,0 +1,26 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+   
+  <!-- KC-817 Change Negotiation Activity Description to be non-required --> 
+  <bean id="NegotiationActivity-description" parent="NegotiationActivity-description-parentBean">
+    <property name="required" value="false" />
+  </bean>
+  
+  <!-- KC-841 Sort Negotiation activity types by function -->
+  <bean id="NegotiationActivity-activityTypeId" parent="NegotiationActivity-activityTypeId-parentBean">
+  
+    <property name="control" >
+      <bean parent="SelectControlDefinition"
+            p:businessObjectClass="org.kuali.kra.negotiations.bo.NegotiationActivityType"
+            p:valuesFinderClass="edu.hawaii.negotiations.UhNegotiationActivityTypeValuesFinder"
+            p:includeKeyInLabel="false"
+            p:includeBlankRow="false"
+            p:keyAttribute="id"
+            p:labelAttribute="description" />
+    </property>
+  </bean>
+  
+</beans>

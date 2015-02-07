@@ -1062,11 +1062,12 @@
 													<fo:block>
 														<fo:block/>
 														<fo:inline>
-															<xsl:text>My signature below certifies that I hereby authorize MIT to submit the above referenced proposal as an institutionally authorized proposal.</xsl:text>
+															<xsl:text>My signature below certifies that I hereby authorize UH to submit the above referenced proposal as an institutionally authorized proposal.</xsl:text>
 														</fo:inline>
 														<fo:block/>
 														<fo:inline>
-															<xsl:text>Further, as a Principal Investigator/Co-Principal Investigator/Co-Investigator I certify that:</xsl:text>
+															<xsl:text>Further, as a Principal Investigator/Co-Principal Investigator/Co-Investigator I certify that:
+</xsl:text>
 														</fo:inline>
 													</fo:block>
 												</fo:table-cell>
@@ -1147,7 +1148,7 @@
 																			<xsl:choose>
 																				<xsl:when test="printCertification/certifications[questionID = &quot;P2&quot; and   answer = &quot;N&quot;]">
 																					<fo:inline>
-																						<xsl:text>I do not have a perceived, potential or real conflict of interest as defined in MIT policies and procedures with regard to the proposed activity.</xsl:text>
+																						<xsl:text>I do not have a perceived, potential or real conflict of interest as defined in UH policies and procedures with regard to the proposed activity.</xsl:text>
 																					</fo:inline>
 																				</xsl:when>
 																				<xsl:when test="printCertification/certifications[questionID = &quot;P2&quot; and   answer = &quot;Y&quot;]">
@@ -1274,24 +1275,12 @@
 																				<xsl:choose>
 																					<xsl:when test="printCertification/certifications[questionID = &quot;P6&quot; and   answer = &quot;Y&quot;]">
 																						<fo:inline>
-																							<xsl:text>I am familiar with the requirements of the Procurement Integrity Act [(OFPP, Section 27 b103)] (</xsl:text>
-																						</fo:inline>
-																						<fo:inline text-decoration="underline">
-																							<xsl:text>http://web.mit.edu/osp/www/Procuint.htm</xsl:text>
-																						</fo:inline>
-																						<fo:inline>
-																							<xsl:text>) and will report any violations to the Office of Sponsored Programs.</xsl:text>
+																							<xsl:text>I am familiar with the requirements of the Procurement Integrity Act [(OFPP, Section 27 b103)] and will report any violations to the Office of Sponsored Programs.</xsl:text>
 																						</fo:inline>
 																					</xsl:when>
 																					<xsl:when test="printCertification/certifications[questionID = &quot;P6&quot; and   answer = &quot;N&quot;]">
 																						<fo:inline>
-																							<xsl:text>I am not familiar with the requirements of the Procurement Integrity Act [(OFPP, Section 27 b103)] (</xsl:text>
-																						</fo:inline>
-																						<fo:inline text-decoration="underline">
-																							<xsl:text>http://web.mit.edu/osp/www/Procuint.htm</xsl:text>
-																						</fo:inline>
-																						<fo:inline>
-																							<xsl:text>) and will not be able report any violations to the Office of Sponsored Programs.</xsl:text>
+																							<xsl:text>I am not familiar with the requirements of the Procurement Integrity Act [(OFPP, Section 27 b103)] and will not be able report any violations to the Office of Sponsored Programs.</xsl:text>
 																						</fo:inline>
 																					</xsl:when>
 																				</xsl:choose>

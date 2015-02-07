@@ -1,0 +1,62 @@
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+<!-- KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine  -->
+	<bean id="Unit" parent="Unit-parentBean">
+         <property name="attributes">
+			<list merge="true">
+				<ref bean="Unit-unitSearchInput" />
+			</list>
+		</property>  
+    </bean>
+    
+    <bean id="Unit-unitSearchInput" parent="Unit-unitSearchInput-parentBean" />
+
+    <bean id="Unit-unitSearchInput-parentBean" abstract="true" parent="AttributeDefinition">
+      <property name="name" value="unitSearchInput" />
+      <property name="forceUppercase" value="false" />
+      <property name="label" value="Unit Search" />
+      <property name="shortLabel" value="Unit Search" />
+      <property name="maxLength" value="200" />
+      <property name="validationPattern" >
+        <bean parent="AnyCharacterValidationPattern"
+              p:allowWhitespace="true" />
+      </property>
+      <property name="control" >
+        <bean parent="TextareaControlDefinition"
+              p:rows="5"
+              p:cols="40" />
+      </property>
+      <property name="summary" value="Unit Search" />
+      <property name="description" value="Unit SearchInput Data to be sent to solr." />
+    </bean>
+
+<bean id="Unit-lookupDefinition" parent="Unit-lookupDefinition-parentBean">
+   <property name="lookupFields" >
+      <list>
+        <bean parent="FieldDefinition"
+              p:attributeName="unitSearchInput" />
+      </list>
+    </property>
+    <!-- KC-534 Improve the order of data returned from a unit search -->
+    <!--  Change the result order.  Put unit first, then parent, then number and organization -->
+    <property name="resultFields" >
+      <list>
+        <bean parent="FieldDefinition"
+              p:attributeName="unitNumber"
+              p:forceInquiry="true" />
+        <bean parent="FieldDefinition"
+              p:attributeName="unitName" />
+        <bean parent="FieldDefinition"
+              p:attributeName="parentUnit.unitName" />
+        <bean parent="FieldDefinition"
+              p:attributeName="organization.organizationName" />
+      </list>
+    </property>
+</bean>
+     
+</beans>

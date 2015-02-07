@@ -539,7 +539,7 @@
 																	<fo:table-row>
 																		<fo:table-cell padding="2pt" display-align="auto">
 																			<fo:block>
-																				My signature below certifies that I hereby authorize MIT to submit the above referenced proposal as an institutionally
+																				My signature below certifies that I hereby authorize UH to submit the above referenced proposal as an institutionally
 																				authorized proposal. 
 																			</fo:block>
 																			<fo:block>
