@@ -1957,7 +1957,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-	        <!-- RRG Adding CAS dependencies
+	    <!-- RRG Adding CAS dependencies -->
             <dependency>
 	          <groupId>org.jasig.cas.client</groupId>
 	          <artifactId>cas-client-core</artifactId>
