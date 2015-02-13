@@ -76,11 +76,23 @@
            		</td>
         	</tr>
 			<tr>
+			 	<!-- UH KC-680 BEGIN hide the budget status drop down menu and label when this budget version has not been finalized/completed, we want users to only be able to finalize from the budget versions tab NOT from the budget parameters tab-->
+			 	<!--  when this budget version has been made final/completed or the PD is in enroute/readonly then display the label "Budget Status" and corresponding value "Complete/Incomplete" -->
+     			<!-- <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.budgetStatus}" /></div></th>  -->
+     			<c:choose>
+					<c:when test="${readOnly}">
      			<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.budgetStatus}" /></div></th>
+					</c:when>
+					<c:otherwise>
+					     			<th><div align="right">&nbsp;</div></th>
+					</c:otherwise>
+				</c:choose>
 			    <td>
 			    	 <input type=hidden name="KualiForm" property="hack" id="hack" disabled="true" />
 			         <html:hidden name="KualiForm" property="document.budget.budgetStatus"  disabled="true" />
-			         <kul:htmlControlAttribute property="document.budget.budgetStatus" readOnly="${readOnly}" readOnlyAlternateDisplay="Complete" attributeEntry="${proposalDevelopmentAttributes.budgetStatus}"  styleClass="fixed-size-200-select" onchange="javascript: toggleFinalCheckboxSummary(document)" disabled="${viewOnly}"/>
+			         <!--  <kul:htmlControlAttribute property="document.budget.budgetStatus" readOnly="${readOnly}" readOnlyAlternateDisplay="Complete" attributeEntry="${proposalDevelopmentAttributes.budgetStatus}"  styleClass="fixed-size-200-select" onchange="javascript: toggleFinalCheckboxSummary(document)" disabled="${viewOnly}"/> -->
+			         <kul:htmlControlAttribute property="document.budget.budgetStatus" attributeEntry="${proposalDevelopmentAttributes.budgetStatus}" styleClass="fixed-size-200-select-hidden"/>
+                <!-- UH KC-680 END -->
                 </td>
         		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${budgetAttributes.urRateClassCode}" /></div></th>
                 <td>
@@ -91,9 +103,28 @@
         	
         	</tr>
      		<tr>
+			 	<!-- UH KC-680 BEGIN hide the finalized checkbox and label when this budget version has not been finalized/completed, we want users to only be able to finalize from the budget versions tab NOT from the budget parameters tab-->
+			 	<!--  when this budget version has been made final/completed or the PD is in enroute/readonly then display the label "Final?" and corresponding value "Yes/No" -->
+	     		<c:choose>
+					<c:when test="${readOnly}">
      		    <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${budgetAttributes.finalVersionFlag}" noColon="true" /></div></th>
+	     		    </c:when>
+					<c:otherwise>
+						<th><div align="right">&nbsp;</div></th>
+					</c:otherwise>
+				</c:choose>
+				<!-- UH KC-680 END -->
            		<td>
+           		<!-- UH KC-680 BEGIN -->
+           		<!-- <kul:htmlControlAttribute property="document.budget.finalVersionFlag" attributeEntry="${budgetAttributes.finalVersionFlag}" onclick="javascript: setupBudgetStatusSummary(document);" disabled="false" /> -->
+	     		<c:choose>
+					<c:when test="${readOnly}">
            			<kul:htmlControlAttribute property="document.budget.finalVersionFlag" attributeEntry="${budgetAttributes.finalVersionFlag}" onclick="javascript: setupBudgetStatusSummary(document);" disabled="false" />
+           			</c:when>
+					<c:otherwise>
+           				<div class="uh-hidden"><kul:htmlControlAttribute property="document.budget.finalVersionFlag" attributeEntry="${budgetAttributes.finalVersionFlag}"/></div>
+					</c:otherwise>
+				</c:choose>
            			<html:hidden name="KualiForm" property="document.budget.finalVersionFlag" disabled="true" />
            		</td>
         		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${budgetAttributes.ohRateClassCode}" /></div></th>

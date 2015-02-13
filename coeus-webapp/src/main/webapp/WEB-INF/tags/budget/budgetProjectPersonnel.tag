@@ -23,7 +23,8 @@
 
 
 <div id="workarea">
-<kul:tab tabTitle="Project Personnel (All Periods)" defaultOpen="true" transparentBackground="true" tabErrorKey="document.budget.budgetPerson*" auditCluster="budgetPersonnelAuditWarnings" tabAuditKey="document.budget.budgetPerson*" useRiceAuditMode="true">
+<!-- UH KC-676 rbl standardize error location -->
+<kul:tab tabTitle="Project Personnel (All Periods)" defaultOpen="true" transparentBackground="true" tabErrorKey="document.budget.budgetPerson*,document.budgetPersons[*,budgetPersons[*" auditCluster="budgetPersonnelAuditWarnings" tabAuditKey="document.budget.budgetPerson*" useRiceAuditMode="true">
 	    <%-- handle job code error start--%>
 	    <c:set var="firstErrorFound" value="false" />
 	    <c:forEach var="property" items="${ErrorContainer.errorPropertyList}">
@@ -71,8 +72,8 @@
 	       <span class="subhead-right"><kul:help parameterNamespace="KC-B" parameterDetailType="Document" parameterName="budgetPersonHelpUrl" altText="help"/></span>
  		</h3>
 		
-       <kra-b:budgetProjectPersonnelDetails budgetPersonList="${KualiForm.document.budget.budgetPersons}" 
-                                            budgetPersonProperty="document.budget.budgetPersons" />
+	            <kra-b:budgetProjectPersonnelDetails budgetPersonList="${KualiForm.document.budget.budgetPersons}" 
+	                                                 budgetPersonProperty="document.budget.budgetPersons" />
 
     </div>
 	

@@ -65,6 +65,8 @@
 <c:set var="tabErrorKey" value="${tabErrorKey},document.budget.budgetPeriod[${budgetPeriod - 1}].budgetLineItem[${budgetLineItemNumber}].startDate" />
 <c:set var="tabErrorKey" value="${tabErrorKey},document.budget.budgetPeriod[${budgetPeriod - 1}].budgetLineItem[${budgetLineItemNumber}].endDate" />
 <c:set var="tabErrorKey" value="${tabErrorKey},document.budget.budgetPeriod[${budgetPeriod - 1}].budgetLineItem[${budgetLineItemNumber}].lineItemCost" />
+<!-- UH KC-676 rbl standardize error message location -->
+<c:set var="tabErrorKey" value="${tabErrorKey},document.budgetPeriod[${budgetPeriod - 1}].budgetLineItem[${budgetLineItemNumber}].*" />
 
 
 

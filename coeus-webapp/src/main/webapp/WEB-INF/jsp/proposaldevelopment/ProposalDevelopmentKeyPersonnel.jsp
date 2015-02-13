@@ -138,17 +138,28 @@
             <html:image property="methodToCall.insertProposalPerson" src="${ConfigProperties.kra.externalizable.images.url}tinybutton-addperson.gif" title="Add Proposal Person" alt="Add Proposal Person" styleClass="tinybutton addButton"/>
             <c:choose>
             <c:when test="${KualiForm.document.developmentProposalList[0].sponsorNihMultiplePi}">
-            <br>
-             <strong>PI/Contact is a required Proposal Role prior to submission. Only one PI/Contact is allowed. 
-            For single PI submissions, please designate the lead investigator as PI/Contact &amp; other senior personnel as Key Persons. 
-            For multiple PI submissions, please designate one PI/Contact. 
-            Add additional lead investigators as co-Investigators and check the Multiple PI box. Add other senior personnel as Key Persons.<br>
+             <strong>
+             <p>
+             PI/Contact is a required Proposal Role prior to submission. Only one PI/Contact (lead investigator) is allowed.
+             </p> 
+             <p>
+             To add a Multi-PI who is not the lead investigator select Proposal Role "Co-Investigator" then select the "Multiple PI" checkbox.
+             </p>
+             <p>
+             To add a CO-I select Proposal Role "Co-Investigator" and do NOT select the "Multi PI" checkbox.
+             </p>
+             </strong>
             </c:when>
             <c:otherwise>
-            <br>
-            <strong>Principal Investigator is a required field prior to submission. Only one PI is allowed.</strong>
+            <strong>
+            <p>
+            Principal Investigator is a required field prior to submission. Only one PI is allowed.
+            </p>
+            </strong>
             </c:otherwise>
             </c:choose>
+            <%-- KC-521 Add FCOI Message to the Add Key Person Message --%>
+            Non-UH Investigators/Key Personnel please complete ORS FCOI form for SFI/COI disclosure at (<a href="http://www.ors.hawaii.edu/index.php/fcoi" target="_blank">http://www.ors.hawaii.edu/index.php/fcoi</a>) and attach a copy on the Abstracts and Attachments tab, Internal Attachments section.
           </div>
     </kra:uncollapsable>
 </c:if>

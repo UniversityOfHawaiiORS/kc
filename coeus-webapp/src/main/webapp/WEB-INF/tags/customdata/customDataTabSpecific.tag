@@ -62,9 +62,18 @@
 				</c:otherwise>
 			</c:choose>
 		  </c:forEach>
+		 <%-- BEGIN UH KC 132 check if  the custom data tab should be defaulted to open to show required questions e.g. Proposal Development should default to open--%>
+		   <c:if test="${not empty uhOpenTab}" >
+				<kul:tab tabTitle="${tabTitleName}" spanForLongTabTitle="true" defaultOpen="${uhOpenTab}" transparentBackground="${groupStatus.first && headerAndFooter}" auditCluster="CustomData${fn:replace(fullName,' ','')}Errors" tabErrorKey="${tabErrorKey}" tabAuditKey="${tabErrorKey}" useRiceAuditMode="true">
+		    			<kra-customdata:customData customAttributeGroups="${customAttributeGroups}" customDataList="${customDataList}" customDataListPrefix="${customDataListPrefix}" fullName="${fullName}" fieldCount="${fieldCount}" excludeInactive="${excludeInactive}" />
+		    	</kul:tab>
+		    </c:if>
+		    <c:if test="${empty uhOpenTab}" >
 	    <kul:tab tabTitle="${tabTitleName}" spanForLongTabTitle="true" defaultOpen="false" transparentBackground="${groupStatus.first && headerAndFooter}" auditCluster="CustomData${fn:replace(fullName,' ','')}Errors" tabErrorKey="${tabErrorKey}" tabAuditKey="${tabErrorKey}" useRiceAuditMode="true">
 			<kra-customdata:customData customAttributeGroups="${customAttributeGroups}" customDataList="${customDataList}" customDataListPrefix="${customDataListPrefix}" fullName="${fullName}" fieldCount="${fieldCount}" excludeInactive="${excludeInactive}" />
 	    </kul:tab>
+		    </c:if>
+			<%-- END UH KC 132 --%>
 	   	<c:set var="fieldCount" value="${fieldCount + fn:length(customAttributeGroup.value)}" />
 	</c:forEach>
 

@@ -31,7 +31,8 @@
   	headerTabActive="customData">
   	
   	<div align="right"><kul:help documentTypeName="ProposalDevelopmentDocument" pageName="Custom Data" /></div>
-
+	<%--UH KC 132 default the custom data tab to open to show required questions --%>
+	<c:set var="uhOpenTab" value="true" scope="request" />
 	<kra-customdata:customDataTab />
 	<kul:documentControls transactionalDocument="true" suppressRoutingControls="true" suppressCancelButton="true" />
 

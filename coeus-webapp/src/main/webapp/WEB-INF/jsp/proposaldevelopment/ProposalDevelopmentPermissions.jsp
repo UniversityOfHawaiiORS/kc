@@ -38,7 +38,8 @@
 	
 	<c:if test="${KualiForm.editingMode['modifyPermissions']}">
 		<c:if test="${ KualiForm.inWorkflow }" >
-			<c:set var="saveViewersSrc" value="${ConfigProperties.kr.externalizable.images.url}buttonsmall_save_viewers.gif" />
+		 <!-- UH KC-487 rbl buttonsmall_save_viewers.gif never existed, so changed to use correct button name -->
+			<c:set var="saveViewersSrc" value="${ConfigProperties.kr.externalizable.images.url}buttonsmall_save.gif" />
 			<c:set var="saveViewersProperty" value="methodToCall.saveViewers" />
 			<c:set var="saveViewersAlt" value="Save Viewers" />
 		</c:if>

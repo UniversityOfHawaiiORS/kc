@@ -45,9 +45,10 @@
 			property="document.budget.budgetRates[${status.index}].rateClass.rateClassTypeCode" />
 		<bean:define id="displayRow" name="KualiForm"
 			property="document.budget.budgetRates[${status.index}].displayLocation" />
-		<c:if test="${irateClassType ==  rateClassType && displayRow == 'Yes'}">
+		<c:if test="${irateClassType == rateClassType && displayRow == 'Yes'}">
+		<!-- UH KC-676 standardize location of error messages -->
 			<c:set var="tabKey"
-				value="${tabKey},document.budgetRates[${status.index}]*" />
+				value="${tabKey},document.budgetRates[${status.index}]*,document.budget.budgetRates[${status.index}]*,document.budget.budgetProposalRate[${rateClass}][${status.index}]*" />
 		</c:if>
 	</c:forEach>
 	<c:forEach items="${KualiForm.document.budget.budgetLaRates}"
@@ -57,11 +58,11 @@
 		<bean:define id="displayRow" name="KualiForm"
 			property="document.budget.budgetLaRates[${laStatus.index}].displayLocation" />
 		<c:if test="${irateClassType == rateClassType && displayRow == 'Yes'}">
+		<!-- UH KC-676 standardize location of error messages -->
 			<c:set var="tabKey"
-				value="${tabKey},document.budgetLaRates[${laStatus.index}]*" />
+				value="${tabKey},document.budgetLaRates[${laStatus.index}]*,document.budget.budgetLaRates[${laStatus.index}]*,document.budget.budgetProposalLaRate[${rateClass}][${laStatus.index}]*" />
 		</c:if>
 	</c:forEach>
-
 
 	<kul:tab tabTitle="${rateClass}" defaultOpen="false"
 		auditCluster="budgetRateAuditWarnings" tabAuditKey="${tabKey}"
@@ -70,43 +71,43 @@
 		<c:set var="transparent" value="false" />
 		<div class="tab-container" align="center">
 		<h3>
-					${rateClass}
-					<c:if test="${rateClass eq 'Fringe Benefits'}">
+			${rateClass}
+		           <c:if test="${rateClass eq 'Fringe Benefits'}">
 						<span class="subhead-right"><kul:help
 								parameterNamespace="KC-AB" parameterDetailType="Document"
 								parameterName="awardBudgetFringeBenefitsHelpUrl" altText="help" /></span>
-					</c:if>
-					<c:if test="${rateClass eq 'Inflation'}">
+                   </c:if>
+		           <c:if test="${rateClass eq 'Inflation'}">
 						<span class="subhead-right"><kul:help
 								parameterNamespace="KC-AB" parameterDetailType="Document"
 								parameterName="awardBudgetInflationHelpUrl" altText="help" /></span>
-					</c:if>
-					<c:if test="${rateClass eq 'Lab Allocation - Other'}">
+                   </c:if>                   
+		           <c:if test="${rateClass eq 'Lab Allocation - Other'}">
 						<span class="subhead-right"><kul:help
 								parameterNamespace="KC-AB" parameterDetailType="Document"
 								parameterName="labAllocationOther" altText="help" /></span>
-					</c:if>
-					<c:if test="${rateClass eq 'Lab Allocation - Salaries'}">
+                   </c:if>                   
+		           <c:if test="${rateClass eq 'Lab Allocation - Salaries'}">
 						<span class="subhead-right"><kul:help
 								parameterNamespace="KC-AB" parameterDetailType="Document"
 								parameterName="labAllocationSalaries" altText="help" /></span>
-					</c:if>
-					<c:if test="${rateClass eq 'Other'}">
+                   </c:if>     
+		           <c:if test="${rateClass eq 'Other'}">
 						<span class="subhead-right"><kul:help
 								parameterNamespace="KC-AB" parameterDetailType="Document"
 								parameterName="awardBudgetOtherHelpUrl" altText="help" /></span>
-					</c:if>
-					<c:if test="${rateClass eq 'Public Service F & A'}">
+                   </c:if>                                     
+		           <c:if test="${rateClass eq 'Public Service F & A'}">
 						<span class="subhead-right"><kul:help
 								parameterNamespace="KC-AB" parameterDetailType="Document"
 								parameterName="awardPublicServicefaHelpUrl" altText="help" /></span>
-					</c:if>
-					<c:if test="${rateClass eq 'Vacation'}">
+                   </c:if> 
+		           <c:if test="${rateClass eq 'Vacation'}">
 						<span class="subhead-right"><kul:help
 								parameterNamespace="KC-AB" parameterDetailType="Document"
 								parameterName="awardBudgetVacationHelpUrl" altText="help" /></span>
-					</c:if>
-				</h3>
+                   </c:if>
+		</h3>
 		<table id="${rateClass}" cellpadding=0 cellspacing="0"
 			class="result-table" summary="">
 			<kul:htmlAttributeHeaderCell

@@ -85,8 +85,30 @@
                 	</c:when>
                 	<c:otherwise>
                 		${kfunc:registerEditableProperty(KualiForm, customAttributeId)}
-                		<input size="60" id="${customAttributeId}" type="text" name="${customAttributeId}" value='${customAttributeValue}' style="${customAttributeErrorStyle}"/>
-
+                		  <%-- KC-492 BEGIN Data entered into Custom Data text box is not viewable because text fields are too small --%> 
+                		    <c:set var="dataLength" value="${customAttributeDocument.customAttribute.dataLength}"/>
+						    <%-- If dataLength isn't passed in then behave as before --%>
+						    <c:choose>
+						    <c:when test="${empty dataLength}">
+						        <input id="${customAttributeId}" type="text" name="${customAttributeId}" value='${customAttributeValue}' style="${customAttributeErrorStyle}"/>
+						    </c:when>
+						    <%-- If dataLength is provided and < 100 make the size of the text control = to dataLength and limit the maxLength so user can't type more than allowed --%>
+						    <c:when test="${dataLength < 100}">
+						        <input id="${customAttributeId}" type="text" name="${customAttributeId}" value='${customAttributeValue}' style="${customAttributeErrorStyle}" size="${dataLength}" maxlength="${dataLength}"/>          
+						    </c:when>
+						    <%-- If dataLength is provided and >= 100 make the control a textarea hard coded to 5 rows 100 cols --%>
+						    <c:when test="${dataLength >= 100}">
+						           <textarea id="${customAttributeId}" name="${customAttributeId}" style="${customAttributeErrorStyle}" rows="5" cols="100" onkeyup="textLimit(this, ${dataLength});"><c:out value="${fn:trim(customAttributeValue)}" /></textarea>
+						           <%-- If dataLength is > 500 add expandedTextAreaOption --%>
+						           <c:if test="${dataLength > 500}">
+						               <c:if test="${readOnly}">
+								            <html:hidden property="${property}" write="false" styleId="${property}" />
+							           </c:if>
+							           <kul:expandedTextArea textAreaFieldName="${customAttributeId}" action="${fn:substringBefore(fn:substring(requestScope['org.apache.struts.taglib.html.FORM'].action, 1, -1),'.do')}" textAreaLabel="${customAttributeDocument.customAttribute.label}" disabled="${disabled}" title="${customAttributeDocument.customAttribute.label}" readOnly="${readOnly}" maxLength="${dataLength}"/>
+							       </c:if>
+						    </c:when>
+						    </c:choose>
+						    <%-- KC-492 END --%> 
 						<c:if test="${not empty customAttributeDocument.customAttribute.lookupClass}">
 						 <c:choose>
 						   <c:when test="${customAttributeDocument.customAttribute.lookupClass eq 'org.kuali.coeus.common.framework.custom.arg.ArgValueLookup'}">

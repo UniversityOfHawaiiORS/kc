@@ -89,6 +89,8 @@
 				bean="${KualiForm.s2sQuestionnaireHelper}"
 				property="s2sQuestionnaireHelper"
 				forceNonTransparent="${forceTabNonTransparent}" parentTab="Questions"/>
+	        <%-- KC-731 YNQ missing from Proposal Development Summary Tab --%>
+	        <kra-summary:proposalSummaryYnq topTabTransparent="false"/>
 	
 			<script>var $j = jQuery.noConflict();</script>
 			<script type="text/javascript" src="scripts/questionnaireAnswer.js"></script>
@@ -178,7 +180,7 @@
 		<c:if
 			test="${!empty KualiForm.editingMode['rejectProposal'] and not suppressRoutingControls}">
 			<html:image
-				src="${ConfigProperties.kra.externalizable.images.url}buttonsmall_reject.gif"
+				src="${ConfigProperties.kra.externalizable.images.url}uh_buttonsmall_return.gif"
 				styleClass="globalbuttons" property="methodToCall.reject"
 				title="reject" alt="reject" onclick="resetScrollPosition();"
 				tabindex="${tabindex}" />
