@@ -18,5 +18,91 @@
  */
 #header h1.headerImage
 {
-	background-image:   url("../static/images/logo-kra.gif");
+	background-image:   url("../static/uh-images/uh-ors-kuali.gif");
+	margin: 0px;
+        padding: 0px;
+        height:70px;
+        width: 450px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
 }
+
+body
+{
+	background-color: #5b5848;
+}
+
+#footer-copyright {
+    background-color: #5B5848;
+    background-image: url("../static/uh-images/orslogo.gif");
+}
+
+
+#search
+{
+	background-image:   url("../static/uh-images/uh-searchback.gif");
+}
+
+div.header2
+{
+	background-image:   url("../static/uh-images/uh-head2-back.gif");
+	background-color: #F4D9D8;
+}
+
+div.header2-left-focus
+{
+	background-image:   url("../static/uh-images/uh-header2-left-focus.gif");
+}
+
+#tabs li.red
+{
+	background:  url("../static/uh-images/uh-left-gold.gif") no-repeat left top;
+}
+
+#tabs a.red
+{
+	background:  url("../static/uh-images/uh-right-gold.gif") no-repeat right top;
+}
+
+.leftback-focus { background-image:   url("../static/uh-images/uh-leftback-focus.gif"); }
+
+#iframe_portlet_container_div {
+	background-image: url('../static/uh-images/uh-leftback-focus.gif'); 
+}
+
+.footerbevel
+{
+	background-image: url("../static/uh-images/uh-bl-bevel-focus.gif");
+}
+
+#footer-nav-focus
+{
+	background-image:   url("../static/uh-images/uh-bl-bevel-focus.gif");
+}
+
+#footer-copyright {
+	text-align: left;
+	font-size: 9px;
+	height: 20px;
+	padding-left: 1%;
+	width: 99%;
+}
+
+#topbar-alert {
+  color:#0000FF;
+  display: block;
+  font-weight:bold;
+  font-size:14px;
+  height: 12px;
+  left: 230px;
+  position: relative;
+  top: 14px; 
+}
+
+#topbar-alert a {
+  color:#000000; 
+}
+
+
+
