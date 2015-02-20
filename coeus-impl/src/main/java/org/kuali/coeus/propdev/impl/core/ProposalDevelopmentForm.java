@@ -1446,6 +1446,8 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
             showProposalSummary = false;
         }
         
+        // KC-911 Remove the custom data tab in PD if there are no custom data fields
+        boolean hideCustomData = getProposalDevelopmentDocument().getCustomDataList().isEmpty();
         
         for (HeaderNavigation tab : tabs) {
             if (tab.getHeaderTabNavigateTo().equals("grantsGov")) {
@@ -1455,7 +1457,10 @@ public class ProposalDevelopmentForm extends BudgetVersionFormBase implements Re
             {
                 if (!tab.getHeaderTabNavigateTo().toUpperCase().equals("APPROVERVIEW") || showProposalSummary || canPerformWorkflowAction()) 
                 {
-                    newTabs.add(tab);
+                    // KC-911 Remove the custom data tab in PD if there are no custom data fields
+                    if (!hideCustomData || !tab.getHeaderTabDisplayName().equals("Custom Data") ) {
+                        newTabs.add(tab);
+                    }
                 }
             }
         }
