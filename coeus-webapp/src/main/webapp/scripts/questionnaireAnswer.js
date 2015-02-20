@@ -124,7 +124,9 @@ var ruleReferenced;
      * uncheck radio button if it is checked and empty answer fields if it is not a 'radio' type.
      */
     function emptyAnswerForHiddenQuestion(questionTable) {
-   		$j(questionTable).find('input[name$=".answer"]').each(function() {		
+        	// KC-808 Text Area child questions don't clear when hidden and still save to DB
+        	// $j(questionTable).find('input[name$=".answer"]').each(function()
+   		$j(questionTable).find('[name$=".answer"]').each(function() {		
    			var radioChecked = $j(this).attr('checked');
    			if (radioChecked) {
    				$j(this).attr('checked', false);

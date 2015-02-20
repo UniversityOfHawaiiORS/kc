@@ -829,7 +829,7 @@ function changeObjectVisibility(objectId, newVisibility) {
     }
 }
 
-
+    
 /**
  * Display the Edit Roles popup window.  This window allows users
  * to change the roles for a user within a proposal.
@@ -1099,20 +1099,36 @@ function loadPersonName(usernameFieldName, fullnameElementId,
 				callback:function(data) {
 					if ( data != null ) {
 						fullNameElement.innerHTML = data.fullName;
+						// KC-328 When adding people to permissions tab Full Name, Unit # and Unit Name say "not found" for valid users
+						// Profiler not retuning Unit details so we may need to work on this in 
+						// Non-Profiler Version
+						//   Non-Profiler version issue fixed by adding checks for null on unitNumberElement and unitNameElement
+						//   They are not passed in when you use the search button we can probably improve this but check fixes error for now
+						if (data.unit != null) {
+						  if (unitNumberElement != null) {			
 						unitNumberElement.innerHTML= data.unit['unitNumber'];
+						  }
+						  if ( unitNameElement != null) {
 						unitNameElement.innerHTML= data.unit['unitName'];
-						
+    				      }
+						}	
+						// KC-328 END			
 					} else {
 						fullNameElement.innerHTML = wrapError( "not found" );
-						unitNameElement.innerHTML= wrapError("not found");
-						unitNumberElement.innerHTML= wrapError("not found");
+						// KC-328 When adding people to permissions tab Full Name, Unit # and Unit Name say "not found" for valid users
+						//unitNameElement.innerHTML= wrapError("not found");
+						//unitNumberElement.innerHTML= wrapError("not found");
+						// KC-328 END
 					}
 				},
 				errorHandler:function( errorMessage ) {
 					window.status = errorMessage;
-					fullNameElement.innerHTML = wrapError( "not found" );
-					unitNameElement.innerHTML= wrapError("not found");
-					unitNumberElement.innerHTML= wrapError("not found");
+					// KC-328 When adding people to permissions tab Full Name, Unit # and Unit Name say "not found" for valid users
+					// Might as well report error in name filed for debugging
+					fullNameElement.innerHTML = wrapError(errorMessage);
+					//unitNameElement.innerHTML= wrapError("not found");
+					//unitNumberElement.innerHTML= wrapError("not found");
+					// KC-328 END
 				}
 			};
 			KraPersonService.getKcPersonByUserName(username, dwrReply);
@@ -1145,7 +1161,8 @@ function loadContactPersonName(usernameFieldName, fullnameElementId,
 						if (phoneNumberElement != null) phoneNumberElement.innerHTML= data.phoneNumber;
 						if (emailElement != null) emailElement.innerHTML= data.emailAddress;
 						if (personIdElement != null) personIdElement.value= data.personId;
-						if (unitNumberElement != null) unitNumberElement.innerHTML= data.unit['unitNumber']
+						// KC-328 Same issue but for award contacts
+						if (unitNumberElement != null && data.unit != null) unitNumberElement.innerHTML= data.unit['unitNumber']
 					} else {
 						if (personIdElement != null) personIdElement.value = "";
 						if (fullNameElement != null) fullNameElement.innerHTML = wrapError( "not found" );
@@ -1870,6 +1887,10 @@ function updateBudgetFlag(){
 	}
 }
 
+//UH KC-680 rbl improve budget Finalization -hide the budget status drop down menu, make the finalize check box drive the budget status drop down
+// i.e. when user checks the Final checkbox set the budget status to "Complete", when user unchecks the Final checkbox set the budget status to "Incomplete"
+// checking of the Final checkbox will also call the page to save and  run validation checks, this will prevent/alert user from Finalizing a budget version which 
+// contains validation errors.
 function enableBudgetStatus(document, index) {
 	var newFinalIndicator;
 	var newFinalStatus;
@@ -1884,9 +1905,10 @@ function enableBudgetStatus(document, index) {
 	  	if (e.checked && j != index) {
 	  		if (confirm("You are changing the final version.  Are you sure?")) {
 	  			e.checked = false;
-	  			statusHidden.value = status.value;
-	  			statusHidden.disabled = false;
-	  			status.disabled = true;
+	  			status.value = '2';
+	  			statusHidden.value = '2';
+			  	  statusHidden.disabled=true;
+			  	  status.disabled=false;
 	  		} else {
 	  			cancelled = true;	
 	  		}
@@ -1894,10 +1916,13 @@ function enableBudgetStatus(document, index) {
 	  		newFinalIndicator = e;
 	  		newFinalStatus = status;
 	  		newFinalStatusHidden = statusHidden;
+	  		newFinalStatus.value = '1';
+	  		newFinalStatusHidden.value = '1';
 	  	} else {
-	  		statusHidden.value = status.value;
-	  		statusHidden.disabled = false;
-	  		status.disabled = true;
+  			status.value = '2';
+  			statusHidden.value = '2';
+	  		statusHidden.disabled = true;
+	  		status.disabled = false;
 	  	}
 	  	j++;
 	  }
@@ -1909,6 +1934,8 @@ function enableBudgetStatus(document, index) {
 	if (cancelled && newFinalIndicator != null) {
 		newFinalIndicator.checked = false;
 	}
+	
+	jQuery("input[name='methodToCall.save']").click();
 }
 
 function getIndex(what) {
@@ -1940,7 +1967,10 @@ function setupBudgetStatuses(document) {
 }
 
 
-
+//UH KC-680 rbl improve budget Finalization -hide the budget status drop down menu, make the finalize check box drive the budget status drop down
+//i.e. when user checks the Final checkbox set the budget status to "Complete", when user unchecks the Final checkbox set the budget status to "Incomplete"
+//checking of the Final checkbox will also call the page to save and  run validation checks, this will prevent/alert user from Finalizing a budget version which 
+//contains validation errors.
 function setupBudgetStatusSummary(document) {
 	  var finalVersionFlag = document.getElementById('document.budget.finalVersionFlag');
 	  var temp = document.getElementById('hack');
@@ -1953,9 +1983,11 @@ function setupBudgetStatusSummary(document) {
 	    if(finalVersionFlag.checked) {
 	  	  statusHidden.disabled=true;
 	  	  status.disabled=false;
+	  	  status.value='1';
 	    } else {
-	   	  statusHidden.disabled=false;
-	  	  status.disabled=true;
+		  	  statusHidden.disabled=true;
+		  	  status.disabled=false;
+		  	  status.value='2';
 	    }
 	  }
 	 }
@@ -2518,7 +2550,7 @@ function setDefaultReviewerTypeCode(methodToCall, committeeId, scheduleId, proto
 				getProtocolReviewerTypes(reviewersReturned, beanName);
 				
 				var reviewersArr = reviewersReturned.split(";");
-				
+
 				var defaultReviewTyper;
 				//just to note, this will probably be higher than the actual number of reviewers, but is a good number to loop through.
    			var numberOfRevierwers = reviewersArr.length;
@@ -3564,11 +3596,12 @@ function addErrorForItem(item, errorMsg) {
 	lastErrorMessage.after('<div style="display:list-item;margin-left:20px;" class="addedByRequireOnAdd">' + errorMsg + '</div>');
 }
 
+//UH KC-480  - rbl Added newProposalAbstract.abstractTypeCode to elementToIgnore to eliminate the "Unsaved changes will be lost" warning msg/row highlighting on page load for "Project Summary" default selection
 var WarningOnAddRow = (function($) {
 	return {
 		emptyValues: [' ', '0.00', '(new group)'],
 		inputs: '.addline input, .addline select, .addline textarea',
-		elementsToIgnore: ['input[name="multiSelectToReset"]', 'input[name="checkboxToReset"]', 'input[name^="document.budget.budgetCategoryType["]'],
+		elementsToIgnore: ['input[name="multiSelectToReset"]', 'input[name="checkboxToReset"]', 'input[name^="document.budget.budgetCategoryType["]','select[name="newProposalAbstract.abstractTypeCode"]'],
 		asterisk: $('<img class="changedNotice changedAsterisk" src="static/images/asterisk_orange.png"/>'),
 		resetBtn: $('<img class="changedNotice changedResetBtn" src="static/images/tinybutton-reset1.gif"/>'),
 		pageNotice: $('<div class="changedNotice changedPageNotice">Unsaved changes will be lost.</div>'),
@@ -3676,11 +3709,11 @@ var WarningOnAddRow = (function($) {
 			if(matchingDiv.length > 0) {
 				return true;
 			}else {
-				for (idx in this.elementsToIgnore) {
-					if ($(element).is(this.elementsToIgnore[idx])) {
-						return true;
-					}
+			for (idx in this.elementsToIgnore) {
+				if ($(element).is(this.elementsToIgnore[idx])) {
+					return true;
 				}
+			}
 			}
 			return false;
 		}

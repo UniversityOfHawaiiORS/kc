@@ -78,6 +78,15 @@
                 <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${institutionalProposalAttributes.deadlineTime}" /></div></th>
                 <td>
                 	<kul:htmlControlAttribute property="document.institutionalProposal.deadlineTime" attributeEntry="${institutionalProposalAttributes.deadlineTime}"  />
+                	<br>
+                	<!--KC-605 BEGIN Add ability to enter timezone to Sponsor Deadline Time -->
+                	<c:if test="${!readOnly}">
+           			 <i>e.g. 8:00 AM HST - <a href="/myGRANTwww/timeZones.html" target="_blank">View List of Valid Time Zone Abbreviations</a></i>
+           			 </c:if>
+           			<c:if test="${readOnly}">
+           			 <i><a href="/myGRANTwww/timeZones.html" target="_blank">View List of Valid Time Zone Abbreviations</a></i>
+           			</c:if>
+           			<!--KC-605 END -->
                 </td>
             </tr>
         	<tr>

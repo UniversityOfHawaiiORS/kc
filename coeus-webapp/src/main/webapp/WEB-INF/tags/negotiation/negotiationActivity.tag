@@ -24,6 +24,8 @@
 <%@ attribute name="tabDivClass" required="false" %>
 <%@ attribute name="readOnly" required="true" %>
 
+<script src="scripts/jquery/jquery.js"></script>
+
 <c:set var="activityAttributes" value="${DataDictionary.NegotiationActivity.attributes}" />
 <c:set var="attachmentAttributes" value="${DataDictionary.NegotiationActivityAttachment.attributes}" />
 
@@ -47,9 +49,12 @@
   <c:set var="bodyClass" value=""/>
 </c:otherwise></c:choose>
 <span class="subhead-right"><kul:help parameterNamespace="KC-NEGOTIATION" parameterDetailType="Document" parameterName="negotiationActivitiesHelp" altText="help"/></span>
-<kul:innerTab parentTab="${parentTab}" tabTitle="${tabTitle}" defaultOpen="false" tabErrorKey="${activityPath}*" useCurrentTabIndexAsKey="true" overrideDivClass="${tabDivClass}">
+<!-- KC-814 Default tab to open to make data entry easier -->
+<!-- KC-871 Change negotiation activities back to closed -->
+<!--        Close individual activities but keep the "Add" activity open by setting defaultOpen to the newActivity variable -->
+<kul:innerTab parentTab="${parentTab}" tabTitle="${tabTitle}" defaultOpen="${newActivity}" tabErrorKey="${activityPath}*" useCurrentTabIndexAsKey="true" overrideDivClass="${tabDivClass}">
             <div class="innerTab-container" align="left">
-
+        
         <table cellpadding="0" cellspacing="0" border="0">
         <tbody class="${bodyClass}"> 
         <td>
@@ -103,16 +108,21 @@
                 <td colspan="5">
                 	<c:if test="${!activity.restricted || KualiForm.editingMode['view_unrestricted']}">
                 	  <kul:htmlControlAttribute property="${activityPath}.description" attributeEntry="${activityAttributes.description}" readOnly="${readOnly}"/>
+ <!-- KC-820 Modify Negotiation Description restricted/unrestricted
+ Commenting out section which displays the restrict/unrestrict buttons  	  
 		              <c:if test="${!readOnly}">
-		               	<c:choose><c:when test="${activity.restricted}">
+		               	<c:choose>
+		               	  <c:when test="${activity.restricted}">
 		               	   <html:image property="methodToCall.unrestrictActivity.activityIndex${activityIndex}"
 		  		  					src="${ConfigProperties.kra.externalizable.images.url}tinybutton-unrestrict.gif" styleClass="tinybutton"/>
-		               	</c:when><c:otherwise>
+		               	  </c:when>
+		               	  <c:otherwise>
 		               	   <html:image property="methodToCall.restrictActivity.activityIndex${activityIndex}"
 		  		  					src="${ConfigProperties.kra.externalizable.images.url}tinybutton-restrict.gif" styleClass="tinybutton"/>                	
 		               	</c:otherwise>
 		               	</c:choose>
 		              </c:if>
+ KC-820 END -->
                 	</c:if>
                 </td>
             </tr>
@@ -250,6 +260,11 @@
    		  				src="${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif" styleClass="tinybutton"/>
    		  			<html:image property="methodToCall.deleteActivity.activityIndex${activityIndex}"
    		  				src="${ConfigProperties.kr.externalizable.images.url}tinybutton-delete1.gif" styleClass="tinybutton"/>
+   		  			<!-- KC-822 Add send notification button and a link to launch Award Memo Tool -->
+   		  			<!-- KC-886 After sorting was added to negotiation activities memo tool launches with wrong code -->
+   		  			<!--        changed activityIndex to activityId for KC-886 -->
+   		  			<html:image property="methodToCall.launchNotificationTool.activityId${activity.activityId}"
+   		  				src="${ConfigProperties.kra.externalizable.images.url}tinybutton-sendmemo.gif" styleClass="tinybutton"/>
 			    </td>
 			</tr>
 			</c:if>
@@ -258,6 +273,123 @@
         </tbody>
         </table>
         </div>
+<!-- KC-814 Set Start to Default to Today --> 
+<c:set var="oneDayNegotiationActivityTypes" value="<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString(\"KC-GEN\", \"All\", \"uh_one_day_negotiation_activity_types\")%>"/>
+<c:set var="restricted_negotiation_activity_types" value="<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString(\"KC-GEN\", \"All\", \"uh_restricted_negotiation_activity_types\")%>"/>
+<script language="JavaScript">
+
+jQuery.noConflict();
+
+jQuery(document).ready(function($) {
+function getToday() {
+                            var today = new Date();
+                            var dd = today.getDate();
+                            var mm = today.getMonth()+1; //January is 0!
+                            var yyyy = today.getFullYear();
+    
+                            if(dd<10) {
+                               dd='0'+dd
+                            } 
+    
+                            if(mm<10) {
+                                mm='0'+mm
+                            } 
+
+                            today = mm+'/'+dd+'/'+yyyy;
+                            return today;
+                        }
+
+//KC-870 Negotiation Start Date resets to today's data when user attaches document 
+         
+function getStartDate() {
+             var startDate =  $("#negotiationActivityHelper\\\.newActivity\\\.startDate").val();
+             return startDate;
+}
+
+function populateEndDate(){
+
+    var selected = $("#negotiationActivityHelper\\\.newActivity\\\.activityTypeId :selected").text();
+    var oneDayNegotiationTypes = "${oneDayNegotiationActivityTypes}";
+    var oneDaySelection = oneDayNegotiationTypes.indexOf("[" + selected + "]") > -1;
+   
+    if (oneDaySelection) {
+        $("#negotiationActivityHelper\\\.newActivity\\\.endDate").val(getStartDate());
+    } else {
+        $("#negotiationActivityHelper\\\.newActivity\\\.endDate").val("");
+    }
+ }
+ 
+//Set Negotiation startDate to today's date when the start date is blank. 
+//This occurs the first time and when a new activity is added.
+
+if ( $("#negotiationActivityHelper\\\.newActivity\\\.startDate").val() == "" )
+{                         
+   $("#negotiationActivityHelper\\\.newActivity\\\.startDate").val(getToday());
+}
+
+
+//Change the endDate when the startDate was changed per the ActivityType, only on new activity
+if (${newActivity}) {
+  $("#negotiationActivityHelper\\\.newActivity\\\.startDate").change(populateEndDate);
+}
+ 
+//Change the endDate per the ActivityType, only on new activity 
+if (${newActivity}) {
+  $("#negotiationActivityHelper\\\.newActivity\\\.activityTypeId").change(populateEndDate);
+}  
+//KC-870 END
+
+//KC-897 Negotiation - Default a location based on selected activity type
+<c:set var="uh_negotiations_activity_to_location" value="<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString(\"KC-GEN\", \"All\", \"uh_negotiations_activity_to_location\")%>"/>
+
+function populateLocation(){
+
+     var selectedActivity = $("#negotiationActivityHelper\\\.newActivity\\\.activityTypeId :selected").text();
+     var activityToLocationStringArray ="${uh_negotiations_activity_to_location}".split(";");
+     var i = 0, defaultLocation = "select";
+     
+     while (i < activityToLocationStringArray.length && !activityFound) {
+            var activityFound = (activityToLocationStringArray[i].indexOf( "[" + selectedActivity + "]")) >= 0;
+            if (activityFound) {
+                // Get the default location Format LOCATION:[activity type][activity type2]...
+                defaultLocation = activityToLocationStringArray[i].split(':')[0].trim();
+            }
+            i++;
+      }      
+      $("#negotiationActivityHelper\\\.newActivity\\\.locationId option:contains(" + defaultLocation + ")").attr('selected', 'selected');
+
+ }
+ 
+// Popoulate Location Based on activity selected, only apply to the new activity section
+if (${newActivity}) {
+    $("#negotiationActivityHelper\\\.newActivity\\\.activityTypeId").change(populateLocation);
+}
+//KC-897 END
+ 
+ <!-- KC-820 Modify Negotiation Description restricted/unrestricted -->
+ function setDescriptionColor() {
+    var escapedString=jq_escape("${activityPath}.activityTypeId") + " :selected";
+    var restricted_negotiation_activity_types="${restricted_negotiation_activity_types}";
+    var selected = $(escapedString).text();
+    var resticted = restricted_negotiation_activity_types.indexOf("[" + selected + "]") > -1;
+    if (resticted) {
+        $(jq_escape("${activityPath}.description")).css({'background-color': 'pink'});
+    } else {
+        $(jq_escape("${activityPath}.description")).css({'background-color': 'white'});
+    }
+ }
+
+<!-- Set the initial color when the document is ready -->
+setDescriptionColor();
+ 
+<!-- Change the color when activity Type is changed. -->
+$(jq_escape("${activityPath}.activityTypeId")).change(function () {
+    setDescriptionColor();
+});
+ 
+ });
+</script>
+<!-- KC-820 END -->
 </kul:innerTab>
 
         
