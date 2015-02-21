@@ -23,13 +23,20 @@
       <channel:unitPreAward />
       <channel:unitPostAward />
 </td>
+
+<%-- KC-612 Declutter the menu screens --%>
+<uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
 <td class="content" valign="top">
       <channel:unitPreSubmissionCompliance />
       <channel:unitPostSubmissionCompliance />
 </td>
+</uh-kc:principalHasRole>
 
 <td class="content" valign="top">
       <channel:unitQuicklinks />
+      <%-- KC-612 Declutter the menu screens --%>
+      <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
       <channel:unitWorkflow />
       <channel:unitRules />
+      </uh-kc:principalHasRole>    
 </td>

@@ -21,9 +21,11 @@
 <channel:portalChannelTop channelTitle="Quicklinks" />
 <div class="body">
   <ul class="chan">
-    <li><portal:portalLink displayTitle="true" title="Kc Pessimistic Lock" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.rice.krad.document.authorization.PessimisticLock&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
+    <li><portal:portalLink displayTitle="true" title="Document Lock" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.rice.krad.document.authorization.PessimisticLock&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
     <li><portal:portalLink displayTitle="false" title="Current & Pending Support" url="${ConfigProperties.application.url}/currentOrPendingReport.do">Current &amp; Pending Support</portal:portalLink></li>
     <li><portal:portalLink displayTitle="true" title="Grants.gov Opportunity Lookup" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.coeus.propdev.impl.s2s.S2sOpportunity&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" /></li>
+    <%-- KC-612 Declutter the menu screens --%>
+    <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
     <li><portal:portalLink displayTitle="true" title="Address Book" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.coeus.common.framework.rolodex.Rolodex&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" /></li>
     <li><portal:portalLink displayTitle="true" title="Sponsor Lookup" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.coeus.common.framework.sponsor.Sponsor&docFormKey=88888888&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true" /></li>
     <li>Change Password</li>
@@ -33,6 +35,7 @@
   	<li><portal:portalLink displayTitle="false" title="ISR/SSR  Reporting" url="${ConfigProperties.application.url}/isrSsrReporting.do?methodToCall=docHandler">ISR/SSR Reporting</portal:portalLink></li>
   	<li><portal:portalLink displayTitle="true" title="Award subcontracting goals and expenditures" url="${ConfigProperties.application.url}/awardSubcontractingGoalsExpenditures.do?methodToCall=start" /></li>
   	<li><portal:portalLink displayTitle="true" title="Subcontracting expenditures data generator admin" url="${ConfigProperties.application.url}/subcontractingExpendituresDataGeneration.do?methodToCall=start" /></li>
+  	</uh-kc:principalHasRole>
   </ul>
 </div>
 <channel:portalChannelBottom />

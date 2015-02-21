@@ -34,8 +34,8 @@
 	${kfunc:registerEditableProperty(KualiForm, prop)}
 	<input type="hidden" name="${prop}" id ="${prop}" 
            value = "${bean.answerHeaders[status.index].showQuestions}" />
-		
-     <kra-questionnaire:questionnaireAnswers bean = "${bean}" property = "${property}" answerHeaderIndex = "${status.index}" forceNonTransparent="${forceNonTransparent}"/>
+	 <%-- KC-805 Change PD Questions Tab to default all questionnaires as shown --%>	
+     <kra-questionnaire:questionnaireAnswers bean = "${bean}" property = "${property}" answerHeaderIndex = "${status.index}" forceNonTransparent="${forceNonTransparent}" defaultOpen="true"/>
    </c:forEach>
 
 <c:if test="${fn:length(bean.answerHeaders) > 0}">

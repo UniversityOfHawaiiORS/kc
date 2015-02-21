@@ -190,6 +190,12 @@
 								<c:set var="rowIndex" value="1" />
 								<bean:define id="budgetRates" name="KualiForm"
 									property="budgetToSummarize.budgetRates" />
+								<%--KC-649 Proposal Summary tab loads very slowly when opening enroute proposal     --%>
+								<%--       Acquire finalBudgetProposalRateClassCode once and pass in as attribute   --%>
+								<%--       Originally it was acquired in summary:proposalDevelopmentBudgetRates.tag --%>
+								<%--       but profiling revealed the call is expensive.  Since it will not change  --%>
+								<%--       while in the loop I moved it up to this tag file.                        --%>
+							    <c:set var="finalBudgetProposalRateClassCode" value="${KualiForm.document.finalrateClassCode}"/>
 								<c:forEach items="${budgetRates}" var="proposalRates"
 									varStatus="status">
 									<c:set var="budgetRate"
@@ -200,9 +206,11 @@
 									<c:if test="${hasErrors}">
 										<c:set var="styleClass" value="errorField" />
 									</c:if>
+									<%--KC-649 Proposal Summary tab loads very slowly when opening enroute proposal --%>
+									<%--       added attribute finalBudgetProposalRateClassCode                     --%>
 									<kra-summary:proposalDevelopmentBudgetRates
 										budgetRate="${budgetRate}" rateClassType="${rateClassType}"
-										styleClass="${styleClass}" />
+										styleClass="${styleClass}" finalBudgetProposalRateClassCode="${finalBudgetProposalRateClassCode}"/>
 								</c:forEach>
 					
 							</c:if>
@@ -251,7 +259,7 @@
 							<h3>
 								<div align="center">
 									<span align="center">Actions</span>
-									<span class="subhead-right"> </span>
+											<span class="subhead-right"> </span>
 								</div>
 							</h3></td>
 					</tr>

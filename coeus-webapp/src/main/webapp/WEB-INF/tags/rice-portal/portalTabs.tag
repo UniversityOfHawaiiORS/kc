@@ -22,6 +22,81 @@
 
 <div id="tabs" class="tabposition">
 	<ul>
+	<%-- Researcher Menu --%>
+	<c:if test='${selectedTab == "portalResearcherBody"}'>
+        <li class="red"><a class="red" href="portal.do?selectedTab=portalResearcherBody" title="Researcher">Researcher</a></li>
+    </c:if>
+    <c:if test='${selectedTab != "portalResearcherBody"}'>
+        <c:if test="${empty selectedTab}">
+            <li class="red"><a class="red" href="portal.do?selectedTab=portalResearcherBody" title="Researcher">Researcher</a></li>
+        </c:if>
+        <c:if test="${!empty selectedTab}">
+            <li class="green"><a class="green" href="portal.do?selectedTab=portalResearcherBody" title="Researcher">Researcher</a></li>
+        </c:if>
+    </c:if>
+    
+    <%-- Unit --%>
+    <c:if test='${selectedTab == "portalUnitBody"}'>
+        <li class="red"><a class="red" href="portal.do?selectedTab=portalUnitBody" title="Unit">Unit</a></li>
+    </c:if> 
+    <c:if test='${selectedTab != "portalUnitBody"}'>
+        <li class="green"><a class="green" href="portal.do?selectedTab=portalUnitBody" title="Unit">Unit</a></li>
+    </c:if>
+    
+    <%-- Central Admin --%>
+    <c:if test='${selectedTab == "portalCentralAdminBody"}'>
+        <li class="red"><a class="red" href="portal.do?selectedTab=portalCentralAdminBody" title="Central Admin">Central Admin</a></li>
+    </c:if> 
+    <c:if test='${selectedTab != "portalCentralAdminBody"}'>
+        <li class="green"><a class="green" href="portal.do?selectedTab=portalCentralAdminBody" title="Central Admin">Central Admin</a></li>
+    </c:if>
+    
+
+
+    <%-- Help KC-517 --%>
+    
+    <c:if test='${selectedTab == "portalHelpBody"}'>
+        <li class="red"><a class="red" href="portal.do?selectedTab=portalHelpBody" title="Help">Help</a></li>
+    </c:if> 
+    <c:if test='${selectedTab != "portalHelpBody"}'>
+        <li class="green"><a class="green" href="portal.do?selectedTab=portalHelpBody" title="Help">Help</a></li>
+    </c:if>
+
+    
+	<%-- Researcher Menu --%>
+	<c:if test='${selectedTab == "portalResearcherBody"}'>
+        <li class="red"><a class="red" href="portal.do?selectedTab=portalResearcherBody" title="Researcher">Researcher</a></li>
+    </c:if>
+    <c:if test='${selectedTab != "portalResearcherBody"}'>
+        <c:if test="${empty selectedTab}">
+            <li class="red"><a class="red" href="portal.do?selectedTab=portalResearcherBody" title="Researcher">Researcher</a></li>
+        </c:if>
+        <c:if test="${!empty selectedTab}">
+            <li class="green"><a class="green" href="portal.do?selectedTab=portalResearcherBody" title="Researcher">Researcher</a></li>
+        </c:if>
+    </c:if>
+    
+    <%-- Unit --%>
+    <c:if test='${selectedTab == "portalUnitBody"}'>
+        <li class="red"><a class="red" href="portal.do?selectedTab=portalUnitBody" title="Unit">Unit</a></li>
+    </c:if> 
+    <c:if test='${selectedTab != "portalUnitBody"}'>
+        <li class="green"><a class="green" href="portal.do?selectedTab=portalUnitBody" title="Unit">Unit</a></li>
+    </c:if>
+    
+    <%-- KC-612 Declutter the menu screens --%>
+    <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH Central Admin Tab Viewer">
+    <%-- Central Admin --%>
+    <c:if test='${selectedTab == "portalCentralAdminBody"}'>
+        <li class="red"><a class="red" href="portal.do?selectedTab=portalCentralAdminBody" title="Central Admin">Central Admin</a></li>
+    </c:if> 
+    <c:if test='${selectedTab != "portalCentralAdminBody"}'>
+        <li class="green"><a class="green" href="portal.do?selectedTab=portalCentralAdminBody" title="Central Admin">Central Admin</a></li>
+    </c:if>
+    </uh-kc:principalHasRole>
+    <%-- KC-612 END --%>
+    
+    <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="Technical Administrator">
     <%-- Maintenance --%>
     <c:if test='${selectedTab == "portalMaintenanceBody"}'>
         <li class="red"><a class="red" href="portal.do?selectedTab=portalMaintenanceBody" title="Maintenance">Maintenance</a></li>
@@ -37,7 +112,7 @@
     <c:if test='${selectedTab != "portalSystemAdminBody"}'>
         <li class="green"><a class="green" href="portal.do?selectedTab=portalSystemAdminBody" title="System Admin">System Admin</a></li>
     </c:if>
-
+	</uh-kc:principalHasRole> 
 	
 	</ul>
 </div>

@@ -22,13 +22,20 @@
 	  	<channel:messageOfTheDay/>
       <channel:researcherProposals />
       <channel:researcherAwards />
+      <%-- KC-737 Remove menu items from Researcher and Unit Tab --%>
+      <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
       <channel:researcherNegotiations />
+      </uh-kc:principalHasRole>
 </td>
+
+<%-- KC-612 Declutter the menu screens --%>
+<uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
 <td class="content" valign="top">
       <channel:researcherIRBProtocols/>
       <channel:researcherCompliance/>
       <channel:researcherIACUCProtocols/>   
 </td>
+</uh-kc:principalHasRole>
 
 <td class="content" valign="top">
       <channel:researcherQuicklinks />

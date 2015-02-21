@@ -141,7 +141,11 @@
 					</select>
 				</td>
 				<%-- not showing the following any more. But we are keeping the element around so we can steal its click() method --%>
+				<%-- UH KC-656 BEGIN  we will display the refesh button since the auto refresh view was causing issues
 				<td style="display:none">				
+				--%>
+					<td style="text-align: center; background-color: rgb(195, 195, 195); width: 60px;">	
+					<%-- UH KC-656 end--%>				
 					<html:image src="${ConfigProperties.kra.externalizable.images.url}tinybutton-refresh.gif" styleClass="tinybutton" alt="Refresh" property="methodToCall.refreshView" />
 				</td>			
 			</tr>

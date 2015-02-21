@@ -21,7 +21,10 @@
 <channel:portalChannelTop channelTitle="Awards" />
 <div class="body">
 	<ul class="chan">
+	  <%-- KC-612 Declutter the menu screens --%>
+	  <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
 	  <li>Awards in Progress</li>
+	  </uh-kc:principalHasRole>
       <li><portal:portalLink displayTitle="false" title="All my Awards" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.award.home.Award&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&projectPersons.fullName=${UserSession.person.firstName}*${UserSession.person.lastName}&hideReturnLink=true">All my Awards</portal:portalLink></li>
 	</ul>
 </div>

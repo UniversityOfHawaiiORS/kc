@@ -38,6 +38,10 @@
       		<td width="15" class="leftback-focus">&nbsp;</td>
 	 		<c:choose>
 	 		  <%-- then default to tab based actions if they are not focusing in --%>
+              <%-- KC-517 Add Help/Resources Tab --%>
+	          <c:when test='${selectedTab == "portalHelpBody"}'>
+	              <portal:portalHelpBody />
+	          </c:when>
 	          <c:when test='${selectedTab == "portalMaintenanceBody"}'>
 	              <portal:portalMaintenanceBody />
 	          </c:when>

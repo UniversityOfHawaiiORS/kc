@@ -23,10 +23,13 @@
 <c:set var="textAreaFieldName" value="document.developmentProposalList[0].programAnnouncementTitle" />
 <c:set var="action" value="proposalDevelopmentProposal" />
 
+<%-- KC-658 Improve PD required field placement                                           --%>
+<%--        modified tabErrorKey and tabAuditKey so error messages display in correct tab --%>
+<%--UH KC-676 rbl further modification req on tabErrorKey for standardizing error msg location --%>
 <kul:tab tabTitle="Sponsor & Program Information" defaultOpen="false" 
-	tabErrorKey="document.developmentProposalList[0].primeSponsorCode,document.developmentProposalList[0].deadlineDate,document.developmentProposalList[0].deadlineTime,document.developmentProposalList[0].noticeOfOpportunityCode,document.developmentProposalList[0].deadlineType,document.developmentProposalList[0].cfdaNumber,document.developmentProposalList[0].programAnnouncementNumber,document.developmentProposalList[0].primeSponsorCode,document.developmentProposalList[0].sponsorProposalNumber,document.developmentProposalList[0].nsfCode,document.developmentProposalList[0].subcontracts,document.developmentProposalList[0].agencyDivisionCode,document.developmentProposalList[0].agencyProgramCode,document.developmentProposalList[0].programAnnouncementTitle,document.developmentProposalList[0].primeSponsorCode" 
+	tabErrorKey="document.developmentProposalList[0].developmentProposalList[0].cfdaNumber,document.developmentProposalList[0].developmentProposalList[0].primeSponsorCode,document.developmentProposalList[0].primeSponsorCode,document.developmentProposalList[0].noticeOfOpportunityCode,document.developmentProposalList[0].cfdaNumber,document.developmentProposalList[0].programAnnouncementNumber,document.developmentProposalList[0].primeSponsorCode,document.developmentProposalList[0].sponsorProposalNumber,document.developmentProposalList[0].nsfCode,document.developmentProposalList[0].subcontracts,document.developmentProposalList[0].agencyDivisionCode,document.developmentProposalList[0].agencyProgramCode,document.developmentProposalList[0].programAnnouncementTitle,document.developmentProposalList[0].primeSponsorCode" 
 	auditCluster="sponsorProgramInformationAuditErrors,sponsorProgramInformationAuditWarnings" 
-	tabAuditKey="document.developmentProposalList[0].deadlineDate,document.developmentProposalList[0].programAnnouncementNumber,document.developmentProposalList[0].cfdaNumber,document.developmentProposalList[0].programAnnouncementTitle,document.developmentProposalList[0].sponsorProposalNumber,document.developmentProposalList[0].primeSponsorCode" 
+	tabAuditKey="document.developmentProposalList[0].programAnnouncementNumber,document.developmentProposalList[0].cfdaNumber,document.developmentProposalList[0].programAnnouncementTitle,document.developmentProposalList[0].sponsorProposalNumber,document.developmentProposalList[0].primeSponsorCode" 
 	useRiceAuditMode="true">
 	<div class="tab-container" align="center">
     	<h3>
@@ -35,26 +38,8 @@
         </h3>
 
         <table cellpadding=0 cellspacing=0 summary="">
-        	<tr>
-                <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.deadlineDate}" /></div></th>
-                <td align="left" valign="middle">
-                	<kul:htmlControlAttribute property="document.developmentProposalList[0].deadlineDate" attributeEntry="${proposalDevelopmentAttributes.deadlineDate}"  />
-                </td>
-				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.deadlineTime}" /></div></th>
-                <td>
-                	<kul:htmlControlAttribute property="document.developmentProposalList[0].deadlineTime" attributeEntry="${proposalDevelopmentAttributes.deadlineTime}"  />
-                </td>
-            </tr>
-        	<tr>
-				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.deadlineType}" /></div></th>
-                <td>
-                	<kul:htmlControlAttribute property="document.developmentProposalList[0].deadlineType" readOnly="${readOnly}" attributeEntry="${proposalDevelopmentAttributes.deadlineType}"  styleClass="fixed-size-200-select"/>
-                </td>
-           		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.noticeOfOpportunityCode}" /></div></th>
-                <td>
-                	<kul:htmlControlAttribute property="document.developmentProposalList[0].noticeOfOpportunityCode" readOnly="${readOnly}" attributeEntry="${proposalDevelopmentAttributes.noticeOfOpportunityCode}"  styleClass="fixed-size-200-select" />
-                </td>
-        	</tr>
+            <%-- KC-658 Improve PD required field placement --%>
+        	<%-- Moved Sponsor Deadline Date and time  to required fields (proposalDevelopmentRequiredFields.tag) --%>
         	<tr>
 				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${DataDictionary.Sponsor.attributes.sponsorName}" /></div></th>
            		<td>
@@ -66,6 +51,18 @@
            		<td>
            			<kul:htmlControlAttribute property="document.developmentProposalList[0].cfdaNumber" attributeEntry="${proposalDevelopmentAttributes.cfdaNumber}" />
            		</td>
+        	</tr>
+     		<tr>
+        	    <%-- KC-658 Improve PD required field placement --%>
+        	    <%-- Moved sponsor deadline type to required fields (proposalDevelopmentRequiredFields.tag) --%>
+           		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.noticeOfOpportunityCode}" /></div></th>
+                <td>
+                	<kul:htmlControlAttribute property="document.developmentProposalList[0].noticeOfOpportunityCode" readOnly="${readOnly}" attributeEntry="${proposalDevelopmentAttributes.noticeOfOpportunityCode}"  styleClass="fixed-size-200-select" />
+                </td>
+                <%-- Added space since we moved sponsor deadline --%>
+                <th>&nbsp;</th>
+                <td align="left" valign="middle">&nbsp;</td>
+                <%-- KC-658 END --%>
         	</tr>
      		<tr>
      		    <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.primeSponsorCode}" /></div></th>
@@ -97,6 +94,8 @@
         	<tr>				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.agencyDivisionCode}" /></div></th>
                 <td>
                 	<kul:htmlControlAttribute property="document.developmentProposalList[0].agencyDivisionCode" attributeEntry="${proposalDevelopmentAttributes.agencyDivisionCode}" />
+                	<br>
+                	<a href="https://www.fastlane.nsf.gov/pgmannounce.jsp" target="_blank">Search by Funding Opportunity #</a>
                 </td>
            		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.subcontracts}" /></div></th>
            		<td>
@@ -112,6 +111,8 @@
                 <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${proposalDevelopmentAttributes.agencyProgramCode}" /></div></th>
            		<td>
            			<kul:htmlControlAttribute property="document.developmentProposalList[0].agencyProgramCode" attributeEntry="${proposalDevelopmentAttributes.agencyProgramCode}" />
+           			<br>
+           			<a href="https://www.fastlane.nsf.gov/pgmannounce.jsp" target="_blank">Search by Funding Opportunity #</a>
            		</td>
      		</tr>
      		

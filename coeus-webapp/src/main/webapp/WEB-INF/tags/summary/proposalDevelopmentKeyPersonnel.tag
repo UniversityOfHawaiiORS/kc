@@ -69,8 +69,9 @@
 						value="document.developmentProposalList[0].proposalPersons[0].proposalPersonYnqs[${status.index}]" />
 					<c:set var="creditSplit"
 						value="document.developmentProposalList[0].investigatorCreditTypes[${status.index}]" />
+					<%-- KC-890 Certification questions showing as incomplete in Proposal Summary when completed --%>
 					<c:set var="completed"
-						value="${KualiForm.proposalPersonQuestionnaireHelpers[personIndex].answerHeaders[0].allQuestionsAnswered}" />
+						value="${KualiForm.proposalPersonQuestionnaireHelpers[personIndex].answerHeaders[0].completed && KualiForm.proposalPersonQuestionnaireHelpers[personIndex].answerHeaders[0].hasVisibleQuestion}" />	
 					<tr>
 						<td class="infoline"><div align="center">${rowIndex}</div>
 						</td>

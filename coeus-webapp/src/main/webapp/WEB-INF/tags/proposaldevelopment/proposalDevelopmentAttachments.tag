@@ -79,8 +79,8 @@ internal attachements.  We are just going to loop through the narratives and see
 
 
 <c:set var="action" value="proposalDevelopmentAbstractsAttachments" />
-
-<kul:tabTop tabTitle="Proposal Attachments (${proposalAttachementCount})" defaultOpen="false" tabErrorKey="newNarrative*,document.developmentProposalList[0].narrative*">
+<!-- UH KC-676 rbl standardize error location -->
+<kul:tabTop tabTitle="Proposal Attachments (${proposalAttachementCount})" defaultOpen="false" tabErrorKey="newNarrative*,document.developmentProposalList[0].narrative*,document.narratives*">
 	<div class="tab-container" align="center">
 	    <kra:section permission="addNarratives">
 	    	<h3>
@@ -89,7 +89,7 @@ internal attachements.  We are just going to loop through the narratives and see
 	        </h3>
         </kra:section>
 		<c:if test="${canUpdateAllStatuses}">
-			<table cellpadding=0 cellspacing=0 summary="">
+        <table cellpadding=0 cellspacing=0 summary="">
 				<tbody>
 		            <c:if test="${fn:length(KualiForm.document.developmentProposalList[0].narratives) > 0}">
 						<tr>
@@ -117,7 +117,7 @@ internal attachements.  We are just going to loop through the narratives and see
         <table cellpadding=0 cellspacing=0 summary="">
             <kra:section permission="addNarratives">
             	<tbody class="addline">
-					<tr>
+	           	<tr>
 	         		<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${narrativeAttributes.narrativeTypeCode}"/></div></th>
 	                <td align="left" valign="middle">
 	                	<kul:htmlControlAttribute property="newNarrative.narrativeTypeCode" attributeEntry="${narrativeAttributes.narrativeTypeCode}" />
@@ -177,7 +177,7 @@ internal attachements.  We are just going to loop through the narratives and see
 	            </tr>
 	            </tbody>
             </kra:section>
-
+            
  
             <c:if test="${fn:length(KualiForm.document.developmentProposalList[0].narratives) > 0}">
             <tr>
@@ -273,32 +273,32 @@ internal attachements.  We are just going to loop through the narratives and see
 			          	<tr>
 							<td colspan=4>
 								<div align="center">
-									<c:if test="${(downloadAttachment) }">
+									<c:if test="${(downloadAttachment) }">							
 										<div style="display: inline;">
-												<html:image styleId="downloadProposalAttachment.line${status.index}"  property="methodToCall.downloadProposalAttachment.line${status.index}.anchor${currentTabIndex}"
-																src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif' styleClass="tinybutton"
-																onclick="javascript: openNewWindow('${action}','downloadProposalAttachment','${status.index}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
+										<html:image styleId="downloadProposalAttachment.line${status.index}"  property="methodToCall.downloadProposalAttachment.line${status.index}.anchor${currentTabIndex}"
+														src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif' styleClass="tinybutton"
+														onclick="javascript: openNewWindow('${action}','downloadProposalAttachment','${status.index}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
 										</div>
 									</c:if>
 									<c:if test="${replaceAttachment}">
 										<div style="display: inline;" id="replaceAttachmentDiv${status.index}">
-												<html:image styleId="replaceProposalAttachment.line${status.index}" 
+										<html:image styleId="replaceProposalAttachment.line${status.index}" 
 																onclick="javascript: showHide('fileDiv${status.index}','replaceDiv${status.index}') ;
 																					 showHide('attachmentStatusDiv${status.index}','updateStatusDiv${status.index}') ;
 																					 showHide('saveNewAttachmentDiv${status.index}','replaceAttachmentDiv${status.index}') ; return false"  
 																src='${ConfigProperties.kew.externalizable.images.url}tinybutton-edit1.gif' styleClass="tinybutton" />
 										</div>
-								    </c:if>
+								    </c:if>	
 								    <c:if test="${deleteAttachment}">
 										<div style="display: inline;">
-												<html:image styleId="deleteProposalAttachment.line${status.index}" property="methodToCall.deleteProposalAttachment.line${status.index}.anchor${currentTabIndex}"
-												            src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif' styleClass="tinybutton"/>
+										<html:image styleId="deleteProposalAttachment.line${status.index}" property="methodToCall.deleteProposalAttachment.line${status.index}.anchor${currentTabIndex}"
+										            src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif' styleClass="tinybutton"/>
 										</div>
 									</c:if>
 									<div style="display: inline;">
-									    <html:image styleId="getProposalAttachmentRights.line${status.index}" property="methodToCall.getProposalAttachmentRights.line${status.index}.anchor${currentTabIndex}"
-											        src='${ConfigProperties.kra.externalizable.images.url}tinybutton-vieweditrights.gif' styleClass="tinybutton"
-											        onclick="javascript: proposalAttachmentRightsPop('${status.index}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}');return false"/>
+									<html:image styleId="getProposalAttachmentRights.line${status.index}" property="methodToCall.getProposalAttachmentRights.line${status.index}.anchor${currentTabIndex}"
+										        src='${ConfigProperties.kra.externalizable.images.url}tinybutton-vieweditrights.gif' styleClass="tinybutton"
+										        onclick="javascript: proposalAttachmentRightsPop('${status.index}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}');return false"/>
 									</div>
 									<c:if test="${replaceAttachment}">
 									    <div id="cancelAttachmentEdit${status.index}" style="display: inline;">
@@ -323,7 +323,7 @@ internal attachements.  We are just going to loop through the narratives and see
 			       </div>
 			     </kul:innerTab>
 			   </c:if>
-        	</c:forEach>
+        	</c:forEach> 
         	</div>
         	</td>
         	</tr>
