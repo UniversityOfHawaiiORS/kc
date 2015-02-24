@@ -127,7 +127,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
      * Struts mapping for the Proposal web page.  
      */
     private static final String MAPPING_PROPOSAL = "proposal";
-    private static final String ROUTING_WARNING_MESSAGE = "Validation Warning Exists.Are you sure want to submit to workflow routing."; 
+    // KC-793 Correct wording for validation warnings exist message in PD and Award
+    private static final String ROUTING_WARNING_MESSAGE = "Validation warning exists.  Are you sure you want to submit to workflow routing."; 
     
     private enum SuperUserAction {
         SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
@@ -179,7 +180,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
             if (canGenerateRequestsInFuture(workflowDoc, GlobalVariables.getUserSession().getPrincipalId())) {
                 forward = promptUserForInput(workflowDoc, "approve", mapping, form, request, response);
             } else {
-                forward = super.approve(mapping, form, request, response);
+                forward = super.approve(mapping, form, request, response);    
             }
             
             if (proposalDevelopmentForm.getEditingMode().containsKey("submitToSponsor")
@@ -264,7 +265,25 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
     private boolean hasAskedToNotReceiveFutureRequests(WorkflowDocument workflowDoc, String principalId) {
         boolean receiveFutureRequests = false;
         boolean doNotReceiveFutureRequests = false;    
-
+        // KC-666 BEGIN Remove question about seeing future approvals
+        GroupService groupService = KcServiceLocator.getService(GroupService.class);
+        // Keep old behavior for help desk since they need to see all approvals requests
+        // workflow nodes missing assigned approvers are routed to help desk and I want them
+        // to always see them.  They will get the question so they can answer no if they know what
+        // they are doing.
+        if (!groupService.isMemberOfGroup(principalId, groupService.getGroupByNamespaceCodeAndName("KC-WKFLW","myGRANT Help Desk").getId())) {
+        	// Since member is not in help desk lets short circuit the future approvals question and simply return false as if user
+        	// has answered the question before not wanting to see future approvals.
+            // NOTE: ORS Final Approver still requires Approval because the login always requires the last approver to approve
+        	//       without checking for prior approvals.  This is a good thing it allows us to put ORS approvers early but
+        	//       still have them approve the document before it goes final.
+        	// Please note that although the name of this method implies that true = "user has asked NOT to see future requests" in fact
+        	// returning false prevents the user from seeing future requests....Ahhhhhhhhh.....
+            return false;
+        }
+        // KC-666 End
+        
+        
         Map<String, String> variables = workflowDoc.getVariables();
         if (variables != null && CollectionUtils.isNotEmpty(variables.keySet())) {
             Iterator<String> variableIterator = variables.keySet().iterator();
@@ -326,8 +345,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
     
     protected GroupService getGroupService() {
         return KimApiServiceLocator.getGroupService();
-    }
-
+            }
+            
     /**
      * Copies a Proposal Development Document based upon user-specified criteria.
      * 
@@ -385,14 +404,14 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
                 
                 ProposalDevelopmentDocument copiedDocument = proposalDevelopmentForm.getProposalDevelopmentDocument();
                 getProposalRoleTemplateService().initializeProposalUsers(copiedDocument);//add in any default permissions
-                copiedDocument.getDevelopmentProposal().setS2sAppSubmission(new ArrayList<S2sAppSubmission>());
+                copiedDocument.getDevelopmentProposal().setS2sAppSubmission(new ArrayList<S2sAppSubmission>());            
                 for(S2sAppSubmission s2sAppSubmissionListValue:s2sAppSubmissionProposalList) {
                           copiedDocument.getDevelopmentProposal().setPrevGrantsGovTrackingID(s2sAppSubmissionListValue.getGgTrackingId());
                 }
                  
                 DocumentService docService = KcServiceLocator.getService(DocumentService.class);
                 docService.saveDocument(copiedDocument);
-
+                
                 nextWebPage = mapping.findForward(MAPPING_PROPOSAL);
                 
                 // Helper method to clear document form data.
@@ -483,7 +502,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         if (status == WARNING) {
 
             if(status == WARNING && question == null){
-                forward =  this.performQuestionWithoutInput(mapping, form, request, response, DOCUMENT_ROUTE_QUESTION, "Validation Warning Exists.Are you sure want to submit to workflow routing.", KRADConstants.CONFIRMATION_QUESTION, methodToCall, "");
+            	// KC-793 Correct wording for validation warnings exist message in PD and Award
+                forward =  this.performQuestionWithoutInput(mapping, form, request, response, DOCUMENT_ROUTE_QUESTION, ROUTING_WARNING_MESSAGE, KRADConstants.CONFIRMATION_QUESTION, methodToCall, "");
             } 
             else if(DOCUMENT_ROUTE_QUESTION.equals(question) && ConfirmationQuestion.YES.equals(buttonClicked)) {
                 //status is OK now since the user said it was :)
@@ -553,7 +573,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
       
         ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
         ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument)proposalDevelopmentForm.getProposalDevelopmentDocument();
-        
+               
         if (!userCanCreateInstitutionalProposal()) {
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
@@ -562,7 +582,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         //cannot be run along side audit rules in ProposalDevelopmentDocumentRule::processRunAuditBusinessRules.
         boolean valid = new ProposalAttachmentSubmitToSponsorRule().processRunAuditBusinessRules(proposalDevelopmentDocument);
-
+        
         int status = isValidSubmission(proposalDevelopmentForm);
         if(!valid || status == ERROR) {
             putErrorInGlobalMessageMap();
@@ -582,11 +602,11 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         } else {
             if ( (ConfirmationQuestion.YES.equals(buttonClicked) || status == OK) && requiresResubmissionPrompt(proposalDevelopmentForm)) {
                 return mapping.findForward(Constants.MAPPING_RESUBMISSION_PROMPT);
-            }
+            } 
             forward = submitApplication(mapping, form, request, response);
-        }
+        }            
 
-        return forward;
+        return forward;      
     }
     
     /*
@@ -721,8 +741,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
              */
             if (!auditPassed || (result != null && result.isValid()) ) {
                 state = putErrorInGlobalMessageMap();
-            }
-        }
+                    }
+                }
             
         return state;
     }
@@ -1005,8 +1025,8 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         ProposalDevelopmentDocument proposalDevelopmentDocument = proposalDevelopmentForm.getProposalDevelopmentDocument();
         getProposalDevelopmentPrintingService().populateSponsorForms(proposalDevelopmentForm.getSponsorFormTemplates(), proposalDevelopmentDocument.getDevelopmentProposal().getSponsorCode());
     }
-
     
+
     /**
      * 
      * This method is called to print forms
@@ -1468,7 +1488,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
         }
         return kraWorkflowService;
     }
-    
+
     public void setKraWorkflowService(KcWorkflowService kraWorkflowService) {
         this.kraWorkflowService = kraWorkflowService;
     }
@@ -1548,7 +1568,7 @@ public class ProposalDevelopmentActionsAction extends ProposalDevelopmentAction 
 
         changeHistory.get(newBudgetChangedData.getEditableColumn().getColumnLabel()).add(0, newBudgetChangedData);
     }
-
+    
     private int getBudgetNextChangeNumber(BusinessObjectService boService, String proposalNumber, String columnName) {
         int changeNumber = 0;
         Map<String, Object> keyMap = new HashMap<String, Object>();

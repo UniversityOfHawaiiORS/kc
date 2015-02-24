@@ -2,23 +2,24 @@
  * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
  * Copyright 2005-2015 Kuali, Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.core;
 
 import com.google.common.collect.Lists;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +32,9 @@ import org.kuali.coeus.common.framework.print.AttachmentDataSource;
 import org.kuali.coeus.propdev.impl.attachment.LegacyNarrativeService;
 import org.kuali.coeus.propdev.impl.attachment.Narrative;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
+import org.kuali.coeus.common.questionnaire.framework.answer.Answer;
+import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
+import org.kuali.coeus.common.questionnaire.framework.core.QuestionnaireQuestion;
 import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstractsService;
 import org.kuali.coeus.propdev.impl.budget.CostShareInfoDO;
 import org.kuali.coeus.propdev.impl.copy.ProposalCopyCriteria;
@@ -61,6 +65,7 @@ import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.common.budget.framework.print.BudgetPrintService;
 import org.kuali.coeus.propdev.impl.budget.ProposalBudgetService;
 import org.kuali.coeus.propdev.impl.hierarchy.ProposalHierarcyActionHelper;
+import org.kuali.coeus.propdev.impl.krms.PropDevJavaFunctionKrmsTermServiceImpl;
 import org.kuali.coeus.propdev.impl.person.question.ProposalPersonQuestionnaireHelper;
 import org.kuali.coeus.propdev.impl.print.ProposalDevelopmentPrintingService;
 import org.kuali.coeus.propdev.impl.s2s.S2sOppForms;
@@ -95,6 +100,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.*;
 import java.util.*;
 
@@ -130,7 +136,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
     @Override
     public ActionForward docHandler(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward forward = null;
-
+        
         ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
         String command = proposalDevelopmentForm.getCommand();
         String createProposalFromGrantsGov=request.getParameter("createProposalFromGrantsGov");
@@ -159,7 +165,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             if(proposalDevelopmentForm.getDocument().getDocumentNumber() != null){
                 rejectedDocument = getKcDocumentRejectionService().isDocumentOnInitialNode(proposalDevelopmentForm.getDocument().getDocumentHeader().getWorkflowDocument());
             }
-
+             
             if (canPerformWorkflowAction(proposalDevelopmentForm.getProposalDevelopmentDocument()) && !rejectedDocument) {
 
                 ProposalDevelopmentApproverViewDO approverViewDO = populateApproverViewDO(proposalDevelopmentForm);
@@ -167,10 +173,6 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
                 
                 loadDocument(proposalDevelopmentForm);
                 return approverView(mapping, form, request, response);
-            }
-            else if (Constants.MAPPING_PROPOSAL_ACTIONS.equals(command)) {
-                loadDocument(proposalDevelopmentForm);
-                forward = actions(mapping, proposalDevelopmentForm, request, response);
             }
             else {
             forward = super.docHandler(mapping, form, request, response);
@@ -198,10 +200,10 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         }
 
         proposalDevelopmentForm.setSaveXmlPermission(getProposalDevelopmentService().canSaveProposalXml(proposalDevelopmentForm.getProposalDevelopmentDocument()));
-        
+
         if(proposalDevelopmentForm.getProposalDevelopmentDocument().getDevelopmentProposal().getS2sOpportunity()!= null){
             proposalDevelopmentForm.setGrantsGovSelectFlag(true);
-        }
+       }
         return forward;
     }
     
@@ -227,7 +229,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
        approverViewDO.setCoPiInfos(coPiInfos);
        if (coPiInfos != null) {
            numberOfCoPI = coPiInfos.size();
-       }
+        }
 
        /* populate cost share info */
        List<CostShareInfoDO> costShareInfos = new ArrayList<CostShareInfoDO>();
@@ -236,28 +238,28 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
            approverViewDO.setCostShareInfos(costShareInfos);
            if (costShareInfos != null) {
                numberOfCostShare = costShareInfos.size();
-           }
-       }
+        }
+        }
 
        /* populate budget cost info */
        if (budget != null) {
            approverViewDO.setDirectCost(budget.getTotalDirectCost());
            approverViewDO.setIndirectCost(budget.getTotalIndirectCost());
            approverViewDO.setTotalCost(budget.getTotalCost());
-       }
+                    }
 
        /* Fill the gap between CoPI number and Cost Share Number for JSP rendering purpose */
        if (numberOfCoPI > numberOfCostShare) {
            for (int i=0; i < numberOfCoPI - numberOfCostShare; i++) {
                CostShareInfoDO costShareInfo = new CostShareInfoDO();
                costShareInfos.add(costShareInfo);
-           }
+                }
        } else if (numberOfCoPI < numberOfCostShare) {
            for (int i=0; i < numberOfCostShare - numberOfCoPI; i++) {
                CoPiInfoDO coPiInfo = new CoPiInfoDO();
                coPiInfos.add(coPiInfo);
-           }
-       }
+            }
+            }
 
        /* populate proposal info */
        approverViewDO.setActivityType(proposal.getActivityType().getDescription());
@@ -272,7 +274,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
        approverViewDO.setPiName(proposal.getPrincipalInvestigatorName());
 
        return approverViewDO;
-   }
+        }
    
    
    /* Check to see if the current user can perform workflow action in proposal development document */
@@ -281,8 +283,8 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
        // Not from the doc handler, don't show the approver view
        if (document.getDocumentHeader().getDocumentNumber() == null) {
            return false;
-       }
-
+    }
+    
        KcTransactionalDocumentAuthorizerBase documentAuthorizer = 
     		   (KcTransactionalDocumentAuthorizerBase) getDocumentHelperService().getDocumentAuthorizer(document);
        
@@ -293,14 +295,14 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
        boolean canDisapprove = documentActions.contains(KRADConstants.KUALI_ACTION_CAN_DISAPPROVE);
 
        return canApprove || canDisapprove;
-   }
+        }
 
    protected DocumentHelperService getDocumentHelperService()  {  
        if (documentHelperService == null) 
     	   documentHelperService =  KNSServiceLocator.getDocumentHelperService();
        return documentHelperService;
-   }
-
+    }
+    
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
     
@@ -309,48 +311,48 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         ProposalDevelopmentDocument document = proposalDevelopmentForm.getProposalDevelopmentDocument();
         String keywordPanelDisplay = this.getParameterService().getParameterValueAsString(
                     ProposalDevelopmentDocument.class, Constants.KEYWORD_PANEL_DISPLAY);        
-        request.getSession().setAttribute(Constants.KEYWORD_PANEL_DISPLAY, keywordPanelDisplay);
-
-        if (proposalDevelopmentForm.isAuditActivated()){
-            proposalDevelopmentForm.setUnitRulesMessages(getUnitRulesMessages(proposalDevelopmentForm.getProposalDevelopmentDocument()));
-        }
+            request.getSession().setAttribute(Constants.KEYWORD_PANEL_DISPLAY, keywordPanelDisplay);
+            
+            if (proposalDevelopmentForm.isAuditActivated()){
+                proposalDevelopmentForm.setUnitRulesMessages(getUnitRulesMessages(proposalDevelopmentForm.getProposalDevelopmentDocument()));
+            }
         if( GlobalVariables.getAuditErrorMap().isEmpty()) {
             KcServiceLocator.getService(AuditHelper.class).auditConditionally(proposalDevelopmentForm);
         }
         getProposalDevelopmentService().sortS2sForms(document.getDevelopmentProposal());    
-                
+
         if(document.getDevelopmentProposal().getS2sOpportunity()!=null && document.getDevelopmentProposal().getS2sOpportunity().getS2sOppForms()!=null){
             Collections.sort(document.getDevelopmentProposal().getS2sOpportunity().getS2sOppForms(),new S2sOppFormsComparator1());
             Collections.sort(document.getDevelopmentProposal().getS2sOpportunity().getS2sOppForms(),new S2sOppFormsComparator3());
         }
         return actionForward;
     }
-    
+            
     protected KrmsRulesExecutionService getKrmsRulesExecutionService(){
     	if (krmsRulesExecutionService == null)
     		krmsRulesExecutionService = KcServiceLocator.getService(KrmsRulesExecutionService.class);
     		return krmsRulesExecutionService;
-    }
+            }
     
     protected BudgetPrintService getBudgetPrintService(){
     	if (budgetPrintService == null)
     		budgetPrintService = KcServiceLocator.getService(BudgetPrintService.class);
     		return budgetPrintService;
     }
-
+            
     protected KcDocumentRejectionService getKcDocumentRejectionService() {
     	if (kcDocumentRejectionService == null)
     		kcDocumentRejectionService = KcServiceLocator.getService(KcDocumentRejectionService.class);
     	return kcDocumentRejectionService;
 	}
-
+            
 	protected BusinessObjectService getBusinessObjectService() {
 		if (businessObjectService == null)
 			businessObjectService = KcServiceLocator.getService(BusinessObjectService.class);
 		return businessObjectService;
-	}
+            }
 
-
+    
     protected List<String> getUnitRulesMessages(ProposalDevelopmentDocument pdDoc) {
         return getKrmsRulesExecutionService().processUnitValidations(pdDoc.getDevelopmentProposal().getAllUnitNumbers(), pdDoc);
 
@@ -377,7 +379,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         ProposalDevelopmentDocument document = ((ProposalDevelopmentForm)kualiDocumentFormBase).getProposalDevelopmentDocument();
         getProposalDevelopmentService().loadDocument(document);
     }
-
+    
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
@@ -417,20 +419,75 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             for (Budget budget : budgets) {
                 budget.setStartDate(developmentProposal.getRequestedStartDateInitial());
                 budget.setEndDate(developmentProposal.getRequestedEndDateInitial());
-                this.getBusinessObjectService().save(budget);
+                    this.getBusinessObjectService().save(budget);
+                }
             }
+        
+        // KC-855 Add feature to Questionnaire for smart answers
+        proposalDevelopmentForm.getQuestionnaireHelper().populateAnswers();
+        List<AnswerHeader> answerHeaders = proposalDevelopmentForm.getQuestionnaireHelper().getAnswerHeaders();
+        if (answerHeaders != null) {
+        	for (AnswerHeader answerHeader:answerHeaders) {
+        		if (answerHeader.isHasVisibleQuestion()) {
+        			List<QuestionnaireQuestion> questions = answerHeader.getQuestionnaire().getQuestionnaireQuestions();
+        			if (questions != null) {
+        				for (QuestionnaireQuestion question:questions) {
+							//String questionToAnswer = question.getQuestionId().getQuestionId();
+        					Long questionToAnswer = question.getQuestion().getId();
+        					// Check if a default answer parameter was configured for this question
+        					String defaultAnswerParam = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN","All", "uh_default_answer_" + questionToAnswer);
+        					if (defaultAnswerParam != null) {
+        						// Split param into parts answer:rule:argument(s)
+        						String[] values=defaultAnswerParam.split(":");
+        						if (values.length == 3) {
+        							String defaultAnswer = values[0];
+        							String rule = values[1];
+        							String arguments = values[2];
+        							Boolean ruleMeet = false;
+        							if (rule.equals("SponsorCode")) {
+        								ruleMeet = doc.getDevelopmentProposal().getSponsor().getSponsorCode().equals(arguments);
+        							} else if (rule.equals("SponsorGroup")) {
+        								PropDevJavaFunctionKrmsTermServiceImpl krmsFunctions = new PropDevJavaFunctionKrmsTermServiceImpl();
+        								ruleMeet = krmsFunctions.sponsorGroupRule(doc.getDevelopmentProposal(),arguments).equals("true");
+        							} else if (rule.equals("All")) {
+        								// All means always default answer
+        								ruleMeet = true;
+        							} else {
+        								log.warn("Error processing question answer rule param for questionID " + questionToAnswer + " Unknown Rule:" + rule);
+        							}
+        							if (ruleMeet) {
+        								List <Answer> answers = answerHeader.getAnswers();
+        								if (answers != null) {
+        									for (Answer answer:answers) {
+        										if (answer.getQuestionId().equals(questionToAnswer) && answer.getAnswer() == null) {
+        											answer.setAnswer(defaultAnswer);
+        											this.getBusinessObjectService().save(answerHeaders);
+        										}
+        									}
+        								}
+        							}
+        						} else {
+            						log.warn("Error processing question answer rule param for questionID " + questionToAnswer + "parse error [" + defaultAnswerParam + "]");
+            					}
+        					} 
+        				}
+        			}
+        		}
+        	}
         }
+        
+        // KC-855 END
 
         return forward;
-    }
-    
+        }
+
     protected void updateProposalDocument(ProposalDevelopmentForm proposalDevelopmentForm) throws Exception {
         ProposalLockingRegion region = ProposalLockingRegion.GENERAL;
         if (proposalDevelopmentForm.getActionName().equalsIgnoreCase("ProposalDevelopmentBudgetVersionsAction")) {
             region = ProposalLockingRegion.BUDGET;
         } else if (proposalDevelopmentForm.getActionName().equalsIgnoreCase("ProposalDevelopmentAbstractsAttachmentsAction" )) {
             region = ProposalLockingRegion.ATTACHMENTS;
-        }
+        							}
         proposalDevelopmentForm.setDocument(getProposalDevelopmentService().updateProposalDocument(proposalDevelopmentForm.getProposalDevelopmentDocument(), region));        
     }
 
@@ -686,8 +743,8 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 		if (proposalAbstractsService==null)
 			proposalAbstractsService = KcServiceLocator.getService(ProposalAbstractsService.class);
 			return proposalAbstractsService;
-	}
-
+    }   
+    
     
     @Override
     protected void initialDocumentSave(KualiDocumentFormBase form) throws Exception {
@@ -752,33 +809,33 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             //KRACOEUS-3300 - there should be GrantsGov audit errors in this case, grab them and display them as normal errors on
             //the GrantsGov forms tab so we don't need to turn on auditing
             grantsGovErrorExists = ErrorUtils.copyAuditErrorsToPage(Constants.GRANTSGOV_ERRORS, "grantsGovFormValidationErrors");
-        }
+            }
         if(grantsGovErrorExists){
             GlobalVariables.getMessageMap().putError("grantsGovFormValidationErrors", KeyConstants.VALIDATTION_ERRORS_BEFORE_GRANTS_GOV_SUBMISSION);
             return mapping.findForward(Constants.GRANTS_GOV_PAGE);
         }
         if (proposalDevelopmentDocument.getDevelopmentProposal().getGrantsGovSelectFlag()) {
             File grantsGovXmlDirectoryFile = getS2sSubmissionService().getGrantsGovSavedFile(proposalDevelopmentDocument);
-            byte[] bytes = new byte[(int) grantsGovXmlDirectoryFile.length()];
-            FileInputStream fileInputStream = new FileInputStream(grantsGovXmlDirectoryFile);
-            fileInputStream.read(bytes);
-            ByteArrayOutputStream baos = null;
-            try {
-                baos = new ByteArrayOutputStream(bytes.length);
-                baos.write(bytes);
-                WebUtils.saveMimeOutputStreamAsFile(response, "binary/octet-stream", baos, grantsGovXmlDirectoryFile.getName() + ".zip");
-            }
-            finally {
+                byte[] bytes = new byte[(int) grantsGovXmlDirectoryFile.length()];
+                FileInputStream fileInputStream = new FileInputStream(grantsGovXmlDirectoryFile);
+                fileInputStream.read(bytes);
+                ByteArrayOutputStream baos = null;
                 try {
-                    if (baos != null) {
-                        baos.close();
-                        baos = null;
+                    baos = new ByteArrayOutputStream(bytes.length);
+                    baos.write(bytes);
+                WebUtils.saveMimeOutputStreamAsFile(response, "binary/octet-stream", baos, grantsGovXmlDirectoryFile.getName() + ".zip");
+                }
+                finally {
+                    try {
+                        if (baos != null) {
+                            baos.close();
+                            baos = null;
+                        }
+                    }
+                    catch (IOException ioEx) {
+                        LOG.warn(ioEx.getMessage(), ioEx);
                     }
                 }
-                catch (IOException ioEx) {
-                    LOG.warn(ioEx.getMessage(), ioEx);
-                }
-            }
             proposalDevelopmentDocument.getDevelopmentProposal().setGrantsGovSelectFlag(false);
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
@@ -788,15 +845,15 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         streamToResponse(attachmentDataSource, response);
         return mapping.findForward(Constants.MAPPING_BASIC);
     }
-
+    
     /**
      *
      * This method is to put validation errors on UI
-     *
+     * 
      * @param errors
      *            List of validation errors which has to be displayed on UI.
      */
-
+        
     protected void setValidationErrorMessage(List<org.kuali.coeus.s2sgen.api.core.AuditError> errors) {
         if (errors != null) {
             LOG.info("Error list size:" + errors.size() + errors.toString());
@@ -855,7 +912,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
 
         ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm)form;
         
-        proposalDevelopmentForm.getQuestionnaireHelper().populateAnswers();        
+            proposalDevelopmentForm.getQuestionnaireHelper().populateAnswers();
         proposalDevelopmentForm.getS2sQuestionnaireHelper().populateAnswers();
         
         return mapping.findForward(Constants.QUESTIONS_PAGE);
@@ -877,17 +934,17 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         getKeyPersonnelService().populateDocument(pdform.getProposalDevelopmentDocument());
         Budget budget = getProposalBudgetService().getFinalBudgetVersion(document);
         if(budget != null) {
-            final Map<String, Object> fieldValues = new HashMap<String, Object>();
-            fieldValues.put("budgetId", budget.getBudgetId()); 
+                final Map<String, Object> fieldValues = new HashMap<String, Object>();
+                fieldValues.put("budgetId", budget.getBudgetId()); 
             List<BudgetPeriod> budgetPeriods = (List<BudgetPeriod>) getBusinessObjectService().findMatching(BudgetPeriod.class, fieldValues);
-            budget.setBudgetPeriods(budgetPeriods);
-            Collection<BudgetRate> rates = businessObjectService.findMatching(BudgetRate.class, fieldValues);   
-            if(!CollectionUtils.isEmpty(rates)) {
+                budget.setBudgetPeriods(budgetPeriods);
+                Collection<BudgetRate> rates = businessObjectService.findMatching(BudgetRate.class, fieldValues);   
+                if(!CollectionUtils.isEmpty(rates)) {
                 List<RateClassType> rateClassTypes =   (List<RateClassType>) getBusinessObjectService().findAll(RateClassType.class);
-                budget.setRateClassTypes(rateClassTypes);
-                pdform.setBudgetToSummarize(budget);
-            }
-            pdform.setBudgetToSummarize(budget);  
+                    budget.setRateClassTypes(rateClassTypes);
+                    pdform.setBudgetToSummarize(budget);
+                }
+                pdform.setBudgetToSummarize(budget);  
             if(budget.getBudgetPrintForms().isEmpty()){
                 getBudgetPrintService().populateBudgetPrintForms(budget);
             }
@@ -1143,7 +1200,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
      * @param form the Action Form
      * @param request the Http Request
      * @param response Http Response
-	 * @return the Action Forward
+         * @return the Action Forward
      * @throws Exception
      */
     public ActionForward printQuestionnaireAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
@@ -1165,18 +1222,18 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         }
         
         return forward;
-    }    
+   }
     
-    /**
+   /**
      * This method print all questionnaire answers.
-     * 
+    * 
      * @param mapping the Action Mapping
      * @param form the Action Form
      * @param request the Http Request
      * @param response Http Response
      * @return the Action Forward
      * @throws Exception
-     */        
+    */
     public ActionForward printAllQuestionnaireAnswer(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
         
@@ -1191,7 +1248,7 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         }
         
         return forward;
-    }
+   }
    
    /**
     * 
@@ -1215,25 +1272,25 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
     protected ProposalRoleTemplateService getProposalRoleTemplateService() {
         if (proposalRoleTemplateService == null) {
             proposalRoleTemplateService = KcServiceLocator.getService(ProposalRoleTemplateService.class);
-        }
+   }
         return proposalRoleTemplateService;
-    }
+   }
 
     public void setProposalRoleTemplateService(ProposalRoleTemplateService proposalRoleTemplateService) {
         this.proposalRoleTemplateService = proposalRoleTemplateService;
-    }
-       
+   }
+
     class S2sOppFormsComparator1 implements Comparator<S2sOppForms> {
-	    public int compare(S2sOppForms s2sOppForms1, S2sOppForms s2sOppForms2) {
+    public int compare(S2sOppForms s2sOppForms1, S2sOppForms s2sOppForms2) {
 	        if (s2sOppForms2.getAvailable() && s2sOppForms1.getAvailable()) {
 	            return 1;
 	        }
-	        return  s2sOppForms2.getAvailable().compareTo(s2sOppForms1.getAvailable());
-	    }
+        return  s2sOppForms2.getAvailable().compareTo(s2sOppForms1.getAvailable());
     }
-    
+  }
+
     class S2sOppFormsComparator3 implements Comparator<S2sOppForms> {
-	    public int compare(S2sOppForms s2sOppForms1, S2sOppForms s2sOppForms2) {
+    public int compare(S2sOppForms s2sOppForms1, S2sOppForms s2sOppForms2) {
 	    	FormMappingInfo info1 = getFormMappingService().getFormInfo(s2sOppForms1.getS2sOppFormsId().getOppNameSpace());
 	    	FormMappingInfo info2 = getFormMappingService().getFormInfo(s2sOppForms2.getS2sOppFormsId().getOppNameSpace());
 	        if(info1 != null && info2 != null) {
@@ -1250,12 +1307,12 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
             formMappingService = KcServiceLocator.getService(FormMappingService.class);
         return formMappingService;
     }
-
+   
     protected ProposalDevelopmentPrintingService getProposalDevelopmentPrintingService() {
         if (proposalDevelopmentPrintingService == null)
         	proposalDevelopmentPrintingService = KcServiceLocator.getService(ProposalDevelopmentPrintingService.class);
         return proposalDevelopmentPrintingService;
-    }
+  }
 
 
     @SuppressWarnings("deprecation")
