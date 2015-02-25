@@ -17,8 +17,9 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-alter table AWARD_PERSONS drop constraint FK_PROP_PERS_ROLE_AWD_PERSONS
-/
+-- NOTE: RRG moved this drop constraint to KC_TBL_AWARD_PERSONS.sql to fix issue
+--alter table AWARD_PERSONS drop constraint FK_PROP_PERS_ROLE_AWD_PERSONS
+--/
 
 alter table EPS_PROP_PERSON_ROLE drop primary key
 /

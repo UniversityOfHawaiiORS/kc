@@ -36,4 +36,5 @@ drop sequence KRIM_ATTR_DATA_ID_BS_S;
 drop sequence KRIM_TYP_ID_BS_S;
 drop sequence KRIM_TYP_ATTR_ID_BS_S;
 
-drop function is_numeric;
+-- NOTE: RRG removing this drop this function doesn't exist to be dropped
+-- drop function is_numeric;
