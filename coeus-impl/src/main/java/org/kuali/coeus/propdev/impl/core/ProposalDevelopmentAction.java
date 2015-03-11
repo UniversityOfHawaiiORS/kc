@@ -29,6 +29,7 @@ import org.apache.struts.action.ActionMapping;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocument;
 import org.kuali.coeus.common.framework.person.editable.PersonEditableService;
 import org.kuali.coeus.common.framework.print.AttachmentDataSource;
+import org.kuali.coeus.common.framework.sponsor.Sponsor;
 import org.kuali.coeus.propdev.impl.attachment.LegacyNarrativeService;
 import org.kuali.coeus.propdev.impl.attachment.Narrative;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
@@ -444,11 +445,24 @@ public class ProposalDevelopmentAction extends BudgetParentActionBase {
         							String rule = values[1];
         							String arguments = values[2];
         							Boolean ruleMeet = false;
+        							// KC-917 KRMS - New term needed, "has Prime Sponsor Type"
+        							Sponsor sponsor = doc.getDevelopmentProposal().getSponsor();
+        							Sponsor primeSponsor =  doc.getDevelopmentProposal().getPrimeSponsor();
         							if (rule.equals("SponsorCode")) {
-        								ruleMeet = doc.getDevelopmentProposal().getSponsor().getSponsorCode().equals(arguments);
-        							} else if (rule.equals("SponsorGroup")) {
-        								PropDevJavaFunctionKrmsTermServiceImpl krmsFunctions = new PropDevJavaFunctionKrmsTermServiceImpl();
-        								ruleMeet = krmsFunctions.sponsorGroupRule(doc.getDevelopmentProposal(),arguments).equals("true");
+        								ruleMeet = (sponsor != null && sponsor.getSponsorCode().equals(arguments));   							
+        							} else if (rule.equals("PrimeSponsorCode")) {
+        								ruleMeet = (primeSponsor != null && primeSponsor.getSponsorCode().equals(arguments));
+        							} else if (rule.equals("SponsorOrPrimeSponsorCode")) {
+        								ruleMeet = (sponsor != null && sponsor.getSponsorCode().equals(arguments)) 
+        										   || (primeSponsor != null && primeSponsor.getSponsorCode().equals(arguments));
+        							} else if (rule.equals("SponsorTypeCode")) {
+        								ruleMeet = (sponsor != null && sponsor.getSponsorTypeCode().equals(arguments));
+        							} else if (rule.equals("PrimeSponsorTypeCode")) {
+        								ruleMeet = (primeSponsor != null && primeSponsor.getSponsorTypeCode().equals(arguments));
+        							} else if (rule.equals("SponsorOrPrimeSponsorTypeCode")) {
+        								ruleMeet = (sponsor != null && sponsor.getSponsorTypeCode().equals(arguments))
+        										   || (primeSponsor != null && primeSponsor.getSponsorTypeCode().equals(arguments));
+        							// KC-917 END
         							} else if (rule.equals("All")) {
         								// All means always default answer
         								ruleMeet = true;

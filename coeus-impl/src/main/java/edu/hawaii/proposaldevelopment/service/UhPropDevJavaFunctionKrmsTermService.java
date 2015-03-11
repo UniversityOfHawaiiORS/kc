@@ -26,4 +26,9 @@ public interface UhPropDevJavaFunctionKrmsTermService {
     public String hasUnrecoveredFandA(DevelopmentProposal developmentProposal);
     // KC-837 KRMS - New term needed, "Prime Sponsor ID"
     public String hasPrimeSponsor(DevelopmentProposal developmentProposal, String sponsorCode);
+    // KC-917 KRMS - New term needed, "has Prime Sponsor Type"
+    public String hasSponsorOrPrimeSponsorCode(DevelopmentProposal developmentProposal, String sponsorCode);
+    public String hasPrimeSponsorTypeCode(DevelopmentProposal developmentProposal, String sponsorTypeCode);
+    public String hasSponsorOrPrimeSponsorTypeCode(DevelopmentProposal developmentProposal, String sponsorTypeCode);
+    // KC-917 END
 }
