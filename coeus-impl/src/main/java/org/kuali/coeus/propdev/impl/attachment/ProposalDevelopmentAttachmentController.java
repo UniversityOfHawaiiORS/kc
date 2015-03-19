@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract;
 import org.kuali.coeus.propdev.impl.core.*;
+import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationContext;
+import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationRenderer;
 import org.kuali.coeus.propdev.impl.person.attachment.AddPersonnelAttachmentEvent;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.kra.infrastructure.Constants;
@@ -31,6 +33,7 @@ import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.krad.bo.Note;
 import org.kuali.rice.krad.service.KualiRuleService;
+import org.kuali.rice.krad.uif.UifConstants;
 import org.kuali.rice.krad.uif.UifParameters;
 import org.kuali.rice.krad.uif.util.ObjectPropertyUtils;
 import org.kuali.rice.krad.web.form.UifFormBase;
@@ -108,21 +111,33 @@ public class ProposalDevelopmentAttachmentController extends ProposalDevelopment
         getKcFileControllerService().getFileFromLine(uifForm,response);
     }
 
-    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=markAllComplete")
-    public ModelAndView markAllComplete(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form,
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=markAllProposalAttachments")
+    public ModelAndView markAllProposalAttachments(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form,
                                         BindingResult result, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    	return markAllAttachmentStatus(form, form.getProposalDevelopmentAttachmentHelper().getProposalAttachmentModuleStatusCode());
+    }
+
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=markAllInternalAttachments")
+    public ModelAndView markAllInternalAttachments(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form,
+                                        BindingResult result, HttpServletRequest request, HttpServletResponse response) throws Exception{
+    	return markAllAttachmentStatus(form, form.getProposalDevelopmentAttachmentHelper().getInternalAttachmentModuleStatusCode());
+     }
+    
+    protected ModelAndView markAllAttachmentStatus(ProposalDevelopmentDocumentForm form, String moduleStatusCode) {
         final String collectionPath = form.getActionParamaterValue(UifParameters.SELECTED_COLLECTION_PATH);
         Collection<Object> collection = ObjectPropertyUtils.getPropertyValue(form, collectionPath);
 
         for (Object object : collection) {
             if(object instanceof Narrative) {
-                ((Narrative) object).setModuleStatusCode(form.getProposalDevelopmentAttachmentHelper().getMarkAllStatus());
+            	Narrative narrative = (Narrative) object;
+            	narrative.setModuleStatusCode(moduleStatusCode);
+            	narrative.setUpdated(true);
                 getDataObjectService().wrap(object).fetchRelationship("narrativeStatus");
             }
         }
         return getRefreshControllerService().refresh(form);
-    }
-
+   }
+    
     @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=prepareNarrative")
     public ModelAndView prepareNarrative(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception{
        String selectedLine = form.getActionParamaterValue(UifParameters.SELECTED_LINE_INDEX);
@@ -208,7 +223,7 @@ public class ProposalDevelopmentAttachmentController extends ProposalDevelopment
             form.getProposalDevelopmentAttachmentHelper().reset();
         } else {
             form.setUpdateComponentId("PropDev-AttachmentsPage-ProposalDetails");
-            form.setAjaxReturnType("update-component");
+            form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
         }
         return getRefreshControllerService().refresh(form);
 
@@ -218,7 +233,6 @@ public class ProposalDevelopmentAttachmentController extends ProposalDevelopment
     public ModelAndView addInstituteAttachment(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         Narrative narrative = form.getProposalDevelopmentAttachmentHelper().getInstituteAttachment();
         initializeNarrative(narrative,form);
-        narrative.setModuleStatusCode(Constants.NARRATIVE_MODULE_STATUS_COMPLETE);
         form.getDevelopmentProposal().getInstituteAttachments().add(0,narrative);
         form.getProposalDevelopmentAttachmentHelper().reset();
 
@@ -257,7 +271,7 @@ public class ProposalDevelopmentAttachmentController extends ProposalDevelopment
             form.getProposalDevelopmentAttachmentHelper().reset();
         } else {
             form.setUpdateComponentId("PropDev-AttachmentsPage-PersonnelDetails");
-            form.setAjaxReturnType("update-component");
+            form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
         }
         return getRefreshControllerService().refresh(form);
     }
@@ -283,9 +297,35 @@ public class ProposalDevelopmentAttachmentController extends ProposalDevelopment
             form.getProposalDevelopmentAttachmentHelper().reset();
         } else {
             form.setUpdateComponentId("PropDev-AttachmentsPage-ProposalDetails");
-            form.setAjaxReturnType("update-component");
+            form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
+        }
+
+        if(form.getProposalDevelopmentDocument().getDocumentHeader().getWorkflowDocument().isEnroute()) {
+            ProposalDevelopmentNotificationContext context = new ProposalDevelopmentNotificationContext(form.getProposalDevelopmentDocument().getDevelopmentProposal(),
+                Constants.DATA_OVERRIDE_NOTIFICATION_ACTION, Constants.DATA_OVERRIDE_CONTEXT);
+            ((ProposalDevelopmentNotificationRenderer) context.getRenderer()).setModifiedNarrative(narrative);
+
+            ((ProposalDevelopmentNotificationRenderer) context.getRenderer()).setDevelopmentProposal(form.getProposalDevelopmentDocument().getDevelopmentProposal());
+            if (form.getNotificationHelper().getPromptUserForNotificationEditor(context)) {
+                form.getNotificationHelper().initializeDefaultValues(context);
+                form.setSendNarrativeChangeNotification(true);
+            }
+            else {
+                getKcNotificationService().sendNotification(context);
+            }
         }
         return getRefreshControllerService().refresh(form);
+    }
+
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=sendNarrativeChangeNotification")
+    public ModelAndView sendNarrativeChangeNotification(ProposalDevelopmentDocumentForm proposalDevelopmentDocumentForm) {
+        if (proposalDevelopmentDocumentForm.isSendNarrativeChangeNotification()) {
+             final String step = proposalDevelopmentDocumentForm.getNotificationHelper().getNotificationRecipients().isEmpty() ? "0" : "2";
+                proposalDevelopmentDocumentForm.getActionParameters().put("Kc-SendNotification-Wizard.step", step);
+                return getModelAndViewService().showDialog("Kc-SendNotification-Wizard", true, proposalDevelopmentDocumentForm);
+        }
+        proposalDevelopmentDocumentForm.setSendNarrativeChangeNotification(false);
+        return getModelAndViewService().getModelAndView(proposalDevelopmentDocumentForm);
     }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=saveBiography")
@@ -309,7 +349,7 @@ public class ProposalDevelopmentAttachmentController extends ProposalDevelopment
             form.getProposalDevelopmentAttachmentHelper().reset();
         } else {
             form.setUpdateComponentId("PropDev-AttachmentsPage-PersonnelDetails");
-            form.setAjaxReturnType("update-component");
+            form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
         }
         return getRefreshControllerService().refresh(form);
     }

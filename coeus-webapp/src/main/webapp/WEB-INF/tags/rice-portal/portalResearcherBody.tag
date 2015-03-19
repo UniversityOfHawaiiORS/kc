@@ -26,19 +26,21 @@
       <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
       <channel:researcherNegotiations />
       </uh-kc:principalHasRole>
+      <channel:researcherPersonnel />
 </td>
 
 <%-- KC-612 Declutter the menu screens --%>
 <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
 <td class="content" valign="top">
-      <channel:researcherIRBProtocols/>
       <channel:researcherCompliance/>
-      <channel:researcherIACUCProtocols/>   
+      <channel:researcherIRBProtocols/>
 </td>
+
 </uh-kc:principalHasRole>
 
+<!-- AAP: report links -->
 <td class="content" valign="top">
-      <channel:researcherQuicklinks />
-      <channel:researcherPersonnel />
+      <channel:researcherReportLinks />
+      <channel:researcherIACUCProtocols/>
       <channel:researcherWorkflow />
 </td>

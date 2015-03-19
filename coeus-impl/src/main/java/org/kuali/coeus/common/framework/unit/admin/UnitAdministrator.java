@@ -42,6 +42,8 @@ import java.sql.Date;
 @IdClass(UnitAdministrator.UnitAdministratorId.class)
 public class UnitAdministrator extends KcPersistableBusinessObjectBase implements AbstractUnitAdministrator, Comparable<UnitAdministrator>, UnitAdministratorContract {
 
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(UnitAdministrator.class);
+
     @Id
     @Column(name = "PERSON_ID")
     private String personId;
@@ -69,7 +71,7 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
 
     @Transient
     private transient KcPersonService kcPersonService;
-    
+
     // KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
     public Date getFromDate() {
 		return fromDate;
@@ -103,6 +105,7 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
 	}
 	// KC-679 END
 
+    @Override
     public String getPersonId() {
         return personId;
     }
@@ -129,10 +132,16 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
     }
 
     public KcPerson getPerson() {
+        KcPerson kcPerson = null;
+        try {
         if (personId !=null) {
-        return getKcPersonService().getKcPersonByPersonId(personId);
-    }
-            return null;
+            return getKcPersonService().getKcPersonByPersonId(personId);
+        }
+        }
+        catch (IllegalArgumentException e) {
+            LOG.info("getPerson(): ignoring missing person/entity: " + personId);
+        }
+        return kcPerson;
     }
 
     /**
@@ -162,10 +171,10 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
     public void setUnit(Unit unit) {
         this.unit = unit;
     }
-    
-    //KRACOEUS-5499 Implemented Comparable interface.
+
+    //KRACOEUS-5499 Implemented Comparable interface. 
     @Override
-    public int compareTo(UnitAdministrator unitAdmin) {        
+    public int compareTo(UnitAdministrator unitAdmin) {
         int result = 0;
         if (unitAdmin == null) {
             result = 1;
@@ -175,12 +184,12 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
             } else {
                 if (getPerson() != null && StringUtils.isNotEmpty(getPerson().getLastName()) && unitAdmin.getPerson() != null && StringUtils.isNotEmpty(unitAdmin.getPerson().getLastName())) {
                     result = getPerson().getLastName().compareTo(unitAdmin.getPerson().getLastName());
-                }             
+                }
             }
         }
         return result;
-    } 
-    
+    }
+
     public static final class UnitAdministratorId implements Serializable, Comparable<UnitAdministratorId> {
 
         private String unitNumber;

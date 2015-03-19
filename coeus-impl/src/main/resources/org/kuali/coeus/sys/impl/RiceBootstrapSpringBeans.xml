@@ -28,6 +28,8 @@
     <context:annotation-config />
 
     <import resource="classpath:org/kuali/coeus/sys/impl/DataSourceSpringBeans.xml"/>
+    <!-- only brought in on the grm profile -->
+    <import resource="classpath:co/kuali/coeus/grm/impl/GrmRiceBootstrapSpringBeans.xml"/>
 
     <bean id="coreConfigurer" class="org.kuali.rice.core.impl.config.module.CoreConfigurer">
         <property name="dataSource" ref="dataSource" />

@@ -18,19 +18,22 @@
  */
 package org.kuali.coeus.propdev.impl.specialreview;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.kuali.coeus.common.framework.compliance.core.AddSpecialReviewEvent;
 import org.kuali.coeus.common.framework.compliance.core.SpecialReviewType;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentControllerBase;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentForm;
 import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.kra.iacuc.IacucProtocolFinderDao;
-import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.protocol.ProtocolBase;
 import org.kuali.kra.protocol.ProtocolFinderDao;
 import org.kuali.rice.krad.data.DataObjectService;
+import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.uif.UifConstants;
 import org.kuali.rice.krad.uif.UifParameters;
+import org.kuali.rice.krad.util.ErrorMessage;
 import org.kuali.rice.krad.web.bind.UifBeanPropertyBindingResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -39,14 +42,19 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Controller
 public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopmentControllerBase {
+
+    private static String NEW_SPECIAL_REVIEW_PATH = "newCollectionLines['document.developmentProposal.propSpecialReviews']";
     @Autowired
     @Qualifier("proposalDevelopmentSpecialReviewService")
     private ProposalDevelopmentSpecialReviewService proposalDevelopmentSpecialReviewService;
@@ -63,6 +71,22 @@ public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopm
     @Qualifier("dataObjectService")
     private DataObjectService dataObjectService;
 
+    @Autowired
+    @Qualifier("kualiRuleService")
+    private KualiRuleService kualiRuleService;
+    
+    @ResponseBody
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=clearAddCompliance")
+    public void clearAddCompliance(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm pdForm, BindingResult result,
+            HttpServletRequest request, HttpServletResponse response) throws Exception {
+        ProposalSpecialReview proposalSpecialReview = ((ProposalSpecialReview)pdForm.getNewCollectionLines().get("document.developmentProposal.propSpecialReviews"));
+        proposalSpecialReview.setSpecialReviewTypeCode(null);
+        proposalSpecialReview.setSpecialReviewType(null);
+        proposalSpecialReview.setApprovalTypeCode(null);
+        proposalSpecialReview.setApprovalType(null);
+        proposalSpecialReview.setProtocolNumber(null);
+    }
+    
     @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=refreshAddCompliance")
     public ModelAndView refreshAddCompliance(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm pdForm, BindingResult result,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -127,16 +151,19 @@ public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopm
         ProtocolBase protocol = null;
 
         if (StringUtils.isNotBlank(protocolNumber) && proposalSpecialReview.getSpecialReviewTypeCode() != null &&
-                (proposalSpecialReview.getSpecialReviewTypeCode().equals(SpecialReviewType.HUMAN_SUBJECTS))) {
+                (proposalSpecialReview.getSpecialReviewTypeCode().equals(SpecialReviewType.HUMAN_SUBJECTS) &&
+                getProposalDevelopmentSpecialReviewService().isIrbLinkingEnabled())) {
             protocol = getProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
         }
         else if (StringUtils.isNotBlank(protocolNumber) && proposalSpecialReview.getSpecialReviewTypeCode() != null &&
-                proposalSpecialReview.getSpecialReviewTypeCode().equals(SpecialReviewType.ANIMAL_USAGE)) {
+                proposalSpecialReview.getSpecialReviewTypeCode().equals(SpecialReviewType.ANIMAL_USAGE) &&
+                getProposalDevelopmentSpecialReviewService().isIacucLinkingEnabled()) {
             protocol = getIacucProtocolFinderDao().findCurrentProtocolByNumber(protocolNumber);
         }
 
         if (protocol != null && protocol.getProtocolStatus() != null) {
             String status = protocol.getProtocolStatus().getDescription();
+            proposalSpecialReview.setApprovalTypeCode(protocol.getProtocolStatusCode());
             proposalSpecialReview.setProtocolStatus(status);
             proposalSpecialReview.setExpirationDate(protocol.getExpirationDate());
             proposalSpecialReview.setApprovalDate(protocol.getApprovalDate());
@@ -152,22 +179,32 @@ public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopm
     @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=addComplianceEntry")
     public ModelAndView addComplianceEntry(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm pdForm) throws Exception {
         ProposalSpecialReview proposalSpecialReview = ((ProposalSpecialReview)pdForm.getNewCollectionLines().get("document.developmentProposal.propSpecialReviews"));
+        ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument) pdForm.getDocument();
+
+        if (!getKualiRuleService().applyRules(new AddSpecialReviewEvent<ProposalSpecialReview>(pdForm.getProposalDevelopmentDocument(),
+                proposalSpecialReview,pdForm.getDevelopmentProposal().getPropSpecialReviews(),
+                protocolNeedsToBeLinked(proposalSpecialReview.getSpecialReviewTypeCode()),
+                NEW_SPECIAL_REVIEW_PATH))) {
+            pdForm.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
+            pdForm.setUpdateComponentId(ProposalDevelopmentConstants.KradConstants.COMPLIANCE_ADD_DIALOG);
+            return getModelAndViewService().getModelAndView(pdForm);
+        }
 
         if (proposalSpecialReview.getSpecialReviewTypeCode().equals(SpecialReviewType.HUMAN_SUBJECTS) ||
                 proposalSpecialReview.getSpecialReviewTypeCode().equals(SpecialReviewType.ANIMAL_USAGE)) {
-            ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument) pdForm.getDocument();
+
             proposalSpecialReview.setDevelopmentProposal(proposalDevelopmentDocument.getDevelopmentProposal());
             pdForm.getSpecialReviewHelper().prepareProtocolLinkViewFields(proposalSpecialReview);
-            
-            if(proposalSpecialReview.getSpecialReviewNumber() == null) {
-            	proposalSpecialReview.setSpecialReviewNumber(getProposalDevelopmentSpecialReviewService().generateSpecialReviewNumber(proposalDevelopmentDocument));
-            }
 
             // Invalid protrocol trying to be linked so blank out protocol info
             if (protocolNeedsToBeLinked(proposalSpecialReview.getSpecialReviewTypeCode()) && !proposalSpecialReview.isLinkedToProtocol()) {
                 proposalSpecialReview.setProtocolStatus(null);
                 proposalSpecialReview.setProtocolNumber(null);
             }
+        }
+
+        if(proposalSpecialReview.getSpecialReviewNumber() == null) {
+            proposalSpecialReview.setSpecialReviewNumber(getProposalDevelopmentSpecialReviewService().generateSpecialReviewNumber(proposalDevelopmentDocument));
         }
         getCollectionControllerService().addLine(pdForm);
         super.save(pdForm);
@@ -186,16 +223,28 @@ public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopm
             getGlobalVariableService().getMessageMap().putError(pdForm.getActionParamaterValue(UifParameters.SELECTED_COLLECTION_ID), "error.special.review.protocol.noprincipal");
         }
         else {
-        	if(!getProposalDevelopmentSpecialReviewService().createProtocol(proposalSpecialReview, document)){
-        		getGlobalVariableService().getMessageMap().putError("document.developmentProposal.propSpecialReviews", KeyConstants.ERROR_PROTOCOL_UNIT_NOT_FOUND);
-        	}else{
-        		super.save((ProposalDevelopmentDocumentForm) pdForm); 
-        	}
+            boolean success = getProposalDevelopmentSpecialReviewService().createProtocol(proposalSpecialReview, document);
+            if (success) {
+                super.save((ProposalDevelopmentDocumentForm) pdForm);
+            } else {
+               displayErrors(pdForm);
+            }
+
         }
         pdForm.getNewCollectionLines().clear();
         return getModelAndViewService().getModelAndView(pdForm);
     }
-    
+
+    protected void displayErrors(ProposalDevelopmentDocumentForm pdForm) {
+        Map<String, List<ErrorMessage>> messages = getGlobalVariableService().getMessageMap().getErrorMessages();
+        for (String message :messages.keySet()) {
+            List<ErrorMessage> errors = messages.get(message);
+            for(ErrorMessage error : errors) {
+                getGlobalVariableService().getMessageMap().putError(pdForm.getActionParamaterValue(UifParameters.SELECTED_COLLECTION_ID), error.getErrorKey());
+            }
+        }
+    }
+
     protected boolean protocolNeedsToBeLinked(String specialReviewTypeCode) {
     	if(specialReviewTypeCode.equals(SpecialReviewType.HUMAN_SUBJECTS)) {
     		return getProposalDevelopmentSpecialReviewService().isIrbLinkingEnabled();
@@ -237,5 +286,13 @@ public class ProposalDevelopmentSpecialReviewController extends ProposalDevelopm
 
     public void setDataObjectService(DataObjectService dataObjectService) {
         this.dataObjectService = dataObjectService;
+    }
+
+    public KualiRuleService getKualiRuleService() {
+        return kualiRuleService;
+    }
+
+    public void setKualiRuleService(KualiRuleService kualiRuleService) {
+        this.kualiRuleService = kualiRuleService;
     }
 }

@@ -21,16 +21,7 @@
 <channel:portalChannelTop channelTitle="Quicklinks" />
 <div class="body">
   <ul class="chan">  	  
-      <%-- UH MODIFICATION: KC-152: Wording Change --%>
-      <li><portal:portalLink displayTitle="true" title="Document Lock" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.rice.krad.document.authorization.PessimisticLock&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
-      <li><portal:portalLink displayTitle="true" title="Grants.gov Opportunity Lookup" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.s2s.bo.S2sOpportunity&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
-      <li><portal:portalLink displayTitle="true" title="Grants.gov Opportunity Lookup" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.s2s.bo.S2sOpportunity&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
-      <%-- KC-612 Declutter the menu screens --%>
-      <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
       <li><portal:portalLink displayTitle="true" title="Grants.gov Opportunity Lookup" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.coeus.propdev.impl.s2s.S2sOpportunity&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&docFormKey=88888888" /></li>
-      <li>Change Password</li>
-      <li><portal:portalLink displayTitle="false" title='Reporting' url='${ConfigProperties.application.url}/reporting.do?methodToCall=getReportParametersFromDesign'>Reporting</portal:portalLink></li>
-      </uh-kc:principalHasRole>
   </ul>
 </div>
 <channel:portalChannelBottom />

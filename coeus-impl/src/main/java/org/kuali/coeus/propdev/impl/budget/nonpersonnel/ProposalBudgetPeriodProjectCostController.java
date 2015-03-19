@@ -19,6 +19,7 @@
 package org.kuali.coeus.propdev.impl.budget.nonpersonnel;
 
 
+
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.budget.framework.core.BudgetConstants;
@@ -79,9 +80,10 @@ public class ProposalBudgetPeriodProjectCostController extends ProposalBudgetCon
 		BudgetLineItem newBudgetLineItem = form.getAddProjectBudgetLineItemHelper().getBudgetLineItem();
 		newBudgetLineItem.setBudget(budget);
         getBudgetService().populateNewBudgetLineItem(newBudgetLineItem, currentTabBudgetPeriod);
-        currentTabBudgetPeriod.getBudgetLineItems().add(newBudgetLineItem);            
         getBudgetCalculationService().populateCalculatedAmount(budget, newBudgetLineItem);
+        currentTabBudgetPeriod.getBudgetLineItems().add(newBudgetLineItem);            
         getBudgetService().recalculateBudgetPeriod(budget, currentTabBudgetPeriod);
+        getDataObjectService().save(budget);
 		form.getAddProjectBudgetLineItemHelper().reset();
 	    validateBudgetExpenses(budget, currentTabBudgetPeriod);
 		return getModelAndViewService().getModelAndView(form);
@@ -273,5 +275,33 @@ public class ProposalBudgetPeriodProjectCostController extends ProposalBudgetCon
 		}
 		return lineItemExists;
 	}
+
+	@Transactional @RequestMapping(params="methodToCall=addFormulatedCost")
+	public ModelAndView addFormulatedCost(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
+	    getCollectionControllerService().addLine(form);
+		calculateAndUpdateFormulatedCost(form);
+        return getModelAndViewService().getModelAndView(form);
+	}
+    
+	@Transactional @RequestMapping(params="methodToCall=updateFormulatedCost")
+	public ModelAndView updateFormulatedCost(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
+	    getCollectionControllerService().editLine(form);
+		calculateAndUpdateFormulatedCost(form);
+        return getModelAndViewService().getModelAndView(form);
+	}
 	
+	@Transactional @RequestMapping(params="methodToCall=deleteFormulatedCost")
+	public ModelAndView deleteFormulatedCost(@ModelAttribute("KualiForm") ProposalBudgetForm form) throws Exception {
+	    getCollectionControllerService().deleteLine(form);
+		calculateAndUpdateFormulatedCost(form);
+        return getModelAndViewService().getModelAndView(form);
+	}
+	
+	protected void calculateAndUpdateFormulatedCost(ProposalBudgetForm form) {
+	    BudgetLineItem budgetLineItem = form.getAddProjectBudgetLineItemHelper().getBudgetLineItem();
+	    getBudgetCalculationService().calculateAndUpdateFormulatedCost(budgetLineItem);
+		Budget budget = form.getBudget();
+		BudgetPeriod currentTabBudgetPeriod = form.getAddProjectBudgetLineItemHelper().getCurrentTabBudgetPeriod();
+        getBudgetService().recalculateBudgetPeriod(budget, currentTabBudgetPeriod);
+	}
 }

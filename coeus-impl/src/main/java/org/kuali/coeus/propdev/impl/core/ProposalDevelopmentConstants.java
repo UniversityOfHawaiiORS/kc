@@ -26,6 +26,8 @@ public class ProposalDevelopmentConstants {
         public static final String SUBMIT_PAGE = "PropDev-SubmitPage";
 		public static final String PREVIOUS_PAGE_ARG = "previous";
 		public static final String NEXT_PAGE_ARG = "next";
+        public static final String DELIVERY_INFO_PAGE = "PropDev-DeliveryInfoPage";
+        public static final String COMPLIANCE_ADD_DIALOG = "PropDev-CompliancePage_AddDialog";
 
         public static final String PERSONNEL_QUESTIONNAIRE = "personnelQuestionnaire";
 	}
@@ -33,6 +35,11 @@ public class ProposalDevelopmentConstants {
     public static class Parameters {
         public static final String KEY_PERSON_CERTIFICATION_SELF_CERTIFY_ONLY = "KEY_PERSON_CERTIFICATION_SELF_CERTIFY_ONLY";
         public static final String NOTIFY_ALL_CERTIFICATIONS_COMPLETE = "notifyAggregatorWhenAllCertificationsComplete";
+    }
+
+    public static class ParameterValues {
+        public static final String KEY_PERSON_CERTIFICATION_BEFORE_SUBMIT = "BS";
+        public static final String KEY_PERSON_CERTIFICATION_BEFORE_APPROVE = "BA";
     }
 
     public static class PropertyConstants {
@@ -77,6 +84,7 @@ public class ProposalDevelopmentConstants {
 		public static final String MODIFY_PROPOSAL_EDIT_MODE = "modifyProposal";
 		public static final String VIEW_ONLY_PROPOSAL_EDIT_MODE = "viewProposal";
         public static final String MAINTAIN_HIERARCHY_EDIT_MODE = "maintainProposalHierarchy";
+        public static final String CAN_SAVE_CERTIFICATION = "canSaveCertification";
     }
     
     

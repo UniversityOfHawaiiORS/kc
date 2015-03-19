@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
+import org.kuali.coeus.common.budget.framework.calculator.BudgetCalculationService;
 import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.budget.framework.core.BudgetAuditRuleEvent;
 import org.kuali.coeus.common.budget.framework.core.BudgetConstants;
@@ -35,11 +36,11 @@ import org.kuali.coeus.common.budget.framework.income.BudgetProjectIncome;
 import org.kuali.coeus.common.budget.framework.period.BudgetPeriod;
 import org.kuali.coeus.common.framework.ruleengine.KcBusinessRulesEngine;
 import org.kuali.coeus.common.impl.KcViewHelperServiceImpl;
+import org.kuali.coeus.propdev.impl.budget.ProposalBudgetNavigationService;
 import org.kuali.coeus.propdev.impl.budget.ProposalBudgetService;
 import org.kuali.coeus.propdev.impl.budget.modular.BudgetModular;
 import org.kuali.coeus.propdev.impl.budget.modular.BudgetModularIdc;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
-import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.hierarchy.ProposalHierarchyService;
 import org.kuali.rice.core.api.datetime.DateTimeService;
@@ -47,9 +48,7 @@ import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.validation.AuditHelper;
 import org.kuali.coeus.sys.impl.validation.DataValidationItem;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
-import org.kuali.rice.krad.uif.UifParameters;
 import org.kuali.rice.krad.uif.element.Action;
-import org.kuali.rice.krad.uif.lifecycle.ViewLifecycle;
 import org.kuali.rice.krad.uif.view.ViewModel;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,22 +91,19 @@ public class ProposalBudgetViewHelperServiceImpl extends KcViewHelperServiceImpl
     @Qualifier("proposalHierarchyService")
     private ProposalHierarchyService proposalHierarchyService;
 
+    @Autowired
+    @Qualifier("budgetCalculationService")
+    private BudgetCalculationService budgetCalculationService;
+
+    @Autowired
+    @Qualifier("proposalBudgetNavigationService")
+    private ProposalBudgetNavigationService proposalBudgetNavigationService;
+
     public void finalizeNavigationLinks(Action action, Object model, String direction) {
-    	ProposalBudgetForm propBudgetForm = (ProposalBudgetForm) model;
-   	 List<Action> actions = propBudgetForm.getOrderedNavigationActions();
-   	 int indexOfCurrentAction = propBudgetForm.findIndexOfPageId(actions);
-   	 if (StringUtils.equals(direction, ProposalDevelopmentConstants.KradConstants.PREVIOUS_PAGE_ARG)) {
-   		 action.setRender(action.isRender() && indexOfCurrentAction > 0);
-   		 if (indexOfCurrentAction > 0) {
-   			 action.getActionParameters().put(UifParameters.NAVIGATE_TO_PAGE_ID, propBudgetForm.getOrderedNavigationActions().get(indexOfCurrentAction-1).getNavigateToPageId());
-   		 }
-   	 } else if (StringUtils.equals(direction, ProposalDevelopmentConstants.KradConstants.NEXT_PAGE_ARG)) {
-   		 action.setRender(action.isRender() && indexOfCurrentAction < actions.size()-1);
-   		 if (indexOfCurrentAction < actions.size()-1) {
-   			 action.getActionParameters().put(UifParameters.NAVIGATE_TO_PAGE_ID, propBudgetForm.getOrderedNavigationActions().get(indexOfCurrentAction+1).getNavigateToPageId());
-   		 }
-   	 }
+        ProposalBudgetForm propBudgetForm = (ProposalBudgetForm) model;
+        getProposalBudgetNavigationService().createNavigationLink(action,propBudgetForm,direction);
     }
+
 
     public boolean isBudgetLineItemEditable(String selectedCollectionPath, String index, HashMap<String,List<String>> editableBudgetLineItem) {
     	boolean retVal = false;
@@ -268,5 +264,33 @@ public class ProposalBudgetViewHelperServiceImpl extends KcViewHelperServiceImpl
             }
         }
         return false;
+    }
+
+    public void prepareHierarchySummary(ProposalBudgetForm form) {
+        if (form.getDevelopmentProposal().isInHierarchy()) {
+            form.setHierarchyDevelopmentProposals(getProposalHierarchyService().getHierarchyProposals(form.getDevelopmentProposal()));
+
+            for (DevelopmentProposal developmentProposal : form.getHierarchyDevelopmentProposals()) {
+                if (developmentProposal.getHierarchySummaryBudget().getBudgetSummaryDetails().isEmpty()){
+                    getBudgetCalculationService().populateBudgetSummaryTotals(developmentProposal.getHierarchySummaryBudget());
+                }
+            }
+        }
+    }
+
+    public BudgetCalculationService getBudgetCalculationService() {
+        return budgetCalculationService;
+    }
+
+    public void setBudgetCalculationService(BudgetCalculationService budgetCalculationService) {
+        this.budgetCalculationService = budgetCalculationService;
+    }
+
+    public ProposalBudgetNavigationService getProposalBudgetNavigationService() {
+        return proposalBudgetNavigationService;
+    }
+
+    public void setProposalBudgetNavigationService(ProposalBudgetNavigationService proposalBudgetNavigationService) {
+        this.proposalBudgetNavigationService = proposalBudgetNavigationService;
     }
 }

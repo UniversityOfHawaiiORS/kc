@@ -18,27 +18,19 @@
  */
 package org.kuali.coeus.common.framework.print;
 
-import org.kuali.coeus.sys.api.model.KcFile;
-import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
+import java.io.Serializable;
 
-import javax.persistence.*;
+import org.kuali.coeus.sys.api.model.KcFile;
 
 /**
  * 
  * This class helps create the foundation of attachment data sources.
  */
-@MappedSuperclass
-public abstract class AttachmentDataSource extends KcPersistableBusinessObjectBase implements KcFile {
+public abstract class AttachmentDataSource implements KcFile, Serializable {
 
-    @Column(name = "FILE_NAME")
     private String name;
-
-    @Column(name = "CONTENT_TYPE")
     private String type;
-
-    @Column(name = "DATA")
-    @Basic(fetch = FetchType.LAZY)
-    @Lob
+    private String fileDataId;
     private byte[] data;
 
     @Override
@@ -59,12 +51,19 @@ public abstract class AttachmentDataSource extends KcPersistableBusinessObjectBa
         this.type = type;
     }
 
-    @Override
-    public byte[] getData() {
-        return data;
-    }
+	public String getFileDataId() {
+		return fileDataId;
+	}
 
-    public void setData(byte[] data) {
-        this.data = data;
-    }
+	public void setFileDataId(String fileDataId) {
+		this.fileDataId = fileDataId;
+	}
+
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
+	}
 }

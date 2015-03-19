@@ -21,16 +21,7 @@
 <channel:portalChannelTop channelTitle="Personnel" />
 <div class="body">
   <ul class="chan">
-    <%-- KC-487 added Change My Information link  --%>
-    <li><a href="http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/4" target="_blank">Change My Information</a></li>
-    <%-- KC-737 Remove menu items from Researcher and Unit Tab --%>
-    <%-- KC-612 Declutter the menu screens --%>
-    <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
-    <li>Degree Information</li>
    <li><portal:portalLink displayTitle="false" title="Current & Pending Support" url="${ConfigProperties.application.url}/currentOrPendingReport.do">Current &amp; Pending Support</portal:portalLink></li>
-    <li>Bio-sketches</li>
-    <li>All my Training</li>
-    </uh-kc:principalHasRole>
   </ul>
 </div>
 <channel:portalChannelBottom />

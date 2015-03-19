@@ -79,7 +79,7 @@
 <c:set var="readonly" value="true"/>
 <kra:section permission="modifyProposalBudget">
 	<c:set var="readonly" value="false"/>
-</kra:section> 
+</kra:section>
 <c:set var="projectDatesString" value=""/>
  <c:set var="useRiceAuditMode" value="true" scope="request" />
 
@@ -109,7 +109,7 @@
     	<h3>
             <span class="subhead-left">Budget Versions</span>
             
-               <span class="subhead-right"><kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetVersionsHelpUrl" altText="help"/></span>
+            <span class="subhead-right"><kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetVersionsHelpUrl" altText="help"/></span>
          </h3>
         <table id="budget-versions-table" cellpadding="0" cellspacing="0" summary="Budget Versions">
             <thead>
@@ -121,7 +121,7 @@
 				<th><kul:htmlAttributeLabel attributeEntry="${budgetAttributes.totalIndirectCost}" useShortLabel="true" noColon="true"/></th>
 				<th>Total</th>
 				<th>Budget Status</th>
-						<th><kul:htmlAttributeLabel attributeEntry="${awardBudgetAttributes.awardBudgetTypeCode}" useShortLabel="true" noColon="true"/></th>
+					<th><kul:htmlAttributeLabel attributeEntry="${awardBudgetAttributes.awardBudgetTypeCode}" useShortLabel="true" noColon="true"/></th>
 				<kra:section permission="openBudgets">
 				    <th><div align="center">Actions</div></th>
 				</kra:section>
@@ -130,7 +130,6 @@
 			<kra:section permission="addBudget">
 			<tr class="addline">
             	<th width="50" align="right" scope="row"><div align="right">Add:</div></th>
-            	<!-- KC-759 When a budget name is more than 40 characters, doc locks and no navigation is allowed -->
             	<td class="infoline"><label><html:text name="KualiForm" property="newBudgetVersionName" size="16" maxlength="40"/></label></td>
 	            <td class="infoline">&nbsp;</td>
 	            <td class="infoline">&nbsp;</td>
@@ -140,7 +139,7 @@
             	<td class="infoline">&nbsp;</td>
 	            <td class="infoline">
             		<div align=center>
-    				    	<html:image property="methodToCall.addBudgetVersion" styleClass="addButton" src='${ConfigProperties.kra.externalizable.images.url}tinybutton-new38.gif' />
+   				    	<html:image property="methodToCall.addBudgetVersion" styleClass="addButton" src='${ConfigProperties.kra.externalizable.images.url}tinybutton-new38.gif' />
 					</div>
 				</td>
           	</tr>
@@ -217,16 +216,16 @@
             		<td colspan="8" style="padding:0px; border-left:none">
             			<table cellpadding="0" cellspacing="0" summary="" style="width:100%;">
 	                		<tr>
-							   	<c:choose>
-											<c:when test="${not empty awardBudgetPage}">
-												<th width="1%" nowrap>Award Version</th>
+                    			<c:choose>
+									<c:when test="${not empty awardBudgetPage}">
+										<th width="1%" nowrap>Award Version</th>
                     					<td align="left" width="12%">${budgetVersion.award.sequenceNumber}</td>
-											</c:when>
-											<c:otherwise>
-												<th width="1%" nowrap>&nbsp;</th>
-		                    					<td align="left" width="12%">&nbsp;</td>
-											</c:otherwise>
-										</c:choose>
+									</c:when>
+									<c:otherwise>
+										<th width="1%" nowrap>&nbsp;</th>
+                    					<td align="left" width="12%">&nbsp;</td>
+									</c:otherwise>
+								</c:choose>
 	                    		<th width="40%" nowrap><div align="right">F&A Rate Type:</div></th>
 	                    		<td align="left" width="99%">${budgetVersion.rateClass.description}&nbsp;</td>
                   			</tr>

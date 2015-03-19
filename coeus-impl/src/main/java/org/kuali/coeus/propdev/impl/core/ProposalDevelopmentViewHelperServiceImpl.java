@@ -30,6 +30,7 @@ import org.kuali.coeus.common.framework.custom.DocumentCustomData;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttribute;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocValue;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeService;
+import org.kuali.coeus.common.framework.person.KcPersonService;
 import org.kuali.coeus.common.framework.sponsor.Sponsor;
 import org.kuali.coeus.common.framework.sponsor.SponsorSearchResult;
 import org.kuali.coeus.common.framework.sponsor.SponsorSearchService;
@@ -41,7 +42,6 @@ import org.apache.log4j.Logger;
 import org.kuali.coeus.propdev.impl.attachment.ProposalDevelopmentAttachment;
 import org.kuali.coeus.propdev.impl.attachment.ProposalDevelopmentAttachmentHelper;
 import org.kuali.coeus.propdev.impl.auth.perm.ProposalDevelopmentPermissionsService;
-import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.custom.ProposalDevelopmentCustomDataGroupDto;
 import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants;
 import org.kuali.coeus.propdev.impl.hierarchy.ProposalHierarchyService;
@@ -54,8 +54,10 @@ import org.kuali.coeus.propdev.impl.s2s.S2sRevisionTypeConstants;
 import org.kuali.coeus.propdev.impl.person.KeyPersonnelService;
 import org.kuali.coeus.propdev.impl.questionnaire.ProposalDevelopmentQuestionnaireHelper;
 import org.kuali.coeus.propdev.impl.s2s.question.ProposalDevelopmentS2sQuestionnaireHelper;
+import org.kuali.coeus.sys.framework.controller.KcFileService;
 import org.kuali.coeus.sys.framework.validation.AuditHelper;
 import org.kuali.kra.authorization.KraAuthorizationConstants;
+import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.protocol.actions.ProtocolStatusBase;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.kew.api.WorkflowDocument;
@@ -78,6 +80,7 @@ import org.kuali.coeus.propdev.impl.docperm.ProposalUserRoles;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.PersonService;
+import org.kuali.rice.krad.file.FileMeta;
 import org.kuali.rice.krad.util.*;
 import org.kuali.rice.krad.bo.Note;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -171,6 +174,14 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     @Qualifier("budgetCalculationService")
     private BudgetCalculationService budgetCalculationService;
 
+    @Autowired
+    @Qualifier("kcPersonService")
+    private KcPersonService kcPersonService;
+
+    @Autowired
+    @Qualifier("kcFileService")
+    private KcFileService kcFileService;
+
     @Override
     public void processBeforeAddLine(ViewModel model, Object addLine, String collectionId, final String collectionPath) {
         ProposalDevelopmentDocumentForm form = (ProposalDevelopmentDocumentForm) model;
@@ -247,6 +258,8 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
             getNoteService().save((Note) lineObject);
         }
         else if (lineObject instanceof ProposalUserRoles){
+            String fullName = getKcPersonService().getKcPersonByUserName(((ProposalUserRoles)lineObject).getUsername()).getFullName();
+            ((ProposalUserRoles)lineObject).setFullname(fullName);
             getProposalDevelopmentPermissionsService().processAddPermission(document,(ProposalUserRoles)lineObject);
         }
         else if (lineObject instanceof ProposalSite) {
@@ -320,6 +333,17 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
             }
 
         }
+        else if (newLine instanceof ProposalPersonUnit) {
+            Collection<ProposalPersonUnit> existingUnits = ObjectPropertyUtils.getPropertyValue(viewModel, collectionPath);
+            ProposalPersonUnit personUnit= (ProposalPersonUnit) newLine;
+            for (ProposalPersonUnit existingUnit : existingUnits) {
+                if (existingUnit.getUnitNumber().equals(personUnit.getUnitNumber())) {
+                   getGlobalVariableService().getMessageMap().putError(collectionPath, KeyConstants.ERROR_ADD_EXISTING_UNIT, personUnit.getUnitNumber(), personUnit.getProposalPerson().getFullName());
+                    isValid = false;
+                    break;
+                }
+            }
+        }
         return isValid;
     }
 
@@ -359,6 +383,9 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         	((ProposalDevelopmentAttachment)deleteLine).setUpdated(true);
         }
 
+        if (deleteLine instanceof FileMeta) {
+            getDataObjectService().delete(deleteLine);
+        }
         return isValid;
     }
 
@@ -476,6 +503,10 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
             success = false;
         }
         return success;
+    }
+
+    public boolean displayKeywords() {
+        return getParameterService().getParameterValueAsBoolean(ProposalDevelopmentDocument.class, Constants.KEYWORD_PANEL_DISPLAY);
     }
 
     protected LegacyNarrativeService getNarrativeService() {
@@ -720,7 +751,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     Personnel which appears in multiple proposals should not allow update of personnel attachments at the child (critical)
     Personnel attachments for personnel who appears only once in proposal hierarchy should be view only at the parent (no update of details nor delete) (critical)
      */
-    public boolean renderPersonnelAttachmentEditForHierarchyProposal(String personId, DevelopmentProposal proposal) {
+    public boolean renderPersonnelEditForHierarchyProposal(String personId, DevelopmentProposal proposal) {
         return (proposal.isInHierarchy()) ? renderEditForPersonnelAttachment(personId, proposal) : true;
     }
 
@@ -765,11 +796,9 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         }
 
         for (DevelopmentProposal developmentProposal : form.getHierarchyDevelopmentProposals()) {
-            for (ProposalDevelopmentBudgetExt budget : developmentProposal.getBudgets()){
-                if (budget.getBudgetSummaryDetails().isEmpty()){
-                    getBudgetCalculationService().populateBudgetSummaryTotals(budget);
+                if (developmentProposal.getHierarchySummaryBudget().getBudgetSummaryDetails().isEmpty()){
+                    getBudgetCalculationService().populateBudgetSummaryTotals(developmentProposal.getHierarchySummaryBudget());
                 }
-            }
         }
     }
 
@@ -841,21 +870,22 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
 		this.proposalDevelopmentService = proposalDevelopmentService;
 	}
 	public boolean isSummaryQuestionsPanelEnabled() {
-		return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.SUMMARY_QUESTIONS_INDICATOR));
+		return getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, ProposalDevelopmentService.SUMMARY_QUESTIONS_INDICATOR);
 
 	}
 
     public boolean isSummaryAttachmentsPanelEnabled() {
-    	return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.SUMMARY_ATTACHMENTS_INDICATOR));
+    	return getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, ProposalDevelopmentService.SUMMARY_ATTACHMENTS_INDICATOR);
     }
 
 	public boolean isSummaryKeywordsPanelEnabled() {
-		return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.SUMMARY_KEYWORDS_INDICATOR));
 
+		return displayKeywords() &&
+                getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.SUMMARY_KEYWORDS_INDICATOR);
 	}
 
     public boolean isSummaryBudgetPanelEnabled(DevelopmentProposal developmentProposal) {
-        return "Y".equalsIgnoreCase(getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,ParameterConstants.DOCUMENT_COMPONENT,ProposalDevelopmentService.BUDGET_SUMMARY_INDICATOR)) &&
+        return getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, ParameterConstants.DOCUMENT_COMPONENT, ProposalDevelopmentService.BUDGET_SUMMARY_INDICATOR) &&
                 (developmentProposal.getLatestBudget() != null || developmentProposal.getFinalBudget() != null);
 
     }
@@ -905,7 +935,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     public boolean areAllCertificationsComplete(List<ProposalPerson> proposalPersons) {
         for (ProposalPerson person : proposalPersons) {
             for (AnswerHeader answerHeader : person.getQuestionnaireHelper().getAnswerHeaders())  {
-                if (!answerHeader.isCompleted() && person.getVersionNumber() != null) {
+                if (!answerHeader.isCompleted()) {
                     return false;
                 }
             }
@@ -1018,4 +1048,39 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         }
         return StringUtils.EMPTY;
     }
+
+    public KcPersonService getKcPersonService() {
+        return kcPersonService;
+    }
+
+    public void setKcPersonService(KcPersonService kcPersonService) {
+        this.kcPersonService = kcPersonService;
+    }
+
+    public boolean isFederalSponsor(DevelopmentProposal developmentProposal) {
+        return getProposalDevelopmentService().isGrantsGovEnabledForProposal(developmentProposal);
+    }
+
+    public void clearOpportunity(DevelopmentProposal proposal) {
+        getLegacyDataAdapter().delete(proposal.getS2sOpportunity());
+        proposal.setS2sOpportunity(null);
+        //Reset Opportunity Title and Opportunity ID in the Sponsor & Program Information section
+        proposal.setProgramAnnouncementTitle("");
+        proposal.setProgramAnnouncementNumber("");
+        proposal.setCfdaNumber("");
+        proposal.setOpportunityIdForGG("");
+    }
+
+    public String getMaxUploadSizeParameter() {
+        return String.valueOf(getKcFileService().getMaxUploadSizeParameter());
+    }
+
+    public KcFileService getKcFileService() {
+        return kcFileService;
+    }
+
+    public void setKcFileService(KcFileService kcFileService) {
+        this.kcFileService = kcFileService;
+    }
+
 }

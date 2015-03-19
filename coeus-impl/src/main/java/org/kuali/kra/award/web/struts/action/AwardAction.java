@@ -418,6 +418,7 @@ public class AwardAction extends BudgetParentActionBase {
             forward = mapping.findForward(Constants.MAPPING_AWARD_ACTIONS_PAGE);
         }
 
+        
         AwardHierarchyBean bean = awardForm.getAwardHierarchyBean();
         if (bean.saveHierarchyChanges()) {
             List<String> order = new ArrayList<String>();
@@ -1091,15 +1092,6 @@ public class AwardAction extends BudgetParentActionBase {
         List<Award> awards = (List<Award>)businessObjectService.findMatchingOrderBy(Award.class, getHashMapToFindActiveAward(awardNumber), "sequenceNumber", true);   
         return awards;
     }
-    
-//    public Award getWorkingAwardVersion(String goToAwardNumber) {
-//        Award award = null;
-//        award = getPendingAwardVersion(goToAwardNumber);
-//        if (award == null) {
-//            award = getActiveAwardVersion(goToAwardNumber);
-//        }
-//        return award;
-//    }
     
     public AwardVersionService getAwardVersionService() {
         return KcServiceLocator.getService(AwardVersionService.class);

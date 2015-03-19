@@ -526,6 +526,9 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         //ipPerson.setPhoneNumber(pdPerson.getPhoneNumber());
         ipPerson.setRoleCode(pdPerson.getRole().getRoleCode());
         ipPerson.setTotalEffort(pdPerson.getPercentageEffort());
+        ipPerson.setAcademicYearEffort(pdPerson.getAcademicYearEffort());
+        ipPerson.setCalendarYearEffort(pdPerson.getCalendarYearEffort());
+        ipPerson.setSummerEffort(pdPerson.getSummerEffort());
         for (ProposalPersonUnit pdPersonUnit : pdPerson.getUnits()) {
             InstitutionalProposalPersonUnit ipPersonUnit = new InstitutionalProposalPersonUnit();
             ipPersonUnit.setLeadUnit(pdPersonUnit.isLeadUnit());
@@ -570,7 +573,9 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
         institutionalProposal.setRequestedEndDateInitial(budget.getBudgetPeriods().get(0).getEndDate());
         
         if (budget.getModularBudgetFlag()) {
-            if (budget.getBudgetPeriod(0).getBudgetModular().getTotalDirectCost() != null) {
+            if (budget.getBudgetPeriod(0) != null &&
+                budget.getBudgetPeriod(0).getBudgetModular() != null &&
+                budget.getBudgetPeriod(0).getBudgetModular().getTotalDirectCost() != null) {
                 institutionalProposal.setTotalDirectCostInitial(
                     new ScaleTwoDecimal(budget.getBudgetPeriod(0).getBudgetModular().getTotalDirectCost().bigDecimalValue()));
             }
@@ -683,7 +688,7 @@ public class InstitutionalProposalServiceImpl implements InstitutionalProposalSe
             Map<String, CustomAttributeDocument> customAttributeDocuments = oldInstitutionalProposal.getInstitutionalProposalDocument().getCustomAttributeDocuments();
             for (Map.Entry<String, CustomAttributeDocument> entry : customAttributeDocuments.entrySet()) {
                 CustomAttributeDocument customAttributeDocument = entry.getValue();
-                if(!availableCustomAttributes.contains(customAttributeDocument.getId())) {
+                if(!availableCustomAttributes.contains(customAttributeDocument.getId().intValue())) {
                     InstitutionalProposalCustomData customData = new InstitutionalProposalCustomData();
                     customData.setCustomAttributeId((long) customAttributeDocument.getId());
                     customData.setCustomAttribute(customAttributeDocument.getCustomAttribute());

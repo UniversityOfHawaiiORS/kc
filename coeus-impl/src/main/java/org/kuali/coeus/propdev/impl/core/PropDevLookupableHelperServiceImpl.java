@@ -241,7 +241,10 @@ public class PropDevLookupableHelperServiceImpl extends LookupableImpl implement
 
                 List<ProposalDevelopmentDocument> documents = getDataObjectService().findMatching(ProposalDevelopmentDocument.class,queryByCriteria).getResults();
                 for (ProposalDevelopmentDocument document : documents) {
-                    aggregatorProposals.add(document.getDevelopmentProposal().getProposalNumber());
+                    //there some rare cases of orphaned dev proposal records...
+                    if (document.getDevelopmentProposal() != null) {
+                        aggregatorProposals.add(document.getDevelopmentProposal().getProposalNumber());
+                    }
                 }
             }
              if (CollectionUtils.isEmpty(aggregatorProposals)){
@@ -332,7 +335,8 @@ public class PropDevLookupableHelperServiceImpl extends LookupableImpl implement
      */
     public void canModifyProposal(FieldGroup fieldGroup, Object model, ProposalDevelopmentDocument document) throws WorkflowException {
         final boolean canModifyProposal = getKcAuthorizationService().hasPermission(getGlobalVariableService().getUserSession().getPrincipalId(), document, PermissionConstants.MODIFY_PROPOSAL);
-        if (!canModifyProposal) {
+        final boolean canModifyBudget = getKcAuthorizationService().hasPermission(getGlobalVariableService().getUserSession().getPrincipalId(), document, PermissionConstants.MODIFY_BUDGET);
+        if (!canModifyProposal && !canModifyBudget) {
             fieldGroup.setRender(false);
         }
     }

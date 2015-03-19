@@ -73,6 +73,7 @@
 				<ref bean="PropBudget-ModularPage" />
 				<ref bean="PropBudget-NotesPage" />
 				<ref bean="PropBudget-SummaryPage" />
+                <ref bean="PropBudget-HierarchySummaryPage"/>
 			</list>
 		</property>
 	</bean>
@@ -82,7 +83,9 @@
 		parent="Uif-MenuNavigationGroup" p:defaultItemIconClass="">
 		<property name="items">
 			<list>
-				<bean id="PropBudget-Menu-ReturnToProposal" parent="Uif-SecondaryActionButton-Mini" p:methodToCall="openProposal" p:actionLabel="« Return to proposal"/>
+				<bean id="PropBudget-Menu-ReturnToProposal" parent="Uif-SecondaryActionButton-Mini"
+                      p:performClientSideValidation="true"
+                      p:methodToCall="openProposal" p:actionLabel="« Return to proposal"/>
 				<bean parent="PropBudget-NavigationMenu-PeriodsAndTotals" p:order="10" />
 				<bean parent="PropBudget-NavigationMenu-Rates" p:order="20" p:render="@{!budget.developmentProposal.isParent()}"/>
 				<bean parent="PropBudget-NavigationMenu-PersonnelCosts" p:order="30" />
@@ -93,65 +96,71 @@
 				<bean parent="PropBudget-NavigationMenu-Modular" p:order="80" />
 				<bean parent="PropBudget-NavigationMenu-Notes" p:order="90" />
 				<bean parent="PropBudget-NavigationMenu-Summary" p:order="100" />
+                <bean parent="PropBudget-NavigationMenu-HierarchySummary" p:order="110" p:render="@{budget.developmentProposal.isInHierarchy()}" />
 			</list>
 		</property>
 	</bean>
 	<bean id="PropBudget-NavigationMenu-PeriodsAndTotals" parent="PropBudget-NavigationMenu-PeriodsAndTotals-parentBean" />
 	<bean id="PropBudget-NavigationMenu-PeriodsAndTotals-parentBean" abstract="true"
-		parent="Uif-MenuAction" p:navigateToPageId="PropBudget-PeriodsPage"
+		parent="Kc-MenuAction" p:navigateToPageId="PropBudget-PeriodsPage"
 		p:actionLabel="Periods &amp; Totals" p:iconClass="icon-sort-by-attributes-alt" />
 	<bean id="PropBudget-NavigationMenu-Rates" parent="PropBudget-NavigationMenu-Rates-parentBean" />
 	<bean id="PropBudget-NavigationMenu-Rates-parentBean" abstract="true"
-		parent="Uif-MenuAction" p:navigateToPageId="PropBudget-RatesPage"
+		parent="Kc-MenuAction" p:navigateToPageId="PropBudget-RatesPage"
 		p:actionLabel="Rates" p:iconClass="icon-tasks" />
 	<bean id="PropBudget-NavigationMenu-PersonnelCosts" parent="PropBudget-NavigationMenu-PersonnelCosts-parentBean" />
 	<bean id="PropBudget-NavigationMenu-PersonnelCosts-parentBean" abstract="true"
 		parent="Uif-SidebarToggleMenu" p:toggleText="Personnel Costs" p:iconClass="icon-user3">
 		<property name="menuItems">
 			<list>
-				<bean parent="Uif-MenuAction" p:navigateToPageId="PropBudget-ProjectPersonnelPage"
+				<bean parent="Kc-MenuAction" p:navigateToPageId="PropBudget-ProjectPersonnelPage"
 					p:actionLabel="Project Personnel" p:order="10" />
-				<bean parent="Uif-MenuAction" p:navigateToPageId="PropBudget-AssignPersonnelToPeriodsPage"
+				<bean parent="Kc-MenuAction" p:navigateToPageId="PropBudget-AssignPersonnelToPeriodsPage"
 					p:actionLabel="Assign Personnel to Periods" p:order="20" />
 			</list>
 		</property>
 	</bean>
 	<bean id="PropBudget-NavigationMenu-NonPersonnelCosts" parent="PropBudget-NavigationMenu-NonPersonnelCosts-parentBean" />
 	<bean id="PropBudget-NavigationMenu-NonPersonnelCosts-parentBean" abstract="true"
-		parent="Uif-MenuAction" p:navigateToPageId="PropBudget-NonPersonnelCostsPage"
+		parent="Kc-MenuAction" p:navigateToPageId="PropBudget-NonPersonnelCostsPage"
 		p:actionLabel="Non-Personnel Costs" p:iconClass="icon-file" />
 	<bean id="PropBudget-NavigationMenu-Subawards" parent="PropBudget-NavigationMenu-Subawards-parentBean" />
 	<bean id="PropBudget-NavigationMenu-Subawards-parentBean" abstract="true"
-		parent="Uif-MenuAction" p:navigateToPageId="PropBudget-SubawardsPage"
+		parent="Kc-MenuAction" p:navigateToPageId="PropBudget-SubawardsPage"
         p:actionLabel="Subawards" p:iconClass="icon-paper-clip"/>
 	<bean id="PropBudget-NavigationMenu-InstitutionalCommitments" parent="PropBudget-NavigationMenu-InstitutionalCommitments-parentBean" />
 	<bean id="PropBudget-NavigationMenu-InstitutionalCommitments-parentBean" abstract="true"
 		parent="Uif-SidebarToggleMenu" p:toggleText="Institutional Commitments" p:iconClass="icon-bell2">
 		<property name="menuItems">
 			<list>
-				<bean parent="Uif-MenuAction" p:navigateToPageId="PropBudget-CostSharingPage"
+				<bean parent="Kc-MenuAction" p:navigateToPageId="PropBudget-CostSharingPage"
 					p:actionLabel="Cost Sharing" p:order="10" />
-				<bean parent="Uif-MenuAction" p:navigateToPageId="PropBudget-UnrecoveredFandAPage"
+				<bean parent="Kc-MenuAction" p:navigateToPageId="PropBudget-UnrecoveredFandAPage"
 					p:actionLabel="Unrecovered F &amp; A" p:order="20" />
 			</list>
 		</property>
 	</bean>      
 	<bean id="PropBudget-NavigationMenu-ProjectIncome" parent="PropBudget-NavigationMenu-ProjectIncome-parentBean" />
 	<bean id="PropBudget-NavigationMenu-ProjectIncome-parentBean"
-		abstract="true" parent="Uif-NavigationActionLink" p:navigateToPageId="PropBudget-ProjectIncomePage"
+		abstract="true" parent="Kc-MenuAction" p:navigateToPageId="PropBudget-ProjectIncomePage"
 		p:actionLabel="Project Income" p:iconClass="icon-money" />
 	<bean id="PropBudget-NavigationMenu-Modular" parent="PropBudget-NavigationMenu-Modular-parentBean" />
-	<bean id="PropBudget-NavigationMenu-Modular-parentBean" parent="Uif-NavigationActionLink"
+	<bean id="PropBudget-NavigationMenu-Modular-parentBean" parent="Kc-MenuAction"
 		p:navigateToPageId="PropBudget-ModularPage" p:actionLabel="Modular"
 		p:iconClass="icon-ok" />
 	<bean id="PropBudget-NavigationMenu-Notes" parent="PropBudget-NavigationMenu-Notes-parentBean" />
 	<bean id="PropBudget-NavigationMenu-Notes-parentBean"
-		abstract="true" parent="Uif-NavigationActionLink" p:navigateToPageId="PropBudget-NotesPage"
+		abstract="true" parent="Kc-MenuAction" p:navigateToPageId="PropBudget-NotesPage"
 		p:actionLabel="Budget Notes" p:iconClass="icon-th-list" />
 	<bean id="PropBudget-NavigationMenu-Summary" parent="PropBudget-NavigationMenu-Summary-parentBean" />
-	<bean id="PropBudget-NavigationMenu-Summary-parentBean" parent="Uif-NavigationActionLink"
+	<bean id="PropBudget-NavigationMenu-Summary-parentBean" parent="Kc-MenuAction"
 		p:navigateToPageId="PropBudget-SummaryPage" p:actionLabel="Budget Summary" p:iconClass="icon-file"/>
-	<bean id="PropBudget-DocumentHeader" parent="PropBudget-DocumentHeader-parentBean" />
+
+    <bean id="PropBudget-NavigationMenu-HierarchySummary" parent="PropBudget-NavigationMenu-HierarchySummary-parentBean" />
+    <bean id="PropBudget-NavigationMenu-HierarchySummary-parentBean" parent="Kc-MenuAction"
+          p:navigateToPageId="PropBudget-HierarchySummaryPage" p:actionLabel="Hierarchy Summary" p:iconClass="icon-list-ol"/>
+
+    <bean id="PropBudget-DocumentHeader" parent="PropBudget-DocumentHeader-parentBean" />
 	<bean id="PropBudget-DocumentHeader-parentBean" abstract="true"
 		parent="Uif-ViewHeader" p:headerText="Budget: Version 1"
 		p:areaTitleText="[action=openProposal]Proposal #@{budget.developmentProposal.proposalNumber}[/action] &gt; Budget #@{budget.budgetVersionNumber}">
@@ -200,7 +209,9 @@
 							p:iconClass="icon-money" p:order="50" />
 						<bean parent="Uif-ActionLink" p:actionLabel="Autocalculate Periods" p:methodToCall="generateAllPeriods"
 							p:iconClass="icon-stack" p:order="60" />
-					</list>
+                        <bean parent="PropBudget-HelpMenu" p:order="70"/>
+
+                    </list>
 				</property>
 			</bean>
 		</property>
@@ -309,35 +320,32 @@
         <property name="menuItems">
             <list>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Periods &amp; Totals"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenperiodstotals.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/periodstotals.htm"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Rates"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenrates.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/rates.htm"/>
                 <bean parent="Uif-MenuDivider"/>
                 <bean parent="Uif-MenuHeader" p:messageText="Personnel Costs"/>
-                <bean parent="Uif-Link" p:target="_blank" p:linkText="Project Personnel" p:style="padding-left:1em;"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenprojectpersonnel.htm"/>
-                <bean parent="Uif-Link" p:target="_blank" p:linkText="Assign Personnel to Periods" p:style="padding-left:1em;"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenprojectpersonnel1.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Project Personnel"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/projectpersonnel.htm"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Assign Personnel to Periods"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/assignpersonneltoperiods.htm"/>
                 <bean parent="Uif-MenuDivider"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Non-Personnel Costs"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreennonpersonnel.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/nonpersonnelcosts.htm"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Subawards"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreensubawards.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/subawards.htm"/>
                 <bean parent="Uif-MenuDivider"/>
                 <bean parent="Uif-MenuHeader" p:messageText="Institutional Commitments"/>
-                <bean parent="Uif-Link" p:target="_blank" p:linkText="Cost Sharing" p:style="padding-left:1em;"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreencostsharing.htm"/>
-                <bean parent="Uif-Link" p:target="_blank" p:linkText="Unrecovered F&amp;A" p:style="padding-left:1em;"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenunrecoveredfa.htm"/>
-                <bean parent="Uif-MenuDivider"/>
+                <bean parent="Uif-Link" p:target="_blank" p:linkText="Cost Sharing"
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/institutionalcommitments.htm"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Project Income"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenprojectincome.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/projectincome.htm"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Modular"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenmodularbudget.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/modularbudget.htm"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Budget Notes"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenbudgetnotes.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/budgetnotes.htm"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Budget Summary"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/onthisscreenbudgetsummary.htm"/>
+                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/budgetsummary.htm"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Glossary of Terms"
                       p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/glossaryofterms.htm"/>
             </list>

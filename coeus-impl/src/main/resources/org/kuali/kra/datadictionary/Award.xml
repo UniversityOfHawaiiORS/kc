@@ -608,7 +608,7 @@
     <property name="forceUppercase" value="false" />
     <property name="label" value="Account ID" />
     <property name="shortLabel" value="Account ID" />
-    <property name="maxLength" value="7" />
+    <property name="maxLength" value="16" />
     <property name="validationPattern" >
       <bean parent="AlphaNumericValidationPattern" />
     </property>
@@ -1105,8 +1105,8 @@
     <property name="controlField">
       <bean p:size="10" parent="Uif-TextControl"/>
     </property>
-		<property name="summary" value="Label for award header fields" />
-		<property name="description" value="Label for award header fields" />
+		<property name="summary" value="Document ID:Status" />
+		<property name="description" value="Document ID:Status" />
 	</bean>
 	
 	<bean id="Award-awardIdAccount" parent="Award-awardIdAccount-parentBean" />
@@ -1114,7 +1114,6 @@
 		<property name="name" value="awardIdAccount" />
 		<property name="label" value="Award ID: Account" />
 		<property name="shortLabel" value="Award ID: Account" />
-    <property name="maxLength" value="20" />
     <property name="required" value="false" />
     <property name="control" >
       <bean parent="TextControlDefinition" p:size="10"/>
@@ -1122,8 +1121,8 @@
     <property name="controlField">
       <bean p:size="10" parent="Uif-TextControl"/>
     </property>
-		<property name="summary" value="Label for award header fields" />
-		<property name="description" value="Label for award header fields" />
+		<property name="summary" value="Award ID: Account" />
+		<property name="description" value="Award ID: Account" />
 	</bean>
 
 	<bean id="Award-financialAccountCreationDate" parent="Award-financialAccountCreationDate-parentBean" />
@@ -1404,10 +1403,9 @@
 		    <bean p:attributeName="closeoutDate" parent="FieldDefinition" />
 		  </list>
 		</property>
-		<property name="resultSetLimit" value="50" />
 	</bean>
   
-  <bean id="Award-LookupView-parentBean" abstract="true" parent="Uif-LookupView">
+  <bean id="Award-LookupView-parentBean" abstract="true" parent="Uif-LookupView" p:viewHelperServiceClass="org.kuali.kra.award.lookup.AwardLookupableKrad">
     <property name="dataObjectClassName" value="org.kuali.kra.award.home.Award"/>
     <property name="headerText" value="Award Lookup"/>
     <property name="criteriaFields">

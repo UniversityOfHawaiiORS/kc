@@ -31,7 +31,8 @@
 	<param name="kc.subaward.mode">LOCAL</param>
 	<param name="kc.negotiation.mode">LOCAL</param>
 	<param name="kc.coi.mode">LOCAL</param>
-	
+    <param name="kc.healthcheck.mode">LOCAL</param>
+
 	<param name="rice.krad.componentPublishing.enabled">false</param>
 	<param name="service.namespace">KC</param>
 	<param name="app.namespace">${service.namespace}</param>
@@ -53,11 +54,11 @@
 	<param name="kew.externalizable.images.url">/${app.context.name}/kew/images/</param>
 	<param name="kra.externalizable.images.url">/${app.context.name}/static/images/</param>
 
-    <param name="kns.javascript.files">plugins/jquery/jquery-1.8.3.js,plugins/cookie/jquery.cookie.js,kr/scripts/core.js,kr/scripts/dhtml.js,kr/scripts/my_common.js,kr/scripts/jscalendar-1.0/calendar.js,kr/scripts/jscalendar-1.0/lang/calendar-en.js,kr/scripts/jscalendar-1.0/calendar-setup.js,dwr/engine.js,dwr/util.js,dwr/interface/PersonService.js,kr/scripts/objectInfo.js,dwr/interface/CustomAttributeService.js,dwr/interface/ProposalDevelopmentService.js,dwr/interface/BudgetService.js,dwr/interface/AwardTemplateReportTermService.js,scripts/fancybox2.1.5/jquery.fancybox.pack.js,plugins/blockUI/jquery.blockUI.js,scripts/kuali_application.js</param>
-    <param name="kns.css.files">kr/css/kuali.css,kr/scripts/jscalendar-1.0/calendar-win2k-1.css,scripts/fancybox2.1.5/jquery.fancybox.css,css/kuali_application.css</param>
+    <param name="kns.javascript.files">plugins/jquery/jquery-1.8.3.js,plugins/cookie/jquery.cookie.js,kr/scripts/core.js,kr/scripts/dhtml.js,kr/scripts/my_common.js,kr/scripts/jscalendar-1.0/calendar.js,kr/scripts/jscalendar-1.0/lang/calendar-en.js,kr/scripts/jscalendar-1.0/calendar-setup.js,dwr/engine.js,dwr/util.js,dwr/interface/PersonService.js,kr/scripts/objectInfo.js,dwr/interface/CustomAttributeService.js,dwr/interface/ProposalDevelopmentService.js,dwr/interface/BudgetService.js,dwr/interface/AwardTemplateReportTermService.js,scripts/fancybox2.1.5/jquery.fancybox.pack.js,plugins/blockUI/jquery.blockUI.js,scripts/kuali_application.js,scripts/bootstrap/bootstrap.js</param>
+    <param name="kns.css.files">kr/css/kuali.css,kr/scripts/jscalendar-1.0/calendar-win2k-1.css,scripts/fancybox2.1.5/jquery.fancybox.css,css/kuali_application.css,css/bootstrap/css/bootstrap-skinned.css</param>
 
-    <param name="portal.css.files">rice-portal/css/portal.css,plugins/fancybox/jquery.fancybox.css,plugins/textpopout/popoutTextarea.css,plugins/jgrowl/jquery.jgrowl.css,css/kuali_overrides.css</param>
-    <param name="portal.javascript.files">plugins/jquery/jquery-1.8.3.js,plugins/cookie/jquery.cookie.js,plugins/scrollto/jquery.scrollTo-1.4.6.js,plugins/blockUI/jquery.blockUI.js,kr/scripts/my_common.js,plugins/fancybox/jquery.fancybox.pack.js,plugins/easing/jquery.easing-1.3.pack.js,plugins/jgrowl/jquery.jgrowl.js,rice-portal/scripts/portal.initialize.js,rice-portal/scripts/easyXDM/easyXDM.js</param>
+    <param name="portal.css.files">plugins/fancybox/jquery.fancybox.css,plugins/textpopout/popoutTextarea.css,plugins/jgrowl/jquery.jgrowl.css,css/kuali_overrides.css,css/bootstrap/css/bootstrap-skinned.css</param>
+    <param name="portal.javascript.files">plugins/jquery/jquery-1.8.3.js,plugins/cookie/jquery.cookie.js,plugins/scrollto/jquery.scrollTo-1.4.6.js,plugins/blockUI/jquery.blockUI.js,kr/scripts/my_common.js,plugins/fancybox/jquery.fancybox.pack.js,plugins/easing/jquery.easing-1.3.pack.js,plugins/jgrowl/jquery.jgrowl.js,rice-portal/scripts/portal.initialize.js,rice-portal/scripts/easyXDM/easyXDM.js,scripts/bootstrap/bootstrap.js</param>
 
     <param name="portal.title">Kuali Coeus</param>
 
@@ -207,4 +208,24 @@
 	 
 	<param name="rice.portal.allowed.regex" override="false">^(${application.url}|${rice.server.url})(/.*|)</param>
 	<param name="kc.config.verifier.hard.error">true</param>
+	
+	<!-- Flyway Properties -->
+    <param name="kc.flyway.applyDemoData">false</param>
+    <param name="kc.flyway.applyStagingData">false</param>
+    <param name="kc.flyway.grm">false</param>
+    <param name="kc.flyway.manageRiceServer">true</param>
+	<param name="kc.flyway.embeddedMode">false</param>
+	<param name="kc.flyway.enabled">true</param>
+    <param name="kc.flyway.sql.migration.path">co/kuali/coeus/data/migration/sql/mysql</param>
+    <param name="kc.flyway.java.migration.path">co/kuali/coeus/data/migration/custom/coeus</param>
+
+	<!-- Auto-ingester properties -->
+	<param name="kc.kew.auto.ingestion.paths">org/kuali/coeus/rice-xml,org/kuali/coeus/coeus-xml</param>
+   	<param name="kc.kew.auto.ingestion.principalId">admin</param>
+   	<param name="kc.kew.auto.ingestion.enabled">true</param>
+
+    <param name="feedback.link.url">https://jira.kuali.org/secure/CreateIssue.jspa?pid=10310&amp;issuetype=1</param>
+    <param name="feedback.link.text">GET HELP</param>
+
+    <param name="rsmart.report.shared.secret">SECRETKEYVALUE</param>
 </config>
