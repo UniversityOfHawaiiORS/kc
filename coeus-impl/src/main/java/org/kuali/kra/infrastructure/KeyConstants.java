@@ -38,7 +38,10 @@ public final class KeyConstants {
     public static final String WARNING_ACTIVITY_TYPE_CHANGED = "warning.activityType.changed";
     public static final String ERROR_START_DATE_AFTER_END_DATE = "error.start.date.after.end.date";
     public static final String ERROR_REQUIRED_GG_TRACKING_ID = "error.ggtrackingid.required";
-    
+    public static final String ERROR_REQUIRED_SPONSOR_DIV_CODE = "error.required.divisionCode";
+    public static final String ERROR_REQUIRED_SPONSOR_PROGRAM_CODE = "error.required.programCode";
+
+
     public static final String QUESTION_DELETE_CONFIRMATION = "document.question.delete.text";
     public static final String INVALID_DEADLINE_TIME = "error.invalid.deadLineTime";
     
@@ -85,6 +88,9 @@ public final class KeyConstants {
     
     //Proposal Development Custome Attribute Date
     public static final String ERROR_DATE="error.date";
+
+    //Proposal Development Delivery Info
+    public static final String DELIVERY_INFO_NOT_NEEDED = "message.proposalDevelopment.delivery.info.not.needed";
     
     // Key Personnel Mojo
     public static final String ERROR_INVESTIGATOR_UNITS_UPBOUND = "error.investigatorUnits.upbound";
@@ -164,7 +170,7 @@ public final class KeyConstants {
     public static final String ERROR_AWARD_BUDGET_END_DATE_MISSING = "error.award.budgetVersion.endDate.required";
     public static final String QUESTION_TOTALCOSTLIMIT_CHANGED = "document.question.totalCostLimit.changed";
     public static final String ERROR_BUDGET_REJECT_NO_REASON = "error.budget.reject.noReason";
-
+    public static final String ERROR_COMPLETE_BUDGET_LOCK = "error.completeBudget.locked";
     //Budget Version warnings
     public static final String WARNING_BUDGET_VERSION_MODULAR_INVALID_TDC = "warning.budgetVersion.Modular.InvalidTotalDirectCost";
 
@@ -1107,6 +1113,7 @@ public final class KeyConstants {
     public static final String S2S_USER_ATTACHED_FORM_WRONG_FILE_TYPE = "error.s2s.userattachedform.wrong.filetype";
     public static final String S2S_USER_ATTACHED_FORM_NOT_VALID = "error.s2s.userattachedform.invalid";
     public static final String S2S_USER_ATTACHED_FORM_NOT_PDF = "error.s2s.userattachedform.not.pdf";
+    public static final String ERROR_DELETION_BLOCKED = "error.deletion.blocked";
 
     /**
      * private utility class ctor.

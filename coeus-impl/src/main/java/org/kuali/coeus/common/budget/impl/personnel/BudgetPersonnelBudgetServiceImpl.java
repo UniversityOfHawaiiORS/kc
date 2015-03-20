@@ -282,16 +282,20 @@ public class BudgetPersonnelBudgetServiceImpl implements BudgetPersonnelBudgetSe
     public void addBudgetPersonnelToPeriod(BudgetPeriod budgetPeriod, BudgetLineItem newBudgetLineItem, BudgetPersonnelDetails newBudgetPersonnelDetail) {
     	Budget budget = budgetPeriod.getBudget();
     	BudgetLineItem groupedBudgetLineItem = getExistingBudgetLineItemBasedOnCostElementAndGroup(budgetPeriod, newBudgetLineItem);
+    	boolean newLineItem = false;
     	if(groupedBudgetLineItem == null) {
     		groupedBudgetLineItem = newBudgetLineItem;
     		setNewBudgetLineItemAttributes(budgetPeriod, groupedBudgetLineItem);
-            budgetPeriod.getBudgetLineItems().add(groupedBudgetLineItem);
+    		newLineItem = true;
     	}
     	groupedBudgetLineItem.setQuantity(getLineItemQuantity(newBudgetLineItem));
     	int newLineNumber = groupedBudgetLineItem.getBudgetPersonnelDetailsList().size() + 1;
     	if(newBudgetPersonnelDetail.getPersonSequenceNumber() != BudgetConstants.BudgetPerson.SUMMARYPERSON.getPersonSequenceNumber()) {
         	addPersonnelToPeriod(budgetPeriod, groupedBudgetLineItem, newBudgetPersonnelDetail);
         	calculateBudgetPersonnelLineItem(budget, groupedBudgetLineItem, newBudgetPersonnelDetail, newLineNumber);
+    	}
+    	if(newLineItem) {
+            budgetPeriod.getBudgetLineItems().add(groupedBudgetLineItem);
     	}
     }
     
@@ -377,36 +381,9 @@ public class BudgetPersonnelBudgetServiceImpl implements BudgetPersonnelBudgetSe
         for(BudgetLineItem budgetLineItem:budgetPeriod.getBudgetLineItems()){
             getBudgetCalculationService().updatePersonnelBudgetRate(budgetLineItem);
             if(budgetLineItem.getFormulatedCostElementFlag()){
-                calculateAndUpdateFormulatedCost(budgetLineItem);
+                getBudgetCalculationService().calculateAndUpdateFormulatedCost(budgetLineItem);
             }
         }
-    }
-    
-    private void calculateAndUpdateFormulatedCost(BudgetLineItem budgetLineItem) {
-        if(budgetLineItem.getFormulatedCostElementFlag()){
-            ScaleTwoDecimal formulatedCostTotal = getFormulatedCostsTotal(budgetLineItem);
-            if(formulatedCostTotal!=null){
-                budgetLineItem.setLineItemCost(formulatedCostTotal);
-            }
-        }
-    }
-
-    private ScaleTwoDecimal getFormulatedCostsTotal(BudgetLineItem budgetLineItem) {
-        List<BudgetFormulatedCostDetail> budgetFormulatedCosts = budgetLineItem.getBudgetFormulatedCosts();
-        ScaleTwoDecimal formulatedExpenses = ScaleTwoDecimal.ZERO;
-        for (BudgetFormulatedCostDetail budgetFormulatedCostDetail : budgetFormulatedCosts) {
-            calculateBudgetFormulatedCost(budgetFormulatedCostDetail);
-            formulatedExpenses = formulatedExpenses.add(budgetFormulatedCostDetail.getCalculatedExpenses());
-        }
-        return formulatedExpenses;
-    }
-    
-    private void calculateBudgetFormulatedCost( BudgetFormulatedCostDetail budgetFormulatedCost) {
-    	ScaleTwoDecimal unitCost = budgetFormulatedCost.getUnitCost();
-    	ScaleTwoDecimal count = new ScaleTwoDecimal(budgetFormulatedCost.getCount());
-    	ScaleTwoDecimal frequency = new ScaleTwoDecimal(budgetFormulatedCost.getFrequency());
-    	ScaleTwoDecimal calculatedExpense = unitCost.multiply(count).multiply(frequency);
-        budgetFormulatedCost.setCalculatedExpenses(calculatedExpense);
     }
     
 	public DataObjectService getDataObjectService() {

@@ -73,8 +73,11 @@ import org.kuali.rice.krad.document.authorization.PessimisticLock;
 import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.service.LegacyDataAdapter;
 import org.kuali.rice.krad.uif.UifConstants;
+import org.kuali.rice.krad.uif.UifParameters;
+import org.kuali.rice.krad.uif.util.ObjectPropertyUtils;
 import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.web.form.DialogResponse;
+import org.kuali.rice.krad.web.form.DocumentFormBase;
 import org.kuali.rice.krad.workflow.service.WorkflowDocumentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -83,6 +86,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -267,8 +271,8 @@ public class ProposalDevelopmentSubmitController extends
        if (successMessageKey != null) {
            getGlobalVariableService().getMessageMap().putInfo(KRADConstants.GLOBAL_MESSAGES, successMessageKey);
        }
-	   
-	   return getModelAndViewService().getModelAndView(form);
+       form.setEvaluateFlagsAndModes(true);
+       return getModelAndViewService().getModelAndView(form);
   } 
   
    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=disapproveProposal")
@@ -368,13 +372,35 @@ public class ProposalDevelopmentSubmitController extends
     			submitApplication(form);
                 handleSubmissionNotification(form);
                 form.setDeferredMessages(getGlobalVariableService().getMessageMap());
-                return getModelAndViewService().showDialog("Kc-SendNotification-Wizard", true, form);
+                return sendSubmitToSponsorNotification(form);
     		} else {
                 return getModelAndViewService().showDialog("PropDev-DataValidationSection", true, form);
     		}
     	} else {
             return getModelAndViewService().showDialog("PropDev-Resumbit-OptionsSection", true, form);
     	}
+    }
+
+    protected ModelAndView sendSubmitToSponsorNotification(ProposalDevelopmentDocumentForm proposalDevelopmentDocumentForm) {
+        ProposalDevelopmentDocument proposalDevelopmentDocument = proposalDevelopmentDocumentForm.getProposalDevelopmentDocument();
+        ProposalDevelopmentNotificationContext context = new ProposalDevelopmentNotificationContext(proposalDevelopmentDocument.getDevelopmentProposal(), "101", "Proposal Submitted");
+        ((ProposalDevelopmentNotificationRenderer) context.getRenderer()).setDevelopmentProposal(proposalDevelopmentDocumentForm.getDevelopmentProposal());
+        if (proposalDevelopmentDocumentForm.getNotificationHelper().getPromptUserForNotificationEditor(context)) {
+            proposalDevelopmentDocumentForm.getNotificationHelper().initializeDefaultValues(context);
+            return getModelAndViewService().showDialog("Kc-SendNotification-Wizard", true, proposalDevelopmentDocumentForm);
+        } else {
+            getKcNotificationService().sendNotification(context);
+        }
+        return getModelAndViewService().getModelAndView(proposalDevelopmentDocumentForm);
+    }
+
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=deleteLineNotificationRecipient")
+    public ModelAndView deleteLine(@ModelAttribute("KualiForm") DocumentFormBase form, @RequestParam("actionParameters[" + UifParameters.SELECTED_COLLECTION_PATH + "]") String selectedCollectionPath) {
+        getCollectionControllerService().deleteLine(form);
+
+        final Collection<Object> collection = ObjectPropertyUtils.getPropertyValue(form, selectedCollectionPath);
+        form.getActionParameters().put("Kc-SendNotification-Wizard.step", collection.isEmpty() ? ProposalDevelopmentConstants.NotificationConstants.NOTIFICATION_STEP_0 : ProposalDevelopmentConstants.NotificationConstants.NOTIFICATION_STEP_2);
+        return getModelAndViewService().showDialog("Kc-SendNotification-Wizard", true, form);
     }
 
     protected void handleSubmissionNotification(ProposalDevelopmentDocumentForm form) {
@@ -681,20 +707,23 @@ public class ProposalDevelopmentSubmitController extends
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=reject")
     public ModelAndView reject(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception{
-        DialogResponse dialogResponse = form.getDialogResponse(ProposalDevelopmentConstants.KradConstants.REJECT_DIALOG);
-        if(dialogResponse == null) {
-            return getModelAndViewService().showDialog(ProposalDevelopmentConstants.KradConstants.REJECT_DIALOG, false, form);
-        }else if (dialogResponse.getResponseAsBoolean()){
-            ProposalDevelopmentRejectionBean bean = form.getProposalDevelopmentRejectionBean();
-            if (new ProposalDevelopmentRejectionRule().proccessProposalDevelopmentRejection(bean)){
-                getProposalHierarchyService().rejectProposalDevelopmentDocument(form.getDevelopmentProposal().getProposalNumber(), bean.getRejectReason(),
-                        getGlobalVariableService().getUserSession().getPrincipalId(),bean.getRejectFile());
-            }
-        } else {
-            form.setProposalDevelopmentRejectionBean(new ProposalDevelopmentRejectionBean());
-        }
+
+    ProposalDevelopmentRejectionBean bean = form.getProposalDevelopmentRejectionBean();
+    if (new ProposalDevelopmentRejectionRule().proccessProposalDevelopmentRejection(bean)){
+        getProposalHierarchyService().rejectProposalDevelopmentDocument(form.getDevelopmentProposal().getProposalNumber(), bean.getRejectReason(),
+                getGlobalVariableService().getUserSession().getPrincipalId(),bean.getRejectFile());
+    }
+
+    form.setEvaluateFlagsAndModes(true);
+    return getTransactionalDocumentControllerService().reload(form);
+    }
+
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=cancelReject")
+    public ModelAndView cancelReject(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception{
+        form.setProposalDevelopmentRejectionBean(new ProposalDevelopmentRejectionBean());
         return getModelAndViewService().getModelAndView(form);
     }
+
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params="methodToCall=sendAdHocRequests")
     public ModelAndView sendAdHocRequests(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) {

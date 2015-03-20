@@ -21,8 +21,28 @@ Kc.Global = Kc.Global || {};
 (function (namespace, $) {
     // set all modals to static behavior (clicking out does not close)
     $.fn.modal.Constructor.DEFAULTS.backdrop = "static";
-
     $(document).on("ready", function(){
+        $.validator.addMethod("kcValidateDate", function(value,element){
+            return this.optional(element) || namespace.validateDate(value);
+        },"Invalid Date");
+        $(".uif-dateControl").each(function() {
+            //make sure all date inputs check for valid dates, in case they are never focused
+            $(this).rules("add",{kcValidateDate: true});
+        });
+        $(document).on("focus", ".uif-dateControl", function(){
+            //if a date input is added after document ready event.
+                $(this).rules("add",{kcValidateDate: true});
+        });
+        $(window).on("resize",function(){
+            namespace.makeApplicationFooterSticky();
+            $(".kc-navMenuDropdown .dropdown-menu").each(function(){
+                var windowWidth = $(window).width();
+                var menuLeftPosition = $(this).parent().position().left;
+                $(this).css("cssText","min-width:0px !important");
+                $(this).css("max-width","868px");
+                $(this).css("width",windowWidth-menuLeftPosition);
+            });
+        });
         // date conversion for date fields to full leading 0 - for days and months and to full year dates
         $(document).on("blur", ".uif-dateControl", function(){
             var dateFormat = $.datepicker._defaults.dateFormat;
@@ -50,12 +70,11 @@ Kc.Global = Kc.Global || {};
                     year = currentDate.getFullYear().toString().substr(0,2) + year;
                 }
 
-                var dateObj = new Date(date);
-                if (isNaN(dateObj.valueOf())) {
-                    // not valid abandon conversion
+                if (!namespace.validateDate(date)) {
                     return;
                 }
 
+                var dateObj = new Date(date);
                 dateObj.setFullYear(year);
 
                 var formattedDate = $.datepicker.formatDate(dateFormat, dateObj);
@@ -63,7 +82,39 @@ Kc.Global = Kc.Global || {};
             }
         });
     });
+    namespace.validateDate = function(value) {
+        var dateFormat = $.datepicker._defaults.dateFormat;
+        var date = value.replace(/-/g, "/");
 
+        if (date && (date.match(/\//g) || []).length === 2) {
+            // find the expected position and value of year in the string based on date format
+            var year;
+            var month;
+            var day;
+            if (dateFormat.indexOf("y") === 0) {
+                year = date.substr(0, date.indexOf("/"));
+                month = "0" + date.substr(date.indexOf("/")+1,date.lastIndexOf("/") - date.indexOf("/")-1)
+                day = "0" + date.substr(date.lastIndexOf("/") + 1, date.length - 1);
+            }
+            else {
+                month = "0" +  date.substr(0, date.indexOf("/"));
+                day ="0" +  date.substr(date.indexOf("/")+1,date.lastIndexOf("/") - date.indexOf("/")-1)
+                year = date.substr(date.lastIndexOf("/") + 1, date.length - 1);
+            }
+
+            if (year.length === 2) {
+                var currentDate = new Date();
+                year = currentDate.getFullYear().toString().substr(0,2) + year;
+            }
+
+            var isoDate = year + "-" + month.substr(month.length-2,2) + "-" + day.substr(day.length-2,2);
+            if (isNaN(new Date(isoDate))) {
+                return false;
+            }
+            return true
+        }
+        return false
+    }
     namespace.attachRedirectHandler = function() {
         $(window).unbind("message.redirect");
         $(window).on("message.redirect", function (event) {
@@ -81,6 +132,13 @@ Kc.Global = Kc.Global || {};
 
         if (footerTop < docHeight) {
             $('#Uif-ApplicationFooter-Wrapper').css('margin-top', (docHeight - footerTop) + 'px');
+        }
+    }
+    namespace.validateAttachmentFile = function(object,maxSize){
+        var file =  object.files[0]
+        if (file.size > maxSize) {
+            alert ("Processing " + file.name + " of type " + file.type + " failed.\nError: File is too large");
+            $(object).val("");
         }
     }
 })(Kc.Global, jQuery);

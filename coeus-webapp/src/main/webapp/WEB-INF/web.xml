@@ -36,6 +36,12 @@
         <param-value>classpath:KcBootstrapSpringBeans.xml</param-value>
     </context-param>
 
+    <!-- Change this if you want to use a different config file, can be overridden with a system property-->
+    <context-param>
+        <param-name>web.bootstrap.config.file</param-name>
+        <param-value>classpath:META-INF/kc-config.xml</param-value>
+    </context-param>
+
     <filter>
         <filter-name>HttpRequestLogger</filter-name>
         <filter-class>org.kuali.rice.core.RequestLoggingFilter</filter-class>
@@ -189,6 +195,10 @@
     <filter>
         <filter-name>PerformanceLoggingFilter</filter-name>
         <filter-class>org.kuali.coeus.sys.framework.controller.interceptor.PerformanceLoggingFilter</filter-class>
+        <init-param>
+        	<param-name>ignored.urls</param-name>
+        	<param-value>.*/healthCheck.*</param-value>
+        </init-param>
     </filter>
 
     <filter-mapping>
@@ -304,7 +314,6 @@
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>3</load-on-startup>
     </servlet>
-
 
     <!--
 
@@ -436,6 +445,7 @@
     <welcome-file-list>
         <welcome-file>index.html</welcome-file>
         <welcome-file>index.jsp</welcome-file>
+        <welcome-file>default.htm</welcome-file>
     </welcome-file-list>
 
     <!-- only need to include this for the kuali tlds

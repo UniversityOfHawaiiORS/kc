@@ -21,9 +21,15 @@ package org.kuali.coeus.propdev.impl.budget.core;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.ObjectUtils;
+import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentControllerBase;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentForm;
+import org.kuali.coeus.propdev.impl.lock.ProposalBudgetLockService;
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.rice.kim.api.identity.Person;
+import org.kuali.rice.krad.document.authorization.PessimisticLock;
 import org.kuali.rice.krad.web.controller.MethodAccessible;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -33,6 +39,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 @Controller
 @RequestMapping(value="/proposalDevelopment")
@@ -68,19 +76,43 @@ public class ProposalBudgetController extends ProposalDevelopmentControllerBase 
         return getProposalBudgetSharedController().populateBudgetSummary(budgetId, form.getDevelopmentProposal().getBudgets(), form);
     }
 
+    @Transactional @RequestMapping(params="methodToCall=markBudgetVersionComplete")
+    public ModelAndView markBudgetVersionComplete(@RequestParam("budgetId") Long budgetId, @ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
+        ProposalDevelopmentBudgetExt budget = getProposalBudgetSharedController().getSelectedBudget(budgetId,form.getDevelopmentProposal().getBudgets());
+        form.getDocument().refreshPessimisticLocks();
+        if (getProposalBudgetSharedController().isBudgetLocked(budget.getBudgetVersionNumber(),form.getDocument().getPessimisticLocks(),form.getPageId()) ||
+                !getProposalBudgetSharedController().isAllowedToCompleteBudget(budget,form.getPageId())) {
+            form.setAjaxReturnType("update-page");
+            return getModelAndViewService().getModelAndView(form);
+        }
+        getProposalBudgetSharedController().markBudgetVersionStatus(budget,Constants.BUDGET_STATUS_COMPLETE_CODE);
+        return getModelAndViewService().getModelAndView(form);
+    }
+
+    @Transactional @RequestMapping(params="methodToCall=markBudgetVersionIncomplete")
+    public ModelAndView markBudgetIncomplete(@RequestParam("budgetId") Long budgetId, @ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
+        ProposalDevelopmentBudgetExt budget = getProposalBudgetSharedController().getSelectedBudget(budgetId,form.getDevelopmentProposal().getBudgets());
+        form.getDocument().refreshPessimisticLocks();
+        if (getProposalBudgetSharedController().isBudgetLocked(budget.getBudgetVersionNumber(),form.getDocument().getPessimisticLocks(),form.getPageId())) {
+            form.setAjaxReturnType("update-page");
+            return getModelAndViewService().getModelAndView(form);
+        }
+        getProposalBudgetSharedController().markBudgetVersionStatus(budget, Constants.BUDGET_STATUS_INCOMPLETE_CODE);
+        return getModelAndViewService().getModelAndView(form);
+    }
+
     @Transactional @RequestMapping(params="methodToCall=markForSubmission")
 	public ModelAndView markForSubmission(@RequestParam("budgetId") Long budgetId, @ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
-		ProposalDevelopmentBudgetExt finalBudget = null;
-		if (form.getProposalDevelopmentDocument().getDevelopmentProposal().getBudgets() != null) {
-			for (ProposalDevelopmentBudgetExt curBudget : form.getProposalDevelopmentDocument().getDevelopmentProposal().getBudgets()) {
-				if (ObjectUtils.equals(budgetId, curBudget.getBudgetId())) {
-					finalBudget = curBudget;
-				}
-			}
-		}
+		ProposalDevelopmentBudgetExt finalBudget = getProposalBudgetSharedController().getSelectedBudget(budgetId,form.getDevelopmentProposal().getBudgets());
 		form.getProposalDevelopmentDocument().getDevelopmentProposal().setFinalBudget(finalBudget);
 		return super.save(form);
 	}
+
+    @Transactional @RequestMapping(params="methodToCall=removeFromSubmission")
+    public ModelAndView removeFromSubmission(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
+        form.getProposalDevelopmentDocument().getDevelopmentProposal().setFinalBudget(null);
+        return super.save(form);
+    }
 	
 	@Transactional @RequestMapping(params="methodToCall=openBudget")
 	public ModelAndView openBudget(@RequestParam("budgetId") String budgetId, @RequestParam("viewOnly") boolean viewOnly, @ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
@@ -113,4 +145,5 @@ public class ProposalBudgetController extends ProposalDevelopmentControllerBase 
 			ProposalBudgetSharedControllerService proposalBudgetSharedController) {
 		this.proposalBudgetSharedController = proposalBudgetSharedController;
 	}
+
 }

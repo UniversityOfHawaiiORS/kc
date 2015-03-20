@@ -29,19 +29,25 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.kuali.coeus.common.budget.framework.calculator.BudgetCalculationService;
+import org.kuali.coeus.common.budget.framework.core.Budget;
+import org.kuali.coeus.common.budget.framework.core.BudgetAuditRuleEvent;
 import org.kuali.coeus.common.budget.framework.core.BudgetService;
 import org.kuali.coeus.common.budget.framework.print.BudgetPrintService;
-import org.kuali.coeus.common.budget.framework.print.BudgetPrintType;
 import org.kuali.coeus.common.budget.impl.print.BudgetPrintForm;
 import org.kuali.coeus.common.framework.print.AttachmentDataSource;
 import org.kuali.coeus.common.framework.ruleengine.KcBusinessRulesEngine;
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+import org.kuali.coeus.propdev.impl.lock.ProposalBudgetLockService;
 import org.kuali.coeus.sys.framework.controller.ControllerFileUtils;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.validation.Auditable;
+import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.krad.data.DataObjectService;
+import org.kuali.rice.krad.document.authorization.PessimisticLock;
 import org.kuali.rice.krad.uif.UifConstants;
 import org.kuali.rice.krad.web.form.UifFormBase;
 import org.kuali.rice.krad.web.service.ModelAndViewService;
@@ -88,7 +94,15 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
     
     @Autowired
     @Qualifier("budgetCalculationService")
-    private BudgetCalculationService budgetCalculationService;    
+    private BudgetCalculationService budgetCalculationService;
+
+    @Autowired
+    @Qualifier("parameterService")
+    private ParameterService parameterService;
+
+    @Autowired
+    @Qualifier("proposalBudgetLockService")
+    private ProposalBudgetLockService proposalBudgetLockService;
 
     public ModelAndView addBudget(String budgetName, Boolean summaryBudget, Boolean modularBudget, DevelopmentProposal developmentProposal, UifFormBase form) throws Exception {
 		ProposalDevelopmentBudgetExt budget = null;
@@ -147,6 +161,43 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
 			return getRefreshControllerService().refresh(form);
 		}
 	}
+
+    public void markBudgetVersionStatus(ProposalDevelopmentBudgetExt budget, String status) {
+        String budgetStatus = getParameterService().getParameterValueAsString(
+                Budget.class,status);
+        budget.setBudgetStatus(budgetStatus);
+        getDataObjectService().wrap(budget).fetchRelationship("budgetStatusDo");
+        getDataObjectService().save(budget);
+    }
+
+    public boolean isBudgetLocked(int budgetVersion, List<PessimisticLock> locks, String errorPath) {
+        Person user = getGlobalVariableService().getUserSession().getPerson();
+        for (PessimisticLock lock : locks) {
+            if (!lock.isOwnedByUser(user)  && getProposalBudgetLockService().doesBudgetVersionMatchDescriptor(lock.getLockDescriptor(),budgetVersion)) {
+                getGlobalVariableService().getMessageMap().putError(errorPath,KeyConstants.ERROR_COMPLETE_BUDGET_LOCK);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public ProposalDevelopmentBudgetExt getSelectedBudget(Long budgetId, List<ProposalDevelopmentBudgetExt> budgets) {
+        for (ProposalDevelopmentBudgetExt curBudget : budgets) {
+            if (ObjectUtils.equals(budgetId, curBudget.getBudgetId())) {
+                return curBudget;
+            }
+        }
+        return null;
+    }
+
+    public boolean isAllowedToCompleteBudget(ProposalDevelopmentBudgetExt budget, String errorPath) {
+        boolean isRulePassed = getKcBusinessRulesEngine().applyRules(new BudgetAuditRuleEvent(budget));
+        if(!isRulePassed) {
+            getGlobalVariableService().getMessageMap().putError(errorPath, KeyConstants.CLEAR_AUDIT_ERRORS_BEFORE_CHANGE_STATUS_TO_COMPLETE);
+            return false;
+        }
+        return true;
+    }
 	
     public <T extends UifFormBase & SelectableBudget> ModelAndView populateBudgetSummary(Long budgetId, 
     		List<ProposalDevelopmentBudgetExt> budgets, T form) throws Exception {
@@ -270,4 +321,20 @@ public class ProposalBudgetSharedControllerServiceImpl implements ProposalBudget
 			BudgetCalculationService budgetCalculationService) {
 		this.budgetCalculationService = budgetCalculationService;
 	}
+
+    public ParameterService getParameterService() {
+        return parameterService;
+    }
+
+    public void setParameterService(ParameterService parameterService) {
+        this.parameterService = parameterService;
+    }
+
+    public ProposalBudgetLockService getProposalBudgetLockService() {
+        return proposalBudgetLockService;
+    }
+
+    public void setProposalBudgetLockService(ProposalBudgetLockService proposalBudgetLockService) {
+        this.proposalBudgetLockService = proposalBudgetLockService;
+    }
 }

@@ -43,6 +43,9 @@
     <import resource="classpath:org/kuali/coeus/sys/impl/SysImportRiceSpringBeans.xml"/>
     <import resource="classpath:org/kuali/coeus/sys/impl/SysImportModuleSpringBeans.xml"/>
 
+    <!-- only brought in on the grm profile -->
+    <import resource="classpath:co/kuali/coeus/grm/impl/GrmSysComponentSpringBeans.xml"/>
+
     <bean id="sysModule" parent="sysModule-parentBean" />
     <bean id="sysModule-parentBean" class="org.kuali.rice.krad.service.impl.ModuleServiceBase" abstract="true">
         <property name="moduleConfiguration" ref="sysModuleConfiguration"/>
