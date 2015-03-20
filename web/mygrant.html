@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+
+<script src="scripts/jquery/jquery.js"></script>
+
+<script>
+
+$(window).load(function() {
+  // ready() isnt working for msie
+  if (motd) {
+    $('#motd').html(motd);
+    $('#motd').show();
+  } else {
+    $('#motd').hide();
+  }
+});
+
+$(document).ready(function() {
+  if (motd) {
+    $('#motd').html(motd);
+    $('#motd').show();
+  } else {
+    $('#motd').hide();
+  }
+});
+
+</script>
+
+
+</head>
+<body>
+
+
+<link rel="stylesheet" type="text/css" href="/myGRANTwww/css/helptab.css">
+
+<br/><br/>
+
+<center>
+<div id="motd"></div>
+
+<br/><br/>
+
+<table class="table">
+  <tbody><tr><td class="span2" colspan="1">
+  <a class="helpComponent" id="createProposal" href="" target="_blank">
+  <span class="proposal-text"> Create Proposal</span>
+  <div class="tile"> <img class="helpComponent" src="/myGRANTwww/icons/create_proposal.png"> </div>
+  </a>  </td>
+ 
+   <td></td>
+  
+  <td class="span2" colspan="1">
+  <a class="helpComponent" href="" id="allMyProposals" target="_blank"</a>
+  <span class="proposal-text1"> Find My Proposals</span>
+  <div class="tile">  <img class="helpComponent" src="/myGRANTwww/icons/find.png">  </div>
+  </a>  </td>
+</tr></tbody></table>
+
+<br>
+
+<table class="table">
+  <tbody><tr><td class="span2 blue1" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/files/myGRANT_guide_NIH.pdf" target="_blank">
+  <span class="title-text"> NIH Guide</span>
+  <div class="tile">
+  <img class="helpComponent" src="/myGRANTwww/icons/nih.png">    </div>
+  </a>  </td>
+ 
+  <td></td>
+  
+  <td class="span2 yellow" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/files/myGRANT_guide_NSF.pdf" target="_blank">
+  <span class="title-text"> NSF Guide</span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/nsf.png">    </div>
+  </a>  </td>
+</tr></tbody></table>
+
+<table class="table"><tbody><tr>
+  <td class="span2 purple" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/files/myGRANT_guide_S2S.pdf" target="_blank">
+  <span class="title-text"> System to System (S2S) Guide</span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/grants.png">    </div>
+  </a>  </td>
+  
+  <td></td>
+ 
+  <td class="span1 blue2" colspan="1">
+  <a href="http://www.ors.hawaii.edu/files/myGRANT_guide_NIH_S2S.pdf" target="_blank">
+  <span class="title-text"> NIH S2S </span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/nih-s2s.png">    </div>
+  </a>  </td>
+  
+  <td></td>
+  <td class="span1 green" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/files/myGRANT_guide_general.pdf" target="_blank">
+  <span class="title-text"> General Guide</span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/non-grants.png">    </div>
+  </a>  </td>
+</tr></tbody></table>
+
+<table class="table">
+  <tbody><tr><td colspan="1" class="span1 yellow">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/5" target="_blank">
+  <span class="title-text"> Add Sponsor </span>
+  <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/add-sponsor.png">    </div>
+  </a>  </td>
+  
+  <td></td>
+  
+  <td class="span1 blue1" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/7" target="_blank">
+  <span class="title-text"> Add Site </span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/add-performance-site.png">    </div>
+  </a>  </td>
+  
+  <td></td>
+  <td class="span1 purple" colspan="1">
+  <a href="http://apps.ors.hawaii.edu/delegation" target="_blank">
+  <span class="title-text"> Delegation</span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/delegation.png">    </div>
+  </a>  </td>
+    
+    <td></td>
+  
+  <td class="span1 red" colspan="1">
+  <a href="http://apps.ors.hawaii.edu/routing" target="_blank">
+  <span class="title-text"> Unit Routing</span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/routing.png">    </div>
+  </a>  </td>
+
+</tr></tbody></table>
+
+<table class="table"> <tbody><tr>
+
+  <td class="span1 green" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/index.php/mygrant" target="_blank">
+  <span class="title-text"> myGRANT Info</span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/more-info.png">    </div>
+  </a>  </td>
+  <td></td>
+  
+  <td class="span1 red" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/index.php/reports" target="_blank">
+  <span class="title-text"> ORS Reports </span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/reports.png">    </div>
+  </a>  </td>
+  
+<td></td>
+  <td colspan="1" class="span1 blue2">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/index.php/mygrant-faq" target="_blank">
+  <span class="title-text"> FAQs </span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/faqs.png">    </div>
+  </a>  </td>
+  
+  <td></td>
+  <td class="span1 yellow" colspan="1">
+  <a class="helpComponent" href="http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/4" target="_blank">
+  <span class="title-text"> ORS Helpline </span>
+    <div class="tile">
+    <img class="helpComponent" src="/myGRANTwww/icons/helpline.png">    </div>
+  </a>  </td>
+</tr></tbody></table>
+
+
+<br/><br/><br/>
+
+<div class="continue-container">
+    <span><a class="helpComponent" href="portal.do?selectedTab=portalResearcherBody">Continue</a></span>
+    <a class="helpComponent" href="portal.do?selectedTab=portalResearcherBody">
+      <img class="helpComponent" style="vertical-align:middle;" src="/myGRANTwww/icons/chevron.png">
+    </a>
+</div>
+
+</center>
+
+
+
+
+</body></html>
