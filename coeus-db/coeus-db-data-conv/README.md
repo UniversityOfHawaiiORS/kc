@@ -50,3 +50,13 @@ IACUC (iacuc)
 For future use
 
 
+====================================================================
+UH NOTES
+====================================================================
+To get help on how to run
+
+	java -Djava.util.logging.config.file=/c/Users/ronald/github/UhKc/coeus-db/coeus-db-data-conv/src/main/resources/org/kuali/coeus/dc/jul-default.properties   -cp target/coeus-db-data-conv-6.0.1.jar org.kuali.coeus.dc.Main -help
+
+To dryrun proposal conversion
+
+	java -Djava.util.logging.config.file=/c/Users/ronald/github/UhKc/coeus-db/coeus-db-data-conv/src/main/resources/org/kuali/coeus/dc/jul-default.properties   -cp target/coeus-db-data-conv-6.0.1.jar org.kuali.coeus.dc.Main -dryrun -dbplatform Oracle -dbricecon jdbc:oracle:thin:@localhost:1530:KCDEV -dbcoeuscon jdbc:oracle:thin:@localhost:1530:KCDEV -dbriceuser user -dbricepwd mypassword  -dbcoeususer user -dbcoeuspwd mypassword
