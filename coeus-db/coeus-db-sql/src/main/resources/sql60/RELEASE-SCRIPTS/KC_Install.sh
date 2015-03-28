@@ -378,6 +378,17 @@ case "${dbtype}" in
 	sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < krrelease/datasql/KR_00_CLEAN_SEQ_BS.sql
         mv *.log ../../LOGS/
         cd ../.. ;;
+
+        # ADDED STEPS RRG to make upgrades easier
+        # Process 6.0.x scripts which KualiCo is no longer supporing in these install scripts.
+        cd ../../co/kuali/coeus/data/migration/sql/oracle/../../co/kuali/coeus/data/migration/sql/oracle
+        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 601_oracle_rice_upgrade.sql
+        sqlplus "${un}"/"${pw}${DBSvrNm}" < 601_oracle_kc_upgrade.sql
+        mv *.log ../../../../../../../sql60/RELEASE-SCRIPTS/LOGS
+        cd ../../../../../../../sql60/RELEASE-SCRIPTS
+        # Move logs folder so running for more than one schema will create multiple log folders
+        mv LOGS "LOGS.${un}"
+        
 		
 	"MYSQL")
 	
@@ -629,20 +640,16 @@ case "${dbtype}" in
             cd ..
         fi
                       
-		cd KC-RELEASE-99_9_9-SCRIPT
-		mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-99_9_9-Upgrade-MYSQL.sql > KR-RELEASE-99_9_9-Upgrade-MYSQL-Install.log 2>&1
-		mv *.log ../LOGS/
-		cd ..
+	cd KC-RELEASE-99_9_9-SCRIPT
+	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-99_9_9-Upgrade-MYSQL.sql > KR-RELEASE-99_9_9-Upgrade-MYSQL-Install.log 2>&1
+	mv *.log ../LOGS/
+	cd ..
 				
         cd KC-RELEASE-3_0-CLEAN/mysql
         mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < krrelease/datasql/KR_00_CLEAN_SEQ_BS.sql > KR_CLEAN_SEQ_BS-Mysql-Install.log 2>&1
         mv *.log ../../LOGS/
         cd ../.. ;;
+
 esac
 
-cd LOGS
 echo 'Review log files for errors during database install.'
-ls *.log
-
-
-
