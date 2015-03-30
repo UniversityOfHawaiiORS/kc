@@ -377,17 +377,17 @@ case "${dbtype}" in
 	cd KC-RELEASE-3_0-CLEAN/oracle
 	sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < krrelease/datasql/KR_00_CLEAN_SEQ_BS.sql
         mv *.log ../../LOGS/
-        cd ../.. ;;
+        cd ../..
 
         # ADDED STEPS RRG to make upgrades easier
         # Process 6.0.x scripts which KualiCo is no longer supporing in these install scripts.
-        cd ../../co/kuali/coeus/data/migration/sql/oracle/../../co/kuali/coeus/data/migration/sql/oracle
+        cd ../../co/kuali/coeus/data/migration/sql/oracle
         sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 601_oracle_rice_upgrade.sql
         sqlplus "${un}"/"${pw}${DBSvrNm}" < 601_oracle_kc_upgrade.sql
         mv *.log ../../../../../../../sql60/RELEASE-SCRIPTS/LOGS
         cd ../../../../../../../sql60/RELEASE-SCRIPTS
         # Move logs folder so running for more than one schema will create multiple log folders
-        mv LOGS "LOGS.${un}"
+        mv LOGS "LOGS.${un}" ;;
         
 		
 	"MYSQL")
