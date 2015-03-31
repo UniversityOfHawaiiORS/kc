@@ -40,15 +40,18 @@ public class RoleDaoImpl implements RoleDao {
     public void copyRoleMembersToDocAccessType(Collection<String> roleIds, KimAttributeDocumentValueHandler handler) {
 
         final String kimTypeId = kimTypeDao.getDocAccessKimTypeId();
+        LOG.info("Entered Method copyRoleMembersToDocAccessType kimTypeId=" + kimTypeId);
 
         if (kimTypeId == null || kimTypeId.trim().equals("")) {
             throw new IllegalStateException("Doc Access Kim Type is not found");
         }
 
         for (String roleId : roleIds) {
+        	LOG.info("***********************  processing roleId:" + roleId + "************************************************");
             Role existingRole = getRole(roleId);
 
             if (!existingRole.getKimTypeId().equals(kimTypeId) && copyExists(createNewRoleName(existingRole.getName()), existingRole.getNamespaceCode())) {
+            	LOG.info("--calling copyRoleMembers");
                 copyRoleMembers(existingRole, handler);
             }
         }
@@ -66,7 +69,7 @@ public class RoleDaoImpl implements RoleDao {
             if (exists) {
                 return true;
             } else {
-                LOG.warning("Copy Role does not exist for name: " + name + " and namespace: " + namespace);
+                LOG.info("Skipping: Copy Role does not exist for name: " + name + " and namespace: " + namespace);
                 return false;
             }
 
@@ -83,51 +86,88 @@ public class RoleDaoImpl implements RoleDao {
 
         Collection<DocumentAccess> accessesToSave = new ArrayList<>();
         Collection<String> attrsToDelete = new ArrayList<>();
-
+        LOG.info("entered copyRoleMembers");
         for (RoleMember member : getRoleMembers(existingRole.getId())) {
+        	LOG.info("--processing role member:" + member.getId());
             if ("P".equals(member.getTypeCode())) {
                 Collection<RoleMemberAttributeData> attrs = getRoleMemberAttributeData(member.getId());
                 for (RoleMemberAttributeData attr : attrs) {
+                	LOG.info("----Processing Attr:" + attr.getKimAttributeId());
                     if (handler.isDocumentValueType(attr.getKimAttributeId())) {
-                        String documentNumber = handler.transform(attr.getAttributeValue());
-                        if (documentNumber != null) {
-                            DocumentAccess access = new DocumentAccess();
-                            access.setId(sequenceDaoService.getNextCoeusSequence("SEQ_DOCUMENT_ACCESS_ID", ""));
-                            access.setDocumentNumber(documentNumber);
-                            access.setPrincipalId(member.getMemberId());
-                            access.setRoleName(createNewRoleName(existingRole.getName()));
-                            access.setNamespaceCode(existingRole.getNamespaceCode());
-                            access.setUpdateUser("kc-doc-access-conv");
-                            access.setUpdateTimestamp(new Timestamp(new java.util.Date().getTime()));
-                            access.setVersionNumber(1L);
-                            access.setObjectId(UUID.randomUUID().toString());
-
-                            accessesToSave.add(access);
-                        }
+                    	// RRG added null check we have pd roles with null for doc number somehow.  We can ignore those.
+                    	if (attr.getAttributeValue() != null) {
+	                        String documentNumber = handler.transform(attr.getAttributeValue());
+	                        if (documentNumber != null) {
+	                        	LOG.info("------DocumentNumber:" + documentNumber);
+	                            DocumentAccess access = new DocumentAccess();
+	                            access.setId(sequenceDaoService.getNextCoeusSequence("SEQ_DOCUMENT_ACCESS_ID", ""));
+	                            access.setDocumentNumber(documentNumber);
+	                            access.setPrincipalId(member.getMemberId());
+	                            access.setRoleName(createNewRoleName(existingRole.getName()));
+	                            access.setNamespaceCode(existingRole.getNamespaceCode());
+	                            access.setUpdateUser("kc-doc-access-conv");
+	                            access.setUpdateTimestamp(new Timestamp(new java.util.Date().getTime()));
+	                            access.setVersionNumber(1L);
+	                            access.setObjectId(UUID.randomUUID().toString());
+	
+	                            accessesToSave.add(access);
+	                        } else {
+	                        	LOG.info("Skipping: DocumentNumber: null");
+	                        }
+                    	}
 
                         attrsToDelete.add(attr.getId());
+                    } else {
+                    	LOG.info("Skipping: Role Attribute for document number has null value");
                     }
                 }
             }
         }
 
+        // RRG fixed the compare method.  It was written wrong and identifying false duplicate data.
+        // it was originally written to compare document number only when not full match this resulted
+        // in loss of data when document number matched but principal id was different for which we have many cases
         final Set<DocumentAccess> filtered = new TreeSet<>(new Comparator<DocumentAccess>(){
             @Override
-            public int compare(DocumentAccess o1, DocumentAccess o2) {
-                if (o1.getPrincipalId().equals(o2.getPrincipalId())
-                        && o1.getDocumentNumber().equals(o2.getDocumentNumber())
-                        && o1.getRoleName().equals(o2.getRoleName())
-                        && o1.getNamespaceCode().equals(o2.getNamespaceCode())) {
-                    return 0;
-                } else {
-                    return o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
-                }
+            public int compare(DocumentAccess o1, DocumentAccess o2) { 
+            	// if principalId differ return compare
+            	int comp = o1.getPrincipalId().compareTo(o2.getPrincipalId());
+            	if (comp != 0) {
+            		return comp;
+            	}
+            	
+            	// if docNum differ return compare
+            	comp = o1.getDocumentNumber().compareTo(o2.getDocumentNumber());
+            	if (comp != 0) {
+            		return comp;
+            	}
+            	
+            	// if roleName differ return compare
+            	comp = o1.getRoleName().compareTo(o2.getRoleName());
+            	if (comp != 0) {
+            		return comp;
+            	}
+            	
+            	// return compare of namespace since it's the last item
+            	comp = o1.getNamespaceCode().compareTo(o2.getNamespaceCode());
+            	if (comp == 0) {
+            		LOG.info("found duplicate to be filtered pi/doc/role/ns:" 
+            	        + o1.getPrincipalId() + "/" + o1.getDocumentNumber() + "/" + o1.getRoleName() + "/" + o1.getNamespaceCode()
+                        + o2.getPrincipalId() + "/" + o2.getDocumentNumber() + "/" + o2.getRoleName() + "/" + o2.getNamespaceCode());
+            	}
+            	return comp;
             }
         });
         filtered.addAll(accessesToSave);
 
         if (filtered.size() != accessesToSave.size()) {
-            LOG.warning("Duplicate role member document qualifiers detected");
+            LOG.warning("Duplicate role member document qualifiers detected OrigSize=" + accessesToSave.size() + ", FilteredSize=" + filtered.size());
+            for (DocumentAccess access:accessesToSave) {
+            	LOG.info("AccessToSave:" + access.getDocumentNumber() + ":" + access.getPrincipalId() + ":" + access.getRoleName() + ":" + access.getNamespaceCode());
+            }
+            for (DocumentAccess access:filtered) {
+            	LOG.info("AccessFiltered:" + access.getDocumentNumber() + ":" + access.getPrincipalId() + ":" + access.getRoleName() + ":" + access.getNamespaceCode());
+            }
         }
 
         saveDocumentAccess(filtered);
@@ -135,9 +175,12 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     private void deleteAttributeData(Collection<String> attrsToDelete) {
+    	LOG.info("Entered deleteAttributeData");
         for (String attr: attrsToDelete) {
             Connection connection = connectionDaoService.getRiceConnection();
             try (PreparedStatement stmt = setString(1, attr, connection.prepareStatement("DELETE FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ATTR_DATA_ID = ?"))) {
+            	LOG.info("SQLALTER:DELETE FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ATTR_DATA_ID = ?");
+            	LOG.info("SQLALTER:--ATTR_DATA_ID="+ attr);
                 stmt.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
@@ -146,7 +189,9 @@ public class RoleDaoImpl implements RoleDao {
     }
 
     private void saveDocumentAccess(Collection<DocumentAccess> accesses) {
+    	LOG.info("Entered saveDocumentAccess");
         for (DocumentAccess access : accesses) {
+        	LOG.info("saving document access document:" + access.getDocumentNumber());
             Connection connection = connectionDaoService.getCoeusConnection();
             try (PreparedStatement stmt = setString(9, access.getObjectId(),
                                         setLong(8, access.getVersionNumber(),
@@ -157,7 +202,17 @@ public class RoleDaoImpl implements RoleDao {
                                         setString(3, access.getPrincipalId(),
                                         setString(2, access.getDocumentNumber(),
                                         setString(1, access.getId(), connection.prepareStatement("INSERT INTO DOCUMENT_ACCESS (DOC_ACCESS_ID, DOC_HDR_ID, PRNCPL_ID, ROLE_NM, NMSPC_CD, UPDATE_TIMESTAMP, UPDATE_USER, VER_NBR, OBJ_ID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"))))))))))) {
-                stmt.executeUpdate();
+                LOG.info("SQLALTER:INSERT INTO DOCUMENT_ACCESS (DOC_ACCESS_ID, DOC_HDR_ID, PRNCPL_ID, ROLE_NM, NMSPC_CD, UPDATE_TIMESTAMP, UPDATE_USER, VER_NBR, OBJ_ID) VALUES (, ?, ?, ?, ?, ?, ?, ?, ?)" );
+                LOG.info("SQLALTER:--DOC_ACCESS_ID=" + access.getId());
+                LOG.info("SQLALTER:--DOC_HDR_ID=" + access.getDocumentNumber());
+                LOG.info("SQLALTER:--PRNCPL_ID=" + access.getPrincipalId());
+                LOG.info("SQLALTER:--ROLE_NM=" + access.getRoleName());
+                LOG.info("SQLALTER:--NMSPC_CD=" + access.getNamespaceCode());
+                LOG.info("SQLALTER:--UPDATE_TIMESTAMP=" + access.getUpdateTimestamp());
+                LOG.info("SQLALTER:--UPDATE_USER=" + access.getUpdateUser());
+                LOG.info("SQLALTER:--VER_NBR=" + access.getVersionNumber());
+                LOG.info("SQLALTER:--OBJ_ID=" + access.getObjectId());
+            	stmt.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -197,8 +252,10 @@ public class RoleDaoImpl implements RoleDao {
 
     protected Collection<RoleMemberAttributeData> getRoleMemberAttributeData(String roleMemberId) {
         Connection connection = connectionDaoService.getRiceConnection();
-        try (PreparedStatement stmt = setString(1, roleMemberId, connection.prepareStatement("SELECT ATTR_DATA_ID, OBJ_ID, VER_NBR, ROLE_MBR_ID, KIM_TYP_ID, KIM_ATTR_DEFN_ID, ATTR_VAL FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ROLE_MBR_ID = ?"));
-            ResultSet result = stmt.executeQuery()) {
+    	LOG.info("SQLREAD:SELECT ATTR_DATA_ID, OBJ_ID, VER_NBR, ROLE_MBR_ID, KIM_TYP_ID, KIM_ATTR_DEFN_ID, ATTR_VAL FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ROLE_MBR_ID = ?");
+    	LOG.info("SQLREAD:--ROLE_MBR_ID:" + roleMemberId);
+        try (PreparedStatement stmt = setString(1, roleMemberId, connection.prepareStatement("SELECT ATTR_DATA_ID, OBJ_ID, VER_NBR, ROLE_MBR_ID, KIM_TYP_ID, KIM_ATTR_DEFN_ID, ATTR_VAL FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ROLE_MBR_ID = ?"));    		
+        	ResultSet result = stmt.executeQuery()) {
 
             final Collection<RoleMemberAttributeData> attrs = new ArrayList<RoleMemberAttributeData>();
             while(result.next()) {
@@ -213,6 +270,7 @@ public class RoleDaoImpl implements RoleDao {
 
                 attrs.add(attr);
             }
+            LOG.info("SQLREAD:--Result Count:" + attrs.size());
             return attrs;
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -40,6 +40,7 @@ public class ProposalKimAttributeDocumentValueHandler implements KimAttributeDoc
     @Override
     public String transform(String val) {
         Connection connection = connectionDaoService.getCoeusConnection();
+        LOG.info("Entered transform document:" + val);
         try (PreparedStatement stmt = setString(1, val, connection.prepareStatement("SELECT DOCUMENT_NUMBER FROM EPS_PROPOSAL WHERE PROPOSAL_NUMBER = ?"));
             ResultSet result = stmt.executeQuery()) {
             if (result.next()) {
