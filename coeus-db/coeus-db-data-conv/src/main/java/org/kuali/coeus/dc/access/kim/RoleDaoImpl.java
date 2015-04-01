@@ -85,7 +85,9 @@ public class RoleDaoImpl implements RoleDao {
     protected void copyRoleMembers(Role existingRole, KimAttributeDocumentValueHandler handler) {
 
         Collection<DocumentAccess> accessesToSave = new ArrayList<>();
-        Collection<String> attrsToDelete = new ArrayList<>();
+        // RRG Refactor to delete role member entirely not just the document number attribute
+        // Collection<String> attrsToDelete = new ArrayList<>();
+        Collection<String> roleMbrDeleteIds = new HashSet<>();
         LOG.info("entered copyRoleMembers");
         for (RoleMember member : getRoleMembers(existingRole.getId())) {
         	LOG.info("--processing role member:" + member.getId());
@@ -111,12 +113,18 @@ public class RoleDaoImpl implements RoleDao {
 	                            access.setObjectId(UUID.randomUUID().toString());
 	
 	                            accessesToSave.add(access);
+	                            // RRG Refactor to delete role member entirely
+	                            // Since we added the access record to be created
+	                            // add this role member id to the role mbr id's to be deleted
+	                            // This is a hashset so duplicate will be removed
+	                        	roleMbrDeleteIds.add(member.getId());
 	                        } else {
 	                        	LOG.info("Skipping: DocumentNumber: null");
 	                        }
                     	}
 
-                        attrsToDelete.add(attr.getId());
+                    	// RRG Refactor to delete role member entirely not just the document number attribute
+                        // attrsToDelete.add(attr.getId());
                     } else {
                     	LOG.info("Skipping: Role Attribute for document number has null value");
                     }
@@ -171,9 +179,35 @@ public class RoleDaoImpl implements RoleDao {
         }
 
         saveDocumentAccess(filtered);
-        deleteAttributeData(attrsToDelete);
+        deleteRoleMembers(roleMbrDeleteIds);
+        //deleteAttributeData(attrsToDelete);
+    }
+    
+    private void deleteRoleMembers(Collection<String> roleMemberIdsToDelete) {
+    	LOG.info("Entered deleteRoleMembers");
+        for (String roleMbrId: roleMemberIdsToDelete) {
+        	LOG.info("Removing KRIM_ROLE_MBR_T for ROLE_MBR_ID=" + roleMbrId);
+            Connection connection = connectionDaoService.getRiceConnection();
+            // First remove attribute data for the role member (data integrity)
+            try (PreparedStatement stmt = setString(1, roleMbrId, connection.prepareStatement("DELETE FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ROLE_MBR_ID = ?"))) {
+            	LOG.info("SQLALTER:DELETE FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ROLE_MBR_ID = ?");
+            	LOG.info("SQLALTER:--ROLE_MBR_ID="+ roleMbrId);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            // Then remove the memeber data itself
+            try (PreparedStatement stmt = setString(1, roleMbrId, connection.prepareStatement("DELETE FROM KRIM_ROLE_MBR_T WHERE ROLE_MBR_ID = ?"))) {
+            	LOG.info("SQLALTER:DELETE FROM KRIM_ROLE_MBR_T WHERE ROLE_MBR_ID = ?");
+            	LOG.info("SQLALTER:--ROLE_MBR_ID="+ roleMbrId);
+                stmt.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
+    /*
     private void deleteAttributeData(Collection<String> attrsToDelete) {
     	LOG.info("Entered deleteAttributeData");
         for (String attr: attrsToDelete) {
@@ -187,6 +221,7 @@ public class RoleDaoImpl implements RoleDao {
             }
         }
     }
+    */
 
     private void saveDocumentAccess(Collection<DocumentAccess> accesses) {
     	LOG.info("Entered saveDocumentAccess");
