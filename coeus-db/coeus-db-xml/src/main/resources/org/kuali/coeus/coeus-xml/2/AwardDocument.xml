@@ -149,13 +149,6 @@
 					<finalApproval>false</finalApproval>
 	            </requests>
 			</routeNodes>
-			<!-- KC-335: Allow anyone with permissions to submit -->
-			<policies>
-				<policy>
-					<name>INITIATOR_MUST_ROUTE</name>
-					<value>false</value>
-				</policy>
-			</policies>
 		</documentType>
 	</documentTypes>
 	
