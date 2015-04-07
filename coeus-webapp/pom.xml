@@ -89,6 +89,11 @@
             <groupId>org.jasig.cas.client</groupId>
 	    <artifactId>cas-client-core</artifactId>
     	</dependency>
+    	<!-- RRG Adding Oracle persistence dependency so I don't have to use oracle profile -->
+        <dependency>
+            <groupId>org.eclipse.persistence</groupId>
+            <artifactId>org.eclipse.persistence.oracle</artifactId>
+    	</dependency>
     </dependencies>
 
 
