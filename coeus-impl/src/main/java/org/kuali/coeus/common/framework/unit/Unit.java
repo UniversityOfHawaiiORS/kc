@@ -52,6 +52,7 @@ public class Unit extends KcPersistableBusinessObjectBase implements MutableInac
     private String unitName;
 
     // KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+    @Transient
     private String unitSearchInput;
 
     //maps to Campus-code

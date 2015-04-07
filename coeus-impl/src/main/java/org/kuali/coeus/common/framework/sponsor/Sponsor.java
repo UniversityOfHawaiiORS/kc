@@ -75,6 +75,7 @@ public class Sponsor extends KcPersistableBusinessObjectBase implements SponsorC
     private String sponsorName;
 
     // KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+    @Transient
     private String sponsorSearchInput;
 
     @Column(name = "SPONSOR_TYPE_CODE")
