@@ -53,17 +53,20 @@
       </property>
     </bean>
 
-    <!--UH KC-367 load UH specific resources -->
-    <bean id="kcRiceSpringResourceLoaderConfigurer" parent="kcRiceSpringResourceLoaderConfigurer-parentBean">
+    <!--UH KC-367 load UH specific resources (this used to override kc bean but they removed it in 6.0 so I added parent and class locally -->  
+    <bean id="kcRiceSpringResourceLoaderConfigurer" parent="kcRiceSpringResourceLoaderConfigurer-parentBean"/>
+    <bean id="kcRiceSpringResourceLoaderConfigurer-parentBean" class="org.kuali.rice.core.framework.resourceloader.RiceSpringResourceLoaderConfigurer">
+      <property name="localServiceName" value="KC-Context"/>
+      <property name="serviceNameSpaceURI" value="KC" />
       <property name="beanNames">
-      <set merge="true">
-            <value>awardAdvancedSearchLookupable</value>
+      <set>
+          <value>awardAdvancedSearchLookupable</value>
           <value>institutionalProposalAdvancedSearchLookupable</value>
           <value>uhOrganizationLookupable</value>
           <value>UhPersonDelegateLookupable</value>
       </set>
       </property>
-    </bean>
+    </bean>   
     
     <!--  KC-679 New routing for 5.1.1 -->
        
@@ -76,8 +79,9 @@
     </bean>
     
     <!-- KC-801 Create KRMS function to return if unrecovered F & A is present in final PD budget -->
+<!--
     <bean id="UhPropDevJavaFunctionKrmsTermService" class="edu.hawaii.proposaldevelopment.service.impl.UhPropDevJavaFunctionKrmsTermServiceImpl"/>
-        
+-->>
     <!-- KC-809 eDocLite doesn't work in KC when running bundled mode -->
     <bean id="edlConfigurer" class="org.kuali.rice.edl.impl.config.EDLConfigurer"/>      
 </beans>

@@ -34,9 +34,6 @@
     <context-param>
         <param-name>web.bootstrap.spring.file</param-name>
         <param-value>classpath:KcBootstrapSpringBeans.xml</param-value>
-      <!-- UH CUSTOMIZATION START -->
-      <param-value>classpath:uh-bootstrap-springbeans.xml</param-value>
-      <!-- UH CUSTOMIZATION END -->
     </context-param>
 
     <!-- Change this if you want to use a different config file, can be overridden with a system property-->

@@ -36,5 +36,7 @@
     <import resource="classpath:org/kuali/kra/subaward/SubAwardBootstrapSpringBeans.xml"/>
     <import resource="classpath:org/kuali/kra/negotiation/NegotiationBootstrapSpringBeans.xml"/>
     <import resource="classpath:org/kuali/kra/coi/CoiBootstrapSpringBeans.xml"/>
-
+    
+    <!-- UH Spring Bean Files -->
+    <import resource="classpath:edu/hawaii/UhSpringBeans.xml" />
 </beans>
