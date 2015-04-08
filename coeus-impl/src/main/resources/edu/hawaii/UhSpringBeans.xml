@@ -81,7 +81,7 @@
     <!-- KC-801 Create KRMS function to return if unrecovered F & A is present in final PD budget -->
 <!--
     <bean id="UhPropDevJavaFunctionKrmsTermService" class="edu.hawaii.proposaldevelopment.service.impl.UhPropDevJavaFunctionKrmsTermServiceImpl"/>
--->>
+-->
     <!-- KC-809 eDocLite doesn't work in KC when running bundled mode -->
     <bean id="edlConfigurer" class="org.kuali.rice.edl.impl.config.EDLConfigurer"/>      
 </beans>
