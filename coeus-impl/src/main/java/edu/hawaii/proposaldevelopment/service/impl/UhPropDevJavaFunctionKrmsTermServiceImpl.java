@@ -21,13 +21,14 @@ import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.framework.sponsor.Sponsor;
 import org.kuali.coeus.common.impl.krms.KcKrmsJavaFunctionTermServiceBase;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+import org.springframework.stereotype.Component;
 
 import edu.hawaii.proposaldevelopment.service.UhPropDevJavaFunctionKrmsTermService;
 
 
+@Component("UhPropDevJavaFunctionKrmsTermService")
 public class UhPropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunctionTermServiceBase implements UhPropDevJavaFunctionKrmsTermService {
     
-    //  RRG 
     /**
      * 
      * This method checks if there is a final budget which contains unrecovered F & A  

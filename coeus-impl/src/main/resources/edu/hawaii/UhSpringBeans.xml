@@ -79,7 +79,7 @@
     </bean>
     
     <!-- KC-801 Create KRMS function to return if unrecovered F & A is present in final PD budget -->
-<!--
+<!--  NOTE in KC 6.0 this is replaced by spring beans autowire directive @Component("propDevJavaFunctionKrmsTermService") in the objects java code
     <bean id="UhPropDevJavaFunctionKrmsTermService" class="edu.hawaii.proposaldevelopment.service.impl.UhPropDevJavaFunctionKrmsTermServiceImpl"/>
 -->
     <!-- KC-809 eDocLite doesn't work in KC when running bundled mode -->
