@@ -38,5 +38,5 @@
     <import resource="classpath:org/kuali/kra/coi/CoiBootstrapSpringBeans.xml"/>
     
     <!-- UH Spring Bean Files -->
-    <import resource="classpath:edu/hawaii/UhSpringBeans.xml" />
+    <import resource="classpath:edu/hawaii/UhSpringBeans.xml"/>
 </beans>

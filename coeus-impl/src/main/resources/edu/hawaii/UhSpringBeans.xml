@@ -21,9 +21,7 @@
                            http://www.springframework.org/schema/util
                            http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-    <bean id="customModuleConfiguration" parent="customModuleConfiguration-parentBean" />
-
-    <bean id="customModuleConfiguration-parentBean" class="org.kuali.rice.krad.bo.ModuleConfiguration" abstract="true">
+    <bean id="customModuleConfiguration" class="org.kuali.rice.krad.bo.ModuleConfiguration">
         <property name="initializeDataDictionary" value="true" />
         <property name="databaseRepositoryFilePaths">
             <list>
@@ -34,14 +32,37 @@
           <list>
             <value>edu.hawaii</value>
           </list>
-        </property>
+        </property>  
         <property name="dataDictionaryPackages">
             <list>
-                <value>edu/hawaii/datadictionary</value>
-                <!-- <value>edu/hawaii/datadictionary/docs</value> -->
-                <!-- <value>${kc.additional.datadictionary.location}</value> -->
-            </list>
-        </property>
+                <value>classpath:edu/hawaii/datadictionary/Award.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/AwardAdvancedSearch.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/AwardDocument.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/DevelopmentProposal.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/InstitutionalProposal.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/InstitutionalProposalAdvancedSearch.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/InstitutionalProposalCostShare.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/InstitutionalProposalUnrecoveredFandA.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/KcPerson.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/NegotiationActivity.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/NegotiationDocument.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/NonOrganizationalRolodex.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/Organization.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/PersonDocumentEmploymentInfo.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/PessimisticLock.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/ProposalDevelopmentDocument.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/ProposalLog.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/Rolodex.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/Sponsor.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/TimeAndMoneyDocument.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/UhAwardExtension.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/UhPersonDelegate.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/Unit.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/UnitAdministrator.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/docs/UhPersonDelegateMaintenanceDocument.xml</value>
+                <value>classpath:edu/hawaii/datadictionary/docs/UnitAdministratorMaintenanceDocument.xml</value>
+             </list>
+        </property>   
     </bean>
 
     <!-- KC-326 -->
@@ -54,8 +75,7 @@
     </bean>
 
     <!--UH KC-367 load UH specific resources (this used to override kc bean but they removed it in 6.0 so I added parent and class locally -->  
-    <bean id="kcRiceSpringResourceLoaderConfigurer" parent="kcRiceSpringResourceLoaderConfigurer-parentBean"/>
-    <bean id="kcRiceSpringResourceLoaderConfigurer-parentBean" class="org.kuali.rice.core.framework.resourceloader.RiceSpringResourceLoaderConfigurer">
+    <bean id="kcRiceSpringResourceLoaderConfigurer" class="org.kuali.rice.core.framework.resourceloader.RiceSpringResourceLoaderConfigurer">
       <property name="localServiceName" value="KC-Context"/>
       <property name="serviceNameSpaceURI" value="KC" />
       <property name="beanNames">
