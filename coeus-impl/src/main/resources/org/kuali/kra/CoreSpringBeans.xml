@@ -51,6 +51,9 @@
     <import resource="classpath:org/kuali/coeus/sys/framework/ImportRiceKradSpringBeans.xml"/>
     <import resource="classpath:org/kuali/rice/krad/config/KRADDependentModuleCommonImports.xml" />
 
+    <!-- only brought in on the grm profile -->
+    <import resource="classpath:co/kuali/coeus/grm/impl/GrmCoreSpringBeans.xml" />
+
     <bean id="coreModule" class="org.kuali.rice.krad.service.impl.ModuleServiceBase">
         <property name="moduleConfiguration" ref="coreModuleConfiguration"/>
         <property name="kualiModuleService" ref="kualiModuleService"/>
@@ -625,6 +628,7 @@
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardCloseout.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardContact.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardCopyRightsType.xml</value>
+                <value>classpath:org/kuali/kra/datadictionary/SubAwardCostType.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardCustomData.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardDocument.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardForms.xml</value>
@@ -950,6 +954,7 @@
                 <value>classpath:org/kuali/coeus/common/impl/auth/docperm/DocumentAccessMaintenanceDocument.xml</value>
                 <value>classpath:org/kuali/coeus/common/impl/LineItemTableCommon.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/AwardCgb.xml</value>
+                <value>classpath:org/kuali/kra/datadictionary/krad/common/DummyLoginOverrides.xml</value>
             </list>
         </property>
         <property name="databaseRepositoryFilePaths">
@@ -1231,7 +1236,7 @@
     
     <!-- Core Services -->
 
-    <bean id="accountCreationClient" class="org.kuali.kra.award.external.award.AccountCreationClientFactoryBean">
+    <bean id="accountCreationClient" class="org.kuali.kra.external.award.AccountCreationClientFactoryBean">
         <property name="sharedRice" value="${shared.rice}" />
         <property name="documentService" ref="documentService" />
         <property name="businessObjectService" ref="businessObjectService" />
@@ -1239,7 +1244,7 @@
         <property name="configurationService" ref="kualiConfigurationService" />
     </bean>
 
-    <bean id="awardAccountValidationService" class="org.kuali.kra.award.external.award.impl.AwardAccountValidationServiceImpl">
+    <bean id="awardAccountValidationService" class="org.kuali.kra.external.award.impl.AwardAccountValidationServiceImpl">
         <property name="businessObjectService" ref="businessObjectService" />
     </bean>
     

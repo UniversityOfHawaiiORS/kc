@@ -64,13 +64,24 @@
         <property name="items">
             <list>
                 <bean parent="Uif-InputField" class="org.kuali.coeus.propdev.impl.custom.ProposalDevelopmentCustomDataField"
-                      p:fieldLabel.labelText="@{#line.customAttribute ne null ? #line.customAttribute.label : &quot;Custom Attribute&quot;}"
-                      p:propertyName="value" p:required = "@{#ViewHelper.isRequired(#line.customAttribute, document.customDataList)}">
+                      p:fieldLabel.labelText="@{#line.customAttribute?.label?: &quot;Custom Attribute&quot;}@{#ViewHelper.isRequired(#line.customAttribute, document.customDataList) ? ': [color=red]*[/color]' : ':'}"
+                      p:fieldLabel.renderColon="false"
+                      p:propertyName="value">
                     <property name="suggest">
                         <bean parent="Uif-Suggest" p:render="false" />
                     </property>
                     <property name="quickfinder">
                         <bean parent="Uif-QuickFinder" p:render="false" />
+                    </property>
+                    <property name="inquiry">
+                        <bean parent="Uif-Inquiry" p:render="false" p:dataObjectClassName="org.kuali.coeus.common.framework.custom.arg.ArgValueLookup"
+                              p:inquiryParameters="value:value,customAttribute.lookupReturn:argumentName"
+                              p:viewName="PropDev-CustomData-ArgValueInquiry"/>
+                    </property>
+                </bean>
+                <bean parent="Uif-InputField" p:propertyName="customAttribute.lookupReturn" p:fieldLabel.render="false">
+                    <property name="control">
+                        <bean parent="Uif-HiddenControl" />
                     </property>
                 </bean>
             </list>

@@ -40,7 +40,6 @@ import org.kuali.rice.krad.exception.AuthorizationException;
 import org.kuali.rice.krad.uif.UifParameters;
 import org.kuali.rice.krad.util.AuditCluster;
 import org.kuali.rice.krad.util.AuditError;
-import org.kuali.rice.krad.util.KRADUtils;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -164,22 +163,21 @@ public class ProposalDevelopmentS2SController extends ProposalDevelopmentControl
    @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=clearOpportunity"})
    public ModelAndView clearOpportunity(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result, HttpServletRequest request, HttpServletResponse response)
            throws Exception {
-       ProposalDevelopmentDocument document = form.getProposalDevelopmentDocument();
-       DevelopmentProposal proposal = document.getDevelopmentProposal();
-       getLegacyDataAdapter().delete(proposal.getS2sOpportunity());
-       proposal.setS2sOpportunity(null);
-       //Reset Opportunity Title and Opportunity ID in the Sponsor & Program Information section
-       proposal.setProgramAnnouncementTitle("");
-       proposal.setProgramAnnouncementNumber("");
-       proposal.setCfdaNumber("");
-       proposal.setOpportunityIdForGG("");
+       ((ProposalDevelopmentViewHelperServiceImpl)form.getViewHelperService()).clearOpportunity(form.getDevelopmentProposal());
        return getRefreshControllerService().refresh(form);
    }
+
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=printFormsXml"})
+    public ModelAndView printFormsXml(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, HttpServletResponse response)
+            throws Exception {
+        form.getDevelopmentProposal().setGrantsGovSelectFlag(true);
+        return printForms(form,response);
+    }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=printForms"})
         public ModelAndView printForms(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, HttpServletResponse response)
             throws Exception {
-        ProposalDevelopmentDocument proposalDevelopmentDocument = getUpdatedDocument(form);
+        ProposalDevelopmentDocument proposalDevelopmentDocument = form.getProposalDevelopmentDocument();
 
         proposalDevelopmentDocumentViewAuthorizer.initializeDocumentAuthorizerIfNecessary(form.getProposalDevelopmentDocument());
 
@@ -192,10 +190,11 @@ public class ProposalDevelopmentS2SController extends ProposalDevelopmentControl
             return getModelAndViewService().getModelAndView(form);
         }
         FormPrintResult formPrintResult = getFormPrintService().printForm(proposalDevelopmentDocument);
+
         setValidationErrorMessage(formPrintResult.getErrors());
         KcFile attachmentDataSource = formPrintResult.getFile();
-        if(attachmentDataSource==null || attachmentDataSource.getData()==null || attachmentDataSource.getData().length==0 
-        		|| !formPrintResult.getErrors().isEmpty()){
+        if(attachmentDataSource==null || attachmentDataSource.getData()==null || attachmentDataSource.getData().length==0
+                || !formPrintResult.getErrors().isEmpty()){
             boolean grantsGovErrorExists = copyAuditErrorsToPage(Constants.GRANTSGOV_ERRORS, "grantsGovFormValidationErrors");
             if(grantsGovErrorExists){
                 getGlobalVariableService().getMessageMap().putError("grantsGovFormValidationErrors", KeyConstants.VALIDATTION_ERRORS_BEFORE_GRANTS_GOV_SUBMISSION);
@@ -205,14 +204,18 @@ public class ProposalDevelopmentS2SController extends ProposalDevelopmentControl
         if (proposalDevelopmentDocument.getDevelopmentProposal().getGrantsGovSelectFlag()) {
             File grantsGovXmlDirectoryFile = getS2sSubmissionService().getGrantsGovSavedFile(proposalDevelopmentDocument);
             byte[] bytes = new byte[(int) grantsGovXmlDirectoryFile.length()];
-            long size = bytes.length;
-            try (ByteArrayInputStream inputStream = new ByteArrayInputStream(bytes)) {
-                KRADUtils.addAttachmentToResponse(response, inputStream, "binary/octet-stream", grantsGovXmlDirectoryFile.getName() + ".zip", size);
+            FileInputStream fileInputStream = new FileInputStream(grantsGovXmlDirectoryFile);
+            fileInputStream.read(bytes);
+            int size = bytes.length;
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(size)) {
+                outputStream.write(bytes);
+                ControllerFileUtils.streamOutputToResponse(response, outputStream, "binary/octet-stream", grantsGovXmlDirectoryFile.getName(), size);
                 response.flushBuffer();
             }
             proposalDevelopmentDocument.getDevelopmentProposal().setGrantsGovSelectFlag(false);
             return getModelAndViewService().getModelAndView(form);
         }
+
         ControllerFileUtils.streamToResponse(attachmentDataSource, response);
         return getModelAndViewService().getModelAndView(form);
     }

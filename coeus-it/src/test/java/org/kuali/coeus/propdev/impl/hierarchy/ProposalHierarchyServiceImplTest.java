@@ -612,6 +612,7 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 		narrativeAttachment.setNarrative(narrative);
 		narrativeAttachment.setModuleNumber(1);
 		narrativeAttachment.setName("test");
+		narrativeAttachment.setFileDataId("0000000-000000-000000-0000");
 		narrative.setNarrativeAttachment(narrativeAttachment);
 	}
 
@@ -620,10 +621,11 @@ public class ProposalHierarchyServiceImplTest extends KcIntegrationTestBase {
 		List<ProposalSpecialReview> proposalSpecialReviews = new ArrayList<ProposalSpecialReview>();
 		ProposalSpecialReview proposalSpecialReview = new ProposalSpecialReview();
 		proposalSpecialReview.setDevelopmentProposal(developmentProposal);
-		proposalSpecialReview.setSpecialReviewTypeCode("1");
+		proposalSpecialReview.setSpecialReviewTypeCode("5");
 		proposalSpecialReview.setApprovalTypeCode("2");
 		proposalSpecialReview.setHierarchyProposalNumber(developmentProposal
 				.getHierarchyParentProposalNumber());
+        proposalSpecialReview.setSpecialReviewNumber(1);
 		proposalSpecialReviews.add(proposalSpecialReview);
 		developmentProposal.setPropSpecialReviews(proposalSpecialReviews);
 	}

@@ -25,7 +25,7 @@
     <parent>
         <groupId>org.kuali.coeus</groupId>
         <artifactId>coeus</artifactId>
-        <version>6.0.0</version>
+        <version>6.0.1</version>
     </parent>
     <artifactId>coeus-impl</artifactId>
     <packaging>jar</packaging>
@@ -430,6 +430,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.ws.security</groupId>
+            <artifactId>wss4j</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>
         </dependency>
@@ -541,6 +546,12 @@
 
         <dependency>
             <groupId>org.kuali.coeus</groupId>
+            <artifactId>coeus-db-sql</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.kuali.coeus</groupId>
             <artifactId>coeus-s2sgen-api</artifactId>
         </dependency>
 
@@ -548,7 +559,13 @@
             <groupId>org.kuali.coeus</groupId>
             <artifactId>coeus-s2sgen-impl</artifactId>
         </dependency>
-
+        
+        <dependency>
+        	<groupId>org.kuali.coeus</groupId>
+        	<artifactId>coeus-db-xml</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.kuali.rice</groupId>
             <artifactId>rice-edl-impl</artifactId>
@@ -669,4 +686,32 @@
             <artifactId>xstream</artifactId>
         </dependency>
     </dependencies>
+
+    <profiles>
+        <profile>
+            <id>grm</id>
+            <!-- comment out activation section to turn this profile off permanently
+            <activation>
+                <property>
+                    <name>!grm.off</name>
+                </property>
+            </activation>-->
+            <dependencies>
+                <dependency>
+                    <groupId>co.kuali</groupId>
+                    <artifactId>kc-sql</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.rsmart</groupId>
+                    <artifactId>tokenauth</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.rsmart.kuali</groupId>
+                    <artifactId>kc_hr_rest</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

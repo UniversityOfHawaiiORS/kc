@@ -512,10 +512,9 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
         changeKeyPersonnelUnits(newDoc, srcDoc.getDevelopmentProposal().getOwnedByUnitNumber(), criteria.getLeadUnitNumber());
 
-
-        if (!StringUtils.equals(srcDoc.getDevelopmentProposal().getUnitNumber(), newDoc.getDevelopmentProposal().getUnitNumber())) {
-            changeOrganizationAndLocations(newDoc);
-        }
+        // districts need to be changed if the org details have been changed
+        // do change even if unit is same.
+        changeOrganizationAndLocations(newDoc);
 
         setPreviousGrantsGovTrackingId(srcDoc.getDevelopmentProposal().getProposalNumber(), newDoc);
 
@@ -667,13 +666,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     }
 
     protected void cleanupHierarchy(ProposalDevelopmentDocument newDoc) {
-        // if proposal is parent, users want to be able to copy it and retain parent status so they can retain all data but still
-        // link children, otherwise
-        // this becomes an unlinked proposal and not all data syncs up to parent.
-        if (!StringUtils.equals(newDoc.getDevelopmentProposal().getHierarchyStatus(), HierarchyStatusConstants.Parent.code()))
-        {
-            newDoc.getDevelopmentProposal().setHierarchyStatus(HierarchyStatusConstants.None.code());
-        }
+        newDoc.getDevelopmentProposal().setHierarchyStatus(HierarchyStatusConstants.None.code());
         newDoc.getDevelopmentProposal().setHierarchyParentProposalNumber(null);
         newDoc.getDevelopmentProposal().setHierarchyLastSyncHashCode(null);
     }
@@ -697,7 +690,20 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                 proposalSite.setLocationName(proposalSite.getOrganization().getOrganizationName());
                 proposalSite.setRolodexId(proposalSite.getOrganization().getContactAddressId());
                 proposalSite.refreshReferenceObject("rolodex");
-                proposalSite.initializeDefaultCongressionalDistrict();
+                initializeCongressionalDistrict(proposalSite.getOrganizationId(), proposalSite);
+            }
+        }
+    }
+
+    protected void initializeCongressionalDistrict(String organizationId, ProposalSite proposalSite) {
+        Organization organization = (Organization)getDataObjectService().find(Organization.class, organizationId);
+
+        if (organization != null) {
+            String defaultDistrict = organization.getCongressionalDistrict();
+            if (!StringUtils.isEmpty(defaultDistrict)) {
+                proposalSite.setDefaultCongressionalDistrictIdentifier(defaultDistrict);
+            } else {
+                proposalSite.getCongressionalDistricts().clear();
             }
         }
     }

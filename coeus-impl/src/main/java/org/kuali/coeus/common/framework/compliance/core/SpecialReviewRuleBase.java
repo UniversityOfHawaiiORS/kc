@@ -21,6 +21,7 @@ package org.kuali.coeus.common.framework.compliance.core;
 import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.framework.compliance.exemption.SpecialReviewExemption;
+import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.rule.KcTransactionalDocumentRuleBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.iacuc.IacucProtocol;
@@ -282,21 +283,31 @@ public class SpecialReviewRuleBase<T extends SpecialReview<? extends SpecialRevi
             isValid = false;
             reportError(APPROVAL_DATE_FIELD, KeyConstants.ERROR_SPECIAL_REVIEW_REQUIRED_FOR_VALID, APPROVAL_DATE_TITLE, errorString);
         }
+
+        boolean kradScreen = !StringUtils.equals(EXEMPTION_TYPE_CODE_FIELD,getExemptionTypeCodeField());
+        boolean noExceptions = CollectionUtils.isEmpty(kradScreen?specialReview.getSpecialReviewExemptions():specialReview.getExemptionTypeCodes());
         if (approval.isExemptNumberFlag()) {
-            if (CollectionUtils.isEmpty(specialReview.getExemptionTypeCodes())) {
+            if (noExceptions) {
                 isValid = false;
-                reportError(EXEMPTION_TYPE_CODE_FIELD, KeyConstants.ERROR_SPECIAL_REVIEW_REQUIRED_FOR_VALID, EXEMPTION_TYPE_CODE_TITLE, errorString);
+                reportError(getExemptionTypeCodeField(), KeyConstants.ERROR_SPECIAL_REVIEW_REQUIRED_FOR_VALID, EXEMPTION_TYPE_CODE_TITLE, errorString);
             }
         } else {
-            if (!CollectionUtils.isEmpty(specialReview.getExemptionTypeCodes())) {
+            if (!noExceptions) {
                 isValid = false;
-                reportError(EXEMPTION_TYPE_CODE_FIELD, KeyConstants.ERROR_SPECIAL_REVIEW_CANNOT_SELECT_EXEMPTION_FOR_VALID, errorString);
+                reportError(getExemptionTypeCodeField(), KeyConstants.ERROR_SPECIAL_REVIEW_CANNOT_SELECT_EXEMPTION_FOR_VALID, errorString);
             }
         }
-        
+
         return isValid;
     }
-    
+
+    private String getExemptionTypeCodeField() {
+        List<String> errorPath = getGlobalVariableService().getMessageMap().getErrorPath();
+        if (errorPath.isEmpty() || StringUtils.equals(GlobalVariables.getMessageMap().getErrorPath().get(0),"specialReviewHelper.newSpecialReview")) {
+            return EXEMPTION_TYPE_CODE_FIELD;
+        }
+        return "specialReviewExemptions";
+    }
     /**
      * Validates the interdependencies between the different date fields and the statuses.
      * 
@@ -359,4 +370,7 @@ public class SpecialReviewRuleBase<T extends SpecialReview<? extends SpecialRevi
         this.iacucProtocolFinderDao = iacucProtocolFinderDao;
     }
 
+   public GlobalVariableService getGlobalVariableService() {
+        return KcServiceLocator.getService(GlobalVariableService.class);
+   }
 }
