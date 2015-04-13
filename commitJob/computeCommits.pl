@@ -2,6 +2,9 @@
 use strict;
 use warnings;
 
+my $commitBatchData = {};
+my $jiraProcessedList = {};
+
 sub processJira
 {
     my $commitCount = shift @_;
@@ -10,12 +13,22 @@ sub processJira
     my $fileJiraHash = shift @_;
     
     print "Processing $jira\n";
-    foreach (@{$jiraDataHash->{$jira}}) {
-        my @dataArray = @{$_};
-        my $fileName=$dataArray[0];
-        my $action=$dataArray[1];
-        my $description=$dataArray[2];
-        print "$commitCount:$jira:$fileName\n";
+    if (! exists $jiraProcessedList->{$jira}) {
+        foreach (@{$jiraDataHash->{$jira}}) {
+            my @dataArray = @{$_};
+            my $fileName=$dataArray[0];
+            my $action=$dataArray[1];
+            my $description=$dataArray[2];
+            my @commitData = [ $jira, $fileName, $action, $description ];
+            push(@{$commitBatchData->{$commitCount}}, @commitData);
+            push(@{$jiraProcessedList->{$jira}}, $commitCount);
+            foreach (@{$fileJiraHash->{$fileName}}) {
+               my $fileJira = $_;
+               processJira($commitCount,$fileJira, $jiraDataHash, $fileJiraHash);
+            }
+        }
+    } else {
+        print "$jira already processed\n"
     }
 }
 
@@ -25,7 +38,7 @@ sub writeHashData
     my $fileJiraHash = shift @_;
 
     foreach my $k (keys %$fileJiraHash) {
-       print "Processing $k\n";
+       print "Listing fileJiraHash for $k\n";
        foreach (@{$fileJiraHash->{$k}}) {
            print " : $_ \n";
        }
@@ -33,7 +46,7 @@ sub writeHashData
     }
 
     foreach my $k (keys %$jiraDataHash) {
-       print "Processing $k\n";
+       print "Listing jiraDataHash for  $k\n";
        foreach (@{$jiraDataHash->{$k}}) {
           my @dataArray = @{$_};
           print " : FileName:$dataArray[0] \n";
@@ -44,7 +57,7 @@ sub writeHashData
     }
 }
 
-my $commitCount=0;
+my $commitCount=100;
 my @array;
 open(my $fh, "<", "CommitData.tsv")
     or die "Failed to open file: $!\n";
@@ -94,4 +107,15 @@ foreach(@array)
 foreach my $k (keys %$jiraFileHash) {
     $commitCount += 1;
     processJira($commitCount,$k, $jiraDataHash, $fileJiraHash);
+}
+
+foreach my $k (keys %$commitBatchData) {
+   print "====  Commit $k Data Hash Begin  ============================================\n";
+   foreach (sort @{$commitBatchData->{$k}}) {
+      my @dataArray = @{$_};
+      print " : FileName:$dataArray[0] \n";
+      print " : \tAction:$dataArray[1] \n";
+      print " : \tDescription:$dataArray[2] \n";
+   }
+   print "====     Commit Data Hash End ============================================\n";
 }
