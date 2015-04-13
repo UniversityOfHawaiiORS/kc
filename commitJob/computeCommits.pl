@@ -109,13 +109,18 @@ foreach my $k (keys %$jiraFileHash) {
     processJira($commitCount,$k, $jiraDataHash, $fileJiraHash);
 }
 
-foreach my $k (keys %$commitBatchData) {
+# commitData = [ $jira, $fileName, $action, $description ];
+foreach my $k (sort keys %$commitBatchData) {
    print "====  Commit $k Data Hash Begin  ============================================\n";
-   foreach (sort @{$commitBatchData->{$k}}) {
+   foreach (@{$commitBatchData->{$k}}) {
       my @dataArray = @{$_};
-      print " : FileName:$dataArray[0] \n";
-      print " : \tAction:$dataArray[1] \n";
-      print " : \tDescription:$dataArray[2] \n";
+      my $jira = $dataArray[0];
+      my $fileName = $dataArray[1];
+      my $action = $dataArray[2];
+      my $description = $dataArray[3];
+      print " : Jira:$jira\n";
+      print " : FileName:$fileName\n";
+      print " : Action:$action\n";
+      print " : Description:$description\n";
    }
-   print "====     Commit Data Hash End ============================================\n";
 }
