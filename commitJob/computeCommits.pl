@@ -5,27 +5,33 @@ use Data::Dumper;
 
 my $commitBatchData = {};
 my $jiraProcessedList = {};
+my $jiraPath = "";
 
 sub processJira
 {
-    my $commitCount = shift @_;
+    my $commitLabel = shift @_;
     my $jira = shift @_;
     my $jiraDataHash = shift @_;
     my $fileJiraHash = shift @_;
     
-#    print "Processing $jira\n";
+   # print "Processing $jira\n";
+#print "new call";
+#print Dumper $jiraProcessedList->{$jira};
+
     if (! exists $jiraProcessedList->{$jira}) {
+        $jiraPath .= "->" . $jira;
         foreach (@{$jiraDataHash->{$jira}}) {
             my @dataArray = @{$_};
             my $fileName=$dataArray[0];
             my $action=$dataArray[1];
             my $description=$dataArray[2];
             my @commitData = [ $jira, $fileName, $action, $description ];
-            push(@{$commitBatchData->{$commitCount}}, @commitData);
-            push(@{$jiraProcessedList->{$jira}}, $commitCount);
+            push(@{$commitBatchData->{$commitLabel}}, @commitData);
+            push(@{$jiraProcessedList->{$jira}}, $commitLabel);
             foreach (@{$fileJiraHash->{$fileName}}) {
                my $fileJira = $_;
-               processJira($commitCount,$fileJira, $jiraDataHash, $fileJiraHash);
+#print $fileJira . ": " . $jiraPath . "\n";
+               processJira($commitLabel,$fileJira, $jiraDataHash, $fileJiraHash, $jiraPath);
             }
         }
     } else {
@@ -108,7 +114,11 @@ foreach(@array)
 foreach my $k (keys %$jiraFileHash) {
     $commitCount += 1;
     my $commitLabel = $commitCount . ":" . $k ;
+    $jiraPath = "";
     processJira($commitLabel,$k, $jiraDataHash, $fileJiraHash);
+    print "====  JiraPath:$jiraPath  ============================================\n";
+last;
+
 }
 
 my $commitResults = {};
