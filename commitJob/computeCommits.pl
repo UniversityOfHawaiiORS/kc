@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
+use Data::Dumper;
 
 my $commitBatchData = {};
 my $jiraProcessedList = {};
@@ -12,7 +13,7 @@ sub processJira
     my $jiraDataHash = shift @_;
     my $fileJiraHash = shift @_;
     
-    print "Processing $jira\n";
+#    print "Processing $jira\n";
     if (! exists $jiraProcessedList->{$jira}) {
         foreach (@{$jiraDataHash->{$jira}}) {
             my @dataArray = @{$_};
@@ -28,7 +29,7 @@ sub processJira
             }
         }
     } else {
-        print "$jira already processed\n"
+#        print "$jira already processed\n"
     }
 }
 
@@ -106,21 +107,43 @@ foreach(@array)
 
 foreach my $k (keys %$jiraFileHash) {
     $commitCount += 1;
-    processJira($commitCount,$k, $jiraDataHash, $fileJiraHash);
+    my $commitLabel = $commitCount . ":" . $k ;
+    processJira($commitLabel,$k, $jiraDataHash, $fileJiraHash);
 }
 
-# commitData = [ $jira, $fileName, $action, $description ];
+my $commitResults = {};
 foreach my $k (sort keys %$commitBatchData) {
-   print "====  Commit $k Data Hash Begin  ============================================\n";
+#   print "====  Commit $k Data Hash Begin  ============================================\n";
+   my $commitFileResults = {};
    foreach (@{$commitBatchData->{$k}}) {
       my @dataArray = @{$_};
       my $jira = $dataArray[0];
       my $fileName = $dataArray[1];
       my $action = $dataArray[2];
       my $description = $dataArray[3];
-      print " : Jira:$jira\n";
-      print " : FileName:$fileName\n";
-      print " : Action:$action\n";
-      print " : Description:$description\n";
+#      print " : Jira:$jira\n";
+#      print " : FileName:$fileName\n";
+#      print " : Action:$action\n";
+#      print " : Description:$description\n";
+      my $thisFileDetails = $jira . ":" . $action . ":" . $description;
+      my $fullFileDetails = $thisFileDetails;
+      if (exists $commitFileResults->{$fileName}) {
+          my $value = $commitFileResults->{$fileName};
+          $fullFileDetails = $value;
+          $fullFileDetails .= "\n";
+          $fullFileDetails .= $thisFileDetails;
+      }
+      $commitFileResults->{$fileName}=$fullFileDetails;
+   }
+   $commitResults->{$k}= $commitFileResults;
+}
+
+
+foreach my $commitKey (sort keys %$commitResults) {
+   print "====  Commit $commitKey  ============================================\n";
+   foreach  my $fileKey (keys %{$commitResults->{$commitKey}}) {
+       print ": File:$fileKey\n";
+       my $commitComment= $commitResults->{$commitKey}->{$fileKey};
+       print ":\tComment:$commitComment\n";
    }
 }
