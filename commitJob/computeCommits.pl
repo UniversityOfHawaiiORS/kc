@@ -3,6 +3,9 @@ use strict;
 use warnings;
 use Data::Dumper;
 
+my $fromBranch = "uh-modifications-initial-effort-6.0.1";
+my $targetDirectory = "/cygdrive/c/Users/ronald/github/UhKc-Merge/";
+
 my $commitBatchData = {};
 my $jiraProcessedList = {};
 my $jiraPath = "";
@@ -155,13 +158,15 @@ foreach my $k (sort keys %$commitBatchData) {
 #      print " : FileName:$fileName\n";
 #      print " : Action:$action\n";
 #      print " : Description:$description\n";
-      my $thisFileDetails = $jira . ":" . $action . ":" . $description;
+      my $thisFileDetails = "\n" . $fileName . "\n" . $jira . ":" . $action . ":" . $description . "\n";
       my $fullFileDetails = $thisFileDetails;
       if (exists $commitFileResults->{$fileName}) {
           my $value = $commitFileResults->{$fileName};
-          $fullFileDetails = $value;
-          $fullFileDetails .= "\n";
-          $fullFileDetails .= $thisFileDetails;
+          # Add details if they are not already present
+          if (!index($fullFileDetails, $value)) {
+              $fullFileDetails = $value;
+              $fullFileDetails .= $thisFileDetails;
+         }
       }
       $commitFileResults->{$fileName}=$fullFileDetails;
    }
@@ -169,12 +174,33 @@ foreach my $k (sort keys %$commitBatchData) {
 }
 
 
+my @commands;
+my $fullCommitComment="";
+
 foreach my $commitKey (sort keys %$commitResults) {
+   $fullCommitComment="";
    print "====  Commit $commitKey  ============================================\n";
    print "====  $commitJiraPaths->{$commitKey}  ============================================\n";
    foreach  my $fileKey (keys %{$commitResults->{$commitKey}}) {
        print ": File:$fileKey\n";
        my $commitComment= $commitResults->{$commitKey}->{$fileKey};
        print ":\tComment:$commitComment\n";
+       $fullCommitComment .= $commitComment;
+       push(@commands,"echo git checkout $fromBranch ${fileKey}");
    }
+   my $messageFileName = ${commitKey} . ".message.txt";
+   open(my $messageFile, '>', $messageFileName) or die "Could not open file '$messageFileName' $!";
+   print $messageFile "KC-6.0 Upgrade Commit containing the following JIRA Changes $commitJiraPaths->{$commitKey}\n\n";
+   $fullCommitComment =~ s/KC-/\nKC-/g;
+   print $messageFile "$fullCommitComment\n";
+   close $messageFile;
+   push(@commands,"echo git commit -F $messageFileName");
 }
+
+my $filename = "gitCommands.sh";
+open(my $cmdFile, '>', $filename) or die "Could not open file '$filename' $!";
+foreach (@commands) {
+   my $cmd = $_;
+   print $cmdFile "$cmd\n";
+}
+close $cmdFile;

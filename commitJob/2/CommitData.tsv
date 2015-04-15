@@ -1,25 +1,7 @@
 AppResources	Keep	Uh Application resources	coeus-impl/src/main/resources/UhApplicationResources.properties
 CACERTS	Keep	cacerts file	coeus-impl/src/main/resources/META-INF/cacerts.ips.keystore
 Helpline	Keep	helpline info jsp file	coeus-webapp/src/main/webapp/uh_helpline_info.jsp
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
-Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images
+Image	Keep	Images Keep	coeus-webapp/src/main/webapp/static/uh-images/*
 KC-FixButton	Keep	KC-??? Fix missing button	coeus-webapp/src/main/webapp/static/images/tinybutton-maint.gif
 KC-ReturnChange	Keep	KC-??? Add new return for changes button and reference it for proposal document actions	coeus-webapp/src/main/webapp/static/images/uh_buttonsmall_return.gif
 KC-ReturnChange	Merged	KC-731 YNQ missing from Proposal Development Summary Tab KC-??? Replace "reject" button with "return for changes"	coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentApproverView.jsp
