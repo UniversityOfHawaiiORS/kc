@@ -6,6 +6,8 @@ use Data::Dumper;
 my $commitBatchData = {};
 my $jiraProcessedList = {};
 my $jiraPath = "";
+my $jiraPathCount = 0;
+my $lastFileName = "";
 
 sub processJira
 {
@@ -15,11 +17,11 @@ sub processJira
     my $fileJiraHash = shift @_;
     
    # print "Processing $jira\n";
-#print "new call";
-#print Dumper $jiraProcessedList->{$jira};
 
     if (! exists $jiraProcessedList->{$jira}) {
+#        $jiraPath .= "\n->" . $jira . "(" . $lastFileName . ")";
         $jiraPath .= "->" . $jira;
+        $jiraPathCount += 1;
         foreach (@{$jiraDataHash->{$jira}}) {
             my @dataArray = @{$_};
             my $fileName=$dataArray[0];
@@ -30,8 +32,8 @@ sub processJira
             push(@{$jiraProcessedList->{$jira}}, $commitLabel);
             foreach (@{$fileJiraHash->{$fileName}}) {
                my $fileJira = $_;
-#print $fileJira . ": " . $jiraPath . "\n";
-               processJira($commitLabel,$fileJira, $jiraDataHash, $fileJiraHash, $jiraPath);
+               $lastFileName = $fileName;
+               processJira($commitLabel,$fileJira, $jiraDataHash, $fileJiraHash);
             }
         }
     } else {
@@ -114,11 +116,10 @@ foreach(@array)
 foreach my $k (keys %$jiraFileHash) {
     $commitCount += 1;
     my $commitLabel = $commitCount . ":" . $k ;
-    $jiraPath = "";
-    processJira($commitLabel,$k, $jiraDataHash, $fileJiraHash);
-    print "====  JiraPath:$jiraPath  ============================================\n";
-last;
-
+    $jiraPath = $k;
+    $jiraPathCount = 0;
+    processJira($commitLabel,$k, $jiraDataHash, $fileJiraHash );
+    print "====  JiraPath:$jiraPathCount:$jiraPath  ============================================\n";
 }
 
 my $commitResults = {};
