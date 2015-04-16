@@ -86,11 +86,17 @@
                         <kul:htmlControlAttribute property="${proposalSiteBoName}.locationName" attributeEntry="${proposalSiteAttributes.locationName}" />
                     </c:when>
                     <c:otherwise>
+                        <%-- KC-654 Primary Performance Site difficult to understand how to add --%>                       
+                        <c:if test="${addressSelectable && empty proposalSiteBo.organization}">
+                            <c:out value="Please Select..." />
+                        </c:if>
+                        <%-- KC-654 End --%>
                         <c:out value="${proposalSiteBo.locationName}" />
                     </c:otherwise>
                 </c:choose>
             </div></th>
             
+                                
             <td align="left" valign="middle" class="infoline" width="60%">
                 <%-- Code for Rolodex lookup enabled sites follows --%>
                 <c:if test="${locationType == 'rolo'}">
@@ -146,6 +152,11 @@
                     <%-- The lookup control --%>
                     <kra:section permission="modifyProposal">
                         <c:if test="${addressSelectable}">
+                            <%-- KC-654 Primary Performance Site difficult to understand how to add --%>
+                        	<c:if test="${empty proposalSiteBo.organization}">
+                                <c:out value="(Select)" />
+                            </c:if>
+                            <%-- KC-654 End --%>
                             <kul:lookup boClassName="org.kuali.coeus.common.framework.org.Organization" 
                                 fieldConversions="organizationId:${proposalSiteBoName}.organizationId,organizationName:${proposalSiteBoName}.locationName,address:${proposalSiteBoName}.organization.address,congressionalDistrict:${proposalSiteBoName}.defaultCongressionalDistrictIdentifier"
                                 anchor="${currentTabIndex}" />

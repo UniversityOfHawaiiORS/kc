@@ -70,7 +70,10 @@ public class InstitutionalProposalUnrecoveredFandARuleImpl extends KcTransaction
         boolean validRateType = validateRateType(institutionalProposalUnrecoveredFandA.getIndirectcostRateTypeCode());
         
         // test if source account is valid
-        boolean validSourceAccount = validateSourceAccount(institutionalProposalUnrecoveredFandA.getSourceAccount());
+        /* KC-800 Add Questionnaire to capture Unrecovered F and A information 
+                  as a part of this chage we made Source Account Optional in Cost Sharing and Unrecovered F & A 
+                  therefore for submit to sponsor which creates an IP we need to remove the requirement of this value from IP */
+        //boolean validSourceAccount = validateSourceAccount(institutionalProposalUnrecoveredFandA.getSourceAccount());
         
         // test if amount is entered and valid
         boolean validAmount = validateAmount(institutionalProposalUnrecoveredFandA.getAmount());
@@ -78,7 +81,10 @@ public class InstitutionalProposalUnrecoveredFandARuleImpl extends KcTransaction
         // test if row is a duplicate
         boolean validRows = checkNoDuplicates(institutionalProposalUnrecoveredFandA, institutionalProposalUnrecoveredFandAs);
  
-        return validFiscalYearRange && validPercentage && validRateType && validSourceAccount && validAmount  && validRows;
+        /* KC-800 Add Questionnaire to capture Unrecovered F and A information 
+                  as a part of this chage we made Source Account Optional in Cost Sharing and Unrecovered F & A 
+                  therefore for submit to sponsor which creates an IP we need to remove the requirement of this value from IP */
+        return validFiscalYearRange && validPercentage && validRateType && validAmount  && validRows;
     }
     
     /**

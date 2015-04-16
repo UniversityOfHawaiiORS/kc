@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts-config PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 1.2//EN" "http://struts.apache.org/dtds/struts-config_1_2.dtd" [
+	<!ENTITY protocol_forwards SYSTEM "struts_protocol_forwards.xml">
+	]>
+
+<struts-config>
+	<data-sources />
+	<!-- <form-beans>
+		<form-bean name="CustomForm" type="edu.hawaii.CustomForm" />
+	</form-beans> -->
+	<action-mappings>
+		<!-- <action path="/meetingManagement" name="MeetingForm"
+			type="edu.hawaii.MeetingAction" attribute="KualiForm">
+			<forward name="basic" path="/WEB-INF/jsp/meeting/meeting.jsp" />
+			<forward name="meetingAction" path="/WEB-INF/jsp/meeting/meetingAction.jsp" />
+		</action> -->
+		<!-- KC-306: Extend ProposalDevelopmentProposalAction with UhProposalDevelopmentProposalAction. -->
+		<action path="/proposalDevelopmentProposal" name="ProposalDevelopmentForm" input="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentProposal.jsp" type="edu.hawaii.proposaldevelopment.web.struts.action.UhProposalDevelopmentProposalAction"  scope="request" parameter="methodToCall" validate="true" attribute="KualiForm">
+          <forward name="basic" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentProposal.jsp" />
+          <forward name="budgetVersions" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentBudgetVersions.jsp" />
+          <forward name="keyPersonnel" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentKeyPersonnel.jsp" />
+          <forward name="questions" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentQuestions.jsp" />
+          <forward name="hierarchy" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentHierarchy.jsp" />
+          <forward name="proposal" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentProposal.jsp" />
+          <forward name="specialReview" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentSpecialReview.jsp" />
+          <forward name="abstractsAttachments" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentAbstractsAttachments.jsp" />
+          <forward name="attachmentRights" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentAttachmentRights.jsp" />
+          <forward name="instituteAttachmentRights" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentInstituteAttachmentRights.jsp" />
+          <forward name="customData" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentCustomData.jsp" />
+          <forward name="actions" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentActions.jsp" />
+       	  <forward name="resubmit" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentResubmission.jsp" />
+          <forward name="grantsGov" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentGrantsGov.jsp" />
+          <forward name="permissions" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentPermissions.jsp" />
+          <forward name="permissionsRoleRights" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentPermissionsRoleRights.jsp" />
+      	  <forward name="permissionsEditRoles" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentPermissionsEditRoles.jsp" />
+      	  <forward name="permissionsCloseEditRoles" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentPermissionsCloseEditRoles.jsp" />
+          <forward name="resubmissionPrompt" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentResubmissionPrompt.jsp" />
+          <forward name="proposalMedusa" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentMedusa.jsp" />
+          <forward name="ajaxProposalSummary" path="/WEB-INF/jsp/proposalhierarchy/ProposalHierarchyProposalSummary.jsp" />
+          <forward name="ajaxBudgetSummary" path="/WEB-INF/jsp/proposalhierarchy/ProposalHierarchyBudgetSummary.jsp" />
+          <forward name="deleted" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentDeleted.jsp"/>
+          <forward name="approverView" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentApproverView.jsp" />
+          <forward name="notificationEditor" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentNotificationEditor.jsp" />
+          <forward name="proposalPersonCertificate" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentPersonCertification.jsp" />
+          <forward name="personComment" path="/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentSpecialReviewComment.jsp" />
+		</action>
+		<action path="/logout" name="KualiLogoutForm" type="edu.hawaii.its.kuali.struts.LogoutAction" />
+		<action path="/PermissionDenied" name="KualiForm" type="org.kuali.rice.kns.web.struts.action.KualiSimpleAction">
+            <forward name="basic" path="/PermissionDenied.jsp" />
+        </action>
+	</action-mappings>
+</struts-config>

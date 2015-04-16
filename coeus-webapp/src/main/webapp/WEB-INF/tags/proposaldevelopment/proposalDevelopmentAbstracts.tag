@@ -24,13 +24,22 @@
 <c:set var="action" value="proposalDevelopmentAbstractsAttachments" />
 <c:set var="textAreaFieldName" value="newProposalAbstract.abstractDetails" />
 
-<kul:tab tabTitle="Abstracts" defaultOpen="false" 
+ <%-- 
+ SFB KC-201 No Scope of Work Field in Proposal Development
+  Override proposalDevelopmentAbstracts.tag to enable the tab to use validation features.
+ --%>
+<!-- UH KC-515 rbl make Abstracts subpanel to open by default to highlight required nature of project summary data entry-->
+<kul:tab tabTitle="Abstracts" defaultOpen="true" 
          tabItemCount="${fn:length(KualiForm.document.developmentProposalList[0].proposalAbstracts)}" 
-         tabErrorKey="document.developmentProposalList[0].proposalAbstract*,newProposalAbstract*">
+         tabErrorKey="document.developmentProposalList[0].proposalAbstract*,newProposalAbstract*"
+         tabAuditKey="document.developmentProposalList[0].proposalAbstract*"
+         auditCluster="proposalAbstractsAuditWarnings"
+         useRiceAuditMode="true">
          
 	<div class="tab-container" align="center">
     	<h3>
-    		<span class="subhead-left">Abstracts</span>
+    	<!-- UH KC-515 rbl added blurb to Abstract sub panel tab to inform/highlight required nature of project summary data entry-->
+    		<span class="subhead-left">Abstracts <i>( * A "Project Summary" Abstract is required. Please limit your detailed description to 1000 characters or less.)</i></span>
     		<span class="subhead-right"><kul:help businessObjectClassName="org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract" altText="help"/></span>
         </h3>
     

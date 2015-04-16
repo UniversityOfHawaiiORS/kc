@@ -99,6 +99,10 @@ public class BudgetUnrecoveredFandAAuditRule extends BudgetAuditRuleBase {
             source = unrecoveredFandA.getSourceAccount();
             fiscalYear = unrecoveredFandA.getFiscalYear();
             
+            /* KC-800 Add Questionnaire to capture Unrecovered F and A information
+             *  (As part of this change we want to remove the Audit Check which forces Source Account to be entered
+             *  
+             *  
             if (null == source || source.length() == 0) {
                 retval = false;
                 getAuditErrors().add(new AuditError("document.budget.budgetUnrecoveredFandA["+i+"].sourceAccount",
@@ -106,6 +110,10 @@ public class BudgetUnrecoveredFandAAuditRule extends BudgetAuditRuleBase {
                                                     Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_UNRECOVERED_F_AND_A_PANEL_ANCHOR,
                                                     params));
             }
+            *
+            *
+            *END KC-800 
+            */
             if (null == fiscalYear || fiscalYear.intValue() <= 0) {
                 retval = false;
                 getAuditErrors().add(new AuditError("document.budget.budgetUnrecoveredFandA["+i+"].fiscalYear",

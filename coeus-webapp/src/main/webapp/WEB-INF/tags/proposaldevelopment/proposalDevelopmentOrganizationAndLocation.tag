@@ -27,7 +27,9 @@
 <c:set var="propLocationAttributes" value="${DataDictionary.ProposalLocation.attributes}" />
 <c:set var="rolodexAttributes" value="${DataDictionary.Rolodex.attributes}" />
 
-<kul:tab tabTitle="Organization/Location" defaultOpen="false" tabErrorKey="document.developmentProposal.*,newPerformanceSite.*,newOtherOrganization.*,applicantOrganizationHelper*,performingOrganizationHelper*,performanceSiteHelpers[*,otherOrganizationHelpers[*">
+<%-- KC-654 Primary Performance Site difficult to understand how to add                   --%>
+<%--        Changed Default to open to make it easier to see performance site requirement --%>
+<kul:tab tabTitle="Organization/Location" defaultOpen="true" tabErrorKey="document.developmentProposal.*,newPerformanceSite.*,newOtherOrganization.*,applicantOrganizationHelper*,performingOrganizationHelper*,performanceSiteHelpers[*,otherOrganizationHelpers[*">
 	<div class="tab-container" align="center">
         <kra-pd:proposalSite
             tabTitle="Applicant Organization"
@@ -43,8 +45,11 @@
             deleteDistrictMethodToCall="deleteApplicantOrgCongDistrict"
             clearSiteMethodToCall="clearApplicantOrganization"
             locationType="org" />
+        <%--KC-306 - Rename section and don't automatically populate automatically.--%>
+        <%--KC-654 Primary Performance Site difficult to understand how to add     --%>
+        <%--       added * before Primary Performance Site to indicate required    --%>
         <kra-pd:proposalSite
-            tabTitle="Performing Organization"
+            tabTitle="* Primary Performance Site"
             showTabTitle="true"
             parentTab="Organization/Location"
             addTable="true"
@@ -55,7 +60,8 @@
             addDistrictMethodToCall="addPerformingOrgCongDistrict"
             deleteDistrictMethodToCall="deletePerformingOrgCongDistrict"
             locationType="org" />
-        <kra-pd:multipleProposalSites
+        <%-- KC-306 - Remove the proposal site locations section --%>
+        <%--<kra-pd:multipleProposalSites
             tabTitle="Performance Site Locations"
             proposalSitesList="${KualiForm.document.developmentProposal.performanceSites}"
             proposalSitesListName="document.developmentProposal.performanceSites"
@@ -67,9 +73,10 @@
             clearAddressMethodToCall="clearPerformanceSiteAddress"
             addDistrictMethodToCall="addPerformanceSiteCongDistrict"
             deleteDistrictMethodToCall="deletePerformanceSiteCongDistrict"
-            locationType="rolo" />
+            locationType="rolo" /> --%>
+        <%--KC-306 - Rename section. --%>
         <kra-pd:multipleProposalSites
-            tabTitle="Other Organizations"
+            tabTitle="Additional Performance Sites"
             proposalSitesList="${KualiForm.document.developmentProposal.otherOrganizations}"
             proposalSitesListName="document.developmentProposal.otherOrganizations"
             locationNameEditable="false"
