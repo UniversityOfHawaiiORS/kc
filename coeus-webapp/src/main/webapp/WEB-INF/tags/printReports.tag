@@ -42,6 +42,9 @@
                                             <td colspan="4">
                                                 <c:if test='${showCurrentReport}'>
                                                     <strong>Current Support - ${reportPersonName}</strong><br/>
+                                                    <!-- UH KC-536 BEGIN coded added by rbl to fix sorting and export reporting failures -->
+                                                    <c:choose>
+                                                    <c:when test="${fn:contains(requestUri,'?')}">
                                                     <display:table class="datatable-100" cellspacing="0" cellpadding="0" name="${currentReportRows}"
                                                         id="row" export="true" pagesize="100" requestURI="${requestUri}?methodToCall=prepareCurrentReport" requestURIcontext="true" >
                                                         <c:forEach items="${row.columns}" var="column" varStatus="loopStatus">
@@ -51,9 +54,26 @@
                                                         </c:forEach>
                                                         <display:setProperty name="export.csv.include_header" value="true"/>
                                                     </display:table>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                     <display:table class="datatable-100" cellspacing="0" cellpadding="0" name="${currentReportRows}"
+                                                        id="row" export="true" pagesize="100" requestURI="${requestUri}?methodToCall.prepareCurrentReport" requestURIcontext="true" >
+                                                        <c:forEach items="${row.columns}" var="column" varStatus="loopStatus">
+															<%--NOTE: DO NOT FORMAT THIS FILE, DISPLAY:COLUMN WILL NOT WORK CORRECTLY IF IT CONTAINS LINE BREAKS --%>
+                                                            <display:column style="text-align: center;" sortable="${column.sortable}" title="${column.columnTitle}" comparator="${column.comparator}" maxLength="${column.maxLength}" decorator="org.kuali.rice.kns.web.ui.FormatAwareDecorator"><c:out value="${column.propertyValue}" escapeXml="true" default="&nbsp;" /></display:column>
+															<%--NOTE: DO NOT FORMAT THIS FILE, DISPLAY:COLUMN WILL NOT WORK CORRECTLY IF IT CONTAINS LINE BREAKS --%>
+                                                        </c:forEach>
+                                                        <display:setProperty name="export.csv.include_header" value="true"/>
+                                                    </display:table>
+                                                    </c:otherwise>
+                                                    </c:choose>
+                                                    <!-- UH KC-536 END -->
                                                 </c:if>
                                                 <c:if test='${showPendingReport}'>
                                                     <strong>Pending Support - ${reportPersonName}</strong><br/>
+                                                     <!-- UH KC-536 BEGIN coded added by rbl to fix sorting and export reporting failures -->
+                                                    <c:choose>
+                                                    <c:when test="${fn:contains(requestUri,'?')}">
                                                      <display:table class="datatable-100" cellspacing="0" cellpadding="0" name="${pendingReportRows}"
                                                                     id="row" export="true" pagesize="100" requestURI="${requestUri}?methodToCall=preparePendingReport=" requestURIcontext="true" >
                                                          <c:forEach items="${row.columns}" var="column" varStatus="loopStatus">
@@ -63,6 +83,20 @@
                                                         </c:forEach>
                                                         <display:setProperty name="export.csv.include_header" value="true"/>
                                                     </display:table>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                      <display:table class="datatable-100" cellspacing="0" cellpadding="0" name="${pendingReportRows}"
+                                                         id="row" export="true" pagesize="100" requestURI="${requestUri}?methodToCall.preparePendingReport=" requestURIcontext="true" >
+                                                         <c:forEach items="${row.columns}" var="column" varStatus="loopStatus">
+															<%--NOTE: DO NOT FORMAT THIS FILE, DISPLAY:COLUMN WILL NOT WORK CORRECTLY IF IT CONTAINS LINE BREAKS --%>
+                                                        	<display:column sortable="${column.sortable}" title="${column.columnTitle}" comparator="${column.comparator}" maxLength="${column.maxLength}" class="" decorator="org.kuali.rice.kns.web.ui.FormatAwareDecorator"><c:out value="${column.propertyValue}" escapeXml="true" default="&nbsp;" /></display:column>
+															<%--NOTE: DO NOT FORMAT THIS FILE, DISPLAY:COLUMN WILL NOT WORK CORRECTLY IF IT CONTAINS LINE BREAKS --%>
+                                                        </c:forEach>
+                                                        <display:setProperty name="export.csv.include_header" value="true"/>
+                                                    </display:table>                                                    
+                                                    </c:otherwise>
+                                                    </c:choose>
+                                                     <!-- UH KC-536 END -->
                                                 </c:if>
                                             </td>
                                         </tr>
