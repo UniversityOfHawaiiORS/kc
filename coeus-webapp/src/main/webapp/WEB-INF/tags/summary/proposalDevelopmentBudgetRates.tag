@@ -22,7 +22,9 @@
 <%@ attribute name="budgetRate" description="Budget proposal and la rates" required="true"%>
 <%@ attribute name="rateClassType" description="rate class type code" required="true"%>
 <%@ attribute name="styleClass" description="style class to validate applicable rate " required="true"%>
-
+<%--KC-649 Proposal Summary tab loads very slowly when opening enroute proposal --%>
+<%--       added attribute finalBudgetProposalRateClassCode                     --%>
+<%@ attribute name="finalBudgetProposalRateClassCode" description="Final Budget Rate Class Code" required="true"%>
 <c:set var="budgetRatesAttributes" value="${DataDictionary.BudgetRate.attributes}" />
 <c:set var="action" value="budgetRates" />
 <bean:define id="irateClassType" name="KualiForm" property="${budgetRate}.rateClass.rateClassTypeCode" />
@@ -30,10 +32,14 @@
 <bean:define id="displayRow" name="KualiForm" property="${budgetRate}.displayLocation" />
 <bean:define id="fandaRateType" name="KualiForm" property="${budgetRate}.rateType.description" />
 
-<c:set var="finalBudgetProposalRateClassCode" value="${KualiForm.document.finalrateClassCode }"/>
 
+<%--KC-649 Proposal Summary tab loads very slowly when opening enroute proposal        --%>
+<%--comment out acqisition of finalBudgetProposalRateClassCode passed as attribute now --%>
+<%-- <c:set var="finalBudgetProposalRateClassCode" value="${KualiForm.document.finalrateClassCode}"/> --%>
 
 <c:if test="${irateClassType == 'O' && displayRow == 'Yes' && finalBudgetProposalRateClassCode == irateClassCode }">
+<%--<c:if test="${irateClassType == 'O' && displayRow == 'Yes' && finalBudgetProposalRateClassCode == irateClassCode }"> --%>
+
 
 	<tr>
 		<td width="10%" class="${tdClass}">
