@@ -93,14 +93,14 @@
 						<branch name="False">
 							<split name="isSyncChild" nextNode="JoinSync">
 								<branch name="False">
-									<requests name="AwardStandardApproval" nextNode="JoinSyncChild"/>
+									<requests name="AwardStandardApproval" nextNode="SFIReview"/>
+									<requests name="SFIReview" nextNode="JoinSyncChild"/>
 								</branch>
 							</split>
 							<join name="JoinSyncChild"/>
 						</branch>
 					</split>
 					<join name="JoinSync"/>
-					
 				</routePath>
 			</routePaths>
 			<routeNodes>
@@ -142,6 +142,12 @@
 					<ruleTemplate>AwardStandardApproval</ruleTemplate>
 					<mandatoryRoute>false</mandatoryRoute>
 				</requests>				
+				<requests name="SFIReview">
+					<qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass>
+					<ruleTemplate>SFIReviewApprovalTemplate</ruleTemplate>
+                    <activationType>P</activationType>
+					<finalApproval>false</finalApproval>
+	            </requests>
 			</routeNodes>
 		</documentType>
 	</documentTypes>
@@ -216,6 +222,26 @@
                     <validation required="false" />
                     <fieldEvaluation>
                         <xpathexpression>string(//xmlRouting/field[@name='inventions']/value) = wf:ruledata('inventions')</xpathexpression>
+                    </fieldEvaluation>
+                </fieldDef>
+            </routingConfig>
+        </ruleAttribute>
+        <!-- custom attribute -->
+		<ruleAttribute>
+            <name>SFICustomDataAttribute</name>
+            <className>org.kuali.rice.kew.rule.xmlrouting.StandardGenericXMLRuleAttribute</className>
+            <label>SFICustomDataAttribute</label>
+            <description>SFICustomDataAttribute</description>
+            <type>RuleXmlAttribute</type>
+			<serviceNamespace>KC</serviceNamespace>
+            <routingConfig>
+     			<fieldDef name="SFIApprovalRequired" title="SFI Approval" workflowType="RULE">
+                    <display>
+                        <type>text</type>
+                    </display>
+                    <validation required="false" />
+                    <fieldEvaluation>
+                        <xpathexpression>translate(string(//document/awardList/org.kuali.kra.award.home.Award/awardCustomDataList/org.kuali.kra.award.customdata.AwardCustomData[customAttributeId="180"]/value),'y','Y') = wf:ruledata('SFIApprovalRequired')</xpathexpression>
                     </fieldEvaluation>
                 </fieldDef>
             </routingConfig>
@@ -324,7 +350,7 @@
 					<display>
 						<type>text</type>
 					</display>
-					<lookup businessObjectClass="org.kuali.kra.bo.Unit">
+					<lookup businessObjectClass="org.kuali.coeus.common.framework.unit.Unit">
 				      <fieldConversions>
 				        <fieldConversion lookupFieldName="unitNumber" localFieldName="leadUnit"/>
 				      </fieldConversions>
@@ -347,7 +373,7 @@
 					<display>
 						<type>text</type>
 					</display>
-					<lookup businessObjectClass="org.kuali.kra.bo.Sponsor">
+					<lookup businessObjectClass="org.kuali.coeus.common.framework.sponsor.Sponsor">
 				      <fieldConversions>
 				        <fieldConversion lookupFieldName="sponsorCode" localFieldName="sponsor"/>
 				      </fieldConversions>
@@ -368,6 +394,18 @@
 	      <name>AwardStandardApproval</name>
 	      <description>Standard Approval Template for Awards</description>
 	    </ruleTemplate>
+	    
+	    <ruleTemplate allowOverwrite="true">
+			<name>SFIReviewApprovalTemplate</name>
+			<description>SFI Review Custom Approval Routing Rule</description>
+			<attributes>
+				<attribute>
+					<name>SFICustomDataAttribute</name>
+					<required>false</required>
+				</attribute>
+			</attributes>
+		</ruleTemplate> 
+		
      </ruleTemplates>     
 	 <rules xmlns="ns:workflow/Rule" xsi:schemaLocation="ns:workflow/Rule resource:Rule">     
          <rule>
@@ -391,5 +429,32 @@
       		<description>Standard Approval Node for Awards</description>
 			<forceAction>false</forceAction>
     	</rule>      
+        <rule>
+			<name>SFICustomApprovalRouting</name>
+			<documentType>AwardDocument</documentType>
+			<ruleTemplate>SFIReviewApprovalTemplate</ruleTemplate>
+			<description>SFI Custom approval routing</description>
+			<ruleExtensions>
+				<ruleExtension>
+					<attribute>SFICustomDataAttribute</attribute>
+					<ruleTemplate>SFIReviewApprovalTemplate</ruleTemplate>
+					<ruleExtensionValues>
+						<ruleExtensionValue>
+							<key>SFIApprovalRequired</key>
+							<value>Y</value>
+						</ruleExtensionValue>
+					</ruleExtensionValues>
+				</ruleExtension>
+			</ruleExtensions>
+			
+			<responsibilities>
+        		<responsibility>
+          			<workgroup>KC-WKFLW:SFIApproval</workgroup>
+          			<approvePolicy>F</approvePolicy>
+          			<actionRequested>A</actionRequested>
+          			<priority>1</priority>
+        		</responsibility>
+      		</responsibilities>
+        </rule>     
     </rules>
 </data>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+	<!-- KC-335: Allow Award to be submit by anyone with correct permission. -->
+	<bean id="AwardDocument" parent="AwardDocument-parentBean">
+		<property name="documentAuthorizerClass" value="edu.hawaii.award.document.authorization.UhAwardDocumentAuthorizer"/>
+	</bean>
+	  <bean id="AwardDocument-workflowProperties" parent="AwardDocument-workflowProperties-parentBean">
+    <property name="workflowPropertyGroups">
+      <list merge="true">
+        <bean parent="WorkflowPropertyGroup">
+          <property name="workflowProperties">
+            <list merge="true">
+				  <bean parent="WorkflowProperty" p:path="awardList.awardCustomDataList"/>
+            </list>
+          </property>
+        </bean>
+      </list>
+    </property>
+    </bean>
+</beans>
