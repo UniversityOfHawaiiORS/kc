@@ -25,6 +25,8 @@
         <c:set var="tabItemCount" value="${tabItemCount+1}" />
 </c:forEach>
 
+<%-- KC-866 Hide new notes and awards with 0 notes--%>
+<c:if test="${tabItemCount>0}">
 
 <kul:tab tabTitle="Notes" tabItemCount="${tabItemCount}" defaultOpen="false" tabErrorKey="awardNotepadBean.*">
 	<div class="tab-container" align="center">
@@ -84,7 +86,9 @@
 		     <kra:noteLineItem statusIndex="${status.index}" noteParmeterString="document.award.awardNotepads[${status.index}]" 
 		         viewRestrictedNotes="true" noteObject="${awardNotepad}" modifyPermission="${modifyPermission}" 
 		         hasAdministratorRole="${awardAdmin}" action="AwardNotesAndAttachmentsAction" showUpdate="true" isAddLine="${false}" />
-	    	</c:forEach> 
+        	</c:forEach> 
         </table>
    </div>
 </kul:tab>
+</c:if>  
+<%-- KC-866 END--%>
