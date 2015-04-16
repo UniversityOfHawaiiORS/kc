@@ -56,13 +56,21 @@ public class ProposalDevelopmentApproverViewAction extends ProposalDevelopmentAc
     private static final String LINE_NUMBER = "line";
 
     private SpecialReviewService specialReviewService;
- 
+
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response)
     throws Exception {
         ActionForward forward = super.execute(mapping, form, request, response);
         super.refresh(mapping, form, request, response);
+        
+        //UH KC-579 BEGIN fix to auto-forward to "Return for Changes/Reject" confirmation screen on Proposal Actions Tab
+        // after clicking on "Return for Changes/Reject" button on Proposal Summary Tab
+        if (StringUtils.equals((String) request.getAttribute("methodToCallAttribute"), "methodToCall.reject.y")) {
+        	return new ActionForward("/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentActions.jsp");
+        }
+        //UH KC-579 END
+        
         return forward;
     }
 
