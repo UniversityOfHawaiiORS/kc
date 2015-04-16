@@ -24,6 +24,8 @@ import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import org.kuali.coeus.common.framework.module.CoeusSubModule;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentAction;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentRule;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentForm;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.infrastructure.Constants;
@@ -34,9 +36,11 @@ import org.kuali.coeus.common.questionnaire.framework.answer.SaveQuestionnaireAn
 import org.kuali.coeus.common.questionnaire.framework.core.QuestionnaireConstants;
 import org.kuali.coeus.common.questionnaire.framework.print.QuestionnairePrintingService;
 import org.kuali.rice.krad.document.Document;
+import org.kuali.rice.krad.util.GlobalVariables;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,13 +60,26 @@ public class ProposalDevelopmentQuestionsAction extends ProposalDevelopmentActio
         List<AnswerHeader> answerHeaders = proposalDevelopmentForm.getQuestionnaireHelper().getAnswerHeaders();
         List<AnswerHeader> s2sAnswerHeaders = proposalDevelopmentForm.getS2sQuestionnaireHelper().getAnswerHeaders();
         
-        if (applyRules(new SaveQuestionnaireAnswerEvent(document, answerHeaders)) && applyRules(new SaveQuestionnaireAnswerEvent(document,s2sAnswerHeaders,"s2sQuestionnaireHelper"))) {
+        // KC-686 - OLE stack trace/IR thrown in PD Questions tab when you attempt to correct explanation is required error
+        // Before processing Questionnaires make sure the YNQ questions are failing to pass the rules
+        // otherwise the saved questionnaire data will be saved before the reset of the document save is cancelled causing
+        // the optimistic lock exception.
+        ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument) document;
+        ProposalDevelopmentDocumentRule rule = new ProposalDevelopmentDocumentRule();
+        boolean ynqRulesOK = rule.processProposalYNQBusinessRule(proposalDevelopmentDocument, false);
+        // clear the errors, we just ran processProposalYNQBusinessRule to test if it will pass
+        // let normal processing of this rule produce the real error list.
+        // At first I didn't do this but the errors were reported without highlighting the fields correctly.
+        GlobalVariables.getMessageMap().clearErrorMessages();
+        
+        if (ynqRulesOK &&
+            applyRules(new SaveQuestionnaireAnswerEvent(document, answerHeaders)) && applyRules(new SaveQuestionnaireAnswerEvent(document,s2sAnswerHeaders,"s2sQuestionnaireHelper"))) {
             proposalDevelopmentForm.getQuestionnaireHelper().preSave();
             proposalDevelopmentForm.getS2sQuestionnaireHelper().preSave();
             getBusinessObjectService().save(answerHeaders);
             getBusinessObjectService().save(s2sAnswerHeaders);
         }
-        
+        // KC-686 END
     }
     
     @Override
@@ -92,7 +109,7 @@ public class ProposalDevelopmentQuestionsAction extends ProposalDevelopmentActio
         ProposalDevelopmentForm proposalDevelopmentForm = (ProposalDevelopmentForm) form;
         final int answerHeaderIndex = this.getSelectedLine(request);
         final String formProperty = getFormProperty(request,"printQuestionnaireAnswer");
-
+       
         if (StringUtils.equals(formProperty, ".questionnaireHelper")) {
             reportParameters.put(QuestionnaireConstants.QUESTIONNAIRE_SEQUENCE_ID_PARAMETER_NAME, proposalDevelopmentForm.getQuestionnaireHelper().getAnswerHeaders().get(answerHeaderIndex).getQuestionnaire().getQuestionnaireSeqIdAsInteger());
             reportParameters.put("template", proposalDevelopmentForm.getQuestionnaireHelper().getAnswerHeaders().get(answerHeaderIndex).getQuestionnaire().getTemplate());
