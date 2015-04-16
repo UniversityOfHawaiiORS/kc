@@ -23,7 +23,8 @@
 <c:set var="action" value="awardNotesAndAttachments" />
 <c:set var="attachments" value="${KualiForm.document.awardList[0].awardAttachments}"/>
 
-<kul:tab tabTitle="Attachments" tabItemCount="${fn:length(attachments)}" defaultOpen="false" tabErrorKey="awardAttachmentFormBean.newAttachment*,document.awardList[0].awardAttachments*" transparentBackground="false">
+<%-- KC-836 Default Award Attachments tab to be shown --%>
+<kul:tab tabTitle="Attachments" tabItemCount="${fn:length(attachments)}" defaultOpen="true" tabErrorKey="awardAttachmentFormBean.newAttachment*,document.awardList[0].awardAttachments*" transparentBackground="false">
 	<div class="tab-container" align="center">
    		<h3>
    			<span class="subhead-left">Add Attachment</span>
