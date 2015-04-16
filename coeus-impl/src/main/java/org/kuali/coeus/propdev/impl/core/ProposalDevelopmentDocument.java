@@ -2,17 +2,17 @@
  * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
  * Copyright 2005-2015 Kuali, Inc.
- * 
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -446,7 +446,6 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
         return getDevelopmentProposal();
     }
 
-    @Override
     public String getDocumentBoNumber() {
         return getDevelopmentProposal().getProposalNumber();
     }
@@ -554,7 +553,12 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
 
     public void setDefaultDocumentDescription() {
         DevelopmentProposal proposal = getDevelopmentProposal();
-        String desc = String.format("%s; Proposal No: %s; PI: %s; Sponsor: %s; Due Date: %s", proposal.getTitle() != null ? proposal.getTitle().substring(0, Math.min(proposal.getTitle().length(), 19)) : "null", proposal.getProposalNumber(), proposal.getPrincipalInvestigatorName(), proposal.getSponsorName(), proposal.getDeadlineDate() != null ? getDateTimeService().toDateString(proposal.getDeadlineDate()) : "null");
+        //UH KC-645 remove the project title from doc search results since this information is sensitive and should not be visible by all users
+        String desc = String.format("Proposal No: %s; PI: %s; Sponsor: %s; Due Date: %s",
+                proposal.getProposalNumber(),
+                proposal.getPrincipalInvestigatorName(),
+                proposal.getSponsorName(),
+                proposal.getDeadlineDate() != null ? getDateTimeService().toDateString(proposal.getDeadlineDate()) : "null"); 
         getDocumentHeader().setDocumentDescription(desc);
     }
 
