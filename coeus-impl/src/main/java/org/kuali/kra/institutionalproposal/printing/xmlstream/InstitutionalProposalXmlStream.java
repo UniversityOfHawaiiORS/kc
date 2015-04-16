@@ -19,6 +19,7 @@
 package org.kuali.kra.institutionalproposal.printing.xmlstream;
 
 import org.apache.xmlbeans.XmlObject;
+import org.kuali.coeus.common.api.rolodex.RolodexService;
 import org.kuali.coeus.common.framework.compliance.core.SpecialReviewApprovalType;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocument;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeService;
@@ -64,7 +65,7 @@ import java.util.*;
 public class InstitutionalProposalXmlStream extends
 		InstitutionalProposalBaseStream {
     
-
+	
 	private static final String PROPOSAL_SUMMARY_COMMENT_CODE;
 	private static final String PROTOCOL_NUMBER = "protocolNumber";
 	private static final String SPECIAL_REVIEW_APPROVAL_CODE = "5";
@@ -189,7 +190,7 @@ public class InstitutionalProposalXmlStream extends
                     
                     otherGroup.setGroupName(customAttributeDocuments.get(custData.getCustomAttributeId().toString()).getCustomAttribute().getGroupName());
                     otherGroupDetails.setColumnValue(custData.getValue());                  
-                    otherGroupDetails.setColumnName(customAttributeDocuments.get(custData.getCustomAttributeId().toString()).getCustomAttribute().getLabel());
+                    otherGroupDetails.setColumnName(customAttributeDocuments.get(custData.getCustomAttributeId().toString()).getCustomAttribute().getLabel());                                       
                     otherGroupDetailsTypesList.add(otherGroupDetails);
                     break;
                 }
@@ -221,21 +222,29 @@ public class InstitutionalProposalXmlStream extends
 					keyPersonType.setPersonId(proposalPerson.getPersonId());
 				}
 				KcPerson person = proposalPerson.getPerson();
-				if (person != null && person.getFullName() != null) {
-					keyPersonType.setPersonName(person.getFullName());
+				//BEGIN UH KC-450 rbl added code to fix null pointer error - print notice generation failure for non-employees
+				if (person != null) {
+				    if (person.getFullName() != null) {
+					    keyPersonType.setPersonName(person.getFullName());
+				    } else if (proposalPerson.getRolodex() != null) {
+					    if (proposalPerson.getRolodex().getFullName() != null) {
+						    keyPersonType.setPersonName(proposalPerson.getRolodex().getFullName());
+					    }
+				    }
 				}
+				//END UH KC-450 
 				ContactRole role = proposalPerson.getContactRole();
 				if (role != null && role.getRoleDescription() != null) {
 					keyPersonType.setRoleName(role.getRoleDescription());
 				}
 				if (proposalPerson.getPerson() != null) {
-	                if (proposalPerson.getPerson().getAddressLine1() != null) {
+				if (proposalPerson.getPerson().getAddressLine1() != null) {
 					    keyPersonType.setPersonAddress(proposalPerson.getPerson().getAddressLine1());
 	                }
 				} else if (proposalPerson.getRolodex() != null) {
                     if (proposalPerson.getRolodex().getAddressLine1() != null) {
                         keyPersonType.setPersonAddress(proposalPerson.getRolodex().getAddressLine1());
-                    }
+					}
 				}
 				if (proposalPerson.getTotalEffort() != null) {
 					keyPersonType.setPercentEffort(proposalPerson
@@ -269,31 +278,31 @@ public class InstitutionalProposalXmlStream extends
                 if (person != null) {
                     if (person.getAddressLine1() != null) {
                         personType.setAddress(person.getAddressLine1());
-                    }
+				}
                     if (person.getCity() != null) {
                         personType.setCity(person.getCity());
-                    }
+				}
                     if (person.getFirstName() != null) {
                         personType.setFirstName(person.getFirstName());
-                    }
-                    if (proposalPerson.getFullName() != null) {
-                        personType.setFullName(proposalPerson.getFullName());
-                    }
+				}
+				if (proposalPerson.getFullName() != null) {
+					personType.setFullName(proposalPerson.getFullName());
+				}
                     if (person.getLastName() != null) {
                         personType.setLastName(person.getLastName());
-                    }
+				}
                     if (person.getMiddleName() != null) {
                         personType.setMiddleName(person.getMiddleName());
-                    }
-                    if (proposalPerson.getPhoneNumber() != null) {
-                        personType.setPhone(proposalPerson.getPhoneNumber());
-                    }
+				}
+				if (proposalPerson.getPhoneNumber() != null) {
+					personType.setPhone(proposalPerson.getPhoneNumber());
+				}
                     if (person.getState() != null) {
                         personType.setState(person.getState());
-                    }
+				}
                     if (person.getPostalCode() != null) {
                         personType.setZip(person.getPostalCode());
-                    }
+				}
                 } else {
                     NonOrganizationalRolodex rolodex = proposalPerson.getRolodex();
                     if (rolodex != null) {
