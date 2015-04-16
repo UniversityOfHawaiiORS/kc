@@ -74,8 +74,9 @@
     		</c:forEach>
     	</c:if>
     </c:forEach>
-    
+   <!-- UH KC-676 rbl standardize error message location --> 
 <kul:tab tabTitle="Personnel Detail (Period ${budgetPeriod})" defaultOpen="false" tabErrorKey="*costElement*,newGroupName,newBudgetLineItems*,newBudgetPersonnelDetails.*,${tabErrorKeyString},${tabErrorKeyString2}" auditCluster="budgetNonPersonnelAuditWarnings${budgetPeriod}Personnel" tabAuditKey="${tabErrorKeyString},${tabErrorKeyString2},${tabErrorKeyString3}" useRiceAuditMode="true">
+    
 		<div class="tab-container" align="center">
 		
 		<div style="text-align:left;width: 98%" >
@@ -91,7 +92,7 @@
 		
    		<h3>
             <span class="subhead-left">Add Details</span>
-	       	<div align="right"><kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetPersonnelDetailsHelpUrl" altText="help"/></div>
+        	<div align="right"><kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetPersonnelDetailsHelpUrl" altText="help"/></div>
 		</h3>
         <jsp:useBean id="paramMap" class="java.util.HashMap"/>
 		<c:set target="${paramMap}" property="budgetCategoryTypeCode" value="${budgetCategoryTypeCodeKey}" />

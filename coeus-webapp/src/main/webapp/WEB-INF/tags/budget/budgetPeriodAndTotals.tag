@@ -21,17 +21,18 @@
 <c:set var="budgetAttributes" value="${DataDictionary.Budget.attributes}" />
 <c:set var="budgetPeriodAttributes" value="${DataDictionary.BudgetPeriod.attributes}" />
 <c:set var="action" value="budgetParameters" />
+<!-- UH KC-676  rbl standardize error message location -->
 <kul:tab tabTitle="Budget Periods & Totals" defaultOpen="true" 
-	tabErrorKey="newBudgetPeriod*,document.budget.budgetPeriod*" 
+	tabErrorKey="newBudgetPeriod*,document.budget.budgetPeriod*,document.budgetPeriods[*" 
 	auditCluster="budgetPeriodProjectDateAuditErrors,budgetPeriodProjectDateAuditWarnings,awardBudgetTotalCostAuditErrors,awardBudgetCostLimitAuditErrors"  
 	tabAuditKey="document.budget.budgetPeriod*,document.budget.totalCost,document.budget.totalDirectCost,document.budget.totalIndirectCost" 
 	useRiceAuditMode="true">
 	<div class="tab-container" align="center">
     	<h3>
             <span class="subhead-left">Budget Periods</span>		
-			<span class="subhead-right">
-				<kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetPeriodHelpUrl" altText="help"/>
-			</span>
+            		<span class="subhead-right">
+ 			    		<kul:help parameterNamespace="KC-AB" parameterDetailType="Document" parameterName="awardBudgetPeriodHelpUrl" altText="help"/>
+	        		</span>
         </h3>
         
         <table cellpadding="0" cellspacing="0" summary="">
@@ -68,7 +69,8 @@
                 </td>
                 <td width="10%" valign="middle" class="infoline">                	
                 	<div align="center">
-                  	<kul:htmlControlAttribute property="newBudgetPeriod.totalCost" attributeEntry="${budgetPeriodAttributes.totalCost}" styleClass="amount" /> 
+                	<!-- UH KC-677 lock total sponsor cost for editing, force users to fill out direct and F&A fields to prevent reporting from breaking -->
+                  	<kul:htmlControlAttribute property="newBudgetPeriod.totalCost" attributeEntry="${budgetPeriodAttributes.totalCost}" styleClass="amount" readOnly="true"/> 
                 	</div>
 				</td>
                 <td width="10%" valign="middle" class="infoline">
@@ -134,9 +136,26 @@
                 		<kul:htmlControlAttribute property="document.budget.budgetPeriods[${status.index}].endDate" attributeEntry="${budgetPeriodAttributes.endDate}" />
 					</div>
 	                </td>
+	                <c:if test="${proposalBudgetFlag}">
+		                <td>
+		                	 <bean:define id="numberOfMonths" name="KualiForm" property="document.budget.budgetPeriods[${status.index}].numberOfMonths" />
+		                	${numberOfMonths }
+		                </td>
+	                </c:if>
+	                <c:if test="${proposalBudgetFlag}">
+		                <td>
+		                	 <bean:define id="numberOfMonths" name="KualiForm" property="document.budget.budgetPeriods[${status.index}].numberOfMonths" />
+             <!-- KC-599 number of months displayed with too much precision -->
+		         <div align="center">
+								<fmt:formatNumber type="number" value="${numberOfMonths}" minFractionDigits="2" groupingUsed="false" />
+						 </div>
+             <!-- KC-599 --> 
+		                </td>
+	                </c:if>
 	                <td width="10%" valign="middle">                	
 					<div align="center">
-                  		<kul:htmlControlAttribute property="document.budget.budgetPeriods[${status.index}].totalCost" attributeEntry="${budgetPeriodAttributes.totalCost}" styleClass="amount" readOnly="${periodReadOnly}"/> 
+					<!-- UH KC-677 lock total sponsor cost for editing, force users to fill out direct and F&A fields to prevent reporting from breaking -->
+                  		<kul:htmlControlAttribute property="document.budget.budgetPeriods[${status.index}].totalCost" attributeEntry="${budgetPeriodAttributes.totalCost}" styleClass="amount" readOnly="true"/> 
 					</div>
 					</td>
 	                <td width="10%" valign="middle">                	
@@ -182,9 +201,9 @@
 		    				</c:otherwise>
 						</c:choose>
    				    	<kul:multipleValueLookup boClassName="org.kuali.coeus.common.budget.framework.period.BudgetPeriod"
-   				    							anchor="${tabKey}" 
-   				    							lookupParameters="document.parentDocument.award.awardNumber:budgetParentId"
-   				    							lookedUpCollectionName="${status.index}" autoSearch="yes" />						
+    				    							anchor="${tabKey}" 
+    				    							lookupParameters="document.parentDocument.award.awardNumber:budgetParentId"
+    				    							lookedUpCollectionName="${status.index}" autoSearch="yes" />						
 						</kra:section>
 					</div>
 	                </td>
@@ -341,7 +360,7 @@
           	    &nbsp;
           	    </td>
           	
-          	</tr> 	
+          	</tr>
         </table>
         <br/>
     </div> 

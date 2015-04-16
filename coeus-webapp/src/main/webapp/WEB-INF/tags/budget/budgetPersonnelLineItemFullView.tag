@@ -40,8 +40,8 @@
 <c:if test="${fn:length(KualiForm.document.budget.budgetPeriods[budgetPeriod-1].budgetLineItems[budgetLineItemNumber].budgetPersonnelDetailsList) == 0}" >
 	<c:set var="summaryViewReadOnly" value="false" />
 </c:if>          		
-
-<c:set var="tabErrorKey"                value="document.budget.budgetPeriods[${budgetPeriod - 1}].budgetLineItems[${budgetLineItemNumber}].quantity" />
+<!-- UH KC-676 rbl standardize error message location -->
+<c:set var="tabErrorKey" value="document.budget.budgetPeriod[${budgetPeriod - 1}].budgetLineItem[${budgetLineItemNumber}].quantity,document.budget.budgetPeriods[${budgetPeriod - 1}].budgetLineItems[${budgetLineItemNumber}].quantity" />
 <c:set var="tabErrorKey" value="${tabErrorKey},document.budget.budgetPeriod[${budgetPeriod - 1}].budgetLineItem[${budgetLineItemNumber}].underrecoveryAmount" />
 <c:set var="tabErrorKey" value="${tabErrorKey},document.budget.budgetPeriod[${budgetPeriod - 1}].budgetLineItem[${budgetLineItemNumber}].costSharingAmount" />
 <c:set var="tabErrorKey" value="${tabErrorKey},document.budget.budgetPeriods[${budgetPeriod - 1}].budgetLineItems[${budgetLineItemNumber}].applyInRateFlag" />

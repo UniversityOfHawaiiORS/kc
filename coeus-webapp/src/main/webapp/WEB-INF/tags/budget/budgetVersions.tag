@@ -95,8 +95,8 @@
 	  <c:set var="projectDatesString" value ="(${KualiForm.document.budget.award.awardIdAccount})" />
     </c:otherwise>
    </c:choose>
-
-<kul:tab tabTitle="Budget Versions ${projectDatesString}"  transparentBackground="${transParent}" defaultOpen="true" tabErrorKey="document.budget.budgetParent.budgetVersion*,${Constants.DOCUMENT_ERRORS},${errorKey},document.budgetDocumentVersion[*" auditCluster="awardBudgetTotalCostAuditErrors" tabAuditKey="document.budget.totalCost">
+<!-- UH KC-676 rbl standardize error location on page -->
+<kul:tab tabTitle="Budget Versions ${projectDatesString}"  transparentBackground="${transParent}" defaultOpen="true" tabErrorKey="document.parentDocument.budgetDocumentVersion*,document.budget.parentDocument.budgetParent.budgetVersion*,${Constants.DOCUMENT_ERRORS},${errorKey},document.budgetDocumentVersion[*" auditCluster="awardBudgetTotalCostAuditErrors" tabAuditKey="document.budget.totalCost">
 
 	<div class="tab-container" align="center">
 

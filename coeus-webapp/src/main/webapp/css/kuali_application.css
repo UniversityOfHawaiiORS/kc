@@ -33,6 +33,15 @@ width:160px;
 select.fixed-size-200-select {
 width:200px;
 }
+/* UH KC-680 */
+select.fixed-size-200-select-hidden {
+width: 200px;
+display: none;
+}
+/* UH KC-680 */
+.uh-hidden {
+display: none;
+}
 
 select.fixed-size-850-select {
 	width: 850px;

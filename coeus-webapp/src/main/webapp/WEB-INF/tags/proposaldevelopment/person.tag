@@ -358,7 +358,8 @@
 		<c:set var="personEA" value="document.developmentProposalList[0].proposalPersons[${personIndex}].proposalPersonExtendedAttributes" />
 		<tr>
 			<td colspan=4>
-				<kul:innerTab tabTitle="Extended Details" parentTab="${parentTabName}" defaultOpen="false" tabErrorKey="document.developmentProposalList[0].proposalPersons*">
+			<!-- UH KC-676 rbl standardize error message location -->
+				<kul:innerTab tabTitle="Extended Details" parentTab="${parentTabName}" defaultOpen="false" tabErrorKey="document.developmentProposalList[0].proposalPersons[${personIndex}].proposalPersonExtendedAttributes*">
 					<div class="innerTab-container" align="left">
 						<table class=tab cellpadding=0 cellspacing="0" summary="">
 							<tbody id="G2">
@@ -702,7 +703,8 @@
 <bean:define id="certificationRequired" name="KualiForm" property="${proposalPerson}.role.certificationRequired" /> 
 
 <c:choose>
- <c:when test="${certificationRequired == 'Y'  || !KualiForm.editingMode['modifyProposal']}">
+ <%-- KC-505 Require Certification Questions for all KeyPersons if they are employees only - Added check for empty rolodexId which means it is employee --%>
+ <c:when test="${(certificationRequired == 'Y' && empty KualiForm.document.developmentProposalList[0].proposalPersons[personIndex].rolodexId) || !KualiForm.editingMode['modifyProposal']}">
  	<c:choose>
  		<c:when test="${KualiForm.document.developmentProposalList[0].proposalPersons[personIndex].anyYNQsAnswered}">
 		   	<tr>
@@ -717,6 +719,9 @@
 		</c:when>
   	</c:choose>
   	<tr>
+  	 <%-- KC-794 Key Person Certification Questions show up for non-employees --%>
+  	 <%-- Added the c:if to control access to the kra_questionnaire:questionnaireAnswersInnerTab tag file. No Qsntr will be displayed if the person opted out--%>
+  	 <c:if test="${KualiForm.document.developmentProposalList[0].proposalPersons[personIndex].optInCertificationStatus =='Y'}" >
 		<td colspan=4>
 			<c:set var="answerHeaderIndex" value="0" />
 			<c:set var="property" value="proposalPersonQuestionnaireHelpers[${personIndex}]" />
@@ -725,12 +730,14 @@
 			<c:set var="questionnaireAnswerableUpToApproval" value="${KualiForm.proposalPersonQuestionnaireHelpers[personIndex].canAnswerAfterRouting}"/>
         <%-- hidden rule results --%>
             <input type="hidden" name="ruleReferenced" id ="ruleReferenced" 
-       					value = "${bean.ruleReferenced}" />
+       value = "${bean.ruleReferenced}" />
 			
+		
 			<kra-questionnaire:questionnaireAnswersInnerTab bean = "${bean}" property = "${property}" 
 				answerHeaderIndex = "${answerHeaderIndex}" parentTab="${parentTabName}" completed="${completed}"
 				printLineIndex="${personIndex }" answerableUpToApproval="${questionnaireAnswerableUpToApproval}"/>
 		</td>
+		</c:if>
 	</tr>
   </c:when>
   <c:otherwise>

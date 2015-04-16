@@ -356,6 +356,10 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         destDevelopmentProposal.getPerformingOrganization().setLocationName(srcDevelopmentProposal.getPerformingOrganization().getLocationName());
         destDevelopmentProposal.getPerformingOrganization().setSiteNumber(srcDevelopmentProposal.getPerformingOrganization().getSiteNumber());
         
+        //UH KC-466 BEGIN - sponsor deadline date and sponsor deadline type were made required fields on save so they need to be copied too
+        destDevelopmentProposal.setDeadlineDate(srcDevelopmentProposal.getDeadlineDate());
+        destDevelopmentProposal.setDeadlineType(srcDevelopmentProposal.getDeadlineType());
+        //UH KC-466 END
         if (isProposalTypeRenewalRevisionContinuation(srcDevelopmentProposal.getProposalTypeCode())) {
             destDevelopmentProposal.setSponsorProposalNumber(srcDevelopmentProposal.getSponsorProposalNumber());
         }
@@ -514,7 +518,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
         // districts need to be changed if the org details have been changed
         // do change even if unit is same.
-        changeOrganizationAndLocations(newDoc);
+            changeOrganizationAndLocations(newDoc);
 
         setPreviousGrantsGovTrackingId(srcDoc.getDevelopmentProposal().getProposalNumber(), newDoc);
 
@@ -666,7 +670,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     }
 
     protected void cleanupHierarchy(ProposalDevelopmentDocument newDoc) {
-        newDoc.getDevelopmentProposal().setHierarchyStatus(HierarchyStatusConstants.None.code());
+            newDoc.getDevelopmentProposal().setHierarchyStatus(HierarchyStatusConstants.None.code());
         newDoc.getDevelopmentProposal().setHierarchyParentProposalNumber(null);
         newDoc.getDevelopmentProposal().setHierarchyLastSyncHashCode(null);
     }
