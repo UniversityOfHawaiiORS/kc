@@ -43,10 +43,11 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
 
 	@Resource(name="KcFileMimeTypeIcons")
     private Map<String, String> KcFileMimeTypeIcons;
-
+   
     private static final String REPLACEMENT_CHARACTER = "_";
     //Exclude everything but numbers, alphabets, dots, hyphens and underscores
-    private static final String REGEX_TITLE_FILENAME_PATTERN = "([^0-9a-zA-Z\\.\\-_])";
+    // KC-364 remove spaces from "invalid char" check for attachments
+    private static final String REGEX_TITLE_FILENAME_PATTERN = "([^0-9 a-zA-Z\\.\\-_])";
     private static final String REGEX_TITLE_SPECIAL_CHARACTER_PATTERN = "([^\\x00-\\x7F])";
     
     /**
@@ -103,8 +104,8 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
             }
         }        
         return false;    
-    }
-
+    }   
+    
     @Override
     public String checkAndReplaceSpecialCharacters(String text) {     
         String cleanText = text;
