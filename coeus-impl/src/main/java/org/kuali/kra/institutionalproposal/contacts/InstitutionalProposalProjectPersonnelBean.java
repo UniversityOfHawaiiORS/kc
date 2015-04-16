@@ -69,7 +69,8 @@ public class InstitutionalProposalProjectPersonnelBean extends InstitutionalProp
             if(institutionalProposalPerson.isPrincipalInvestigator()) {
                 institutionalProposalPerson.getUnits().add(new InstitutionalProposalPersonUnit(institutionalProposalPerson, getInstitutionalProposal().getLeadUnit(), true));
             } else {
-                if(institutionalProposalPerson.isEmployee() && !institutionalProposalPerson.isKeyPerson()) {
+                //UH Change - KC-307: Don't add empty units when adding a new proposal person.
+                if(institutionalProposalPerson.isEmployee() && !institutionalProposalPerson.isKeyPerson() && institutionalProposalPerson.getPerson().getUnit() != null) {
                     institutionalProposalPerson.getUnits().add(new InstitutionalProposalPersonUnit(institutionalProposalPerson, institutionalProposalPerson.getPerson().getUnit(), false));
                 }
             }
