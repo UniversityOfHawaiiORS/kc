@@ -1,0 +1,128 @@
+
+.helpComponent {
+  border: 0px;
+  text-decoration: none;
+}
+
+a.helpComponent:link {
+  color: #000000;
+  text-decoration: none;
+}
+
+.continue-container {
+  background-color: #ffffff;
+  width: 444px;
+  font-size: 22pt;
+  font-weight: bold;
+  font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+.table {
+  padding: 0px 0px 10px 0px;
+  width:444px;
+  text-align:left;
+}
+
+.table-proposal {
+  padding: 0px 0px 10px 0px;
+  width:644px;
+ }
+
+.tile {
+  height: 100%;
+  width: 100%;
+  cursor: pointer;
+  text-align:center;
+}
+
+.span1 {
+  width: 96px;
+}
+
+.span2 {
+  width: 210px;
+}
+
+.span3 {
+  width: 210px;
+  border-style:solid;
+}
+
+.blue1 {
+  background-color: #00859B
+}
+
+.yellow {
+  background-color: #F3B200
+}
+
+.purple {
+  background-color: #3C38A6
+}
+
+.red {
+  background-color: #9A283F
+}
+
+.green {
+  background-color: #488C16
+}
+
+.blue2 {
+  background-color: #2573D9
+}
+
+.title-text{
+font-family:Calibri;
+font-size:14px;
+font-weight:700;
+position:absolute;
+padding-top:78px;
+padding-left:4px;
+color: white;
+}
+
+.proposal-text{
+font-family:Calibri;
+font-size:22px;
+font-weight:700;
+position:absolute;
+padding-top:70px;
+padding-left:31px;
+color: black;
+}
+.proposal-text1{
+font-family:Calibri;
+font-size:22px;
+font-weight:700;
+position:absolute;
+padding-top:70px;
+padding-left:20px;
+color: black;
+}
+.skip-text{
+font-family:Calibri;
+font-size:16px;
+font-weight:700;
+color: black;
+}
+
+#motd {
+  background: #c0c0c0;
+  border-radius: 15px;
+  color: black;
+  font-family:Calibri;
+  font-size:16px;
+  font-weight:700;
+  width: 90%;
+  padding: 12px 5px 12px 5px;
+  text-align: left;
+}
+
+#motd h1 {
+  color: black;
+  font-family:Calibri;
+  font-size:28px;
+  font-weight:700;
+}
+
