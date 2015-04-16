@@ -64,7 +64,7 @@ public class InstitutionalProposalLookupableHelperServiceImpl extends KraLookupa
     private boolean includeMergeCustomActionUrls;
     private DocumentService documentService;
     private InstitutionalProposalService institutionalProposalService;
-    
+
 	@Autowired
 	@Qualifier("dataObjectService")
 	private DataObjectService dataObjectService;
@@ -82,8 +82,15 @@ public class InstitutionalProposalLookupableHelperServiceImpl extends KraLookupa
         
         configureCustomActions(fieldValues);
         
+        // KC-624 IP advanced search is not working
+        // Check for Added field indicating this is an advanced search and if found don't
+        // restrict to active records only
+        if (fieldValues.get("UhAdvancedSearch") != null) {
+        	fieldValues.remove("UhAdvancedSearch");
+        } else {
         fieldValues.remove(InstitutionalProposal.PROPOSAL_SEQUENCE_STATUS_PROPERTY_STRING);
         fieldValues.put(InstitutionalProposal.PROPOSAL_SEQUENCE_STATUS_PROPERTY_STRING, VersionStatus.ACTIVE.toString());
+        }
         
         Map<String, String> formProps = new HashMap<String, String>();
         if (!StringUtils.isEmpty(fieldValues.get("lookupUnit.unitName"))) {
@@ -279,7 +286,7 @@ public class InstitutionalProposalLookupableHelperServiceImpl extends KraLookupa
         }
         return devProposals;
     }
-
+    
     protected Map<String, Object> getFieldValues(String key, Object value){
         Map<String, Object> fieldValues = new HashMap<String, Object>();
         fieldValues.put(key, value);
