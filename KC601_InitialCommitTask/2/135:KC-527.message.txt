@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-527->KC-527
+
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/KcPerson.xml
+
+KC-527:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-527 Key Person Search displays fields which don't work for search (Due to Profiler limitations) NOTE: Profiler is gone but leaving these fields out since nobody ever missed them)
+

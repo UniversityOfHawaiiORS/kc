@@ -1,0 +1,14 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-421->KC-421->KC-398
+
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/RRKeyPersonExpandedV1_2Generator.java
+
+KC-398:Merged-Extreemly difficult, had to re-write the code mostly…needs to be tested heavily:
+KC-398 Prevent S2S errors because length is too long 
+KC-421 employee key personnel set their division to their home unit if it exists
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/RRKeyPersonExpandedBaseGenerator.java
+
+KC-398:Merged - Removed static variables we added to gain access to service locators.  We can use the kuali methods to get these now.:
+KC-398 For non-employees, Organization shows as University of Hawaii on grants.gov forms 
+

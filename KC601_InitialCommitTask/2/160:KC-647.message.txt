@@ -1,0 +1,28 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-647->KC-647
+
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/RRKeyPersonV1_1Generator.java
+
+KC-647:Merged:
+KC-647 S2S Division name validation error with RRKeyPerson
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/RRKeyPersonV1_0Generator.java
+
+KC-647:Merged:
+KC-647 S2S Division name validation error with RRKeyPerson
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/RRKeyPersonExpandedV1_1Generator.java
+
+KC-647:Merged:
+KC-647 S2S Division name validation error with RRKeyPerson
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/RRKeyPersonBaseGenerator.java
+
+KC-647:Merged:
+KC-647 S2S Division name validation error with RRKeyPerson
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/RRKeyPersonExpandedV1_0Generator.java
+
+KC-647:Merged:
+KC-647 S2S Division name validation error with RRKeyPerson
+

@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-729->KC-729
+
+
+coeus-impl/src/main/java/org/kuali/coeus/common/impl/org/OrganizationMaintenanceDocumentRule.java
+
+KC-729:Merged:
+KC-729 Make YNQ Questions not required in Organization Maintenance
+

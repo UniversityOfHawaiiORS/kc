@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-454->KC-454
+
+
+coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/service/impl/InstitutionalProposalServiceImpl.java
+
+KC-454:Merged-need to be hand modified:
+KC-454 When Institutional Proposal is Generated from Proposal Development doc, Project Summary field does not appear in the Custom Data tab.
+

@@ -1,0 +1,135 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-680->KC-680->KC-328->KC-480->KC-676->KC-599->KC-677->KC-759->KC-505->KC-794->KC-658->KC-605->KC-466->KC-625->KC-641->KC-865->KC-598->KC-792
+
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/DevelopmentProposal.xml
+
+KC-792:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-466 Fix make Sponsor Deadline Date required when you save 
+KC-598 - Can no longer search for proposal by person full name 
+KC-605 .... add time zone to sponsor deadline time field 
+KC-792 S2S Opportunity Id validation pattern is incorrect
+
+coeus-impl/src/main/java/org/kuali/coeus/common/impl/ynq/YnqServiceImpl.java
+
+KC-505:Merged:
+KC-505 Make Certification Questions required for Key Persons (Don't require for non-employees unless opted in)
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/person.tag
+
+KC-794:Merged:
+KC-676 standardize error message location 
+KC-505 Require Certification Questions for all KeyPersons if they are employees only  
+KC-794 Key Person Certification Questions show up for non-employees 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/institutionalproposal/institutionalProposalSponsorAndProgramInformation.tag
+
+KC-605:Merged:
+KC-605 Add ability to enter timezone to Sponsor Deadline Time
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposal.xml
+
+KC-605:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-605 .... add time zone to sponsor deadline time field
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPersonnelLineItems.tag
+
+KC-676:Merged: 
+KC-676  standardize error message location
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/ProposalLog.xml
+
+KC-605:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-605 add time zone to sponsor deadline time field
+
+coeus-webapp/src/main/webapp/css/kuali_application.css
+
+KC-680:Merged - NOTE: We can likely remove this change since we need to re-implement this change:
+KC-680 Improve budget finalization  NOTE: I know they changed the interface so this fix should not work but the code was unmodifed.  I am guessing this is dead code and likley there will be others.   We need to test every feature to make sure they still w
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPersonnelLineItemFullView.tag
+
+KC-676:Merged: 
+KC-676  standardize error message location
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentSponsorProgramInformation.tag
+
+KC-658:Merged:
+KC-658 Improve PD required field placement 
+KC-676 Standardize error/warning location on page 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentRequiredFields.tag
+
+KC-605:Merged-Difficult merge with a lot of hand hacking to make it look right.  May have issues.:
+KC-658 Improve PD required field placement  
+KC-605 Add ability to enter timezone to Sponsor Deadline Time 
+
+coeus-impl/src/main/java/org/kuali/coeus/sys/framework/util/DateUtils.java
+
+KC-605:Merged-Code moved to new file,  I had to hand merge code from TimeFormatter to DateUtils:
+KC-605 BEGIN rbl add time zone to sponsor deadline time
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/abstrct/AbstractTypeValuesFinder.java
+
+KC-480:Merged:
+KC-480 make "Project Summary" the default abstract selection choice
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPeriodAndTotals.tag
+
+KC-677:Merged:
+KC-676  standardize error message location  
+KC-677 lock total sponsor cost for editing, force users to fill out direct and F&A fields to prevent reporting from breaking 
+KC-599 number of months displayed with too much precision (Note: Code for 
+KC-599 was removed by Kuali so our fix of the percision can't remain but did we want this info ?)
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetRates.tag
+
+KC-676:Merged: 
+KC-676  standardize error message location
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetProjectPersonnel.tag
+
+KC-676:Merged: 
+KC-676  standardize error message location
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/copy/ProposalCopyServiceImpl.java
+
+KC-865:Merged- Needs more Review- Code we modifed has been removed.  We should test to see if this issue still exists. 
+KC-625 (Code removed-test) 
+KC-641 (Code removed-test) 
+KC-865 (Code removed-test):
+KC-625 Copy Proposal is not honoring the Lead Unit Selected 
+KC-641 Not all questions are copying when copy proposal is set to include questions 
+KC-466 BEGIN - sponsor deadline date and sponsor deadline type were made required fields on save so they need to be copied too 
+KC-865 BEGIN inactive ynq questions should not be copied during copy proposal process   
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetVersions.tag
+
+KC-759:Review :
+KC-676  standardize error message location 
+KC-680 BEGIN improve budget finalization (Code no longer there we need to re-write this NOTE: Royce showed me that finalization is worse...we need to fix again) 
+KC-759 When a budget name is more than 40 characters, doc locks and no navigation is allowed (They fixed in 6.0.1 )
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPersonnelDetail.tag
+
+KC-676:Merged: 
+KC-676  standardize error message location
+
+coeus-webapp/src/main/webapp/scripts/kuali_application.js
+
+KC-480:Review - I merged but may need to look at 
+KC-680 code given new design I think there is better way to do 
+KC-480 and it will likely be different in new design.:
+KC-328 When adding people to permissions tab Full Name, Unit # and Unit Name say "not found" for valid users 
+KC-680 Improve budget finalization (Needs work) 
+KC-480 PD - Abstracts and Attachments Tab (Abstracts section): Request for "Project Summary" to be default selection for field  
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetParameters.tag
+
+KC-680:Merged:
+KC-680 Improve budget finalization  NOTE: I know they changed the interface so this fix should not work but the code was unmodifed.  I am guessing this is dead code and likley there will be others.   We need to test every feature to make sure they still work.
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentAttachments.tag
+
+KC-676:Merged:
+KC-676 standardize error location 
+

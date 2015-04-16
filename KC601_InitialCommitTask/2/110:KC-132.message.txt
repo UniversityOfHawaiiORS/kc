@@ -1,0 +1,12 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-132->KC-132
+
+
+coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentCustomData.jsp
+
+KC-132:Merged:
+KC-132 NOTE: Do we still want this, nothing in custom data anymore, perhaps we will add some ?
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/customdata/customDataTabSpecific.tag
+
+KC-132:Merged: KC 132 check if  the custom data tab should be defaulted to open to show required questions NOTE: Do we need this anymore ?
+

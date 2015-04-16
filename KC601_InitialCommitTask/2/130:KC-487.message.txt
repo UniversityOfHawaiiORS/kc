@@ -1,0 +1,23 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-487->KC-487
+
+
+coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentPermissions.jsp
+
+KC-487:Merged: 
+KC-487 fixed missing save button on PD permissions tab view only mode
+
+coeus-impl/src/main/java/org/kuali/coeus/common/framework/person/KcPerson.java
+
+KC-487:Merged:
+KC-487 UH-RICE change, check isFaculty based our affiliation
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/PersonDocumentEmploymentInfo.xml
+
+KC-487:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-487 make base salary non-required field
+
+coeus-webapp/src/main/webapp/kim/WEB-INF/jsp/identityManagementPersonDocument.jsp
+
+KC-487:Merged:
+KC-487 Move to Standard Rice in preperation for KC5.0 merge. UH Rice not available in 2.0 version 
+

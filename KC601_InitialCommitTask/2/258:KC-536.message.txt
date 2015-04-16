@@ -1,0 +1,13 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-536->KC-536
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/printReports.tag
+
+KC-536:Merged:
+KC-536 User with no roles can run current & pending support report and see proposals for other PI
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/currentOrPendingReport.tag
+
+KC-536:Merged:
+KC-536 User with no roles can run current & pending support report and see proposals for other PI
+

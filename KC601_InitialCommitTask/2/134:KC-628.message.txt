@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-628->KC-628
+
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/s2s/S2sOpportunityLookupableHelperServiceImpl.java
+
+KC-628:Merged-Needed by hand adjustment:
+KC-628 BEGIN if the s2sSubmissionTypeCode is blank then default it to Application to prevent validation tab cut off issue
+

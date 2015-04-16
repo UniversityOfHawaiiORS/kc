@@ -1,0 +1,15 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-727->KC-727->KC-656->KC-733
+
+
+coeus-impl/src/main/java/org/kuali/kra/timeandmoney/web/struts/action/TimeAndMoneyAction.java
+
+KC-733:Merged:
+KC-733 No Cost Extension hard coded to trans code of 10 
+KC-727 TimeAndMoney, Direct/F&A Funds Distribution fields not saving 
+KC-656 remove the call to refresh view because it was causing the parent award obligated/anticipated amounts to double - possible race condition?
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/timeandmoney/awardHierarchyTimeAndMoney.tag
+
+KC-656:Merged:
+KC-656 Parent Award Totals display incorrectly after T&M transaction is added 
+

@@ -1,0 +1,18 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-492->KC-492
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/institutionalproposal/institutionalProposalCustomData.tag
+
+KC-492:Merged: 
+KC-492 Data entered into Custom Data text box is not viewable because text fields are too small 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/kr/htmlControlAttribute.tag
+
+KC-492:Merged: 
+KC-492 Data entered into Custom Data text box is not viewable because text fields are too small 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/customdata/customData.tag
+
+KC-492:Merged:
+KC-492 Data entered into Custom Data text box is not viewable because text fields are too small
+

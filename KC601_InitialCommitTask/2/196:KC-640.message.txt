@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-640->KC-640
+
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/person/DepartmentalPersonServiceImpl.java
+
+KC-640:Merged - Moved code to new Class by hand.    Method moved to new service DepartmentalPersonServiceImpl.java:
+KC-640 AOR contact switch when submitting causes exception in background process
+

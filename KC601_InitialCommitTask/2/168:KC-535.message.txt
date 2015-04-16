@@ -1,0 +1,19 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-535->KC-535->KC-755
+
+
+coeus-webapp/src/main/webapp/kr/WEB-INF/struts-config.xml
+
+KC-535:Merged:
+KC-535 If SOLR is down search's result in incident report
+
+coeus-webapp/src/main/webapp/kr/WEB-INF/jsp/KualiLookup.jsp
+
+KC-755:Merged:
+KC-755 Remove Organization Lookup from Address Book 
+KC-535 If SOLR is down search's result in incident report
+
+coeus-impl/src/main/java/edu/hawaii/rice/kew/web/struts/action/UhKualiLookupAction.java
+
+KC-535:Keep:
+KC-535 If SOLR is down search's result in incident report
+

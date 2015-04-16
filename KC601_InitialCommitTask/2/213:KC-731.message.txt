@@ -1,0 +1,14 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-731->KC-731->KC-ReturnChange
+
+
+coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentApproverView.jsp
+
+KC-ReturnChange:Merged:
+KC-731 YNQ missing from Proposal Development Summary Tab 
+KC-??? Replace "reject" button with "return for changes"
+
+coeus-webapp/src/main/webapp/static/images/uh_buttonsmall_return.gif
+
+KC-ReturnChange:Keep:
+KC-??? Add new return for changes button and reference it for proposal document actions
+

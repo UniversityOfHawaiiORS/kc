@@ -1,0 +1,14 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-815->KC-815->KC-201->KC-306->KC-515->KC-680->KC-764->KC-892
+
+
+coeus-impl/src/main/java/edu/hawaii/infrastructure/UhKeyConstants.java
+
+KC-892:Keep:
+KC-201: Add a UH specific Constants class as counterpart to community one. 
+KC-306: Make performing organization required and prevent it from getting a default value during refresh. 
+KC-515 Improve Project Summary validation 
+KC-680 .... fix to improve budget finalization 
+KC-764 If the modular budget checkbox is checked, the proposal cannot be "submitted to sponsor" for non S2S 
+KC-815 Negotiation should populate with default data 
+KC-892 Enforce some negotiation activity type entries to single occurrence per award
+

@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-418->KC-418
+
+
+coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/contacts/InstitutionalProposalUnitContactAddRuleImpl.java
+
+KC-418:Merged:
+KC-418 Modification add check for primary unit
+

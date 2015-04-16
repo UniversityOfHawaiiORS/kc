@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-553->KC-553
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/kim/personContact.tag
+
+KC-553:Merged:
+KC-553 Lock down person edit page
+

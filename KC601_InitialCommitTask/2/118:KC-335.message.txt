@@ -1,0 +1,18 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-335->KC-335->KC-503
+
+
+coeus-impl/src/main/java/edu/hawaii/award/document/authorization/UhAwardDocumentAuthorizer.java
+
+KC-335:Keep:
+KC-335: Add Unit Number to Award qualifications so anyone with correct permissions can submit Award. Disable INITIATOR_MUST_ROUTE policy for Award and Time and Money documents.
+
+coeus-db/coeus-db-xml/src/main/resources/org/kuali/coeus/coeus-xml/2/AwardDocument.xml
+
+KC-335:REVIEW:Merged - we have some rice object names which may change need to verify once rice is stable
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/AwardDocument.xml
+
+KC-503:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-335 Initiator is the only one allowed to submit documents 
+KC-503 Award Routing to members of ORS Compliance based on Custom Data field 
+

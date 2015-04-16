@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-363->KC-363
+
+
+coeus-impl/src/main/java/org/kuali/kra/timeandmoney/TimeAndMoneyForm.java
+
+KC-363:Merged:
+KC-363 Move Disapprove button and fix broken image copy of reload button on time and money docs
+

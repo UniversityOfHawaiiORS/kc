@@ -1,0 +1,23 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-517->KC-517
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalTabs.tag
+
+KC-517:Removed (6.0.1):
+KC-517 Add Help Tab (6.0.1 removed, we need to move help elsewhere anyway)
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalHelpBody.tag
+
+KC-517:Merged:
+KC-517 Add Help/Resources tab to myGRANT
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalBody.tag
+
+KC-517:Merged - Needs Review (Note looks like Help Tab will exist in old portal now….We need to move to new) :
+KC-517 Add Help/Resources Tab
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/helplinks.tag
+
+KC-517:Keep … Needs Review - Help tags….will this work in new design:
+KC-517 Add Help/Resources tab to myGRANT
+

@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-307->KC-307
+
+
+coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/contacts/InstitutionalProposalProjectPersonnelBean.java
+
+KC-307:Merged:
+KC-307: Don't add empty units when adding a new proposal person.
+

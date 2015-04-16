@@ -1,0 +1,13 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-246->KC-246
+
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/Rolodex.xml
+
+KC-246:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-246: Change rolodex and non-organizational sponsor code validation to AnyCharacterValidationPattern.
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/NonOrganizationalRolodex.xml
+
+KC-246:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-246: Change rolodex and non-organizational sponsor code validation to AnyCharacterValidationPattern.
+

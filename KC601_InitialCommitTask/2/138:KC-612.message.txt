@@ -1,0 +1,61 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-612->KC-612->KC-675->KC-152
+
+
+coeus-webapp/src/main/webapp/WEB-INF/jsp/uh/uhTldHeader.jsp
+
+KC-612:Merged:
+KC-??? Hide Maintenance and System Admin tabs to all but those with KR-SYS Technical Administrator role
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/administration/configuration.tag
+
+KC-152:Merged:
+KC-152: Wording Change (Document Lock)
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalUnitBody.tag
+
+KC-612:Merged:
+KC-612 Declutter the menu screens
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitQuicklinks.tag
+
+KC-152:Merged:
+KC-152: Wording Change (Document Lock) 
+
+coeus-webapp/src/main/webapp/WEB-INF/jsp/kraTldHeader.jsp
+
+KC-612:merged-found file:
+KC-??? Hide Maintenance and System Admin tabs to all but those with KR-SYS Technical Administrator role
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/researcherAwards.tag
+
+KC-612:Removed (6.0.1):
+KC-612 Declutter the menu screens (6.0.1 Update they made same change as us removing one item (Awards in progress)
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/researcherQuicklinks.tag
+
+KC-152:Removed (6.0.1):
+KC-152: Wording Change (Document Lock) (6.0.1 update pessimistic lock removed) 
+KC-612 Declutter the menu screens (6.0.1 update they removed the items we where hiding )
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/PessimisticLock.xml
+
+KC-152:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-152: Rename Pessimistic Lock to Lock on accross all tabs and in the lookup and inquiry screens. 
+KC-152: Change lock wording to the correct wording (Document Lock - was just Lock).
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/uh/principalHasRole.tag
+
+KC-612:Keep:
+KC-??? Hide Maintenance and System Admin tabs to all but those with KR-SYS Technical Administrator role
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/researcherProposals.tag
+
+KC-675:Merged: 
+KC-675 Have "All my proposals" run when selected  
+KC-612 Declutter the menu screens 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/researcherPersonnel.tag
+
+KC-612:Merged:
+KC-612 Declutter the menu screens (6.0.1 Update they made same change as us removing one item (Degree Information,BioSketces,All My Training)
+

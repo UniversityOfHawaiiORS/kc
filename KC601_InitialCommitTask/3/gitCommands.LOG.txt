@@ -1,0 +1,9 @@
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/UhSpringBeans.xml
+
+[uh-modifications-jira-merge d78d217] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-800->KC-800->KC-203->KC-306->KC-326->KC-367->KC-679->KC-801
+ 1 file changed, 107 insertions(+)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/UhSpringBeans.xml

@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-763->KC-763
+
+
+coeus-s2sgen-impl/src/main/java/org/kuali/coeus/s2sgen/impl/generate/support/GlobalLibraryV2_0Generator.java
+
+KC-763:Merged-File Moved to s2s project:
+KC-763 Validation throws exception if proposal is s2s and AOR has no address configured.
+

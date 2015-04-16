@@ -1,0 +1,15 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes SpringBean->SpringBean
+
+
+coeus-impl/src/main/resources/edu/hawaii/UHCustomInstitutionalProposalSpringBeans.xml
+SpringBean:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:KC51 modified UH custom datadictionary and spring beans to use new KC5.X override techniques per tech collab
+
+coeus-impl/src/main/resources/uh-bootstrap-springbeans.xml
+SpringBean:Keep:Uh Spring Beans Bootstrap
+
+coeus-impl/src/main/resources/edu/hawaii/UHCustomAwardSpringBeans.xml
+SpringBean:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:KC51 modified UH custom datadictionary and spring beans to use new KC5.X override techniques per tech collab
+
+coeus-impl/src/main/resources/edu/hawaii/UHCustomProposalDevelopmentSpringBeans.xml
+SpringBean:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:KC51 modified UH custom datadictionary and spring beans to use new KC5.X override techniques per tech collab
+

@@ -1,0 +1,14 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-805->KC-805->KC-319
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentQuestionnaireAnswers.tag
+
+KC-805:Merged:
+KC-805 Change PD Questions Tab to default all questionnaires as shown 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalYnq.tag
+
+KC-319:Merged:
+KC-805 Change PD Questions Tab to default all questionnaires as shown 
+KC-319 added link to UH Export Controls Policy for Export Control Question #15
+

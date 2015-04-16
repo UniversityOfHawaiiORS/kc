@@ -1,0 +1,19 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-645->KC-645->KC-286->KC-362->KC-422
+
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/core/ProposalDevelopmentDocument.java
+
+KC-645:Merged:
+KC-645 Fix Proposal Project Titles now visible to all via doc search 
+
+coeus-impl/src/main/java/edu/hawaii/its/kuali/mail/KcUHStyleableEmailContentServiceImpl.java
+
+KC-422:REVIEW-See Class Import Fixed notes.:
+KC-286: Add UH KC specific extension of UH Rice's email content service to customize our Proposal routing subject. 
+KC-362: Add action requested to propostal notification email subject. 
+KC-422, 
+KC-434, 
+KC-457, 
+KC-496 added email notification message body changes 
+KC-645 Fix Proposal Project Titles now visible to all via doc search
+

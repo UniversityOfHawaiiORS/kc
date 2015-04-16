@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-541->KC-541
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/kim/attributeLookup.tag
+
+KC-541:Merged:
+KC-541 "Unit Search" Field does not get pre-populated with the Unit Number when initiating a Unit lookup from Person Edit Screen
+

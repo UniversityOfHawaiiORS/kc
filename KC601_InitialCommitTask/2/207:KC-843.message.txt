@@ -1,0 +1,13 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-843->KC-843
+
+
+coeus-impl/src/main/java/edu/hawaii/timeandmoney/document/authorization/UhTimeAndMoneyDocumentAuthorizer.java
+
+KC-843:Keep:
+KC-843 Can we hide the cancel button in award and time and money
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/TimeAndMoneyDocument.xml
+
+KC-843:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-843 Can we hide the cancel button in award and time and money
+

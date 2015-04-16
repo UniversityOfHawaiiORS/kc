@@ -1,0 +1,113 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-569->KC-569->KC-201->KC-306->KC-515->KC-391->KC-800->KC-837->KC-917->KC-146->KC-203->KC-531->KC-570->KC-654
+
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/UhPropDevJavaFunctionKrmsTermService.java
+
+KC-917:merged:
+KC-917 KRMS - New term needed, "has Prime Sponsor Type"
+
+coeus-webapp/src/main/webapp/PermissionDenied.jsp
+
+KC-531:Keep:
+KC-531 Improve message when user doesn't have "KC USER" group current
+
+coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/rules/InstitutionalProposalAddCostShareRuleImpl.java
+
+KC-800:Merged: 
+KC-800 Add Questionnaire to capture Unrecovered F and A information  as a part of this chage we made Source Account Optional in Cost Sharing and Unrecovered F & A therefore for submit to sponsor which creates an IP we need to remove the requirement of this value from IP
+
+coeus-impl/src/main/java/org/kuali/coeus/common/budget/impl/distribution/BudgetCostShareAuditRule.java
+
+KC-800:Merged:
+KC-800 Add Questionnaire to capture Unrecovered F and A information Remove requirement for Source Account
+
+coeus-webapp/src/main/webapp/WEB-INF/struts-uh-config.xml
+
+KC-146:Review - With new design we likely need to adjust the structs config file.  This needs to be done after everything is done:
+KC-306: Make performing organization required and prevent it from getting a default value during refresh. 
+KC-146 and 
+KC-531  Failed Login improvements (related Jiras)  
+KC-146 If user not found in Profiler (or Profiler is down) myGRANT throws exception on login 
+KC-531 Improve message when user doesn't have "KC USER" group current status 500 error confuses users 
+KC-570 KC 5.1 Approver cannot open PD ready for his/her approval 
+KC-570 ... fix wildcard path which was causing issues.
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalSite.tag
+
+KC-654:Merged:
+KC-654 Primary Performance Site difficult to understand how to add 
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalCostShare.xml
+
+KC-800:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-800 Add Questionnaire to capture Unrecovered F and A information (More changes needed becaues this modification caused IP to fail on submit to sponsor)
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/rules/UhProposalDevelopmentDocumentRule.java
+
+KC-515:Keep:
+KC-201: Overrid Proposal Development's businessRulesClass with UH class which makes "Project Summary" abstract required. 
+KC-306: Make performing organization required and prevent it from getting a default value during refresh. 
+KC-569 Abstracts and Attachments listed twice under validation errors 
+KC-515 Improve Project Summary validation
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentOrganizationAndLocation.tag
+
+KC-654:Merged:
+KC-654 Primary Performance Site difficult to understand how to add Changed Default to open to make it easier to see performance site requirement 
+KC-306 - Rename section and don't automatically populate automatically 
+
+coeus-impl/src/main/java/org/kuali/coeus/common/budget/impl/distribution/BudgetUnrecoveredFandAAuditRule.java
+
+KC-800:Merged: 
+KC-800 Add Questionnaire to capture Unrecovered F and A information (As part of this change we want to remove the Audit Check which forces Source Account to be entered
+
+coeus-impl/src/main/java/edu/hawaii/rice/kew/web/UhKcUserLoginFilter.java
+
+KC-531:Keep:
+KC-203: Don't allow users not in the UH KC Users group to login. 
+KC-146 If user not found in Profiler (or Profiler is down) myGRANT throws exception on login 
+KC-531 Improve message when user doesn't have "KC USER" group current     status 500 error confuses users
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/impl/UhProposalDevelopmentServiceImpl.java
+
+KC-800:Keep:
+KC-800 and 
+KC-801 Add KRMS Rule for hasUnrecoveredFandA 
+KC-837 KRMS - New term needed, "Prime Sponsor ID"
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentAbstracts.tag
+
+KC-201:Merged:
+KC-201 No Scope of Work Field in Proposal Development 
+KC-515 Improve Project Summary validation 
+
+coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/rules/InstitutionalProposalUnrecoveredFandARuleImpl.java
+
+KC-800:Merged: 
+KC-800 Add Questionnaire to capture Unrecovered F and A information as a part of this chage we made Source Account Optional in Cost Sharing and Unrecovered F & A  therefore for submit to sponsor which creates an IP we need to remove the requirement of this value from IP
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/core/ProposalDevelopmentAction.java
+
+KC-917:merged:
+KC-917 KRMS - New term needed, "has Prime Sponsor Type"
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/web/struts/action/UhProposalDevelopmentProposalAction.java
+
+KC-306:Keep:
+KC-306: Make performing organization required and prevent it from getting a default value during refresh. 
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalUnrecoveredFandA.xml
+
+KC-800:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-800 Add Questionnaire to capture Unrecovered F and A information     More changes needed becaues this modification caused IP to fail on submit to sponsor
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/impl/UhPropDevJavaFunctionKrmsTermServiceImpl.java
+
+KC-917:merged:
+KC-917 KRMS - New term needed, "has Prime Sponsor Type"
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/rules/UhProposalDevelopmentProposalLocationRule.java
+
+KC-306:Keep:
+KC-306: Make performing organization required and prevent it from getting a default value during refresh.
+

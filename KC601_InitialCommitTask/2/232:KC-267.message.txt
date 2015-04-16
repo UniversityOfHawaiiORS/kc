@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-267->KC-267
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitWorkflow.tag
+
+KC-267:Merged:
+KC-267 Unit and Central Admin tabs have access to the "Rules" Lookup. Here you can disable rules which are used for routing, etc.
+

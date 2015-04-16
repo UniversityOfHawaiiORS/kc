@@ -1,0 +1,312 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-632->KC-632->KC-661->KC-679->KC-756->KC-774->KC-210->KC-263->KC-154->KC-489->KC-819->KC-477->KC-793->KC-818->KC-821->KC-840->KC-797->KC-883->KC-822->KC-877->KC-831->KC-814->KC-856->KC-820->KC-871->KC-573->KC-666->KC-785->KC-855->KC-829->KC-367->KC-650->KC-545->KC-901->KC-709
+
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/bo/NegotiationActivity.java
+
+KC-820:merged:
+KC-820 Modify Negotiation Description restricted/unrestricted Auto Restrict based on activity type
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/negotiation/negotiation.tag
+
+KC-819:Merged:
+KC-822 Add send notification button and a link to launch Award Memo Tool  
+KC-818 Default Agreement Type to "AWARD", then hide Anticipated Award Date, and Document Folder fields 
+KC-831 Allow Negotiations to be linked with Saved documents 
+KC-819 Display UH Assigned To field on the Negotiations Attributes Tab and Default negotiator 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/award/awardDetailsDates.tag
+
+KC-154:Merged:
+KC-821 Only allow one Negotiation per child award. 
+KC-154 Add New Date Fields within the Awards Module
+
+coeus-impl/src/main/java/org/kuali/coeus/common/framework/unit/admin/UnitAdministrator.java
+
+KC-679:Merged:
+KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+
+coeus-impl/src/main/java/edu/hawaii/award/bo/UhAwardExtension.java
+
+KC-679:Keep:
+KC-679 New routing 5.1.1 (UhPersonDelegationMaintenanceDocument support)
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/Award.xml
+
+KC-829:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-154 Add New Date Fields within the Awards Module 
+KC-829 Modify Award Lookup Results
+
+coeus-impl/src/main/java/edu/hawaii/award/lookup/AwardAdvancedSearchLookupableHelperServiceImpl.java
+
+KC-650:Keep:
+KC-367: Add an advanced award search that does not filter out saved awards and previous versions. 
+KC-650 Advanced Award Lookup behaves like a basic search
+
+coeus-impl/src/main/java/edu/hawaii/award/home/AwardAdvancedSearch.java
+
+KC-367:Keep:
+KC-367: Add an advanced award search that does not filter out saved awards and previous versions.
+
+coeus-impl/src/main/resources/edu/hawaii/repository-uh.xml
+
+KC-154:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-154 Add New Date Fields within the Awards Module 
+KC-367 Add an advanced award search that does not filter out saved awards and previous versions. 
+KC-679 New routing for 5.1.1 
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/document/workflow/UhUnitAdministratorRoleAttribute.java
+
+KC-679:Keep:
+KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalCentralAdminBody.tag
+
+KC-367:Merged:
+KC-367 Make the advanced search show only on the central admin tab
+
+coeus-webapp/src/main/webapp/static/images/tinybutton-openaward.gif
+
+KC-821:Keep:
+KC-821 Only allow one Negotiation per child award. (New Button)
+
+coeus-impl/src/main/java/edu/hawaii/institutionalproposal/service/impl/InstitutionalProposalAdvancedSearchLookupableHelperServiceImpl.java
+
+KC-367:Keep:
+KC-367: Make advanced search for institutional proposal which doesn't filter versions.  Also changed InstitutionalProposalLookupableHelperServiceImpl maven override to an extension.
+
+coeus-webapp/src/main/webapp/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp
+
+KC-821:Merged:
+KC-821 Only allow one Negotiation per child award.
+
+coeus-impl/src/main/java/org/kuali/kra/award/AwardForm.java
+
+KC-840:Merged:REVIEW-Use KraServiceLocator should we use this anymore ?   Emailed Question to Travis to find out.  Travis Replied to keep the KraServiceLocator 
+KC-821 Only allow one Negotiation per child award. 
+KC-840 Hide Negotiation link button in Award page if not in group "All ORS"
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/docs/UnitAdministratorMaintenanceDocument.xml
+
+KC-679:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+
+coeus-impl/src/main/java/edu/hawaii/kra/service/impl/UhPersonDelegateLookupableHelperServiceImpl.java
+
+KC-679:Keep:
+KC-679 New routing 5.1.1 (UhPersonDelegationMaintenanceDocument support)
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/negotiation/negotiationActivities.tag
+
+KC-856:Merged:
+KC-814 Default negotiations activities tab to open to make data entry easier 
+KC-856 Hide entire activity if restricted and user can not view restricted
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/ProposalDevelopmentDocument.xml
+
+KC-632:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-201: Overrid Proposal Development's businessRulesClass with UH class which makes "Project Summary" abstract required. 
+KC-263 - extend proposal document authorizer with class that returns false for canDisapprove to hide the disapprove button. 
+KC-632 OTTED routing not working(Could be removed but doesn't hurt) 
+KC-679 New Routing for 5.1.1
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/service/NegotiationService.java
+
+KC-821:Merged:
+KC-821 Only allow one Negotiation per child award. 
+KC-840 Hide Negotiation link button in Award page if not in group "All ORS"
+
+coeus-db/coeus-db-xml/src/main/resources/org/kuali/coeus/coeus-xml/2/ProposalDevelopmentDocument.xml
+
+KC-774:Merged:Routing Modifications 
+KC-632,
+KC-679,
+KC-661,
+KC-756,
+KC-774,Moved people flow last,…
+
+coeus-impl/src/main/java/org/kuali/kra/award/document/AwardDocument.java
+
+KC-883:Merged:
+KC-833 Document Locks not removed when opening negotiations from action buttons 
+KC-797 removed same as Kuali
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/systemAdminSystem.tag
+
+KC-901:Merged:
+KC-545 Adding ORS Help Line Info Page 
+KC-679 New routing 5.1.1 (Support Links) 
+KC-901 Add ability for help desk to run the uhims process on deman 
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/AwardAdvancedSearch.xml
+
+KC-367:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-367: Add an advanced award search that does not filter out saved awards and previous versions. 
+KC-829 Modify Award Lookup result
+
+coeus-impl/src/main/java/edu/hawaii/kra/bo/UhPersonDelegate.java
+
+KC-679:Keep:
+KC-679 New routing 5.1.1 (UhPersonDelegationMaintenanceDocument support)
+
+coeus-impl/src/main/java/edu/hawaii/kra/bo/UhPersonDelegateMaintainableImpl.java
+
+KC-679:Keep:
+KC-679 New routing 5.1.1 (UhPersonDelegationMaintenanceDocument support)
+
+coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/document/authorization/UhProposalDevelopmentDocumentAuthorizer.java
+
+KC-263:Keep:
+KC-263 Hide PD disapprove button
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/UHcentralAdminPreAward.tag
+
+KC-814:Keep:
+KC-814 ... removing central admin tab links to "add negotiation" and "all my negotiations"
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/negotiation/negotiationActivity.tag
+
+KC-871:Merged:
+KC-871 Change negotiation activities back to closed 
+KC-820 Modify Negotiation Description restricted/unrestricted 
+KC-822 Add send notification button and a link to launch Award Memo Tool  
+KC-814 Set Start to Default to Today
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/UhAwardExtension.xml
+
+KC-154:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-154 Add New Date Fields within the Awards Module
+
+coeus-impl/src/main/java/org/kuali/kra/award/home/Award.java
+
+KC-819:Merged:
+KC-154: Override Award business object (through overlay) - extension is not getting persisted, so explicitly save it after the Award. 
+KC-489 Project Ends Dates displayed incorrectly in Award Search results 
+KC-819 Display UH Assigned To field on the Negotiations Attributes Tab and Default negotiator
+
+coeus-webapp/src/main/webapp/kew/WEB-INF/jsp/routelog/RouteLog.jsp
+
+KC-679:Merged:
+KC-679 New routing for 5.1.1 Remove date/time and add route node name (Routing Group) for future actions only
+
+coeus-webapp/src/main/webapp/flushUhKcUsersCache.jsp
+
+KC-709:Keep:
+KC-709 myGRANT 5.1.1 too slow (Caused by our KC_USERS check)
+
+coeus-webapp/src/main/webapp/static/images/tinybutton-negotiations.gif
+
+KC-821:Keep:
+KC-821 Only allow one Negotiation per child award. (New Button)
+
+coeus-impl/src/main/java/org/kuali/coeus/common/impl/unit/admin/UnitAdministratorLookupableHelperServiceImpl.java
+
+KC-679:Merged:
+KC-679 New Routing in 5.1.1 - Allow unit administrator maintenance edit and copy ability. We don't really need this because of Justin's tool but it can't hurt.
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/form/NegotiationForm.java
+
+KC-821:Merged:
+KC-821 Only allow one Negotiation per child award.
+
+coeus-impl/src/main/java/edu/hawaii/institutionalproposal/home/InstitutionalProposalAdvancedSearch.java
+
+KC-367:Keep:
+KC-367: Make advanced search for institutional proposal which doesn't filter versions.  Also changed InstitutionalProposalLookupableHelperServiceImpl maven override to an extension.
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/docs/UhPersonDelegateMaintenanceDocument.xml
+
+KC-679:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-679 New routing 5.1.1 (UhPersonDelegationMaintenanceDocument support)
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/document/NegotiationDocument.java
+
+KC-797:merged- messy merge but easy hand copied code:
+KC-797 Document Locks are not working correctly 
+KC-821 Only allow one Negotiation per child award.    
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/action/NegotiationNegotiationAction.java
+
+KC-877:Merged:
+KC-877 Negotiation activity still adds when invalid end date is entered  
+KC-822 Add send notification button and a link to launch Award Memo Tool
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/UhPersonDelegate.xml
+
+KC-679:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-679 New routing for 5.1.1 
+
+coeus-impl/src/main/java/edu/hawaii/kra/kew/UhUnitSplitNode.java
+
+KC-679:Keep:
+KC-679 UH Unit Split Node for routing
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/action/NegotiationAction.java
+
+KC-821:Merged:
+KC-821 Only allow one Negotiation per child award. Link back to the award document from negotiation document
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/action/ProposalDevelopmentActionsAction.java
+
+KC-855:Review - Merged - 
+KC-855 merge was not lining up in p4merge so I had to hand merge this code. (Also had to modify the code because they changed method return types)  NEEDS TESTING 
+KC-785 removed:
+KC-573 KC 5.1 submission of development proposal throws incident report 
+KC-855 Add feature to Questionnaire for smart answers 
+KC-785 Many of the "print" buttons on the Proposal Summary tab don't work and generate incident reports.  Solution taken from KC 5.2 code so this should not be needed after next upgrade
+
+coeus-webapp/src/main/webapp/static/images/tinybutton-sendmemo.gif
+
+KC-822:Keep:
+KC-822 Add send notification button and a link to launch Award Memo Tool 
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/service/NegotiationServiceImpl.java
+
+KC-821:Merged:
+KC-821 Only allow one Negotiation per child award. 
+KC-840 Hide Negotiation link button in Award page if not in group "All ORS"
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/centralAdminPostAward.tag
+
+KC-367:Merged:
+KC-367: Add a link to search for awards including old versions 
+
+coeus-impl/src/main/java/org/kuali/kra/award/lookup/AwardLookupableHelperServiceImpl.java
+
+KC-650:Merged:
+KC-650 Advanced Award Lookup behaves like a basic search
+
+coeus-db/coeus-db-uh-xml/4/UhPersonDelegateMaintenanceDocument.xml
+
+KC-679:Keep:
+KC-679 Add Delegations maintenance document... UH Specific XML document, keep and store in new folder …/coeus-db/coeus-db-uh-xml/4  Technically we don't need this since Justin's tool allows entry of delegations but it is nice to be able to look-up quickly in mygrant if needed.  Doesn't hurt
+
+coeus-webapp/src/main/webapp/kew/WEB-INF/jsp/routelog/ActionRequest.jsp
+
+KC-679:Merged - Rice Overlayed in KC: 
+KC-679 New routing for 5.1.1 When multiple found display the qualified roll before the multiple message
+
+coeus-impl/src/main/java/org/kuali/kra/award/web/struts/action/AwardAction.java
+
+KC-821:Merged:
+KC-477  Award Persons are getting added with award_number 000000-00000 when created from IP or Funding Proposal 
+KC-793 Correct wording for validation warnings exist message in PD and Award 
+KC-821 Only allow one Negotiation per child award. 
+KC-818 Default Agreement Type to "AWARD", then hide Anticipated Award Date, and Document Folder fields. 
+KC-819 .... Changed the default negotiator from assigedTo to hard coded "ORS"  
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalAdvancedSearch.xml
+
+KC-367:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-367: Make advanced search for institutional proposal which doesn't filter versions.  Also changed InstitutionalProposalLookupableHelperServiceImpl maven override to an extension. 
+KC-367: Rename sequence number fields to version number.  (Why did we do this...has always confused me and I thought it was a Kualiism...turns out we didn't thie very early on.
+
+coeus-impl/src/main/java/edu/hawaii/kra/kew/UhUnitToBranchDecoder.java
+
+KC-679:Keep:
+KC-679 New routing 5.1.1
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/UnitAdministrator.xml
+
+KC-679:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+

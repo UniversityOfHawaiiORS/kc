@@ -1,0 +1,877 @@
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-db/coeus-db-uh-xml/4/UhPersonDelegateMaintenanceDocument.xml
+	modified:   ../../coeus-db/coeus-db-xml/src/main/resources/org/kuali/coeus/coeus-xml/2/ProposalDevelopmentDocument.xml
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/award/bo/UhAwardExtension.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/award/home/AwardAdvancedSearch.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/award/lookup/AwardAdvancedSearchLookupableHelperServiceImpl.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/institutionalproposal/home/InstitutionalProposalAdvancedSearch.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/institutionalproposal/service/impl/InstitutionalProposalAdvancedSearchLookupableHelperServiceImpl.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/kra/bo/UhPersonDelegate.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/kra/bo/UhPersonDelegateMaintainableImpl.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/kra/kew/UhUnitSplitNode.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/kra/kew/UhUnitToBranchDecoder.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/kra/service/impl/UhPersonDelegateLookupableHelperServiceImpl.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/document/authorization/UhProposalDevelopmentDocumentAuthorizer.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/document/workflow/UhUnitAdministratorRoleAttribute.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/framework/unit/admin/UnitAdministrator.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/unit/admin/UnitAdministratorLookupableHelperServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/action/ProposalDevelopmentActionsAction.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/AwardForm.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/document/AwardDocument.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/home/Award.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/lookup/AwardLookupableHelperServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/web/struts/action/AwardAction.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/bo/NegotiationActivity.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/document/NegotiationDocument.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/service/NegotiationService.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/service/NegotiationServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/action/NegotiationAction.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/action/NegotiationNegotiationAction.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/form/NegotiationForm.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/Award.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/AwardAdvancedSearch.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalAdvancedSearch.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/ProposalDevelopmentDocument.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/UhAwardExtension.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/UhPersonDelegate.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/UnitAdministrator.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/docs/UhPersonDelegateMaintenanceDocument.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/docs/UnitAdministratorMaintenanceDocument.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/repository-uh.xml
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/negotiation/NegotiationNegotiation.jsp
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/award/awardDetailsDates.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/negotiation/negotiation.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/negotiation/negotiationActivities.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/negotiation/negotiationActivity.tag
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/UHcentralAdminPreAward.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/centralAdminPostAward.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/systemAdminSystem.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalCentralAdminBody.tag
+	new file:   ../../coeus-webapp/src/main/webapp/flushUhKcUsersCache.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/kew/WEB-INF/jsp/routelog/ActionRequest.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/kew/WEB-INF/jsp/routelog/RouteLog.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/static/images/tinybutton-negotiations.gif
+	modified:   ../../coeus-webapp/src/main/webapp/static/images/tinybutton-openaward.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/images/tinybutton-sendmemo.gif
+
+[uh-modifications-jira-merge 35145cc] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-632->KC-632->KC-661->KC-679->KC-756->KC-774->KC-210->KC-263->KC-154->KC-489->KC-819->KC-477->KC-793->KC-818->KC-821->KC-840->KC-797->KC-883->KC-822->KC-877->KC-831->KC-814->KC-856->KC-820->KC-871->KC-573->KC-666->KC-785->KC-855->KC-829->KC-367->KC-650->KC-545->KC-901->KC-709
+ 54 files changed, 4100 insertions(+), 186 deletions(-)
+ create mode 100644 coeus-db/coeus-db-uh-xml/4/UhPersonDelegateMaintenanceDocument.xml
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/award/bo/UhAwardExtension.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/award/home/AwardAdvancedSearch.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/award/lookup/AwardAdvancedSearchLookupableHelperServiceImpl.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/institutionalproposal/home/InstitutionalProposalAdvancedSearch.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/institutionalproposal/service/impl/InstitutionalProposalAdvancedSearchLookupableHelperServiceImpl.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/kra/bo/UhPersonDelegate.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/kra/bo/UhPersonDelegateMaintainableImpl.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/kra/kew/UhUnitSplitNode.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/kra/kew/UhUnitToBranchDecoder.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/kra/service/impl/UhPersonDelegateLookupableHelperServiceImpl.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/document/authorization/UhProposalDevelopmentDocumentAuthorizer.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/document/workflow/UhUnitAdministratorRoleAttribute.java
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/Award.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/AwardAdvancedSearch.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalAdvancedSearch.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/ProposalDevelopmentDocument.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/UhAwardExtension.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/UhPersonDelegate.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/UnitAdministrator.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/docs/UhPersonDelegateMaintenanceDocument.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/docs/UnitAdministratorMaintenanceDocument.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/repository-uh.xml
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/UHcentralAdminPreAward.tag
+ create mode 100644 coeus-webapp/src/main/webapp/flushUhKcUsersCache.jsp
+ create mode 100644 coeus-webapp/src/main/webapp/kew/WEB-INF/jsp/routelog/ActionRequest.jsp
+ create mode 100644 coeus-webapp/src/main/webapp/kew/WEB-INF/jsp/routelog/RouteLog.jsp
+ create mode 100644 coeus-webapp/src/main/webapp/static/images/tinybutton-negotiations.gif
+ rewrite coeus-webapp/src/main/webapp/static/images/tinybutton-openaward.gif (100%)
+ create mode 100644 coeus-webapp/src/main/webapp/static/images/tinybutton-sendmemo.gif
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/kim/personContact.tag
+
+[uh-modifications-jira-merge db6390a] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-553->KC-553
+ 1 file changed, 88 insertions(+)
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/kim/personContact.tag
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/kr/static/images/uh_buttonsmall_cancel_document.gif
+
+[uh-modifications-jira-merge f9623a4] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-337->KC-337
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 coeus-webapp/src/main/webapp/kr/static/images/uh_buttonsmall_cancel_document.gif
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/ynq/YnqServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/abstrct/AbstractTypeValuesFinder.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/copy/ProposalCopyServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/sys/framework/util/DateUtils.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/DevelopmentProposal.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposal.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/ProposalLog.xml
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetParameters.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPeriodAndTotals.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPersonnelDetail.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPersonnelLineItemFullView.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetPersonnelLineItems.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetProjectPersonnel.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetRates.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/budget/budgetVersions.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/institutionalproposal/institutionalProposalSponsorAndProgramInformation.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/person.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentAttachments.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentRequiredFields.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentSponsorProgramInformation.tag
+	modified:   ../../coeus-webapp/src/main/webapp/css/kuali_application.css
+	modified:   ../../coeus-webapp/src/main/webapp/scripts/kuali_application.js
+
+[uh-modifications-jira-merge 36c42eb] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-680->KC-680->KC-328->KC-480->KC-676->KC-599->KC-677->KC-759->KC-505->KC-794->KC-658->KC-605->KC-466->KC-625->KC-641->KC-865->KC-598->KC-792
+ 22 files changed, 637 insertions(+), 130 deletions(-)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/DevelopmentProposal.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposal.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/ProposalLog.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/rules/UhProposalDevelopmentDocumentRule.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/rules/UhProposalDevelopmentProposalLocationRule.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/UhPropDevJavaFunctionKrmsTermService.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/impl/UhPropDevJavaFunctionKrmsTermServiceImpl.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/impl/UhProposalDevelopmentServiceImpl.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/web/struts/action/UhProposalDevelopmentProposalAction.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/rice/kew/web/UhKcUserLoginFilter.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/budget/impl/distribution/BudgetCostShareAuditRule.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/budget/impl/distribution/BudgetUnrecoveredFandAAuditRule.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/core/ProposalDevelopmentAction.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/rules/InstitutionalProposalAddCostShareRuleImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/rules/InstitutionalProposalUnrecoveredFandARuleImpl.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalCostShare.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalUnrecoveredFandA.xml
+	new file:   ../../coeus-webapp/src/main/webapp/PermissionDenied.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/struts-uh-config.xml
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentAbstracts.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentOrganizationAndLocation.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalSite.tag
+
+[uh-modifications-jira-merge 4ee00a7] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-569->KC-569->KC-201->KC-306->KC-515->KC-391->KC-800->KC-837->KC-917->KC-146->KC-203->KC-531->KC-570->KC-654
+ 19 files changed, 910 insertions(+), 102 deletions(-)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/rules/UhProposalDevelopmentDocumentRule.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/rules/UhProposalDevelopmentProposalLocationRule.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/UhPropDevJavaFunctionKrmsTermService.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/impl/UhPropDevJavaFunctionKrmsTermServiceImpl.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/service/impl/UhProposalDevelopmentServiceImpl.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/proposaldevelopment/web/struts/action/UhProposalDevelopmentProposalAction.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/rice/kew/web/UhKcUserLoginFilter.java
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalCostShare.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/InstitutionalProposalUnrecoveredFandA.xml
+ create mode 100644 coeus-webapp/src/main/webapp/PermissionDenied.jsp
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/struts-uh-config.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/its/kuali/mail/KcUHStyleableEmailContentServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/core/ProposalDevelopmentDocument.java
+
+[uh-modifications-jira-merge 8590e4a] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-645->KC-645->KC-286->KC-362->KC-422
+ 2 files changed, 196 insertions(+), 5 deletions(-)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/its/kuali/mail/KcUHStyleableEmailContentServiceImpl.java
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentCustomData.jsp
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/customdata/customDataTabSpecific.tag
+
+[uh-modifications-jira-merge 4ec5810] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-132->KC-132
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/scripts/uh_app.js
+
+[uh-modifications-jira-merge 086dda9] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-648->KC-648
+ 1 file changed, 3 insertions(+)
+ create mode 100644 coeus-webapp/src/main/webapp/scripts/uh_app.js
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/negotiations/UhNegotiationDocumentAuthorizer.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/NegotiationDocument.xml
+
+[uh-modifications-jira-merge 7e8bf35] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-878->KC-878
+ 2 files changed, 56 insertions(+)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/negotiations/UhNegotiationDocumentAuthorizer.java
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/NegotiationDocument.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/negotiations/UhNegotiationActivityTypeValuesFinder.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/rules/NegotiationActivityRuleImpl.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/NegotiationActivity.xml
+
+[uh-modifications-jira-merge 8d46a1a] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-841->KC-841->KC-817->KC-892
+ 3 files changed, 211 insertions(+), 2 deletions(-)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/negotiations/UhNegotiationActivityTypeValuesFinder.java
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/NegotiationActivity.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitPostAward.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitPreAward.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalResearcherBody.tag
+
+[uh-modifications-jira-merge c3b2148] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-737->KC-737
+ 3 files changed, 16 insertions(+), 2 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/META-INF/cacerts.ips.keystore
+
+[uh-modifications-jira-merge e811eee] KC-6.0 Upgrade Commit containing the following JIRA Changes CACERTS->CACERTS
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 coeus-impl/src/main/resources/META-INF/cacerts.ips.keystore
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-db/coeus-db-xml/src/main/resources/org/kuali/coeus/coeus-xml/2/AwardDocument.xml
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/award/document/authorization/UhAwardDocumentAuthorizer.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/AwardDocument.xml
+
+[uh-modifications-jira-merge 6aa0e3b] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-335->KC-335->KC-503
+ 3 files changed, 141 insertions(+), 4 deletions(-)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/award/document/authorization/UhAwardDocumentAuthorizer.java
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/AwardDocument.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentKeyPersonnel.jsp
+
+[uh-modifications-jira-merge 260d33e] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-522->KC-522->KC-521
+ 1 file changed, 18 insertions(+), 7 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/scripts/questionnaireAnswer.js
+
+[uh-modifications-jira-merge acc8708] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-808->KC-808
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/timeandmoney/TimeAndMoneyForm.java
+
+[uh-modifications-jira-merge 6728b30] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-363->KC-363
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/questionnaire/impl/QuestionResolver.java
+
+[uh-modifications-jira-merge 6024061] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-845->KC-845
+ 1 file changed, 13 insertions(+), 4 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/framework/person/KcPerson.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/PersonDocumentEmploymentInfo.xml
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentPermissions.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/kim/WEB-INF/jsp/identityManagementPersonDocument.jsp
+
+[uh-modifications-jira-merge 0ee8628] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-487->KC-487
+ 4 files changed, 105 insertions(+), 3 deletions(-)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/PersonDocumentEmploymentInfo.xml
+ create mode 100644 coeus-webapp/src/main/webapp/kim/WEB-INF/jsp/identityManagementPersonDocument.jsp
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/s2s/S2sOpportunityLookupableHelperServiceImpl.java
+
+[uh-modifications-jira-merge daf8516] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-628->KC-628
+ 1 file changed, 8 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/KcPerson.xml
+
+[uh-modifications-jira-merge 40488cb] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-527->KC-527
+ 1 file changed, 31 insertions(+)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/KcPerson.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/PessimisticLock.xml
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/kraTldHeader.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/uh/uhTldHeader.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/administration/configuration.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/researcherProposals.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitQuicklinks.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalUnitBody.tag
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/uh/principalHasRole.tag
+
+[uh-modifications-jira-merge 5afb8bf] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-612->KC-612->KC-675->KC-152
+ 8 files changed, 120 insertions(+), 2 deletions(-)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/PessimisticLock.xml
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/jsp/uh/uhTldHeader.jsp
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/administration/configuration.tag
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/uh/principalHasRole.tag
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/kim/attributeLookup.tag
+
+[uh-modifications-jira-merge 1b54135] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-541->KC-541
+ 1 file changed, 58 insertions(+)
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/kim/attributeLookup.tag
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/timeandmoney/web/struts/action/TimeAndMoneyAction.java
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/timeandmoney/awardHierarchyTimeAndMoney.tag
+
+[uh-modifications-jira-merge 5743d46] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-727->KC-727->KC-656->KC-733
+ 2 files changed, 21 insertions(+), 8 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/timeandmoney/AwardDirectFandADistributionRuleImpl.java
+
+[uh-modifications-jira-merge 4a1f14e] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-669->KC-669
+ 1 file changed, 14 insertions(+)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/static/images/tinybutton-maint.gif
+
+[uh-modifications-jira-merge bb7589d] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-FixButton->KC-FixButton
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 coeus-webapp/src/main/webapp/static/images/tinybutton-maint.gif
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/print/PrintCertificationXmlStream.java
+	modified:   ../../coeus-impl/src/main/resources/org/kuali/kra/printing/stylesheet/QuestionnaireReport.xsl
+	modified:   ../../coeus-impl/src/main/resources/org/kuali/kra/printing/stylesheet/printCertification.xsl
+
+[uh-modifications-jira-merge e53efc5] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-467->KC-467
+ 3 files changed, 28 insertions(+), 38 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/mail/KcEmailServiceImpl.java
+
+[uh-modifications-jira-merge 2dcea48] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-584->KC-584
+ 1 file changed, 16 insertions(+), 5 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalDevelopmentQuestionnaireAnswers.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/proposaldevelopment/proposalYnq.tag
+
+[uh-modifications-jira-merge 819eb1d] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-805->KC-805->KC-319
+ 2 files changed, 10 insertions(+), 3 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/helplinks.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalBody.tag
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalHelpBody.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalTabs.tag
+
+[uh-modifications-jira-merge f9b6441] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-517->KC-517
+ 4 files changed, 130 insertions(+), 8 deletions(-)
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/helplinks.tag
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalHelpBody.tag
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/framework/custom/CustomDataHelperBase.java
+
+[uh-modifications-jira-merge f4fd8ad] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-600->KC-600
+ 1 file changed, 15 insertions(+), 7 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/rice/kew/web/struts/action/UhKualiLookupAction.java
+	modified:   ../../coeus-webapp/src/main/webapp/kr/WEB-INF/jsp/KualiLookup.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/kr/WEB-INF/struts-config.xml
+
+[uh-modifications-jira-merge afaa998] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-535->KC-535->KC-755
+ 3 files changed, 181 insertions(+), 7 deletions(-)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/rice/kew/web/struts/action/UhKualiLookupAction.java
+ create mode 100644 coeus-webapp/src/main/webapp/kr/WEB-INF/struts-config.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/sorting/ActivitySortingType.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/form/NegotiationActivityHelper.java
+
+[uh-modifications-jira-merge 4e46523] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-874->KC-874
+ 2 files changed, 25 insertions(+), 2 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/immutableBar.tag
+
+[uh-modifications-jira-merge f890930] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-550->KC-550->KC-LOOK
+ 1 file changed, 65 insertions(+)
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/immutableBar.tag
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/award/AwardCustomData.jsp
+
+[uh-modifications-jira-merge 11153dd] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-908->KC-908
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/service/impl/InstitutionalProposalLookupableHelperServiceImpl.java
+
+[uh-modifications-jira-merge eef9599] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-624->KC-624
+ 1 file changed, 9 insertions(+), 2 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/summary/proposalDevelopmentKeyPersonnel.tag
+
+[uh-modifications-jira-merge 5e86da0] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-890->KC-890
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+error: pathspec '../../coeus-impl/src/main/resources/uh-bootstrap-springbeans.xml' did not match any file(s) known to git.
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/UHCustomAwardSpringBeans.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/UHCustomInstitutionalProposalSpringBeans.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/UHCustomProposalDevelopmentSpringBeans.xml
+
+[uh-modifications-jira-merge 39db068] KC-6.0 Upgrade Commit containing the following JIRA Changes SpringBean->SpringBean
+ 3 files changed, 97 insertions(+)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/UHCustomAwardSpringBeans.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/UHCustomInstitutionalProposalSpringBeans.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/UHCustomProposalDevelopmentSpringBeans.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/kra/lookup/UhSolrExternalSearch.java
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/organization/service/impl/UhOrganizationLookupableHelperServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/framework/org/Organization.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/framework/sponsor/Sponsor.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/framework/unit/Unit.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/sponsor/SponsorLookupableHelperServiceImpl.java
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/unit/UnitLookupableHelperServiceImpl.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/Organization.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/Sponsor.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/Unit.xml
+
+[uh-modifications-jira-merge 9201270] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-326->KC-326->KC-530->KC-534
+ 10 files changed, 434 insertions(+), 207 deletions(-)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/kra/lookup/UhSolrExternalSearch.java
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/organization/service/impl/UhOrganizationLookupableHelperServiceImpl.java
+ rewrite coeus-impl/src/main/java/org/kuali/coeus/common/impl/sponsor/SponsorLookupableHelperServiceImpl.java (67%)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/Organization.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/Sponsor.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/Unit.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/org/OrganizationMaintenanceDocumentRule.java
+
+[uh-modifications-jira-merge 1c25ee7] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-729->KC-729
+ 1 file changed, 2 insertions(+)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/document/authorizer/ViewAwardAuthorizer.java
+
+[uh-modifications-jira-merge f3cb220] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-346->KC-346->KC-211->KC-546
+ 1 file changed, 73 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/summary/proposalDevelopmentBudgetRates.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/summary/proposalDevelopmentBudgetSummary.tag
+
+[uh-modifications-jira-merge c101386] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-649->KC-649
+ 2 files changed, 18 insertions(+), 4 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/printing/xmlstream/InstitutionalProposalXmlStream.java
+
+[uh-modifications-jira-merge 27f36f7] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-450->KC-450
+ 1 file changed, 28 insertions(+), 19 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/edl/UhEDocLiteDatabasePostProcessor.java
+
+[uh-modifications-jira-merge 2b4056a] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-813->KC-813
+ 1 file changed, 205 insertions(+)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/edl/UhEDocLiteDatabasePostProcessor.java
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/customdata/customData.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/institutionalproposal/institutionalProposalCustomData.tag
+	new file:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/kr/htmlControlAttribute.tag
+
+[uh-modifications-jira-merge db419e2] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-492->KC-492
+ 3 files changed, 479 insertions(+), 3 deletions(-)
+ create mode 100644 coeus-webapp/src/main/webapp/WEB-INF/tags/kr/htmlControlAttribute.tag
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/NonOrganizationalRolodex.xml
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/Rolodex.xml
+
+[uh-modifications-jira-merge 4ff2ce8] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-246->KC-246
+ 2 files changed, 24 insertions(+)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/NonOrganizationalRolodex.xml
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/Rolodex.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/contacts/InstitutionalProposalProjectPersonnelBean.java
+
+[uh-modifications-jira-merge a08498e] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-307->KC-307
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/core/ProposalDevelopmentForm.java
+
+[uh-modifications-jira-merge e1c730f] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-911->KC-911
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/contacts/InstitutionalProposalUnitContactAddRuleImpl.java
+
+[uh-modifications-jira-merge 2b9cc57] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-418->KC-418
+ 1 file changed, 15 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/award/service/impl/AwardHierarchyUIServiceImpl.java
+
+[uh-modifications-jira-merge 5350e98] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-476->KC-476
+ 1 file changed, 10 insertions(+)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/timeandmoney/document/authorization/UhTimeAndMoneyDocumentAuthorizer.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/TimeAndMoneyDocument.xml
+
+[uh-modifications-jira-merge 401cf45] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-843->KC-843
+ 2 files changed, 46 insertions(+)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/timeandmoney/document/authorization/UhTimeAndMoneyDocumentAuthorizer.java
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/TimeAndMoneyDocument.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/rice/kew/role/service/impl/UhRouteLogDerivedRoleTypeServiceImpl.java
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/UHKEWOverrideSpringBeans.xml
+
+[uh-modifications-jira-merge b11067e] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-869->KC-869
+ 2 files changed, 112 insertions(+)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/rice/kew/role/service/impl/UhRouteLogDerivedRoleTypeServiceImpl.java
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/UHKEWOverrideSpringBeans.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/UhApplicationResources.properties
+
+[uh-modifications-jira-merge 09d908a] KC-6.0 Upgrade Commit containing the following JIRA Changes AppResources->AppResources
+ 1 file changed, 90 insertions(+)
+ create mode 100644 coeus-impl/src/main/resources/UhApplicationResources.properties
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/jsp/proposaldevelopment/ProposalDevelopmentApproverView.jsp
+	new file:   ../../coeus-webapp/src/main/webapp/static/images/uh_buttonsmall_return.gif
+
+[uh-modifications-jira-merge c6c689b] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-731->KC-731->KC-ReturnChange
+ 2 files changed, 3 insertions(+), 1 deletion(-)
+ create mode 100644 coeus-webapp/src/main/webapp/static/images/uh_buttonsmall_return.gif
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/resources/edu/hawaii/datadictionary/SponsorSpecial.xml
+
+[uh-modifications-jira-merge 0f93f6c] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-568->KC-568
+ 1 file changed, 50 insertions(+)
+ create mode 100644 coeus-impl/src/main/resources/edu/hawaii/datadictionary/SponsorSpecial.xml
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/uh_helpline_info.jsp
+
+[uh-modifications-jira-merge 385d63a] KC-6.0 Upgrade Commit containing the following JIRA Changes Helpline->Helpline
+ 1 file changed, 9 insertions(+)
+ create mode 100644 coeus-webapp/src/main/webapp/uh_helpline_info.jsp
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/myGRANT.png
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/orslogo.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/os-guy.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/systemlogo.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-bl-bevel-focus.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-gold-headerback.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-head2-back.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-header2-left-focus.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-kuali-login.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-left-gold.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-leftback-focus.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-dev.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-dev31.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-hubble.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-mgtest.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-uat-demo.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-uat.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-right-gold.gif
+	new file:   ../../coeus-webapp/src/main/webapp/static/uh-images/uh-searchback.gif
+
+[uh-modifications-jira-merge d0b7486] KC-6.0 Upgrade Commit containing the following JIRA Changes Image->Image
+ 20 files changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/myGRANT.png
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/orslogo.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/os-guy.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/systemlogo.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-bl-bevel-focus.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-gold-headerback.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-head2-back.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-header2-left-focus.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-kuali-login.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-left-gold.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-leftback-focus.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-dev.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-dev31.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-hubble.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-mgtest.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-uat-demo.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali-uat.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-ors-kuali.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-right-gold.gif
+ create mode 100644 coeus-webapp/src/main/webapp/static/uh-images/uh-searchback.gif
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/filters/UserAgentCompatibleFilter.java
+
+[uh-modifications-jira-merge ddab4f0] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-415->KC-415
+ 1 file changed, 33 insertions(+)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/filters/UserAgentCompatibleFilter.java
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/krms/PropDevJavaFunctionKrmsTermServiceImpl.java
+
+[uh-modifications-jira-merge a0b905d] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-859->KC-859
+ 1 file changed, 27 insertions(+), 27 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/questionnaire/ProposalDevelopmentQuestionsAction.java
+
+[uh-modifications-jira-merge 94f2f76] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-686->KC-686
+ 1 file changed, 20 insertions(+), 3 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/web.xml
+
+[uh-modifications-jira-merge befa973] KC-6.0 Upgrade Commit containing the following JIRA Changes struts->struts
+ 1 file changed, 49 insertions(+), 4 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/unit/UnitHierarchyRoleTypeServiceImpl.java
+
+[uh-modifications-jira-merge c661c92] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-629->KC-629
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/notification/impl/service/impl/KcNotificationServiceImpl.java
+
+[uh-modifications-jira-merge 7373511] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-790->KC-790
+ 1 file changed, 29 insertions(+), 2 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/sys/impl/workflow/KcDocumentRejectionServiceImpl.java
+
+[uh-modifications-jira-merge 3ba1dc3] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-396->KC-396
+ 1 file changed, 47 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-db/coeus-db-xml/src/main/resources/org/kuali/coeus/coeus-xml/2/NegotiationDocument.xml
+
+[uh-modifications-jira-merge 446fbe1] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-881->KC-881
+ 1 file changed, 8 insertions(+)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitWorkflow.tag
+
+[uh-modifications-jira-merge 8de2a4a] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-267->KC-267
+ 1 file changed, 5 insertions(+)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/common/impl/attachment/KcAttachmentServiceImpl.java
+
+[uh-modifications-jira-merge 3bde93f] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-364->KC-364
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-webapp/src/main/webapp/UHMaintenance.html
+
+[uh-modifications-jira-merge ded5411] KC-6.0 Upgrade Commit containing the following JIRA Changes MaintOffline->MaintOffline
+ 1 file changed, 51 insertions(+)
+ create mode 100644 coeus-webapp/src/main/webapp/UHMaintenance.html
+On branch uh-modifications-jira-merge
+nothing to commit, working directory clean
+On branch uh-modifications-jira-merge
+nothing to commit, working directory clean
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/award/awardAttachments.tag
+
+[uh-modifications-jira-merge ccd8dc0] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-836->KC-836
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/kra/institutionalproposal/service/impl/InstitutionalProposalServiceImpl.java
+
+[uh-modifications-jira-merge 41477d4] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-454->KC-454
+ 1 file changed, 25 insertions(+), 10 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/approve/ProposalDevelopmentApproverViewAction.java
+
+[uh-modifications-jira-merge a826ef4] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-579->KC-579
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/kra/UhHelpTabHelper.java
+
+[uh-modifications-jira-merge b210a81] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-549->KC-549
+ 1 file changed, 30 insertions(+)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/kra/UhHelpTabHelper.java
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/sponsor/ProposalDevelopmentSponsorProgramInformationAuditRule.java
+
+[uh-modifications-jira-merge 9c3349c] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-735->KC-735
+ 1 file changed, 33 insertions(+), 17 deletions(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/abstrct/ProposalDevelopmentAbstractsAttachmentsAction.java
+
+[uh-modifications-jira-merge 9ff6bf7] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-778->KC-778
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/award/awardNotes.tag
+
+[uh-modifications-jira-merge 9ab1fc9] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-866->KC-866
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/currentOrPendingReport.tag
+	modified:   ../../coeus-webapp/src/main/webapp/WEB-INF/tags/printReports.tag
+
+[uh-modifications-jira-merge 7411bfb] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-536->KC-536
+ 2 files changed, 73 insertions(+)

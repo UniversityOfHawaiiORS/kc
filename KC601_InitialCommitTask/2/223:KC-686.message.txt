@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-686->KC-686
+
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/questionnaire/ProposalDevelopmentQuestionsAction.java
+
+KC-686:Merged:
+KC-686 - OLE stack trace/IR thrown in PD Questions tab when you attempt to correct explanation is required error
+

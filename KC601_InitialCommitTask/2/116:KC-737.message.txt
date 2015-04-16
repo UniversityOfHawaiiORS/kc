@@ -1,0 +1,18 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-737->KC-737
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/portalResearcherBody.tag
+
+KC-737:Merged:
+KC-737 Remove menu items from Researcher and Unit Tab
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitPreAward.tag
+
+KC-737:Merged:
+KC-737 Remove menu items from Researcher and Unit Tab 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/channel/unitPostAward.tag
+
+KC-737:Merged:
+KC-737 Remove menu items from Researcher and Unit Tab
+

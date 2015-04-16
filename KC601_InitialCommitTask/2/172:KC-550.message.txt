@@ -1,0 +1,22 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-550->KC-550->KC-LOOK
+
+
+coeus-webapp/src/main/webapp/css/kuali_overrides.css
+
+KC-LOOK:Removed (6.0.1):
+KC-??? Add uh look and feel 
+KC-??? Make header smaller and left aligned 
+KC-550 Message in top bar from param (All removed in 6.0.1, these portal changes (colors logo etc) don't make sense in new portal, they will only affect Admin and management tabs. 
+
+coeus-webapp/src/main/webapp/css/kuali_overrides.css
+
+KC-LOOK:Removed (6.0.1):
+KC-??? Add uh look and feel 
+KC-??? Make header smaller and left aligned 
+KC-550 Message in top bar from param (All removed in 6.0.1, these portal changes (colors logo etc) don't make sense in new portal, they will only affect Admin and management tabs. 
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/rice-portal/immutableBar.tag
+
+KC-550:Merged:
+KC-550 Message in top bar from param
+

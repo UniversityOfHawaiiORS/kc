@@ -1,0 +1,55 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-326->KC-326->KC-530->KC-534
+
+
+coeus-impl/src/main/java/org/kuali/coeus/common/framework/unit/Unit.java
+
+KC-530:Merged:
+KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine 
+
+coeus-impl/src/main/java/edu/hawaii/kra/lookup/UhSolrExternalSearch.java
+
+KC-530:Keep:
+KC-530 Improved Solr Search
+
+coeus-impl/src/main/java/org/kuali/coeus/common/impl/unit/UnitLookupableHelperServiceImpl.java
+
+KC-530:merged-messy copied code by hand instead:
+KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/Sponsor.xml
+
+KC-530:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-530 Lookup screens are too difficult for users (Solr)
+
+coeus-impl/src/main/java/edu/hawaii/organization/service/impl/UhOrganizationLookupableHelperServiceImpl.java
+
+KC-530:Keep:
+KC-530 make organization lookup use solr
+
+coeus-impl/src/main/java/org/kuali/coeus/common/framework/org/Organization.java
+
+KC-530:Merged:
+KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine 
+
+coeus-impl/src/main/java/org/kuali/coeus/common/framework/sponsor/Sponsor.java
+
+KC-530:Merged:
+KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine 
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/Unit.xml
+
+KC-534:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-530 adding unit search (Solr) 
+KC-534 Improve the order of data returned from a unit search
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/Organization.xml
+
+KC-530:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-326 Fix for locating a specific performance site is very difficult 
+KC-530-SEARCH only display one textbox for org lookup (Solr Search)
+
+coeus-impl/src/main/java/org/kuali/coeus/common/impl/sponsor/SponsorLookupableHelperServiceImpl.java
+
+KC-530:merged:
+KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+

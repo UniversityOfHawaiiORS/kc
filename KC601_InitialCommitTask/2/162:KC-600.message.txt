@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-600->KC-600
+
+
+coeus-impl/src/main/java/org/kuali/coeus/common/framework/custom/CustomDataHelperBase.java
+
+KC-600:Merged-Strange they did our fix in one of two places so I just kept our versions for both and reported issue to Travis to see what he says about it.:
+KC-600 BEGIN - rbl  maintain the same display order of custom data values that users were used to in KC 3.1.1
+

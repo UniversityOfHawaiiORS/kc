@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-836->KC-836
+
+
+coeus-webapp/src/main/webapp/WEB-INF/tags/award/awardAttachments.tag
+
+KC-836:Merged: 
+KC-836 Default Award Attachments tab to be shown 
+

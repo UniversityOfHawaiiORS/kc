@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-476->KC-476
+
+
+coeus-impl/src/main/java/org/kuali/kra/award/service/impl/AwardHierarchyUIServiceImpl.java
+
+KC-476:Merged:
+KC-476 Error loading Award Hierarchy occurs for some Awards when using Firefox or Chrome
+

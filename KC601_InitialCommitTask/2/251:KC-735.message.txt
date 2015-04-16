@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-735->KC-735
+
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/sponsor/ProposalDevelopmentSponsorProgramInformationAuditRule.java
+
+KC-735:Review - code merged had to be commented out since it is no longer valid code.  We need to determine correct code and fix:
+KC-735 Add warning for Sponsor Deadline Time not entered
+

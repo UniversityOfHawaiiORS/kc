@@ -1,0 +1,14 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-800->KC-800->KC-203->KC-306->KC-326->KC-367->KC-679->KC-801
+
+
+coeus-impl/src/main/resources/edu/hawaii/UhSpringBeans.xml
+
+KC-801:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-306: Don't automatically set performance site from lead unit. Make Performance Site Locations section clearer. 
+KC-203: Remove Key Personnel filter from search. 
+KC-367: Add an advanced award search that does not filter out saved awards and previous versions. 
+KC-326 Fix for locating a specific performance site is very difficult 
+KC-679 New routing 5.1.1 (UhPersonDelegationMaintenanceDocument support) 
+KC-800 and 
+KC-801 Add Questionnaire to capture Unrecovered F and A information
+

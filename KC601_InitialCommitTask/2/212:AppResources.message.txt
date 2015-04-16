@@ -1,0 +1,6 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes AppResources->AppResources
+
+
+coeus-impl/src/main/resources/UhApplicationResources.properties
+AppResources:Keep:Uh Application resources
+

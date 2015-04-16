@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-908->KC-908
+
+
+coeus-webapp/src/main/webapp/WEB-INF/jsp/award/AwardCustomData.jsp
+
+KC-908:merged:
+KC-908 Make Award Custom Data tabs default to opened 
+

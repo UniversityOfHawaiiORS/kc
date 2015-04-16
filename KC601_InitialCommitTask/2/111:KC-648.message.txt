@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-648->KC-648
+
+
+coeus-webapp/src/main/webapp/scripts/uh_app.js
+
+KC-648:Keep:
+KC-648 Incident Report when navigating to another tab before Proposal Summary tab finishes loading 
+

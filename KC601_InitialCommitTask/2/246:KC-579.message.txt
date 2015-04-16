@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-579->KC-579
+
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/approve/ProposalDevelopmentApproverViewAction.java
+
+KC-579:Merged:
+KC-579 : KC 5.1 Proposal: REJECT from the "approver view" (or proposal summary screen) nothing happens - must go to proposal actions to complete
+

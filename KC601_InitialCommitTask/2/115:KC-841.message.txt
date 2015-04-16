@@ -1,0 +1,21 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-841->KC-841->KC-817->KC-892
+
+
+coeus-impl/src/main/resources/edu/hawaii/datadictionary/NegotiationActivity.xml
+
+KC-817:Keep-Spring Bean Overlay These all need to be tested because there is no merge making it difficult to inspect:
+KC-817 Change Negotiation Activity Description to be non-required 
+KC-841 Sort Negotiation activity types by function
+
+coeus-impl/src/main/java/edu/hawaii/negotiations/UhNegotiationActivityTypeValuesFinder.java
+
+KC-841:Keep:
+KC-841 Sort Negotiation activity types by function
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/rules/NegotiationActivityRuleImpl.java
+
+KC-892:merged:
+KC-817 Change Negotiation Activity Description to be non-required 
+KC-815 unless activity type other is selected  
+KC-892 Enforce some negotiation activity type entries to single occurrence per award 
+

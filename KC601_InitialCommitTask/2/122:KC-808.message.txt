@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-808->KC-808
+
+
+coeus-webapp/src/main/webapp/scripts/questionnaireAnswer.js
+
+KC-808:Merged: 
+KC-808 Text Area child questions don't clear when hidden and still save to DB
+

@@ -1,0 +1,6 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes MaintOffline->MaintOffline
+
+
+coeus-webapp/src/main/webapp/UHMaintenance.html
+MaintOffline:Keep:Maintenance offline message
+

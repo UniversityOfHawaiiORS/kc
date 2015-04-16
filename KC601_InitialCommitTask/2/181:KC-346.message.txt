@@ -1,0 +1,10 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-346->KC-346->KC-211->KC-546
+
+
+coeus-impl/src/main/java/org/kuali/kra/award/document/authorizer/ViewAwardAuthorizer.java
+
+KC-546:Merged:
+KC-211: Allow PI's to view their own awards without the Award Viewer role. 
+KC-346: Allow Unit Administrator contact on parent award view the award hierarchy. 
+KC-546 Null Pointer Exception thrown when attempting to do a regular award search
+

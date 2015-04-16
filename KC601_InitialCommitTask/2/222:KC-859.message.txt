@@ -1,0 +1,8 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-859->KC-859
+
+
+coeus-impl/src/main/java/org/kuali/coeus/propdev/impl/krms/PropDevJavaFunctionKrmsTermServiceImpl.java
+
+KC-859:Merged:
+KC-859 KRMS Rule SponsorGroup doesn't allow sponsor to be listed in two groups.
+

@@ -1,0 +1,13 @@
+KC-6.0 Upgrade Commit containing the following JIRA Changes KC-874->KC-874
+
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/web/struts/form/NegotiationActivityHelper.java
+
+KC-874:Merged:
+KC-874 Change Default sort order of negotiation activities to As Entered
+
+coeus-impl/src/main/java/org/kuali/kra/negotiations/sorting/ActivitySortingType.java
+
+KC-874:Merged:
+KC-874 Change Default sort order of negotiation activities to As Entered
+

@@ -1,0 +1,9 @@
+On branch uh-modifications-jira-merge
+Changes to be committed:
+  (use "git reset HEAD <file>..." to unstage)
+
+	new file:   ../../coeus-impl/src/main/java/edu/hawaii/infrastructure/UhKeyConstants.java
+
+[uh-modifications-jira-merge d805a7c] KC-6.0 Upgrade Commit containing the following JIRA Changes KC-815->KC-815->KC-201->KC-306->KC-515->KC-680->KC-764->KC-892
+ 1 file changed, 30 insertions(+)
+ create mode 100644 coeus-impl/src/main/java/edu/hawaii/infrastructure/UhKeyConstants.java
