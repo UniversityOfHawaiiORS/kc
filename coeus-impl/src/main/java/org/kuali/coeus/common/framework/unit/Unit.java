@@ -51,10 +51,14 @@ public class Unit extends KcPersistableBusinessObjectBase implements MutableInac
     @Column(name = "UNIT_NAME")
     private String unitName;
 
-    //maps to Campus-code 
+    // KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+    @Transient
+    private String unitSearchInput;
+
+    //maps to Campus-code
     @Transient
     private String code;
-
+    
     @Column(name = "ACTIVE_FLAG")
     @Convert(converter = BooleanYNConverter.class)
     private boolean active;
@@ -136,6 +140,16 @@ public class Unit extends KcPersistableBusinessObjectBase implements MutableInac
         this.active = active;
     }
 
+    // KC-530 BEGIN Lookup screens are too difficult for users, make searches easier by implementing search engine
+    public String getUnitSearchInput() {
+        return unitSearchInput;
+    }
+
+    public void setUnitSearchInput(String unitSearchInput) {
+        this.unitSearchInput = unitSearchInput;
+    }
+    // KC-530 END
+
     /**
      * Returns the organization.  If no organization is found, recurses up the hierarchy until a valid organization is found.
      * 
@@ -143,7 +157,7 @@ public class Unit extends KcPersistableBusinessObjectBase implements MutableInac
      */
     public Organization getOrganization() {
         if (organization == null && this.getParentUnit() != null && this.getParentUnit().getUnitNumber() != null) {
-            //will recurse up hierarchy until an Organization is found 
+            //will recurse up hierarchy until an Organization is found
             return this.getParentUnit().getOrganization();
         }
         return organization;
@@ -186,7 +200,7 @@ public class Unit extends KcPersistableBusinessObjectBase implements MutableInac
     public void setOrganizationIdForMaintenance(String organizationIdForMaintenance) {
         this.organizationId = organizationIdForMaintenance;
     }
-
+    
     /**
      * Determine whether the given unit is a parent (or grandparent, etc) of this unit.
      * @param parentCandidate
@@ -206,7 +220,7 @@ public class Unit extends KcPersistableBusinessObjectBase implements MutableInac
     @SuppressWarnings("unchecked")
     @Override
     public List buildListOfDeletionAwareLists() {
-        // TODO : need this ?  
+        // TODO : need this ? 
         List managedLists = super.buildListOfDeletionAwareLists();
         managedLists.add(getUnitAdministrators());
         return managedLists;

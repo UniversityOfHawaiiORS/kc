@@ -74,6 +74,10 @@ public class Sponsor extends KcPersistableBusinessObjectBase implements SponsorC
     @Column(name = "SPONSOR_NAME")
     private String sponsorName;
 
+    // KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+    @Transient
+    private String sponsorSearchInput;
+
     @Column(name = "SPONSOR_TYPE_CODE")
     private String sponsorTypeCode;
 
@@ -113,7 +117,7 @@ public class Sponsor extends KcPersistableBusinessObjectBase implements SponsorC
     @OneToOne(mappedBy = "sponsor", orphanRemoval = true, cascade = { CascadeType.ALL })
     @JoinColumn(name = "ROLODEX_ID", referencedColumnName = "ROLODEX_ID", insertable = false, updatable = false)
     private Rolodex rolodex;
-
+    
     public Sponsor() {
         super();
         setCreateUser(getUpdateUser());
@@ -227,6 +231,16 @@ public class Sponsor extends KcPersistableBusinessObjectBase implements SponsorC
         this.sponsorName = sponsorName;
     }
 
+    // KC-530 BEGIN Lookup screens are too difficult for users, make searches easier by implementing search engine
+	public String getSponsorSearchInput() {
+		return sponsorSearchInput;
+	}
+
+	public void setSponsorSearchInput(String sponsorSearchInput) {
+		this.sponsorSearchInput = sponsorSearchInput;
+	}
+    // KC-530 END	
+
     public String getSponsorTypeCode() {
         return sponsorTypeCode;
     }
@@ -293,7 +307,7 @@ public class Sponsor extends KcPersistableBusinessObjectBase implements SponsorC
     public void setRolodex(Rolodex rolodex) {
         this.rolodex = rolodex;
     }
-
+    
     @Override
     public boolean isActive() {
         return active;
@@ -302,7 +316,7 @@ public class Sponsor extends KcPersistableBusinessObjectBase implements SponsorC
     public void setActive(boolean active) {
         this.active = active;
     }
-
+    
     public String getDunningCampaignId() {
         return dunningCampaignId;
     }

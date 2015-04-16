@@ -40,7 +40,10 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import edu.hawaii.kra.lookup.UhSolrExternalSearch;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -113,18 +116,15 @@ public class UnitLookupableHelperServiceImpl extends KcKualiLookupableHelperServ
 
     @Override
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
-        String campusCode = fieldValues.remove(CAMPUS_CODE_FIELD);
-        List<? extends BusinessObject> searchResults = super.getSearchResults(fieldValues);
+    	// KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine
+		UhSolrExternalSearch search = new UhSolrExternalSearch();
+		Map<String, String> conf = new HashMap<String, String>();
+		conf.put("kind", "UNIT");
+		conf.put("pk", "unitNumber");
         
-        List<Unit> filteredSearchResults = new ArrayList<Unit>();
-        for (BusinessObject searchResult : searchResults) {
-            Unit unit = (Unit) searchResult;
-            if (StringUtils.startsWith(unit.getUnitNumber(), campusCode)) {
-                filteredSearchResults.add(unit);
-            }
-        }
-
-        return filteredSearchResults;
+		String q = fieldValues.get("unitSearchInput");
+		return search.getExternalSearchResults(Unit.class, conf, q);
+		// KC-530 END
     }
 
     public KcPersonService getKcPersonService() {
