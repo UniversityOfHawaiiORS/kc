@@ -40,7 +40,7 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
      * Is the end-user allowed to modify the custom data values?
      */
     private boolean modifyCustomData = false;
-
+    
     
     protected abstract T getNewCustomData();
 
@@ -115,13 +115,18 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
                     customAttributeDocumentList = new ArrayList<CustomAttributeDocument>();
                     customAttributeGroups.put(groupName, customAttributeDocumentList);
                 }
-        customAttributeDocumentList.add(customAttributeDocument.getValue());
-        }
+                customAttributeDocumentList.add(customAttributeDocument.getValue());
+                //UH KC-600 BEGIN - rbl  maintain the same display order of custom data values that users were used to in KC 3.1.1
+                //by commenting out the following line of code in KC 5.1.0 and future versions
+                //Collections.sort(customAttributeDocumentList, new LabelComparator());
+                //UH KC-600 END
+        
+            }
 
     protected boolean isMatch(T documentCustomData, Entry<String, CustomAttributeDocument> customAttributeDocumentEntry) {
         return documentCustomData.getCustomAttributeId() == ((long)customAttributeDocumentEntry.getValue().getId());
-    }
-
+        }
+    
     /**
      * This method builds the custom data collections used on the form
      * @param customAttributeGroups
@@ -144,7 +149,10 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
                 
             }
             customAttributeDocumentList.add(getCustomAttributeDocuments().get(customAttributeDocumentEntry.getValue().getId().toString()));
-            Collections.sort(customAttributeDocumentList, new LabelComparator());
+            //UH KC-600 BEGIN - rbl  maintain the same display order of custom data values that users were used to in KC 3.1.1
+            //by commenting out the following line of code in KC 5.1.0 and future versions
+            //Collections.sort(customAttributeDocumentList, new LabelComparator());
+            //UH KC-600 END
         }
     }
     
@@ -220,7 +228,7 @@ public abstract class CustomDataHelperBase<T extends DocumentCustomData> impleme
     protected String getUserIdentifier() {
          return GlobalVariables.getUserSession().getPrincipalId();
     }
-
+    
     /**
      * Set the custom attribute content in workflow.
      */
