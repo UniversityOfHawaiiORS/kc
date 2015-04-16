@@ -27,6 +27,7 @@ import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.kra.timeandmoney.service.AwardFnaDistributionService;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
+import org.kuali.rice.krad.util.ErrorMessage;
 
 import java.sql.Date;
 import java.util.List;
@@ -278,10 +279,23 @@ public class AwardDirectFandADistributionRuleImpl extends KcTransactionalDocumen
                         KNSGlobalVariables.getMessageList().add(KeyConstants.WARNING_AWARD_FANDA_DISTRIB_EXISTS, "");
                     }
                 } else if (getAwardFnaDistributionService().displayAwardFAndADistributionEqualityValidationAsWarning()) {
+                	//UH KC-669 BEGIN - rbl added code to avoid displaying duplicated Direct/F&A Funds Distribution section Warning msg
+                	//this validation code is being processed twice because route/submit is calling save : SEE TimeAndMoneyAction.java - route method
+                	boolean fandaDistribWarnExists = false;
+                	for (ErrorMessage eMsg : KNSGlobalVariables.getMessageList()) {
+                		if(eMsg.getErrorKey().equals(KeyConstants.WARNING_AWARD_FANDA_DISTRIB_EXISTS)){
+                			fandaDistribWarnExists = true;
+                			break;
+                		}
+                	}
+                	
+                	if(!fandaDistribWarnExists) {
                     reportWarning(WARNING_AWARD_DIRECT_FNA_DISTRIBUTION_ANTICIPATED_MISMATCH, 
                             KeyConstants.WARNING_AWARD_FANDA_DISTRIB_LIMITNOTEQUAL_ANTICIPATED, 
                             new String[]{awardDirectFandADistributions.get(0).getAward().getAwardNumber()});
                     KNSGlobalVariables.getMessageList().add(KeyConstants.WARNING_AWARD_FANDA_DISTRIB_EXISTS, "");
+                	}
+                	//UH KC-669 END
                 } else {
                     //no validation warning
                     valid = true;
