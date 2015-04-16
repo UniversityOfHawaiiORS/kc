@@ -287,19 +287,19 @@ public class PropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunctionTe
         for (Budget budget : developmentProposal.getBudgets()) {
             if (budget.getVersionNumber().equals(versionNumberLong)) {
                 try {
-                    if (budget.getVersionNumber().equals(versionNumberLong)) {
-                        for (BudgetPeriod period : budget.getBudgetPeriods()) {
-                            float costElementTotal = 0;
-                            for (BudgetLineItem item : period.getBudgetLineItems()) {
-                                if (StringUtils.equalsIgnoreCase(costElementName, item.getCostElementName())) {
+                        if (budget.getVersionNumber().equals(versionNumberLong)) {
+                            for (BudgetPeriod period : budget.getBudgetPeriods()) {
+                                float costElementTotal = 0;
+                                for (BudgetLineItem item : period.getBudgetLineItems()) {
+                                    if (StringUtils.equalsIgnoreCase(costElementName, item.getCostElementName())) {
                                     costElementTotal = costElementTotal + item.getLineItemCost().floatValue();
+                                    }
+                                }
+                                if (costElementTotal > limitLong) {
+                                    return TRUE;
                                 }
                             }
-                            if (costElementTotal > limitLong) {
-                                return TRUE;
-                            }
                         }
-                    }
                 } catch (Exception e) {
                     //lets just ignor and return false.
                 }
@@ -346,11 +346,11 @@ public class PropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunctionTe
     public String budgetSubawardOrganizationnameRule(DevelopmentProposal developmentProposal) {
     	if (developmentProposal.getFinalBudget() != null) {
             for (BudgetSubAwards bsa : developmentProposal.getFinalBudget().getBudgetSubAwards()) {
-                if (StringUtils.equals(FALSE, specialCharacterRule(bsa.getOrganizationName()))) {
-                    return FALSE;
-                }
-            }
-        }
+                            if (StringUtils.equals(FALSE, specialCharacterRule(bsa.getOrganizationName()))) {
+                                return FALSE;
+                            }
+                        }
+                    }
         return TRUE;
     }
     
@@ -460,7 +460,7 @@ public class PropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunctionTe
      */
     @Override
     public String proposalGrantsRule(DevelopmentProposal developmentProposal) {
-        return developmentProposal.getS2sOpportunity()!=null ? TRUE : FALSE;
+    	return developmentProposal.getS2sOpportunity()!=null ? TRUE : FALSE;
     }
     
     /**
@@ -591,7 +591,7 @@ public class PropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunctionTe
     
     protected boolean mtdcDeviationInBudget(Budget budget) {
         return budget != null && StringUtils.equals(budget.getOhRateClassCode(), "1");
-    }
+        }
 
     @Override
     public String nonFacultyPi(DevelopmentProposal developmentProposal) {
@@ -748,19 +748,19 @@ public class PropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunctionTe
     @Override
     public String sponsorGroupRule(DevelopmentProposal developmentProposal, String sponsorGroup) {
         Map<String, Object> values = new HashMap<>();
-        values.put("hierarchyName", Constants.SPONSOR_HIERARCHY_ROUTING);
+        // KC-859 KRMS Rule SponsorGroup doesn't allow sponsor to be listed in two groups.
+        values.put("hierarchyName", sponsorGroup);
         values.put("sponsorCode", developmentProposal.getSponsorCode());
         List<SponsorHierarchy> hierarchies = (List<SponsorHierarchy>) getBusinessObjectService().findMatching(SponsorHierarchy.class, values);
-        if (hierarchies != null && !hierarchies.isEmpty()
-                && StringUtils.equals(hierarchies.get(0).getLevel1(), sponsorGroup)) {
+        if (hierarchies != null && !hierarchies.isEmpty()) {
             return TRUE;
         }
         values.put("sponsorCode", developmentProposal.getPrimeSponsorCode());
         hierarchies = (List<SponsorHierarchy>) getBusinessObjectService().findMatching(SponsorHierarchy.class, values);
-        if (hierarchies != null && !hierarchies.isEmpty()
-                && StringUtils.equals(hierarchies.get(0).getLevel1(), sponsorGroup)) {
+        if (hierarchies != null && !hierarchies.isEmpty()) {
             return TRUE;
         }
+        // KC-859 End
         return FALSE;
     }
     
@@ -831,14 +831,14 @@ public class PropDevJavaFunctionKrmsTermServiceImpl extends KcKrmsJavaFunctionTe
     public String costElementInVersion(DevelopmentProposal developmentProposal, String versionNumber, String costElement) {
         Long versionNumberLong = Long.parseLong(versionNumber);
         for (Budget budget : developmentProposal.getBudgets()) {
-            if (budget.getVersionNumber().equals(versionNumberLong)) {
-                for (BudgetPeriod period : budget.getBudgetPeriods()) {
+                        if (budget.getVersionNumber().equals(versionNumberLong)) {
+                            for (BudgetPeriod period : budget.getBudgetPeriods()) {
                     if (!period.getBudgetLineItems().isEmpty()) {
-                        return TRUE;
+                                    return TRUE;
+                                }
+                            }
+                        }
                     }
-                }
-            }
-        }
         return FALSE;
     }
     
