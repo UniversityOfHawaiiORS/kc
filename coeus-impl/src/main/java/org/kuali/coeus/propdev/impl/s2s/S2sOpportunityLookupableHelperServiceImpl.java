@@ -19,11 +19,15 @@
 package org.kuali.coeus.propdev.impl.s2s;
 
 import org.apache.commons.lang3.StringUtils;
+import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.sys.framework.lookup.KcKualiLookupableHelperServiceImpl;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.core.web.format.Formatter;
 import org.kuali.rice.core.web.format.TimestampAMPMFormatter;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kns.document.authorization.BusinessObjectRestrictions;
 import org.kuali.rice.kns.lookup.HtmlData;
@@ -76,7 +80,7 @@ public class S2sOpportunityLookupableHelperServiceImpl extends KcKualiLookupable
         final String opportunityId = searchCriteria.get(Constants.OPPORTUNITY_ID);
 
         return s2sOpportunityLookupKradKnsHelperService.performSearch(providerCode, cfdaNumber, opportunityId);
-    }
+        }
 
     public Collection performLookup(LookupForm lookupForm, Collection resultTable, boolean bounded) {
         Collection displayList = super.performLookup(lookupForm, resultTable, bounded);
@@ -116,6 +120,9 @@ public class S2sOpportunityLookupableHelperServiceImpl extends KcKualiLookupable
         parameters.put("newS2sOpportunity.cfdaNumber", opp.getCfdaNumber() != null ? opp.getCfdaNumber() : "");
         parameters.put("newS2sOpportunity.opportunityId", opp.getOpportunityId() != null ? opp.getOpportunityId() : "");
         parameters.put("newS2sOpportunity.opportunityTitle", opp.getOpportunityTitle() != null ? opp.getOpportunityTitle() : "");
+        //UH KC-628 BEGIN if the s2sSubmissionTypeCode is blank then default it to Application to prevent validation tab cut off issue
+        parameters.put("newS2sOpportunity.s2sSubmissionTypeCode", opp.getS2sSubmissionTypeCode() != null ? opp.getS2sSubmissionTypeCode() : KcServiceLocator.getService(ParameterService.class).getParameterValueAsString(ProposalDevelopmentDocument.class, KeyConstants.S2S_SUBMISSIONTYPE_APPLICATION));
+        //UH KC-628 END
         parameters.put("newS2sOpportunity.closingDate", opp.getClosingDate() != null ? getDateTimeService().toDateTimeString(opp.getClosingDate().getTime()) : "");
         parameters.put("newS2sOpportunity.openingDate", opp.getOpeningDate() != null ? getDateTimeService().toDateTimeString(opp.getOpeningDate().getTime()) : "");
         parameters.put("newS2sOpportunity.instructionUrl", opp.getInstructionUrl() != null ? opp.getInstructionUrl() : "");
