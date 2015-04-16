@@ -26,6 +26,17 @@
 <c:set var="medusaLink" value="${KualiForm.methodToCall eq 'medusa'}"/>
 <script type='text/javascript' src='dwr/interface/KraPersonService.js'></script>
 
+<!-- KC-822 Add send notification button and a link to launch Award Memo Tool -->
+<% if (request.getParameter("open_memo_tool") != null) { %>
+<script type="text/javascript">
+    var memoOK = window.open('<%=request.getParameter("open_memo_tool")%>?awardNumber=<%=request.getParameter("memoToolAwardNumber")%>&activityTypeCode=<%=request.getParameter("memoToolActivityTypeCode")%>');
+    if (memoOK == null || typeof(memoOK)=='undefined') {
+        alert("Sorry your browser prevented the pop-up of the Memo Tool.\nPlease disable your pop-up blocker to use the Memo Tool.\nIf you need help doing this please Contact the ORS Helpline 808-956-5198");
+    }
+</script>
+<%}%>
+<!-- KC-822 END -->
+
 <kul:tab tabTitle="Negotiation" defaultOpen="${!medusaLink}" 
 					tabErrorKey="document.negotiationList[0].negotiation*,document.negotiationList[0].negotiator*,document.negotiationList[0].anticipatedAwardDate,document.negotiationList[0].documentFolder,document.negotiationList[0].associatedDocumentId,document.negotiationList[0].unAssociatedDetail*" 
 					auditCluster="requiredFieldsAuditErrors" tabAuditKey="document.title" useRiceAuditMode="true">
@@ -96,18 +107,21 @@
                 <td>
                 	<kul:htmlControlAttribute property="document.negotiationList[0].negotiationAgreementTypeId" attributeEntry="${negotiationAttributes.negotiationAgreementTypeId}" readOnly="${readOnly}"/>
                 </td>
+                <!-- KC-818 Default Agreement Type to "AWARD", then hide Anticipated Award Date, and Document Folder fields. 
                 <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${negotiationAttributes.anticipatedAwardDate}" /></div></th>
                 <td align="left" valign="middle">
                 	<kul:htmlControlAttribute property="document.negotiationList[0].anticipatedAwardDate" attributeEntry="${negotiationAttributes.anticipatedAwardDate}" readOnly="${readOnly}"/>
                 </td>
+                -->
             </tr>  
+            <!-- KC-818 Default Agreement Type to "AWARD", then hide Anticipated Award Date, and Document Folder fields. 
             <tr>
 		        <th><div align="right"><kul:htmlAttributeLabel attributeEntry="${negotiationAttributes.documentFolder}" /></div></th>
                 <td colspan="3">
                 	<kul:htmlControlAttribute property="document.negotiationList[0].documentFolder" attributeEntry="${negotiationAttributes.documentFolder}" readOnly="${readOnly}"/>
                 </td>
             </tr>  
-            
+            -->
 		</table>
 		<h3>Negotiation Attributes:</h3>
 		<table cellpadding="4" cellspacing="0" summary="">
@@ -158,7 +172,8 @@
                 		
 	                	<c:choose>
                 			<c:when test="${KualiForm.displayAward}">
-                				<kul:lookup boClassName="org.kuali.kra.award.home.Award" 
+                			    <!-- KC-831 Allow Negotiations to be linked with Saved documents -->
+                				<kul:lookup boClassName="edu.hawaii.award.home.AwardAdvancedSearch" 
                 					fieldConversions="awardNumber:document.negotiationList[0].associatedDocumentId" />
 					      	</c:when>
 					      	<c:when test="${KualiForm.displaySubAward}">
@@ -397,7 +412,8 @@
             	<tr>
             		<th>
 	                	<div align="right">
-            				<kul:htmlAttributeLabel attributeEntry="${negotiationUnassociatedDetailAttributes.contactAdminPersonId}" />
+	                	    <!-- KC-819 Display UH Assigned To field on the Negotiations Attributes Tab and Default negotiator -->
+            				<c:out value="Assigned To:"/>
             			</div>
 	                </th>
 	                <td>

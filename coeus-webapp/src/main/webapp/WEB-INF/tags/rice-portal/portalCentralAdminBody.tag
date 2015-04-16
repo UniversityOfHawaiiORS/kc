@@ -20,7 +20,9 @@
 
 
 <td class="content" valign="top">
-      <channel:unitPreAward />
+      <%-- KC-367 Make the advanced search show only on the central admin tab --%>
+      <channel:UHcentralAdminPreAward />
+      <%-- KC-367 END --%>
       <channel:centralAdminPostAward />
 </td>
 <td class="content" valign="top">

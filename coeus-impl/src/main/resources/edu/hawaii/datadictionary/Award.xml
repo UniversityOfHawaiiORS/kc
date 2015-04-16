@@ -1,0 +1,99 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="Award" parent="Award-parentBean">
+		<property name="attributes">
+			<list merge="true">
+				<!-- UH ADDITION -->
+				<ref bean="Award-extension-signedDate" />
+				<ref bean="Award-extension-assignedDate" />
+				<ref bean="Award-extension-completedDate" />
+				<ref bean="Award-extension-sponsorIssuedDate" />
+				<ref bean="Award-extension-assignedToPersonId" />
+			</list>
+		</property>
+	</bean>
+    
+	<bean id="Award-extension-signedDate" parent="UhAwardExtension-signedDate">
+		<property name="name" value="extension.signedDate" />
+	</bean>
+
+	<bean id="Award-extension-assignedDate" parent="UhAwardExtension-assignedDate">
+		<property name="name" value="extension.assignedDate" />
+	</bean>
+
+	<bean id="Award-extension-completedDate" parent="UhAwardExtension-completedDate">
+		<property name="name" value="extension.completedDate" />
+	</bean>
+
+	<bean id="Award-extension-sponsorIssuedDate" parent="UhAwardExtension-sponsorIssuedDate">
+		<property name="name" value="extension.sponsorIssuedDate" />
+	</bean>
+
+	<bean id="Award-extension-assignedToPersonId" parent="UhAwardExtension-assignedToPersonId">
+		<property name="name" value="extension.assignedToPersonId" />
+	</bean>
+
+	<!-- Wording change - KC-153 -->
+	<bean id="Award-awardExecutionDate" parent="Award-awardExecutionDate-parentBean">
+		<property name="label" value="Fully Executed Date" />
+		<property name="shortLabel" value="Fully Executed Date" />
+	</bean>
+	
+	<!-- KC-829 Modify Award Look-up results -->
+	<bean id="Award-lookupDefinition" parent="Award-lookupDefinition-parentBean">
+		<property name="lookupFields" >
+		  <list>
+            <bean p:attributeName="awardNumber" parent="FieldDefinition" />
+		  	<bean p:attributeName="sponsorAwardNumber" parent="FieldDefinition" />
+		    <bean p:attributeName="accountNumber" parent="FieldDefinition" />
+		    <bean p:attributeName="statusCode" parent="FieldDefinition" />
+		    <bean p:attributeName="sponsorCode" parent="FieldDefinition" />
+		    <bean p:attributeName="title" parent="FieldDefinition" />
+			<bean p:attributeName="projectPersons.fullName" parent="FieldDefinition" />
+		    <bean p:attributeName="unitNumber" parent="FieldDefinition" />
+		    <bean p:attributeName="leadUnit.unitName" parent="FieldDefinition" />
+		    <!-- KC-829 Modify Award Lookup result ... Remove osp administrator from lookup fields
+		    <bean p:attributeName="lookupOspAdministratorName" parent="FieldDefinition" />
+		    -->
+		    <bean p:attributeName="awardUnitContacts.awardContactId" parent="FieldDefinition" p:hidden="true" />
+		    <!-- KC-829 Modify Award Lookup result ... Remove Archive Location and archive date from lookup fields
+		    <bean p:attributeName="archiveLocation" parent="FieldDefinition" />
+		    <bean p:attributeName="closeoutDate" parent="FieldDefinition" />
+		    -->
+		  	<bean p:attributeName="projectPersons.awardContactId" parent="FieldDefinition" p:hidden="true"  />
+		  	<bean p:attributeName="subPlanFlag" parent="FieldDefinition" p:hidden="true"  />
+		  </list>
+		</property>
+		<property name="resultFields" >
+		  <list>
+		    <bean p:attributeName="awardNumber" parent="FieldDefinition" />
+		    <!-- KC-829 Modify Award Lookup results ... move Award Status just after Award ID (version number in advanced) -->
+			<bean p:attributeName="statusDescription" parent="FieldDefinition" />
+		    <bean p:attributeName="sponsorAwardNumber" parent="FieldDefinition" />
+		    <bean p:attributeName="unitNumber" parent="FieldDefinition" />
+		    <bean p:attributeName="leadUnit.unitName" parent="FieldDefinition" />
+		    <bean p:attributeName="accountNumber" parent="FieldDefinition" />	    
+			<bean p:attributeName="title" parent="FieldDefinition" />
+			<bean p:attributeName="sponsorCode" parent="FieldDefinition" />
+			<bean p:attributeName="sponsorName" parent="FieldDefinition" />
+			<bean p:attributeName="principalInvestigatorName" parent="FieldDefinition" />
+			<!-- KC-829 Modify Award Lookup result ... Remove osp administrator from results
+			<bean p:attributeName="ospAdministratorName" parent="FieldDefinition" />
+			-->
+			<bean p:attributeName="awardEffectiveDate"  parent="FieldDefinition" />
+			<!-- Obligation Expiration Date -->
+			<!-- Final Expiration Date -->
+			<bean p:attributeName="projectEndDate" parent="FieldDefinition" />
+			<!-- KC-829 Modify Award Lookup result ... Remove Archive Location and archive date from results
+			<bean p:attributeName="archiveLocation" parent="FieldDefinition" />
+		    <bean p:attributeName="closeoutDate" parent="FieldDefinition" />
+		    -->		
+		  </list>
+		</property>
+	</bean>
+	<!-- KC-829 END -->
+</beans>
+

@@ -1,0 +1,204 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+	<bean id="UhPersonDelegate" parent="BusinessObjectEntry">
+		<property name="businessObjectClass" value="edu.hawaii.kra.bo.UhPersonDelegate" />
+		<property name="objectLabel" value="UhPersonDelegate" />
+        <property name="lookupDefinition" >
+          <ref bean="UhPersonDelegate-lookupDefinition" />
+        </property>
+        <!-- Inquiry is used when selecting a result to see full details -->
+        <property name="inquiryDefinition" >
+          <ref bean="UhPersonDelegate-inquiryDefinition" />
+        </property>
+		<property name="attributes">
+			<list>
+				<ref bean="UhPersonDelegate-uhPersonDelegateId" />
+				<ref bean="UhPersonDelegate-delegatorPersonId" />
+				<ref bean="UhPersonDelegate-delegatorPerson.userName" />
+				<ref bean="UhPersonDelegate-delegatorPerson.fullName" />
+				<ref bean="UhPersonDelegate-delegateePersonId" />
+				<ref bean="UhPersonDelegate-delegateePerson.userName" />
+				<ref bean="UhPersonDelegate-delegateePerson.fullName" />
+				<ref bean="UhPersonDelegate-fromDate" />
+				<ref bean="UhPersonDelegate-toDate" />
+				<ref bean="UhPersonDelegate-includeDelegator" />
+			</list>
+		</property>
+	</bean>
+
+	<!-- Attribute Definitions -->
+	<bean id="UhPersonDelegate-uhPersonDelegateId" parent="AttributeDefinition">
+		<property name="name" value="uhPersonDelegateId" />
+		<property name="label" value="UH Person Delegate Id" />
+		<property name="shortLabel" value="UH Person Delegate Id" />
+		<property name="required" value="true" />
+		<property name="maxLength" value="12" />
+		<property name="control" >
+            <bean parent="TextControlDefinition"  p:size="6" />
+         </property>
+	</bean>
+
+	<bean id="UhPersonDelegate-fromDate" parent="AttributeDefinition">
+		<property name="name" value="fromDate" />
+		<property name="label" value="From Date" />
+		<property name="shortLabel" value="From Date" />
+		<property name="required" value="true" />
+		<property name="control">
+			<bean p:datePicker="true" p:size="10" parent="TextControlDefinition" />
+		</property>
+		<property name="maxLength" value="20" />
+	</bean>
+
+	<bean id="UhPersonDelegate-toDate" parent="AttributeDefinition">
+		<property name="name" value="toDate" />
+		<property name="label" value="To Date" />
+		<property name="shortLabel" value="To Date" />
+		<property name="required" value="true" />
+		<property name="control">
+			<bean p:datePicker="true" p:size="10" parent="TextControlDefinition" />
+		</property>
+		<property name="maxLength" value="20" />
+	</bean>
+
+	<bean id="UhPersonDelegate-includeDelegator" parent="AttributeDefinition">
+		<property name="name" value="includeDelegator" />
+		<property name="label" value="Include Delegator" />
+		<property name="shortLabel" value="Include Delegator" />
+		<property name="required" value="true" />
+		<property name="control" >
+            <bean parent="CheckboxControlDefinition" />
+         </property>
+	</bean>
+	
+	<bean id="UhPersonDelegate-delegatorPersonId" parent="PersonImpl-principalId">
+  	<property name="name" value="delegatorPersonId" />
+        <property name="label" value="Delegator Person ID" />
+        <property name="shortLabel" value="Delegator Person ID" />
+        <property name="control">
+            <bean parent="HiddenControlDefinition" />
+        </property>
+        <property name="displayLabelAttribute" value="delegatorPerson.userName" />
+    </bean>
+  
+    <bean id="UhPersonDelegate-delegatorPerson.userName" parent="PersonImpl-principalName">
+        <property name="name" value="delegatorPerson.userName" />
+        <property name="label" value="Delegator Person User Name" />
+        <property name="shortLabel" value="Delegator Person User Name" />
+        <property name="required" value="false" />
+        <property name="validationPattern" >
+            <bean parent="AnyCharacterValidationPattern" />
+        </property>
+        <property name="control" >
+            <bean parent="KualiUserControlDefinition"
+                p:personNameAttributeName="delegatorPerson.fullName"
+                p:universalIdAttributeName="delegatorPersonId"
+                p:userIdAttributeName="delegatorPerson.userName" />
+        </property>
+    </bean>
+
+    <bean id="UhPersonDelegate-delegatorPerson.fullName"  parent="KcPerson-fullName">
+        <property name="name" value="delegatorPerson.fullName" />
+        <property name="label" value="Delegator Full Name" />
+        <property name="shortLabel" value="Delegator Full Name" />
+    </bean>
+	
+	<bean id="UhPersonDelegate-delegateePersonId" parent="PersonImpl-principalId">
+  	<property name="name" value="delegateePersonId" />
+        <property name="label" value="Delegatee Person ID" />
+        <property name="shortLabel" value="Delegatee Person ID" />
+        <property name="control">
+            <bean parent="HiddenControlDefinition" />
+        </property>
+        <property name="displayLabelAttribute" value="delegateePerson.userName" />
+    </bean>
+  
+    <bean id="UhPersonDelegate-delegateePerson.userName" parent="PersonImpl-principalName">
+        <property name="name" value="delegateePerson.userName" />
+        <property name="label" value="Delegatee Person User Name" />
+        <property name="shortLabel" value="Delegatee Person User Name" />
+        <property name="required" value="false" />
+        <property name="validationPattern" >
+            <bean parent="AnyCharacterValidationPattern" />
+        </property>
+        <property name="control" >
+            <bean parent="KualiUserControlDefinition"
+                p:personNameAttributeName="delegateePerson.fullName"
+                p:universalIdAttributeName="delegateePersonId"
+                p:userIdAttributeName="delegateePerson.userName" />
+        </property>
+    </bean>
+
+    <bean id="UhPersonDelegate-delegateePerson.fullName"  parent="KcPerson-fullName">
+        <property name="name" value="delegateePerson.fullName" />
+        <property name="label" value="Delegatee Full Name" />
+        <property name="shortLabel" value="Delegatee Full Name" />
+    </bean>
+    
+	<bean id="UhPersonDelegate-inquiryDefinition" parent="InquiryDefinition">
+      <property name="title" value="UH Person Delegate Inquiry" /> 
+      <property name="inquirySections" >
+      <list>
+          <bean parent="InquirySectionDefinition">
+            <property name="title" value="UH Person Delegate" />
+            <property name="numberOfColumns" value="1" />
+            <property name="inquiryFields" >
+              <list>
+                <bean parent="FieldDefinition"
+                      p:attributeName="delegatorPerson.personId"
+                      p:forceInquiry="true" />
+                <bean parent="FieldDefinition"
+                      p:attributeName="delegateePerson.personId"
+                      p:forceInquiry="true" />
+              </list>
+            </property>
+          </bean>
+        </list>
+      </property>
+    </bean>
+	
+  <bean id="UhPersonDelegate-lookupDefinition" parent="LookupDefinition">
+    <property name="title" value="UH Person Delegate Lookup" />
+    <property name="lookupableID" value="UhPersonDelegateLookupable" />
+    <property name="menubar" value="&lt;a href=&quot;index.jsp&quot;&gt;Main&lt;/a&gt;" />
+
+    <property name="defaultSort" >
+      <bean parent="SortDefinition">
+      	<property name="attributeNames">
+          <list> 
+            <value>delegatorPerson.personId</value>
+          </list>
+        </property>
+        <property name="sortAscending" value="true"/>
+      </bean>
+    </property>
+    <property name="lookupFields" >
+      <list>
+        <bean parent="FieldDefinition"
+              p:attributeName="delegatorPerson.userName" />
+        <bean parent="FieldDefinition"
+              p:attributeName="delegateePerson.userName" />
+      </list>
+    </property>
+    <property name="resultFields" >
+      <list>
+        <bean parent="FieldDefinition"
+              p:attributeName="uhPersonDelegateId"
+              p:forceInquiry="true" />
+        <bean parent="FieldDefinition"
+              p:attributeName="delegatorPerson.fullName" />
+        <bean parent="FieldDefinition"
+              p:attributeName="delegateePerson.fullName" />
+        <bean parent="FieldDefinition"
+              p:attributeName="fromDate" />
+        <bean parent="FieldDefinition"
+              p:attributeName="toDate" />
+        <bean parent="FieldDefinition"
+              p:attributeName="includeDelegator" />
+      </list>
+    </property>
+  </bean>
+	
+</beans>

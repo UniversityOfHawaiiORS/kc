@@ -23,6 +23,7 @@ import org.kuali.coeus.common.framework.person.KcPerson;
 import org.kuali.coeus.common.framework.person.KcPersonService;
 import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.krad.util.GlobalVariables;
 
 import java.sql.Date;
@@ -276,6 +277,18 @@ public class NegotiationActivity extends KcPersistableBusinessObjectBase {
     }
 
     public Boolean getRestricted() {
+    	// KC-820 Modify Negotiation Description restricted/unrestricted
+    	// Auto Restrict based on activity type
+    	String restricted_negotiation_activity_types = CoreFrameworkServiceLocator
+                .getParameterService().getParameterValueAsString("KC-GEN",
+                                "All", "uh_restricted_negotiation_activity_types");
+    	NegotiationActivityType activityType = this.getActivityType();
+    	if (activityType != null && restricted_negotiation_activity_types.contains("[" + activityType.getDescription() + "]")) {
+    		restricted = true;
+    	} else {
+    		restricted = false;
+    	}
+    	// KC-820 END
         return restricted;
     }
 

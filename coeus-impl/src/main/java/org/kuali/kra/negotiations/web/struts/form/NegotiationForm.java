@@ -35,6 +35,12 @@ import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kns.web.ui.HeaderField;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.KRADConstants;
+// KC-821 Only allow one Negotiation per child award.
+import org.kuali.kra.infrastructure.Constants;
+import org.kuali.rice.kns.web.ui.ExtraButton;
+import org.kuali.rice.core.api.CoreApiServiceLocator;
+// KC-821 END
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -346,4 +352,20 @@ public class NegotiationForm extends KcTransactionalDocumentFormBase implements 
             return "";
         }
     }
+    
+    // KC-821 Only allow one Negotiation per child award.
+    public List<ExtraButton> getExtraTopButtons() {
+        extraButtons.clear();
+        String externalImageURL = Constants.KRA_EXTERNALIZABLE_IMAGES_URI_KEY;
+         
+        Negotiation neg= this.getNegotiationDocument().getNegotiation();
+        if (this.getNegotiationDocument().getNegotiation().getNegotiationAssociationTypeId() != null && 
+            this.getNegotiationDocument().getNegotiation().getNegotiationAssociationTypeId().equals(getNegotiationService().getNegotiationAssociationType("AWD").getId())) {
+            String generateNegotiationsImage = CoreApiServiceLocator.getKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "tinybutton-openaward.gif";
+            addExtraButton("methodToCall.openAward", generateNegotiationsImage, "Open Award");
+        }
+        
+        return extraButtons;
+    }
+    // KC-821 END
 }

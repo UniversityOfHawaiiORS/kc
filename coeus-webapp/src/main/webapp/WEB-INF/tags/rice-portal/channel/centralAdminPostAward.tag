@@ -26,6 +26,8 @@
     <td>
       <portal:portalLink displayTitle="false" title="Award" url="${ConfigProperties.application.url}/awardHome.do?methodToCall=docHandler&command=initiate&docTypeName=AwardDocument"><img src="static/images/add.png" alt="add" width="16" height="16" border="0" align="absmiddle"></portal:portalLink>
       <portal:portalLink displayTitle="false" title="Award" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.award.home.Award&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true"><img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle"></portal:portalLink>
+     <!--  KC-367: Add a link to search for awards including old versions -->
+      <portal:portalLink displayTitle="true" title="Advanced Search" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=edu.hawaii.award.home.AwardAdvancedSearch&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true"></portal:portalLink>
     </td>
   </tr>
   <tr>

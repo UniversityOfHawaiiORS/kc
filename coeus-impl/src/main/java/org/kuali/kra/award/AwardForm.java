@@ -84,6 +84,7 @@ import org.kuali.rice.kns.util.ActionFormUtilMap;
 import org.kuali.rice.kns.web.ui.ExtraButton;
 import org.kuali.rice.kns.web.ui.HeaderField;
 import org.kuali.rice.krad.util.KRADConstants;
+import org.kuali.kra.negotiations.service.NegotiationService;
 
 import java.text.ParseException;
 import java.util.*;
@@ -884,7 +885,7 @@ public class AwardForm extends BudgetVersionFormBase implements MultiLookupForm,
     public void setDeletedRas(String deletedRas) {
         this.deletedRas = deletedRas;
     }
-
+    
     private AwardHierarchyUIService getAwardHierarchyUIService() {
         if (awardHierarchyUIService == null) {
             awardHierarchyUIService = KcServiceLocator.getService(AwardHierarchyUIService.class);
@@ -986,6 +987,15 @@ public class AwardForm extends BudgetVersionFormBase implements MultiLookupForm,
         String generatePeriodImage = lookupKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "tinybutton-timemoney.gif";
         
         addExtraButton("methodToCall.timeAndMoney", generatePeriodImage, "Time And Money");
+        
+        // KC-821 Only allow one Negotiation per child award. 
+        // Only allow 
+        // KC-840 Hide Negotiation link button in Award page if not in group "All ORS"
+        if (KcServiceLocator.getService(NegotiationService.class).isAuthorizedToOpenNegotiations()) {
+            String generateNegotiationsImage = lookupKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "tinybutton-negotiations.gif";
+            addExtraButton("methodToCall.openNegotiations", generateNegotiationsImage, "Open Negotiations");
+        }
+        // KC-821 END
         
         return extraButtons;
     }

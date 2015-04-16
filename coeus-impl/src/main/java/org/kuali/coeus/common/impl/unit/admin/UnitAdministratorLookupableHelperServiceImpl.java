@@ -23,7 +23,6 @@ import org.kuali.coeus.common.framework.person.KcPerson;
 import org.kuali.coeus.common.framework.person.KcPersonService;
 import org.kuali.coeus.common.framework.unit.admin.UnitAdministrator;
 import org.kuali.coeus.sys.framework.lookup.KcKualiLookupableHelperServiceImpl;
-import org.kuali.rice.kns.lookup.HtmlData;
 import org.kuali.rice.kns.web.struts.form.LookupForm;
 import org.kuali.rice.kns.web.ui.Field;
 import org.kuali.rice.kns.web.ui.Row;
@@ -41,17 +40,20 @@ import java.util.Map;
 
 /**
  * Lookupable helper service used for proposal log lookup
- */
+ */  
 @Component("unitAdministratorLookupableHelperService")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class UnitAdministratorLookupableHelperServiceImpl extends KcKualiLookupableHelperServiceImpl {
 
     private static final long serialVersionUID = 2733736916454475501L;
-
+    
     @Autowired
     @Qualifier("kcPersonService")
     private KcPersonService kcPersonService;
-
+    
+    /* KC-679 New Routing in 5.1.1
+     * Allow Edit and Copy now, not sure why they didn't allow but we can
+     * 
     @SuppressWarnings("unchecked")
     public List<HtmlData> getCustomActionUrls(BusinessObject businessObject, List pkNames){
         List<HtmlData> htmlDataList = new ArrayList<HtmlData>();
@@ -65,6 +67,7 @@ public class UnitAdministratorLookupableHelperServiceImpl extends KcKualiLookupa
         }
         return returnHtmlDataList;
     }
+    */
 
     @Override
     public List<Row> getRows() {
@@ -92,7 +95,7 @@ public class UnitAdministratorLookupableHelperServiceImpl extends KcKualiLookupa
         
         return super.performLookup(lookupForm, resultTable, bounded);
     }
-
+    
     @Override
     public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
         List<UnitAdministrator> searchResults = (List<UnitAdministrator>)super.getSearchResults(fieldValues);
@@ -119,7 +122,7 @@ public class UnitAdministratorLookupableHelperServiceImpl extends KcKualiLookupa
         }
         return filteredList;
     }
-
+    
     public KcPersonService getKcPersonService() {
         return kcPersonService;
     }

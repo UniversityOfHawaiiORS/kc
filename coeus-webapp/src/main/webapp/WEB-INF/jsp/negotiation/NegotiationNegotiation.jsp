@@ -21,6 +21,7 @@
 
 <c:set var="negotiationAttributes" value="${DataDictionary.NegotiationDocument.attributes}" />
 
+<%-- KC-821 Only allow one Negotiation per child award. --%>
 <kul:documentPage
 	showDocumentInfo="true"
 	htmlFormAction="negotiationNegotiation"
@@ -29,7 +30,8 @@
 	showTabButtons="true"
 	auditCount="0"
   	headerDispatch="${KualiForm.headerDispatch}"
-  	headerTabActive="negotiation">
+  	headerTabActive="negotiation"
+  	extraTopButtons="${KualiForm.extraTopButtons}">
   	
 <script type="text/javascript"> 
    var $jq = jQuery.noConflict();

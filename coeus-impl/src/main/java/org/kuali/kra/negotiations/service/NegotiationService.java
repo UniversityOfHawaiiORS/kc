@@ -121,7 +121,7 @@ public interface NegotiationService {
      * link the negotiation to the new inst prop.
      */
     void checkForPropLogPromotion(Negotiation negotiation);
-
+    
     /**
      * This method fine a NegotiationAssociatedDetail object from the DB and sets it to the passed in negotiation.
      * @param negotiation
@@ -141,4 +141,10 @@ public interface NegotiationService {
      * @param institutionalProposalProposalNumber
      */
     void promoteProposalLogNegotiation(String proposalLogProposalNumber, String institutionalProposalProposalNumber);
+    
+    // KC-821 Only allow one Negotiation per child award.
+    NegotiationAgreementType getNegotiationAgreementType(String agreementCode);
+    
+    // KC-840 Hide Negotiation link button in Award page if not in group "All ORS"
+    public Boolean isAuthorizedToOpenNegotiations();
 }

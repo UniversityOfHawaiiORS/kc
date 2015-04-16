@@ -33,6 +33,7 @@ import org.kuali.kra.negotiations.notifications.NegotiationNotification;
 import org.kuali.kra.negotiations.printing.NegotiationActivityPrintType;
 import org.kuali.kra.negotiations.web.struts.form.NegotiationForm;
 import org.kuali.coeus.common.framework.print.AttachmentDataSource;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
 import org.kuali.rice.krad.util.GlobalVariables;
@@ -40,9 +41,11 @@ import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.kuali.rice.krad.util.KRADConstants.EMPTY_STRING;
@@ -99,7 +102,7 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     }
     
     /**
-     * 
+    *
      * @see org.kuali.core.web.struts.action.KualiDocumentActionBase#reload(
      * org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, 
      * javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
@@ -359,6 +362,10 @@ public class NegotiationNegotiationAction extends NegotiationAction {
 
     public ActionForward addActivity(ActionMapping mapping, ActionForm form, HttpServletRequest request,
             HttpServletResponse response) throws Exception {
+
+    	// KC-877 Negotiation activity still adds when invalid end date is entered
+    	this.save(mapping, form, request, response);
+    	
         NegotiationForm negotiationForm = (NegotiationForm) form;
         negotiationForm.getNegotiationActivityHelper().addActivity();
         return mapping.findForward(Constants.MAPPING_BASIC);
@@ -525,6 +532,52 @@ public class NegotiationNegotiationAction extends NegotiationAction {
                         KeyConstants.NEGOTIATION_DELETE_ACTIVITY),
                         "confirmDeleteActivity", null);
     }        
+    
+    // KC-822 Add send notification button and a link to launch Award Memo Tool
+    public ActionForward launchNotificationTool(ActionMapping mapping, ActionForm form,
+            HttpServletRequest request, HttpServletResponse response) throws Exception {
+    	
+    	NegotiationForm negotiationForm = (NegotiationForm) form;
+        NegotiationDocument negotiationDocument = negotiationForm.getNegotiationDocument();
+    	ActionForward actionForward = mapping.findForward(Constants.MAPPING_AWARD_BASIC);
+    	
+    	// Save and launch notification memo tool
+    	this.save(mapping, form, request, response);
+    	
+    	if (GlobalVariables.getMessageMap().hasNoErrors()) {
+    		Negotiation negotiation = negotiationDocument.getNegotiation();
+    		String awardNumber = negotiation.getAssociatedDocumentId();
+    		
+    	    String parameterName = (String) request.getAttribute(KRADConstants.METHOD_TO_CALL_ATTRIBUTE);
+            if (StringUtils.isNotBlank(parameterName)) {
+            	// KC-886 After sorting was added to negotiation activities memo tool launches with wrong code
+            	Long activityId = Long.parseLong(StringUtils.substringBetween(parameterName, ".activityId", "."));
+
+    		    List<NegotiationActivity> activities = negotiationForm.getNegotiationDocument().getNegotiation().getActivities();
+    		    NegotiationActivity selectedActivity = null;
+    		    for (NegotiationActivity activity : activities) {
+    		    	if (activity.getActivityId().equals(activityId)) {
+    		    		selectedActivity = activity;
+    		    	}
+    		    }
+    		    	
+    		    if (selectedActivity != null) {
+    		        String activityTypeCode = selectedActivity.getActivityType().getCode();
+    		
+    		        String uh_memo_app_compose_url = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN","All", "uh_memo_app_compose_url");
+    		        //  Launch Memo App URL ( add open_memo parameter and let tag file process it )
+    		        ActionForward newActionForward = new ActionForward(actionForward);
+        	        String forward = newActionForward.getPath() + "?open_memo_tool=" + uh_memo_app_compose_url + "&memoToolAwardNumber=" + awardNumber + "&memoToolActivityTypeCode=" + activityTypeCode;
+        	        newActionForward.setPath(forward);
+    		        return newActionForward;
+    		    }
+    		    // KC-886 End
+            }
+    	}
+        return actionForward;
+        
+    } 
+    // KC-822 END
     
     public ActionForward confirmDeleteActivity(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) throws Exception {

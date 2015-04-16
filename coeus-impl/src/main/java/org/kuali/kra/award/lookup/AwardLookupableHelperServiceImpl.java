@@ -47,7 +47,7 @@ import java.util.*;
 /**
  * This class provides Award lookup support
  */
-public class AwardLookupableHelperServiceImpl extends KraLookupableHelperServiceImpl {
+public class AwardLookupableHelperServiceImpl extends KraLookupableHelperServiceImpl {    
 
     static final String PERSON_ID = "personId";
     static final String ROLODEX_ID = "rolodexId";
@@ -89,8 +89,22 @@ public class AwardLookupableHelperServiceImpl extends KraLookupableHelperService
         setDocFormKey(fieldValues.get(KRADConstants.DOC_FORM_KEY));
         setReferencesToRefresh(fieldValues.get(KRADConstants.REFERENCES_TO_REFRESH));
         
-        List<Award> unboundedResults = (List<Award>)getAwardLookupDao().getAwardSearchResults(fieldValues, usePrimaryKeys);
+        // KC-650 Advanced Award Lookup behaves like a basic search
+        boolean advancedSearch=false;
+        if (fieldValues.get("UhAdvancedSearch") != null) {
+        	fieldValues.remove("UhAdvancedSearch");
+        	advancedSearch=true;
+        }
         
+        List<Award> unboundedResults;
+        
+        if (advancedSearch) {
+        	unboundedResults = (List<Award>)super.getSearchResults(fieldValues);
+        } else {
+            unboundedResults = (List<Award>)getAwardLookupDao().getAwardSearchResults(fieldValues, usePrimaryKeys);
+        }
+        // KC-650 END
+       
         List<Award> filteredResults = new ArrayList<Award>();
         
         filteredResults = (List<Award>) filterForPermissions(unboundedResults);
@@ -231,7 +245,7 @@ public class AwardLookupableHelperServiceImpl extends KraLookupableHelperService
         
         htmlData.setHref(href);
         return htmlData;
-    }
+    }      
     
     protected HtmlData getOspAdminNameInquiryUrl(Award award) {
         KcPerson ospAdministrator = award.getOspAdministrator();
@@ -298,8 +312,8 @@ public class AwardLookupableHelperServiceImpl extends KraLookupableHelperService
     @Override
     protected String getKeyFieldName() {
         return "awardId";
-    }
-
+    }   
+    
     public AwardLookupDao getAwardLookupDao() {
         return awardLookupDao;
     }

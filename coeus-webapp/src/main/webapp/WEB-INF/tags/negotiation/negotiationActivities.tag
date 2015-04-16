@@ -50,15 +50,16 @@ $jq(document).ready(function() {
 	doFilterActivities();
 });
 </script>
-
-<kul:tab tabTitle="Activities & Attachments" defaultOpen="false" tabErrorKey="" innerTabErrorKey="document.negotiationList[0].activities*,negotiationActivityHelper.*">
+<!-- KC-814 Default tab to open to make data entry easier -->
+<kul:tab tabTitle="Activities & Attachments" defaultOpen="true" tabErrorKey="" innerTabErrorKey="document.negotiationList[0].activities*,negotiationActivityHelper.*">
 <div class="tab-container"  align="center">
 
 <c:if test="${KualiForm.editingMode['create_activity']}">
   <kra-negotiation:negotiationActivity activity="${KualiForm.negotiationActivityHelper.newActivity}" activityIndex="-1" parentTab="Activities & Attachments" tabDivClass="innerTab-h3head" readOnly="false"/>
 </c:if>
 <jsp:useBean id="paramMap" class="java.util.HashMap"/>
-<kul:innerTab parentTab="Activities & Attachments" tabTitle="Activities" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
+<!-- KC-814 Default tab to open to make data entry easier -->
+<kul:innerTab parentTab="Activities & Attachments" tabTitle="Activities" defaultOpen="true" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
   <table>
    <tr>
     <th style="text-align: right; width: 5em;">Sort By:</th>
@@ -85,14 +86,22 @@ $jq(document).ready(function() {
    
   </table>
   <c:forEach items="${KualiForm.document.negotiation.activities}" var="activity" varStatus="ctr">
+    <!-- KC-856 Hide entire activity if restricted and user can not view restricted -->
+    <c:if test="${!activity.restricted || KualiForm.editingMode['view_unrestricted']}">
   	<kra-negotiation:negotiationActivity activity="${activity}" activityIndex="${ctr.count-1}" parentTab="All Activities" readOnly="${readOnly}"/>
+    </c:if>
+    <!-- END KC-856 -->
   </c:forEach>
 </kul:innerTab>
 
-
+<!-- KC-856 Hide entire activity if restricted and user can not view restricted -->
+<!-- Not sure how to limit this one to show all except for restricted so hide the section from those not authorized -->
+<c:if test="${KualiForm.editingMode['view_unrestricted']}">
 <kul:innerTab parentTab="Activities & Attachments" tabTitle="Activity/Location History" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
 	<kra-negotiation:negotiationActivityHistory/>
 </kul:innerTab>
+</c:if>
+<!-- END KC-856 -->
 
 
 <kul:innerTab parentTab="Activities & Attachments" tabTitle="All Attachments" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">

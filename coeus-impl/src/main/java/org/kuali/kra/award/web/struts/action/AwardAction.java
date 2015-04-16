@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.kuali.kra.award.web.struts.action;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -49,11 +50,13 @@ import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService;
 import org.kuali.kra.award.budget.AwardBudgetService;
 import org.kuali.kra.award.contacts.AwardPerson;
 import org.kuali.kra.award.contacts.AwardProjectPersonsSaveRule;
+import org.kuali.kra.award.contacts.AwardSponsorContact;
 import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.AwardAmountInfo;
 import org.kuali.kra.award.home.AwardComment;
+import org.kuali.kra.award.home.AwardSponsorTerm;
 import org.kuali.kra.award.home.AwardService;
 import org.kuali.kra.award.home.approvedsubawards.AwardApprovedSubaward;
 import org.kuali.kra.award.paymentreports.ReportClass;
@@ -61,6 +64,7 @@ import org.kuali.kra.award.paymentreports.awardreports.AwardReportTerm;
 import org.kuali.kra.award.paymentreports.awardreports.AwardReportTermRecipient;
 import org.kuali.kra.award.paymentreports.awardreports.reporting.service.ReportTrackingService;
 import org.kuali.kra.award.paymentreports.closeout.CloseoutReportTypeValuesFinder;
+import org.kuali.kra.award.timeandmoney.AwardDirectFandADistribution;
 import org.kuali.kra.award.service.AwardDirectFandADistributionService;
 import org.kuali.kra.award.service.AwardReportsService;
 import org.kuali.kra.award.service.AwardSponsorTermService;
@@ -100,6 +104,14 @@ import org.kuali.rice.krad.rules.rule.event.DocumentEvent;
 import org.kuali.rice.krad.service.*;
 import org.kuali.rice.krad.util.KRADConstants;
 
+// KC-821 Only allow one Negotiation per child award.
+import org.kuali.kra.negotiations.bo.Negotiation;
+import org.kuali.kra.negotiations.document.NegotiationDocument;
+import org.kuali.kra.negotiations.service.NegotiationService;
+import edu.hawaii.award.bo.UhAwardExtension;
+import org.kuali.rice.kns.service.DataDictionaryService;
+import org.kuali.rice.krad.service.SequenceAccessorService;
+// KC-821 END
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.*;
@@ -129,6 +141,8 @@ public class AwardAction extends BudgetParentActionBase {
     private transient ReportTrackingService reportTrackingService;
     private transient KcNotificationService notificationService;
     private transient SubAwardService subAwardService;
+    // KC-821 Only allow one Negotiation per child award.
+    private NegotiationService negotiationService;
     TimeAndMoneyAwardDateSaveRuleImpl timeAndMoneyAwardDateSaveRuleImpl;
     
     private static final Log LOG = LogFactory.getLog( AwardAction.class );
@@ -161,7 +175,7 @@ public class AwardAction extends BudgetParentActionBase {
     
     private static final String ADD_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";
     private static final String DEL_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";    
-
+   
     @Override
     public ActionForward docHandler(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -323,7 +337,8 @@ public class AwardAction extends BudgetParentActionBase {
         
         if (status == ValidationState.WARNING) {
             if(question == null){
-                return this.performQuestionWithoutInput(mapping, form, request, response, DOCUMENT_ROUTE_QUESTION, "Validation Warning Exists. Are you sure want to submit to workflow routing.", KRADConstants.CONFIRMATION_QUESTION, methodToCall, "");
+            	// KC-793 Correct wording for validation warnings exist message in PD and Award
+                return this.performQuestionWithoutInput(mapping, form, request, response, DOCUMENT_ROUTE_QUESTION, "Validation warning exists.  Are you sure you want to submit to workflow routing.", KRADConstants.CONFIRMATION_QUESTION, methodToCall, "");
             } else if(DOCUMENT_ROUTE_QUESTION.equals(question) && ConfirmationQuestion.YES.equals(buttonClicked)) {
                 return submitAward(mapping, form, request, response);
             } else {
@@ -397,6 +412,8 @@ public class AwardAction extends BudgetParentActionBase {
         }
 
         forward = super.save(mapping, form, request, response);
+
+        
         if (awardForm.getMethodToCall().equals("save") && awardForm.isAuditActivated()) {
             forward = mapping.findForward(Constants.MAPPING_AWARD_ACTIONS_PAGE);
         }
@@ -484,9 +501,25 @@ public class AwardAction extends BudgetParentActionBase {
         for(AwardComment comment : award.getAwardComments()) {
             comment.setAward(award);
         }
+
         for(AwardCustomData customData : award.getAwardCustomDataList()) {
             customData.setAward(award);
         }
+        // RRG KC-477 BEGIN - Award Persons are getting added with award_number 000000-00000 when created from IP or Funding Proposal
+        for(AwardPerson awardPerson : award.getProjectPersons()) {
+        	awardPerson.setAward(award);
+    }
+        for(AwardReportTerm awardReportTerm : award.getAwardReportTermItems()) {
+        	awardReportTerm.setAward(award);
+    
+        }
+        for(AwardSponsorContact awardSponsorContact : award.getSponsorContacts()) {
+        	awardSponsorContact.setAward(award);
+        }
+        for(AwardSponsorTerm awardSponsorTerm : award.getAwardSponsorTerms()) {
+        	awardSponsorTerm.setAward(award);
+        }
+        // RRG KC-477 END
     }
     
     /**
@@ -649,7 +682,7 @@ public class AwardAction extends BudgetParentActionBase {
         
         return mapping.findForward(Constants.MAPPING_AWARD_HOME_PAGE);
     }
-
+    
     @SuppressWarnings("unchecked")
     public void setBooleanAwardInMultipleNodeHierarchyOnForm (Award award) {
         Map<String, Object> fieldValues = new HashMap<String, Object>();
@@ -707,7 +740,7 @@ public class AwardAction extends BudgetParentActionBase {
      */
     public ActionForward contacts(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         Award award = getAward(form);
-
+        
         award.initCentralAdminContacts();
 
         return mapping.findForward(Constants.MAPPING_AWARD_CONTACTS_PAGE);
@@ -732,7 +765,7 @@ public class AwardAction extends BudgetParentActionBase {
         if(!(award.getAwardEffectiveDate() == null)) {
             // delete entries that were added during previous T&M initiations but the doc cancelled.
             getBusinessObjectService().delete(award.getAwardDirectFandADistributions());
-            
+    
             Boolean autoGenerate = getParameterService().getParameterValueAsBoolean(Constants.PARAMETER_MODULE_AWARD, ParameterConstants.DOCUMENT_COMPONENT, 
                                                                                     KeyConstants.AUTO_GENERATE_TIME_MONEY_FUNDS_DIST_PERIODS); 
             if (autoGenerate) {
@@ -829,6 +862,100 @@ public class AwardAction extends BudgetParentActionBase {
 
     }
         
+    // KC-821 KC Negotiation - UH Customization, Only allow one Negotiation per child award.
+    protected NegotiationService getNegotiationService() {
+        if (negotiationService == null) {
+            negotiationService = KcServiceLocator.getService(NegotiationService.class);
+        }
+        return negotiationService;
+    }
+    
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public ActionForward openNegotiations(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        AwardForm awardForm = (AwardForm) form;
+        AwardDocument awardDocument = awardForm.getAwardDocument();
+        ActionForward actionForward;
+
+        //if award document is view only then we don't need to save document before opening negotiation.
+        if ((!awardForm.getEditingMode().containsKey("viewOnly") || awardForm.getEditingMode().containsKey("fullEntry")) &&
+                !awardDocument.getDocumentHeader().getWorkflowDocument().isFinal()) {
+            this.save(mapping, form, request, response);
+        }
+        
+        if(GlobalVariables.getMessageMap().hasNoErrors()){
+            //AwardForm awardForm = (AwardForm) form;
+            DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
+            TransactionDetail transactionDetail = null;
+        
+            Award currentAward = awardDocument.getAward();
+    
+            Map<String, Object> fieldValues = new HashMap<String, Object>();
+            String awardNumber = currentAward.getAwardNumber();
+            // Populate search field values with award Number which is found in associatedDocumentId in negotiations document
+            fieldValues.put("associatedDocumentId", awardNumber);
+            BusinessObjectService businessObjectService =  KcServiceLocator.getService(BusinessObjectService.class);
+
+            List<Negotiation> negotiations = 
+                (List<Negotiation>)businessObjectService.findMatching(Negotiation.class, fieldValues);
+            
+            Negotiation negotiationFound = null; 
+            if(negotiations.size() > 0) {
+            	negotiationFound = negotiations.get(0);
+            	
+                // We plan to enforce only one negotiation document per award so produce warning if more than one exists.
+                if(negotiations.size() > 1) {
+                	GlobalVariables.getMessageMap().putError("none","error.negotiation.multiple.found");
+                	actionForward = mapping.findForward(Constants.MAPPING_AWARD_BASIC);
+                	return actionForward;
+                }
+            }           
+            
+            String routeHeaderId = null;
+       
+            //  If negotiationDocument is null then this is the first negotiation document requeset for this award so create it now
+            if(negotiationFound == null){  
+                NegotiationDocument negotiationDocument = null;
+            	negotiationDocument = (NegotiationDocument) documentService.getNewDocument(NegotiationDocument.class);
+            	// KC-815 Negotiation should populate with default data
+            	// Set required fields
+              	// Description
+            	negotiationDocument.getDocumentHeader().setDocumentDescription("ORS Post-Award Process " + currentAward.getAwardNumber());
+            	// Negotiation Status to "In Progress"
+            	negotiationDocument.getNegotiation().setNegotiationStatusId(getNegotiationService().getNegotiationStatus("IP").getId());
+            	// KC-819 Display UH Assigned To field on the Negotiations Attributes Tab and Default negotiator
+            	// Assigned To (Fake user ORS)
+            	negotiationDocument.getNegotiation().setNegotiatorPersonId("ORS");
+            	// Negotiation Association Type
+            	Long assoicationType=getNegotiationService().getNegotiationAssociationType("AWD").getId();
+                negotiationDocument.getNegotiation().setNegotiationAssociationTypeId(assoicationType);
+                // Agreement Type to Award (NOTE: JIRA KC-818 changed this value from N/A to Award)
+                negotiationDocument.getNegotiation().setNegotiationAgreementTypeId(getNegotiationService().getNegotiationAgreementType("AWD").getId());
+                                 // AssociatedDocumentId
+            	negotiationDocument.getNegotiation().setAssociatedDocumentId(awardNumber);
+            	
+            	negotiationDocument.getNegotiation().setNegotiationId(KcServiceLocator.getService(SequenceAccessorService.class).getNextAvailableSequenceNumber(Constants.NEGOTIATION_SEQUENCE_NAME));
+            		
+                documentService.saveDocument(negotiationDocument);
+                routeHeaderId = negotiationDocument.getDocumentHeader().getWorkflowDocument().getDocumentId();
+            } else {
+                routeHeaderId = negotiationFound.getDocumentNumber();
+            }
+            
+            // KC-883 Document Locks not removed when opening negotiations from action buttons
+            setupDocumentExit();
+            
+            String forward = buildForwardUrl(routeHeaderId);
+            actionForward = new ActionForward(forward, true);
+            //add this to session for return to award action.
+            GlobalVariables.getUserSession  ().addObject(Constants.AWARD_DOCUMENT_STRING_FOR_SESSION + "-" + routeHeaderId, awardDocument.getDocumentNumber());
+        } else {
+            actionForward = mapping.findForward(Constants.MAPPING_AWARD_BASIC);
+        }
+        return actionForward;
+
+    }
+    // KC-821 END  
+    
     protected TimeAndMoneyDocument getLastFinalTandMDocument(List<TimeAndMoneyDocument> timeAndMoneyDocuments) throws WorkflowException {
         TimeAndMoneyDocument returnVal = null;
         DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
@@ -1246,7 +1373,7 @@ public class AwardAction extends BudgetParentActionBase {
    /**
     *
     * loadDocumentInForm
-    */
+    */    
     protected void loadDocumentInForm(HttpServletRequest request, AwardForm awardForm)
     throws WorkflowException {
         String docIdRequestParameter = request.getParameter(KRADConstants.PARAMETER_DOC_ID);
@@ -1568,7 +1695,7 @@ public class AwardAction extends BudgetParentActionBase {
         }
         return syncScopesList;
     }
-
+    
     protected SponsorHierarchyService getSponsorHierarchyService() {
         return KcServiceLocator.getService(SponsorHierarchyService.class);
     }
@@ -1582,8 +1709,8 @@ public class AwardAction extends BudgetParentActionBase {
     protected VersionHistoryService getVersionHistoryService() {
         return KcServiceLocator.getService(VersionHistoryService.class);
     }
+    
 
-   
     /**
      * KCAWD-494:If the user selects a sponsor template lookup, set a flag and store the current sponsor template code in the form.  The flag and the 
      * current value will be used on the return to check if the template has changed.
@@ -1821,8 +1948,9 @@ public class AwardAction extends BudgetParentActionBase {
                 //clicking yes to the question. Retrieve again during actual routing and add to form.
                 GlobalVariables.getUserSession().addObject(SUPER_USER_ACTION_REQUESTS, selectedActionRequests);
                 try {
+                	// KC-793 Correct wording for validation warnings exist message in PD and Award
                     return this.performQuestionWithoutInput(mapping, form, request, response, DOCUMENT_ROUTE_QUESTION, 
-                            "Validation Warning Exists. Are you sure want to submit to workflow routing.", 
+                            "Validation warning exists.  Are you sure you want to submit to workflow routing.", 
                             KRADConstants.CONFIRMATION_QUESTION, methodToCall, "");
                 }
                 catch (Exception e) {

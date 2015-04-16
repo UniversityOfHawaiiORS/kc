@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p" xsi:schemaLocation="http://www.springframework.org/schema/beans         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+
+  <bean id="UnitAdministratorMaintenanceDocument" parent="UnitAdministratorMaintenanceDocument-parentBean">
+    <property name="lockingKeys">
+      <list merge="true">
+        <value>personId</value>
+        <value>unitAdministratorTypeCode</value>
+        <value>unitNumber</value>
+        <value>fromDate</value>
+        <value>toDate</value>
+      </list>
+    </property>
+    <property name="allowsRecordDeletion" value="true" />
+    <property name="documentTypeName" value="UnitAdministratorMaintenanceDocument"/>
+    <property name="businessRulesClass" value="org.kuali.coeus.common.impl.unit.admin.UnitAdministratorMaintenanceDocumentRule"/>
+    <property name="documentAuthorizerClass" value="org.kuali.rice.kns.document.authorization.MaintenanceDocumentAuthorizerBase"/>
+  </bean>
+
+<!-- Maintenance Section Definitions -->
+
+  <bean id="UnitAdministratorMaintenanceDocument-EditUnitAdministrator" parent="UnitAdministratorMaintenanceDocument-EditUnitAdministrator-parentBean">
+    <property name="title" value="Edit UnitAdministrator (From/To dates used for PD Routing only)"/>
+    <property name="maintainableItems">
+      <list merge="true">
+        <bean parent="MaintainableFieldDefinition" p:name="fromDate" p:required="false" />
+        <bean parent="MaintainableFieldDefinition" p:name="toDate" p:required="false" />
+      </list>
+    </property>
+  </bean>
+</beans>
