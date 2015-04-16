@@ -186,7 +186,7 @@ foreach my $commitKey (sort keys %$commitResults) {
        my $commitComment= $commitResults->{$commitKey}->{$fileKey};
        print ":\tComment:$commitComment\n";
        $fullCommitComment .= $commitComment;
-       push(@commands,"echo git checkout $fromBranch ${fileKey}");
+       push(@commands,"git checkout $fromBranch ../../${fileKey}");
    }
    my $messageFileName = ${commitKey} . ".message.txt";
    open(my $messageFile, '>', $messageFileName) or die "Could not open file '$messageFileName' $!";
@@ -194,7 +194,8 @@ foreach my $commitKey (sort keys %$commitResults) {
    $fullCommitComment =~ s/KC-/\nKC-/g;
    print $messageFile "$fullCommitComment\n";
    close $messageFile;
-   push(@commands,"echo git commit -F $messageFileName");
+   push(@commands,"git status");
+   push(@commands,"git commit -F $messageFileName");
 }
 
 my $filename = "gitCommands.sh";
