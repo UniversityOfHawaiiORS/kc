@@ -64,7 +64,8 @@
 
     <filter>
         <filter-name>UserLoginFilter</filter-name>
-        <filter-class>org.kuali.rice.krad.web.filter.UserLoginFilter</filter-class>
+		<!-- UH Changes: KC-203: Use a custom UserLoginFilter. -->
+		<filter-class>edu.hawaii.rice.kew.web.UhKcUserLoginFilter</filter-class>
     </filter>
 
     <filter>
@@ -171,6 +172,34 @@
         <url-pattern>*.jsp</url-pattern>
     </filter-mapping>
 
+  <!-- KC-809 eDocLite doesn't work in KC when running bundled mode -->
+  <filter-mapping>
+    <filter-name>BootstrapFilter</filter-name>
+    <servlet-name>edoclite</servlet-name>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>UserLoginFilter</filter-name>
+    <servlet-name>edoclite</servlet-name>
+  </filter-mapping>
+
+  <filter-mapping>
+    <filter-name>UserPreferencesFilter</filter-name>
+    <servlet-name>edoclite</servlet-name>
+  </filter-mapping>
+  
+  <servlet>
+    <servlet-name>edoclite</servlet-name>
+    <servlet-class>org.kuali.rice.edl.impl.EDLServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>edoclite</servlet-name>
+    <url-pattern>/kew/EDocLite</url-pattern>
+  </servlet-mapping>
+  
+  <!-- KC-809 END -->
+
     <!-- ******************* Start Logging Filters ********************* -->
     <filter>
         <filter-name>JspLoggingFilter</filter-name>
@@ -228,7 +257,6 @@
     <listener>
         <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
-
     <listener>
         <listener-class>org.kuali.rice.krad.web.listener.KualiHttpSessionListener</listener-class>
     </listener>
@@ -242,7 +270,9 @@
         <servlet-class>org.kuali.rice.kns.web.struts.action.KualiActionServlet</servlet-class>
         <init-param>
             <param-name>config</param-name>
-            <param-value>/WEB-INF/struts-config.xml</param-value>
+          <!-- UH CUSTOMIZATION START -->
+          <param-value>/WEB-INF/struts-config.xml, /WEB-INF/struts-uh-config.xml</param-value>
+          <!-- UH CUSTOMIZATION END -->
         </init-param>
         <init-param>
             <param-name>debug</param-name>
@@ -467,7 +497,22 @@
         </taglib>
     </jsp-config>
 
-    <!-- Rice content End -->
+<!-- Rice content End -->
+<!-- IE Compatability Filter KC-415 -->
+        <filter>
+        <filter-name>UserAgentCompatibleFilter</filter-name>
+        <filter-class>edu.hawaii.filters.UserAgentCompatibleFilter</filter-class>
+        <init-param>
+            <param-name>compatibilityMode</param-name>
+            <param-value>IE=EmulateIE8</param-value>
+        </init-param>
+        </filter>
+
+        <filter-mapping>
+            <filter-name>UserAgentCompatibleFilter</filter-name>
+            <url-pattern>/*</url-pattern>
+        </filter-mapping>
+<!-- IE Compatability Filter End -->
 
 </web-app>
 
