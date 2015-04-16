@@ -72,13 +72,14 @@ public class PrintCertificationXmlStream extends ProposalBaseStream {
 	private static final String SCHOOL_NAME = "SCHOOL_NAME";
 	private static final String SCHOOL_ACRONYM = "SCHOOL_ACRONYM";
 	private static final String KEY_ROLODEX_ID = "rolodexId";
-	private static final String STATEMENT_CONFLICT = "I have indicated whether or not there is any potential for a real or perceived conflict of interest as defined in MIT Policies and Procedures, 4.4:  http://web.mit.edu/afs/athena.mit.edu/org/p/policies/4.4.html";
+	//UH KC-467 begin - remove all references to MIT
+	private static final String STATEMENT_CONFLICT = "I have indicated whether or not there is any potential for a real or perceived conflict of interest as defined in UH Policies and Procedures, 4.4";
 	private static final String STATEMENT_CERTIFICATION_NOT_NEEDED = "Certification is not needed";
-	private static final String STATEMENT_NIH_PROPOSAL = "For NSF & NIH proposals, only: I have submitted the required financial conflict of interest documentation to the Director, Office of Sponsored Programs: http://web.mit.edu/osp/www/resources_policy.htm";
-	private static final String STATEMENT_NOT_DEBARRED = "I am not debarred, suspended or proposed for debarment or suspended by any agency of the U.S. government: http://web.mit.edu/osp/www/debarmen.htm";
-	private static final String STATEMENT_FEDERAL_AGENCY_LOBBY = "I certify that I have not and will not lobby any federal agency on behalf of this award: http://web.mit.edu/osp/www/fedlobrg.htm";
-	private static final String STATEMENT_REQUIREMENT_FAMILIARITY = "I am familiar with the requirements of the Procurement Integrity Act [OFPP, Section 27 (a-e)] and will report any violations to the Office of Sponsored Programs: http://web.mit.edu/osp/www/Procuint.htm";
-
+	private static final String STATEMENT_NIH_PROPOSAL = "For NSF & NIH proposals, only: I have submitted the required financial conflict of interest documentation to the Director, Office of Sponsored Programs";
+	private static final String STATEMENT_NOT_DEBARRED = "I am not debarred, suspended or proposed for debarment or suspended by any agency of the U.S. government";
+	private static final String STATEMENT_FEDERAL_AGENCY_LOBBY = "I certify that I have not and will not lobby any federal agency on behalf of this award";
+	private static final String STATEMENT_REQUIREMENT_FAMILIARITY = "I am familiar with the requirements of the Procurement Integrity Act [OFPP, Section 27 (a-e)] and will report any violations to the Office of Sponsored Programs";
+	//UH KC-467 end
 	/**
 	 * This method generates XML for Print Certification Report. It uses data
 	 * passed in {@link org.kuali.coeus.sys.framework.model.KcTransactionalDocumentBase} for populating the XML nodes. The
