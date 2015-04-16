@@ -45,7 +45,8 @@
       	<portal:portalLink displayTitle="false" title="Institutional Proposal" url="${ConfigProperties.application.url}/kr/lookup.do?methodToCall=start&businessObjectClassName=org.kuali.kra.institutionalproposal.home.InstitutionalProposal&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true"><img src="static/images/searchicon.gif" alt="lookup" width="16" border="0" align="absmiddle"></portal:portalLink>
     </td>
   </tr>
-  
+  <%-- KC-737 Remove menu items from Researcher and Unit Tab --%>
+  <uh-kc:principalHasRole roleNamespace="KR-SYS" roleName="UH VIEW ALL LINKS ROLE">
   <tr>
       <td nowrap class="disabled-text">Negotiations</td>
       <td>
@@ -58,6 +59,7 @@
    		<portal:portalLink displayTitle="false" title='All My Negotiations' url='${ConfigProperties.application.url}/kr/lookup.do?methodToCall=search&businessObjectClassName=org.kuali.kra.negotiations.bo.Negotiation&docFormKey=88888888&includeCustomActionUrls=true&returnLocation=${ConfigProperties.application.url}/portal.do&hideReturnLink=true&negotiatorName=${UserSession.person.firstName}*${UserSession.person.lastName}&negotiatorPersonId=${UserSession.principalId}&searchCriteriaEnabled=true'>All My Negotiations</portal:portalLink>
    	</td>
    </tr>
+   </uh-kc:principalHasRole>
 </table>
 </div>
 <channel:portalChannelBottom />
