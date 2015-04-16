@@ -73,7 +73,8 @@
                 		<c:out value="${customAttributeValue}" />
                 	</c:when>
                 	<c:otherwise>
-                	<kul:htmlControlAttribute property="${customAttributeId}" attributeEntry="${DataDictionary.InstitutionalProposalCustomData.attributes.value}"/>
+                	<%-- KC-492 Data entered into Custom Data text box is not viewable because text fields are too small --%>
+                	<kul:htmlControlAttribute property="${customAttributeId}" attributeEntry="${DataDictionary.InstitutionalProposalCustomData.attributes.value}" dataLength="${customAttributeDocument.customAttribute.dataLength}"/>
 						<c:if test="${not empty customAttributeDocument.customAttribute.lookupClass}">
 						 <c:choose>
 						   <c:when test="${customAttributeDocument.customAttribute.lookupClass eq 'org.kuali.coeus.common.framework.custom.arg.ArgValueLookup'}">
