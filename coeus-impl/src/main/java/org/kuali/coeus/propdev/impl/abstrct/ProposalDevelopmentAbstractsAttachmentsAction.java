@@ -426,7 +426,11 @@ public class ProposalDevelopmentAbstractsAttachmentsAction extends ProposalDevel
         boolean rulePassed = getKualiRuleService().applyRules(new ReplaceNarrativeEvent("document.developmentProposalList[0].narrative[" + getSelectedLine(request) + "]", pd, modifiedNarrative));
         if(rulePassed) {
         pd.getDevelopmentProposal().replaceAttachment(getSelectedLine(request));
-
+	        // KC-778 BEGIN Change Attachment Notifications so they are sent to ORS only.
+	        // Since we changed the configuration of this rule to send to ORS staff instead of pre-approvers
+	        // we need to check if it is enroute first.  Otherwise the replace button sends notifications during
+	        // saved state prior to submit to routing.
+	        if (pd.getDocumentHeader().getWorkflowDocument().isEnroute()) {
         ProposalDevelopmentNotificationContext context = 
             new ProposalDevelopmentNotificationContext(pd.getDevelopmentProposal(), Constants.DATA_OVERRIDE_NOTIFICATION_ACTION, Constants.DATA_OVERRIDE_CONTEXT);
         ((ProposalDevelopmentNotificationRenderer) context.getRenderer()).setModifiedNarrative(modifiedNarrative);
@@ -436,6 +440,8 @@ public class ProposalDevelopmentAbstractsAttachmentsAction extends ProposalDevel
         } else {
             getNotificationService().sendNotification(context);                
         }                
+        }
+	        // KC-778 END 
         }
 
         return forward;
