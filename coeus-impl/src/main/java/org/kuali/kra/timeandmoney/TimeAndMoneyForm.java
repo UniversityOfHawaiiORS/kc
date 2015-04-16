@@ -184,9 +184,9 @@ public class TimeAndMoneyForm extends KcTransactionalDocumentFormBase {
 
     @Override
     protected void setSaveDocumentControl(Map editMode) {
-
         
-    }
+    
+    }    
     
     /**
      * Gets the businessObjectService attribute. 
@@ -725,10 +725,11 @@ public class TimeAndMoneyForm extends KcTransactionalDocumentFormBase {
     public List<ExtraButton> getExtraButtons() {
         // clear out the extra buttons array
         extraButtons.clear();
-        String externalImageURL = Constants.KRA_EXTERNALIZABLE_IMAGES_URI_KEY;
-        String reloadImage = lookupKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "buttonsmall_reload.gif";
+        //KC-363 Move Disapprove button and fix broken image copy of reload button on time and money docs 
+        //String externalImageURL = Constants.KRA_EXTERNALIZABLE_IMAGES_URI_KEY;
+        //String reloadImage = lookupKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "buttonsmall_reload.gif";
         //addExtraButton("methodToCall.reload", reloadImage, "Reload");
-        addExtraButton("methodToCall.reload", reloadImage, null);
+        //addExtraButton("methodToCall.reload", reloadImage, null);
         return extraButtons;
     }
     
