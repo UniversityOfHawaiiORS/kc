@@ -21,6 +21,7 @@
 
 <%--NOTE: DO NOT FORMAT THIS FILE, DISPLAY:COLUMN WILL NOT WORK CORRECTLY IF IT CONTAINS LINE BREAKS --%>
 <c:set var="headerMenu" value="" />
+<!-- KC-755 Remove Organization Lookup from Address Book -->
 <c:set var="boClassName" value="${KualiForm.lookupable.businessObjectClass.name}"/>
 
 <!-- KCIU Customization Starts 
@@ -31,6 +32,7 @@ Suppresses the Create New button on the top right corner-->
     </c:if>
 </c:if>
 <!-- KCIU Customization Ends -->
+<!-- KC-755 END -->
 <c:if test="${!empty KualiForm.backLocation}">
     <c:choose>
      <c:when test="${fn:contains(KualiForm.backLocation,'?')}">
@@ -59,7 +61,7 @@ Suppresses the Create New button on the top right corner-->
       var kualiElements = kualiForm.elements;
     </SCRIPT>
     <script type="text/javascript" src="${pageContext.request.contextPath}/dwr/interface/DocumentTypeService.js"></script>
-	
+
 	<c:if test="${KualiForm.headerBarEnabled}">
 	<div class="headerarea-small" id="headerarea-small">
 		<h1><c:out value="${KualiForm.lookupable.title}" /> <c:choose>
@@ -210,27 +212,39 @@ Suppresses the Create New button on the top right corner-->
 
 			<br>
 			
+			<!-- KC-755 Remove Organization Lookup from Address Book -->
 			<!-- KCIU Customization Starts -->
+			<!-- Origin IU version get's this param from the system (This means ALL lookups are getting this value but only rolodex uses it.
+			     UH version is hard coded link to the help line, no point in parameter overhead for this one it's one hard coded value for our help desk link
 			<c:set var="adminEmail" value='<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN", "All", "LOOKUP_CONTACT_EMAIL")%>' />
+			-->
 			<c:if test="${!empty reqSearchResultsActualSize}" >			
     			<c:choose>
-						<c:when test="${fn:contains(boClassName,'org.kuali.kra.bo.Rolodex') or fn:contains(boClassName,'org.kuali.kra.bo.NonOrganizationalRolodex')}">
+						<c:when test="${fn:contains(boClassName,'org.kuali.kra.bo.NonOrganizationalRolodex')}">
     			    			<!--  Cannot create this by parsing the createNewUrl because NonOrganizationalRolodex is not a maint doc and does not have one-->
-    				  			Can't find what you are looking for? Click <a href="${KRADConstants.MAINTENANCE_ACTION}?businessObjectClassName=org.kuali.kra.bo.Rolodex&methodToCall=start" target="_blank">here</a> to add a new Address Book entry
-    				  			or contact the <a href="mailto:${adminEmail}">System Administrator</a> to add one.
-    				  			<br>
-    				  			<br>
+    				  			Can't find who you are looking for? Contact the <a href=http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/10 target="_blank">ORS Helpline</a> to add someone.<br>
+						</c:when>
+						<c:when test="${fn:contains(boClassName,'org.kuali.kra.bo.Rolodex')}">
+    				  			Can't find what you are looking for? Click <a href="${KRADConstants.MAINTENANCE_ACTION}?businessObjectClassName=org.kuali.kra.bo.Rolodex&methodToCall=start">here</a> to add a new Address Book entry.<br>
 						</c:when>
 				</c:choose>
 			</c:if>
-				
+
 			<!-- KCIU Customization Ends -->
+			<!-- KC-755 END -->
 			
 			<br>
 
 			<c:if test="${reqSearchResultsActualSize > reqSearchResultsLimitedSize && reqSearchResultsLimitedSize>0}">
 				<c:out value="${reqSearchResultsActualSize}" /> items found.  Please refine your search criteria to narrow down your search.
             </c:if>
+            <%-- BEGIN KC-535 If SOLR is down search's result in incident report --%>
+            <c:if test="${solrFailure>0}">
+                <strong>
+				There was an error processing your search.  Please try again.  If the problem persists please contact the <a href=http://www.ors.hawaii.edu/helpline target="_blank">ORS Helpline</a>.
+				</strong>
+            </c:if>
+            <%-- END KC-535 If SOLR is down search's result in incident report --%>
 			<c:if test="${!empty reqSearchResultsActualSize }">
 			    <c:if test="${KualiForm.searchUsingOnlyPrimaryKeyValues}">
 			    	<bean-el:message key="lookup.using.primary.keys" arg0="${KualiForm.primaryKeyFieldLabels}"/>
