@@ -66,7 +66,8 @@
 	    <c:set var = "transparent" value = "true"/>
 	</c:if>
 
-<kul:tab tabTitle="${trunGroupName}" spanForLongTabTitle="true" defaultOpen="false" tabErrorKey="${tabErrorKeys[groups.groupName]}" auditCluster="ynqAuditErrors${fullGroupName}" tabAuditKey="${tabErrorKeys[groups.groupName]}" transparentBackground="${transparent}" useRiceAuditMode="true" >
+<%-- KC-805 Change PD Questions Tab to default all questionnaires as shown --%>
+<kul:tab tabTitle="${trunGroupName}" spanForLongTabTitle="true" defaultOpen="true" tabErrorKey="${tabErrorKeys[groups.groupName]}" auditCluster="ynqAuditErrors${fullGroupName}" tabAuditKey="${tabErrorKeys[groups.groupName]}" transparentBackground="${transparent}" useRiceAuditMode="true" >
 <c:set var="tabErrorKey" value="document.developmentProposalList[0].proposalYnq[${gps.index}]"/>
     <c:set var="proposalYnq" value="document.developmentProposalList[0].proposalYnqs[${gps.index}]" /> 
     <c:set var="transparent" value="false" />
@@ -95,6 +96,12 @@
                     <th scope="row" align="center">${rowIndex}</th>
                     <td width="50%" class="${tdClass}"><div align=left><span class="copy">
                     <bean:write name="KualiForm" property="${iproposalYnq}.ynq.description"/>
+                    <%--UH KC-319 BEGIN - rbl added link to UH Export Controls Policy for Export Control Question #15 --%>
+                    <bean:define id="uhQuestionId" name="KualiForm" property="${iproposalYnq}.ynq.questionId" />
+                    <c:if test="${uhQuestionId == 'EC1'}" >
+                    	<br><a href="http://www.hawaii.edu/apis/ep/e5/e5218.pdf" target="_blank">http://www.hawaii.edu/apis/ep/e5/e5218.pdf</a>
+                    </c:if>
+                    <%--UH KC-319 END--%>
                     <span class="fineprint"><br><br>
                     <bean:write name="KualiForm" property="${iproposalYnq}.reviewDateRequiredDescription"/>
                     <br>
