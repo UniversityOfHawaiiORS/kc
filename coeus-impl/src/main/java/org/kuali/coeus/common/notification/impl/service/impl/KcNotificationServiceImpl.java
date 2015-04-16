@@ -19,6 +19,7 @@
 package org.kuali.coeus.common.notification.impl.service.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -99,8 +100,8 @@ public class KcNotificationServiceImpl implements KcNotificationService {
     private RolodexService rolodexService;
     private ParameterService parameterService;
     private IdentityService identityService;
-    private KcEmailService kcEmailService;
-
+    private KcEmailService kcEmailService;    
+    
     @Override
     public NotificationType getNotificationType(NotificationContext context) {
         return getNotificationType(context.getModuleCode(), context.getActionTypeCode());
@@ -174,8 +175,34 @@ public class KcNotificationServiceImpl implements KcNotificationService {
             String message = notification.getMessage();
             Collection<NotificationRecipient.Builder> notificationRecipients = getNotificationRecipients(context);
     
+            // KC-790 Add ability to disable notification action list generation
+            //        Disable adding notification to action list if configured in parameter
+            //        Parameter should contain comma separated list of action codes
+            String uh_disable_action_list_notification_type_codes = parameterService.getParameterValueAsString(
+                    Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, 
+                    "UH_NOTIFICATION_DISABLE_ACTION_LIST_TYPE_CODES");
+            List disable_action_list_action_codes = null;
+            if (uh_disable_action_list_notification_type_codes != null) {
+            	disable_action_list_action_codes = Arrays.asList(uh_disable_action_list_notification_type_codes.split(","));
+            }
+            if (disable_action_list_action_codes != null && disable_action_list_action_codes.contains(context.getActionTypeCode())) {
+            	LOG.info("Skipping Notification Action List because of UH override param UH_NOTIFICATION_DISABLE_ACTION_LIST_TYPE_CODES for action_code [" + context.getActionTypeCode() + "]");
+            } else {
             sendNotification(contextName, subject, message, notificationRecipients);
+            }
+            String uh_disable_email_notification_type_codes = parameterService.getParameterValueAsString(
+                    Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, 
+                    "UH_NOTIFICATION_DISABLE_EMAIL_TYPE_CODES");
+            List disable_email_action_codes = null;
+            if (uh_disable_email_notification_type_codes != null) {
+            	disable_email_action_codes = Arrays.asList(uh_disable_email_notification_type_codes.split(","));
+            }
+            if (disable_email_action_codes != null && disable_email_action_codes.contains(context.getActionTypeCode())) {
+            	LOG.info("Skipping Notification email because of UH override param UH_NOTIFICATION_DISABLE_EMAIL_TYPE_CODES for action_code [" + context.getActionTypeCode() + "]");
+            } else {
             sendEmailNotification(subject, message, notificationRecipients, context.getEmailAttachments());
+        }
+            // END KC-790
         }
     }
     
