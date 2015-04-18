@@ -76,12 +76,15 @@
       <start name="Initiated" nextNode="isHierarchyChild" />
       <split name="isHierarchyChild">
       <branch name="False">
-        <role name="OSPInitial" nextNode="ProposalPersons" />
-        <role name="ProposalPersons" nextNode="DepartmentRouting" />
-        <requests name="DepartmentRouting" nextNode="CollegeRouting" />
-        <requests name="CollegeRouting" nextNode="PeopleFlows" />
-        <requests name="PeopleFlows" nextNode="OSPOfficeRouting" />
-        <role name="OSPOfficeRouting" nextNode="Join" />
+	        <!-- UH Routing -->
+			<requests name="ProposalPersons" nextNode="PreApprover" />
+			<requests name="PreApprover" nextNode="Initial_FA" />
+			<requests name="Initial_FA" nextNode="Chair" />
+			<requests name="Chair" nextNode="Dean_VC" />
+			<requests name="Dean_VC" nextNode="Final_Unit_Approval" />
+			<requests name="Final_Unit_Approval" nextNode="PeopleFlows" />
+			<requests name="PeopleFlows" nextNode="UH_Central_Final_Approval" />
+			<requests name="UH_Central_Final_Approval" nextNode="Join" />		
       </branch>
       <branch name="True">
         <requests name="WaitForHierarchyDisposition" nextNode="Join" />
@@ -99,37 +102,54 @@
     <split name="isHierarchyChild">
       <type>org.kuali.coeus.sys.framework.workflow.SimpleBooleanSplitNode</type>
     </split>
-    <role name="OSPInitial">
-      <qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass>
-      <activationType>S</activationType>
-      <finalApproval>false</finalApproval>
-    </role>
     <role name="ProposalPersons">
       <qualifierResolver>ProposalPersons-XPathQualifierResolver</qualifierResolver>
       <activationType>P</activationType>
       <finalApproval>false</finalApproval>
     </role>
+ 	<requests name="PreApprover">
+		<activationType>P</activationType>
+		<finalApproval>false</finalApproval>
+		<ruleSelector>Named</ruleSelector>
+		<ruleName>PreApproverRoutingRule</ruleName>
+	</requests>
+	
+	<requests name="Initial_FA">
+		<activationType>P</activationType>
+		<finalApproval>false</finalApproval>
+		<ruleSelector>Named</ruleSelector>
+		<ruleName>InitialFARoutingRule</ruleName>
+	</requests>
+	
+	<requests name="Chair">
+		<activationType>P</activationType>
+		<finalApproval>false</finalApproval>
+		<ruleSelector>Named</ruleSelector>
+		<ruleName>ChairRoutingRule</ruleName>
+	</requests>
+	
+	<requests name="Dean_VC">
+		<activationType>P</activationType>
+		<finalApproval>false</finalApproval>
+		<ruleSelector>Named</ruleSelector>
+		<ruleName>DeanVCRoutingRule</ruleName>
+	</requests>
+	
+	<requests name="Final_Unit_Approval">
+		<activationType>P</activationType>
+		<finalApproval>false</finalApproval>
+		<ruleSelector>Named</ruleSelector>
+		<ruleName>FinalUnitApprovalRoutingRule</ruleName>
+	</requests>
     <requests name="PeopleFlows">
       <activationType>R</activationType>
       <rulesEngine executorClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentRulesEngineExecutorImpl" />
     </requests>
-    <requests name="DepartmentRouting">
-      <activationType>P</activationType>
-      <finalApproval>false</finalApproval>
-      <ruleSelector>Named</ruleSelector>
-      <ruleName>DepartmentRoutingRule</ruleName>
-    </requests>
-    <requests name="CollegeRouting">
-      <activationType>P</activationType>
-      <finalApproval>false</finalApproval>
-      <ruleSelector>Named</ruleSelector>
-      <ruleName>CollegeRoutingRule</ruleName>
-    </requests>
-    <role name="OSPOfficeRouting">
-      <qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass>
-      <activationType>S</activationType>
-      <finalApproval>false</finalApproval>
-    </role>
+    <role name="UH_Central_Final_Approval">
+		<qualifierResolver>UnitNumberRouting-XPathQualifierResolver</qualifierResolver>
+        <activationType>P</activationType>
+		<finalApproval>false</finalApproval>
+	</role>
     <join name="Join" />
     <requests name="WaitForHierarchyDisposition">
       <activationType>S</activationType>
@@ -157,35 +177,77 @@
 	</ruleTemplate>
   </ruleTemplates>
   <rules xmlns="ns:workflow/Rule" xsi:schemaLocation="ns:workflow/Rule resource:Rule">
-
-    <rule>
-      <name>DepartmentRoutingRule</name>
-      <documentType>ProposalDevelopmentDocument</documentType>
-      <ruleTemplate>DepartmentRouting</ruleTemplate>
-      <description>Department Routing</description>
-      <responsibilities>
-        <responsibility>
-          <roleName attributeClassName="co.kuali.coeus.workflow.UnitAdministratorRoleAttribute">Department Head!3!true</roleName>
-          <approvePolicy>A</approvePolicy><!-- A[ll] F[irst] -->
-          <actionRequested>A</actionRequested><!-- F[YI] A[PPROVE] K[NOWLADGE] -->
-        </responsibility>
-      </responsibilities>
-    </rule>
-
-    <rule>
-      <name>CollegeRoutingRule</name>
-      <documentType>ProposalDevelopmentDocument</documentType>
-      <ruleTemplate>CollegeRouting</ruleTemplate>
-      <description>College Routing</description>
-      <responsibilities>
-        <responsibility>
-          <roleName attributeClassName="co.kuali.coeus.workflow.UnitAdministratorRoleAttribute">Dean of College!3!false</roleName>
-          <approvePolicy>A</approvePolicy><!-- A[ll] F[irst] -->
-          <actionRequested>A</actionRequested><!-- F[YI] A[PPROVE] K[NOWLADGE] -->
-        </responsibility>
-      </responsibilities>
-    </rule>
-
+        <rule>
+  			<name>PreApproverRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>PreApproverRoutingTemplate</ruleTemplate>
+			<description>PreApprover Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Initial Approvers!JABSOM:GDO:910|UHMC:Personnel Approver:912|KU:GAO:918</roleName> <!-- [Options]...:[Role;AdminCode]... -->
+					<approvePolicy>F</approvePolicy><!-- A[ll] F[irst] -->
+					<actionRequested>A</actionRequested><!-- F[YI] A[PPROVE] [A]K[NOWLADGE] -->
+				</responsibility>
+			</responsibilities>
+		</rule>	
+	
+		<rule>
+			<name>InitialFARoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>InitialFARoutingTemplate</ruleTemplate>
+			<description>Initial FA Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!FA Approvers!JABSOM,EXT:skip:0|DEFAULT:FA:913</roleName>
+					<approvePolicy>F</approvePolicy><!-- A[ll] F[irst] -->
+					<actionRequested>A</actionRequested><!-- F[YI] A[PPROVE] [A]K[NOWLADGE] -->
+				</responsibility>
+			</responsibilities>
+		</rule>
+		
+		<rule>
+			<name>ChairRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>ChairRoutingTemplate</ruleTemplate>
+			<description>Chair Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Chair Approval!JABSOM,HILO,UHMC,WO,UHMANOA:Chair:914</roleName>
+					<approvePolicy>F</approvePolicy>
+					<actionRequested>A</actionRequested>
+				</responsibility>
+			</responsibilities>
+		</rule>
+		
+		<rule>
+			<name>DeanVCRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>DeanVCRoutingTemplate</ruleTemplate>
+			<description>Dean/Vice Chancellor Routing</description>
+			<responsibilities>
+				<responsibility>
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Dean/Vice Chancellor!UHMC:Vice Chancellor:916|EXT,WO:skip:0|DEFAULT:Dean:915</roleName>
+					<approvePolicy>F</approvePolicy>
+					<actionRequested>A</actionRequested>
+				</responsibility>
+			</responsibilities>
+		</rule>
+		
+		<!-- Mike is looking into moving JABSOM FA with the standard FA level -->
+		<rule>
+			<name>FinalUnitApprovalRoutingRule</name>
+			<documentType>ProposalDevelopmentDocument</documentType>
+			<ruleTemplate>FinalUnitApprovalRoutingTemplate</ruleTemplate>
+			<description>Final Unit Approval Routing</description>
+			<responsibilities>
+				<responsibility>
+				<!-- REQ=Y!Final Unit Approval!JABSOM:FA:913|WO:Chancellor/Vice Chancellor:916,917|HILO:Chancellor:917|UHMC:Chancellor:917|CC:Chancellor:917|DEFAULT:skip:0 -->
+					<roleName attributeClassName="edu.hawaii.proposaldevelopment.document.workflow.UhUnitAdministratorRoleAttribute">REQ=Y!Final Approval!JABSOM:FA:913|WO:Chancellor/Vice Chancellor:916,917|DEFAULT:Chancellor:917|EXT,UHMANOA:skip:0</roleName>
+					<approvePolicy>F</approvePolicy>
+					<actionRequested>A</actionRequested>
+				</responsibility>
+			</responsibilities>
+		</rule>
   </rules>
   
 	<ruleAttributes xmlns="ns:workflow/RuleAttribute" xsi:schemaLocation="ns:workflow/RuleAttribute resource:RuleAttribute">
