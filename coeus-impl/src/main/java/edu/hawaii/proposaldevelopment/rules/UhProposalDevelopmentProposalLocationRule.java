@@ -35,14 +35,15 @@ public class UhProposalDevelopmentProposalLocationRule extends ProposalDevelopme
 			SaveProposalSitesEvent saveProposalSiteEvent) {
 		boolean isValid = super.processSaveProposalSiteBusinessRules(saveProposalSiteEvent);
 
+/* Remove this requirement for KC 6.0 temporary until we decide to keep or not		
 		ProposalDevelopmentDocument document = (ProposalDevelopmentDocument) saveProposalSiteEvent.getDocument();
 		DevelopmentProposal developmentProposal = document.getDevelopmentProposal();
 		ProposalSite performingOrganization = developmentProposal.getPerformingOrganization();
-		
 		if(performingOrganization == null || performingOrganization.getOrganizationId() == null) {
 			isValid = false;
 			this.getErrorReporter().reportError(saveProposalSiteEvent.getErrorPathPrefix(), UhKeyConstants.ERROR_PROPOSAL_SITES_PRIMARY_REQUIRED);
 		}
+*/
 
 		return isValid;
 	}

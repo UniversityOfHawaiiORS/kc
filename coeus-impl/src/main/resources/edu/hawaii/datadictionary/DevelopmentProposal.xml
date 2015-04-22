@@ -4,12 +4,14 @@
         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 	<!-- UH KC-466 make Sponsor Deadline Date and Sponsor Deadline Type fields required on save -->
+<!--  Removing these required fields temporarily in KC 6.0 until we can re-wire the required fields in the UI so user can create proposals with these required fields	
 	<bean id="DevelopmentProposal-deadlineDate" parent="DevelopmentProposal-deadlineDate-parentBean" >
 		<property name="required" value="true" />
 	</bean>
 	<bean id="DevelopmentProposal-deadlineType" parent="DevelopmentProposal-deadlineType-parentBean" >
 		<property name="required" value="true" />
 	</bean>
+-->
 	
 	<!-- KC-598 - Can no longer search for proposal by person full name -->
 	<bean id="DevelopmentProposal" parent="DevelopmentProposal-parentBean">
