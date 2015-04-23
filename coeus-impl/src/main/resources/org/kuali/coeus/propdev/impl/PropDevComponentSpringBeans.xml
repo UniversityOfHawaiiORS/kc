@@ -35,6 +35,11 @@
     <tx:annotation-driven transaction-manager="transactionManager" />
     <context:annotation-config />
     <context:component-scan base-package="org.kuali.coeus.propdev" />
+    <!-- UH Bean Config Start -->
+    <!-- KC-931 KRMS Validation checks for PD are throwing exception in KC6.0 upgrade -->
+    <!-- KC-801 Create KRMS function to return if unrecovered F & A is present in final PD budget...Moved here for KC 6.0 -->
+    <context:component-scan base-package="edu.hawaii.proposaldevelopment.service" />
+    <!-- UH Bean Config End -->
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="properties" value="#{T(org.kuali.rice.core.api.config.property.ConfigContext).getCurrentContextConfig().getProperties()}" />
