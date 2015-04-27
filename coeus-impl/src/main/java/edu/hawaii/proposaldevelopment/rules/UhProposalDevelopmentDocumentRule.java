@@ -23,10 +23,11 @@ import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentRule;
 import org.kuali.coeus.propdev.impl.location.SaveProposalSitesEvent;
-import org.kuali.coeus.s2sgen.api.core.AuditError;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.AuditCluster;
+// KC-933 Turning on PD Audit Rules generates blank screen in KC 6.0 upgrade
+import org.kuali.rice.krad.util.AuditError;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
 
@@ -89,6 +90,8 @@ public class UhProposalDevelopmentDocumentRule extends
 		}
 		//UH KC-515 END
 
+/*   KC-933 Turning on PD Audit Rules generates blank screen in KC 6.0 upgrade
+ *   NOTE: commenting out to see if we still need this fix in new KC6.0 design I don't think we do
 		if (auditErrors.size() > 0) {
 			// KC-569 Abstracts and Attachments listed twice under validation errors
 			AuditCluster proposalAuditWarnings = (AuditCluster) GlobalVariables.getAuditErrorMap().get("proposalAttachmentsAuditWarnings");
@@ -103,6 +106,7 @@ public class UhProposalDevelopmentDocumentRule extends
 			// KC-569 Abstracts and Attachments listed twice under validation errors
 			GlobalVariables.getAuditErrorMap().put("proposalAttachmentsAuditWarnings", proposalAuditWarnings);
 		}
+*/
 
 		return valid;
 	}
