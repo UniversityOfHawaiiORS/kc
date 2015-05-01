@@ -1,3 +1,7 @@
+set define off
+set sqlblanklines on
+spool uh_fix_issues_missed_by_kualico.log
+
 -- KC-934 Unable to edit institutional proposal due to 3 unknown errors
 alter table proposal
    MODIFY (COST_SHARING_INDICATOR varchar(2),
