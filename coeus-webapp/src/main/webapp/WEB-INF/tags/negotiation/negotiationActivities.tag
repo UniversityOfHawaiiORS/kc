@@ -58,8 +58,15 @@ $jq(document).ready(function() {
   <kra-negotiation:negotiationActivity activity="${KualiForm.negotiationActivityHelper.newActivity}" activityIndex="-1" parentTab="Activities & Attachments" tabDivClass="innerTab-h3head" readOnly="false"/>
 </c:if>
 <jsp:useBean id="paramMap" class="java.util.HashMap"/>
+
+<c:set var="tabItemCount" value="0" />
+<c:if test="${!empty KualiForm.negotiationDocument.negotiation.activities}">
+    <c:forEach var="activity" items="${KualiForm.negotiationDocument.negotiation.activities}" varStatus="status">
+        <c:set var="tabItemCount" value="${tabItemCount+1}" />
+    </c:forEach>
+</c:if>
 <!-- KC-814 Default tab to open to make data entry easier -->
-<kul:innerTab parentTab="Activities & Attachments" tabTitle="Activities" defaultOpen="true" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
+<kul:innerTab parentTab="Activities & Attachments" tabTitle="Activities" tabItemCount="${tabItemCount}" defaultOpen="true" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
   <table>
    <tr>
     <th style="text-align: right; width: 5em;">Sort By:</th>
@@ -97,14 +104,20 @@ $jq(document).ready(function() {
 <!-- KC-856 Hide entire activity if restricted and user can not view restricted -->
 <!-- Not sure how to limit this one to show all except for restricted so hide the section from those not authorized -->
 <c:if test="${KualiForm.editingMode['view_unrestricted']}">
-<kul:innerTab parentTab="Activities & Attachments" tabTitle="Activity/Location History" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
+    <kul:innerTab parentTab="Activities & Attachments" tabTitle="Activity/Location History" tabItemCount="${tabItemCount}" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
 	<kra-negotiation:negotiationActivityHistory/>
 </kul:innerTab>
 </c:if>
 <!-- END KC-856 -->
 
+<c:set var="tabItemCount" value="0" />
+<c:if test="${!empty KualiForm.negotiationActivityHelper.allAttachments}">
+    <c:forEach var="allAttachment" items="${KualiForm.negotiationActivityHelper.allAttachments}" varStatus="status">
+        <c:set var="tabItemCount" value="${tabItemCount+1}" />
+    </c:forEach>
+</c:if>
 
-<kul:innerTab parentTab="Activities & Attachments" tabTitle="All Attachments" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
+<kul:innerTab parentTab="Activities & Attachments" tabTitle="All Attachments" tabItemCount="${tabItemCount}" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
   <table>
    <tr>
     <th style="text-align: right; width: 5em;">Sort By:</th>
@@ -151,7 +164,13 @@ $jq(document).ready(function() {
   </table>
 </kul:innerTab>
 
-<kul:innerTab parentTab="Activities & Attachments" tabTitle="Notifications" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
+<c:if test="${!empty KualiForm.negotiationDocument.negotiation.negotiationNotifications}">
+    <c:forEach var="notifications" items="${KualiForm.negotiationDocument.negotiation.negotiationNotifications}" varStatus="status">
+        <c:set var="tabItemCount" value="${tabItemCount+1}" />
+    </c:forEach>
+</c:if>
+
+<kul:innerTab parentTab="Activities & Attachments" tabTitle="Notifications" tabItemCount="${tabItemCount}" defaultOpen="false" useCurrentTabIndexAsKey="true" overrideDivClass="innerTab-h3head">
 	<kra-negotiation:negotiationNotifications/>
 </kul:innerTab>
 
