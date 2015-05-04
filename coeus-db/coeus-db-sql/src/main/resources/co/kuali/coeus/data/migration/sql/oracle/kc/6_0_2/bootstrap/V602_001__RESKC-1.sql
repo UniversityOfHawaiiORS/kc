@@ -72,27 +72,28 @@ ALTER TABLE BUDGET_SUB_AWARDS
     REFERENCES FILE_DATA (ID)
 /
 
+DECLARE
+    CURSOR cur IS SELECT XML_DATA_ID, SUB_AWARD_NUMBER FROM BUDGET_SUB_AWARDS where XML_DATA_ID is not null;
+    content CLOB;
+BEGIN
+    FOR rec IN cur
+    LOOP
+        EXECUTE IMMEDIATE 'SELECT SUB_AWARD_XML_FILE FROM BUDGET_SUB_AWARDS where sub_award_number = ' || rec.sub_award_number || ' and xml_data_id = ''' || rec.xml_data_id || ''' ' INTO content;
+    IF content IS NOT NULL THEN
+EXECUTE IMMEDIATE 'INSERT INTO FILE_DATA (SELECT XML_DATA_ID, clob_to_blob(SUB_AWARD_XML_FILE) FROM BUDGET_SUB_AWARDS where sub_award_number = ' || rec.sub_award_number || ' and xml_data_id = ''' || rec.xml_data_id || ''')';
+    END IF;
+    END LOOP;
+END;
+/
+
+-- RRG this fails because null records still get inserted....I need to analyze this condition more.
+-- Gayathri asked me to move after the loop processing
 ALTER TABLE BUDGET_SUB_AWARDS
     ADD CONSTRAINT FK3_BUDGET_SUB_AWARDS
     FOREIGN KEY (XML_DATA_ID)
     REFERENCES FILE_DATA (ID)
 /
 
-
-DECLARE
-         CURSOR cur IS SELECT SUB_AWARD_NUMBER FROM BUDGET_SUB_AWARDS;
-    content CLOB;
-BEGIN
-    FOR rec IN cur
-    LOOP
-        EXECUTE IMMEDIATE 'SELECT SUB_AWARD_XML_FILE FROM BUDGET_SUB_AWARDS where sub_award_number = ' || rec.sub_award_number INTO content;
-
-    IF content IS NOT NULL THEN
-            EXECUTE IMMEDIATE 'INSERT INTO FILE_DATA (SELECT XML_DATA_ID, clob_to_blob2(SUB_AWARD_XML_FILE) FROM BUDGET_SUB_AWARDS where sub_award_number = ' || rec.sub_award_number || ')';
-    END IF;
-    END LOOP;
-END;
-/
 
 ALTER TABLE BUDGET_SUB_AWARDS DROP COLUMN SUB_AWARD_XFD_FILE
 /
