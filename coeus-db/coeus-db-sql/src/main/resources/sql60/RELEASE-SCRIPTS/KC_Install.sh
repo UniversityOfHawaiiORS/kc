@@ -380,14 +380,26 @@ case "${dbtype}" in
         cd ../..
 
         # ADDED STEPS RRG to make upgrades easier
-        # Process 6.0.x scripts which KualiCo is no longer supporing in these install scripts.
+        # Process upgrade scripts which KualiCo is no longer supporing in these install scripts.
         cd ../../co/kuali/coeus/data/migration/sql/oracle
-        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 601_oracle_rice_upgrade.sql
+
+        # Update to 6.0.1
+        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 601_oracle_kc_rice_server_upgrade.sql
         sqlplus "${un}"/"${pw}${DBSvrNm}" < 601_oracle_kc_upgrade.sql
+
+        # Update to 1504.3
+        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 1504_oracle_kc_rice_server_upgrade.sql
+        sqlplus "${un}"/"${pw}${DBSvrNm}" < 1504_oracle_kc_upgrade.sql
+
+        # Run UH fixes for issues found
+        sqlplus "${un}"/"${pw}${DBSvrNm}" < uh_fix_issues_missed_by_kualico.sql
+
         mv *.log ../../../../../../../sql60/RELEASE-SCRIPTS/LOGS
         cd ../../../../../../../sql60/RELEASE-SCRIPTS
         # Move logs folder so running for more than one schema will create multiple log folders
         mv LOGS "LOGS.${un}" ;;
+
+        # ADDED STEPS RRG DONE
         
 		
 	"MYSQL")

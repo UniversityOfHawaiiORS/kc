@@ -107,6 +107,10 @@
       <activationType>P</activationType>
       <finalApproval>false</finalApproval>
     </role>
+    <requests name="PeopleFlows">
+      <activationType>R</activationType>
+      <rulesEngine executorClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentRulesEngineExecutorImpl" />
+    </requests>
  	<requests name="PreApprover">
 		<activationType>P</activationType>
 		<finalApproval>false</finalApproval>
@@ -141,12 +145,8 @@
 		<ruleSelector>Named</ruleSelector>
 		<ruleName>FinalUnitApprovalRoutingRule</ruleName>
 	</requests>
-    <requests name="PeopleFlows">
-      <activationType>R</activationType>
-      <rulesEngine executorClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentRulesEngineExecutorImpl" />
-    </requests>
     <role name="UH_Central_Final_Approval">
-		<qualifierResolver>UnitNumberRouting-XPathQualifierResolver</qualifierResolver>
+		<qualifierResolver>UH_Final_Approval-XPathQualifierResolver</qualifierResolver>
         <activationType>P</activationType>
 		<finalApproval>false</finalApproval>
 	</role>
@@ -409,6 +409,19 @@
 			<resolverConfig>
 				<attributes name="proposal">
 					<xPathExpression>//document/developmentProposal/proposalNumber</xPathExpression>
+				</attributes>
+			</resolverConfig>
+		</ruleAttribute>
+		<ruleAttribute>
+			<name>UH_Final_Approval-XPathQualifierResolver</name>
+			<className>org.kuali.rice.kew.role.XPathQualifierResolver</className>
+			<label>UH_Final_Approval-XPathQualifierResolver</label>
+			<description>UH_Final_Approval-XPathQualifierResolver</description>
+			<type>QualifierResolver</type>
+			<serviceNamespace>KC</serviceNamespace>
+			<resolverConfig>
+				<attributes name="unitNumber">
+					<xPathExpression>//document/developmentProposal/ownedByUnitNumber</xPathExpression>
 				</attributes>
 			</resolverConfig>
 		</ruleAttribute>
