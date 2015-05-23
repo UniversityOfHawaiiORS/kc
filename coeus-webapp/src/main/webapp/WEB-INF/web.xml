@@ -27,7 +27,7 @@
     <!-- Rice content Start -->
     <context-param>
         <param-name>environment</param-name>
-        <param-value>dev60</param-value>
+        <param-value>mygrant</param-value>
     </context-param>
 
     <!-- Change this if you want to use a different Spring file -->
