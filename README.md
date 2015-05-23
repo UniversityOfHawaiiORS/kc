@@ -85,3 +85,9 @@ Kuali Coeus supports MySQL 5.5, 5.6 and Oracle. We recommend MySQL 5.6 though as
   [5]: http://git-scm.com/downloads
   [6]: http://mvnrepository.com/artifact/org.springframework/spring-instrument/3.2.12.RELEASE
 
+All the data needed to run Kuali Coeus is located in the coeus-db module.  They are conveniently divided into jar modules
+to support any automated sql processes you may have.  The coeus-db-sql project contains sequenced sql and java files
+that can build a database from scratch.  See the README file for more information.  The coeus-db-xml contains all
+Kuali Coeus and Rice KEW configuration files.  These contains all the KEW files for a complete KEW configuration.
+
+
