@@ -1,0 +1,38 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -o verbose
+
+
+# check java version
+
+# build rice from proper branch
+#/path/to/rice$ JAVA_OPTS="-Xmx2g -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC" mvn clean install 
+
+# build coeus-api
+
+# build coeus-s2sgen
+
+# make sure oracle driver is in .m2 repo (ron added oracle dependency to kc pom.xml)
+
+# copy kc-config.xml to ~kuali/main/dev60 and modify where needed
+
+# make sure VPN or ssh tunnel is set up for db access
+
+# build kc
+MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC" mvn -DskipTests -Dmaven.test.skip=true clean install 
+
+# or only build impl and webapp to save time...
+#/path/to/kc$ JAVA_OPTS="-Xmx2g -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC" mvn -DskipTests -Dmaven.test.skip=true clean install -pl coeus-impl,coeus-webapp
+
+# start coeus-webapp via jetty server
+#cd coeus-webapp 
+#MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Doracle.jdbc.Trace=true -javaagent:/home/jlolofie/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
+./start
+
+# debug via jetty cmd line
+#/path/to/kc/coeus-webapp/$ MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=y" mvn jetty:run
+
+
