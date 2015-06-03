@@ -7,6 +7,16 @@ set -o verbose
 
 cd coeus-webapp 
 
-MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Doracle.jdbc.Trace=true -javaagent:/home/jlolofie/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
+# start without remote debug
+#MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Doracle.jdbc.Trace=true -javaagent:/home/jlolofie/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
+
+
+# debug via jetty cmd line
+# old way:
+#/path/to/kc/coeus-webapp/$ MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=y" mvn jetty:run
+
+# debug via jetty cmd line
+# new way after instrumentation error:
+MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Xdebug -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=y -javaagent:/home/jlolofie/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
 
 
