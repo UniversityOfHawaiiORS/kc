@@ -126,7 +126,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                         </list>
                     </property>
                 </bean>
-                <bean parent="Uif-Link" p:href="../portal.do"
+                <bean parent="Uif-Link" p:href="@{#ConfigProperties['application.url']}/portal.do"
                     p:wrapperCssClasses="pull-right" p:target="_new"
                     p:linkText="SYSTEM ADMIN PORTAL" p:order="50"/>
             </list>
@@ -266,9 +266,13 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                       p:actionUrl.viewId="AllDevelopmentProposals-LookupViewId"
                       p:actionUrl.methodToCall="search"
                       p:actionParameters="viewName:AllLookupableDevelopmentProposals-LookupViewName,investigator=@{#userSession == null ? '' : #userSession.getPerson().getFirstName()+'*'+#userSession.getPerson().getLastName()}"
-                      p:actionUrl.controllerMapping="/lookup" p:order="30"   /> 	
-		        <bean parent="Uif-MenuAction" p:actionLabel="Create Proposal For S2S Opportunity"
-                      p:order="40" />
+                      p:actionUrl.controllerMapping="/lookup" p:order="30"   />
+                <bean parent="Uif-MenuAction" p:actionLabel="Create Proposal For S2S Opportunity"
+                      p:actionUrl.baseUrl="@{#ConfigProperties['application.url']}/kr-krad"
+                      p:actionUrl.viewId="S2sOpportunity-CreateProposalLookupView"
+                      p:actionUrl.methodToCall="search"
+                      p:actionUrl.controllerMapping="/lookup" p:order="40"   />
+
                 <bean parent="Uif-SimpleHeaderFour" p:headerText="Lists"
                       p:order="50"/>
                 <bean parent="Uif-MenuAction" p:actionLabel="Search Proposals"
@@ -671,17 +675,13 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </map>
                     </property>
                 </bean>
-                <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
-                      p:actionLabel="Grants.gov Opportunity Lookup" p:order="20" >
-                    <property name="actionUrl.requestParameters">
-                        <map>
-                            <entry key="href"
 
-                                   value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.coeus.propdev.impl.s2s.S2sOpportunity&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
+                <bean parent="Uif-MenuAction" p:actionLabel="Grants.gov Opportunity Lookup"
+                      p:actionUrl.baseUrl="@{#ConfigProperties['application.url']}/kr-krad"
+                      p:actionUrl.viewId="S2sOpportunity-LookupView"
+                      p:actionUrl.methodToCall="search"
+                      p:actionUrl.controllerMapping="/lookup" p:order="20"   />
 
-                        </map>
-                    </property>
-                </bean>
                 <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
                       p:actionLabel="Reporting" p:order="30" >
                     <property name="actionUrl.requestParameters">
@@ -820,7 +820,7 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                                 <property name="actionUrl.requestParameters">
                                     <map>
                                         <entry key="href"
-                                                value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.kra.institutionalproposal.proposallog.ProposalLog&amp;docFormKey=88888888&amp;includeCustomActionUrls=true&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView?forInstitutionalProposal&amp;hideReturnLink=true&amp;showMaintenanceLinks=true&amp;refreshCaller=cancel"/>
+                                                value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.kra.institutionalproposal.proposallog.ProposalLog&amp;docFormKey=88888888&amp;includeCustomActionUrls=true&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;showMaintenanceLinks=true&amp;hideReturnLink=true&amp;forInstitutionalProposal=true&amp;refreshCaller=cancel"/>
                                     </map>
                                 </property> 
                             </bean>
@@ -1198,18 +1198,12 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </map>
                     </property>
                 </bean>
-                <bean parent="Kc-Header-IframeMenuAction"
-                      p:actionUrl.viewId="Kc-Header-IframeView" p:actionLabel="Grants.gov Opportunity Lookup"
-                      p:order="20">
-                    <property name="actionUrl.requestParameters">
-                        <map>
-                            <entry key="href"
 
-                                   value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.coeus.propdev.impl.s2s.S2sOpportunity&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
-
-                        </map>
-                    </property>
-                </bean>
+                <bean parent="Uif-MenuAction" p:actionLabel="Grants.gov Opportunity Lookup"
+                      p:actionUrl.baseUrl="@{#ConfigProperties['application.url']}/kr-krad"
+                      p:actionUrl.viewId="S2sOpportunity-LookupView"
+                      p:actionUrl.methodToCall="search"
+                      p:actionUrl.controllerMapping="/lookup" p:order="20"   />
 
                 <bean parent="Kc-Header-IframeMenuAction"
                       p:actionUrl.viewId="Kc-Header-IframeView" p:actionLabel="Address Book"
@@ -1443,6 +1437,7 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
             <list>
                 <bean parent="Kc-Header-Reports-AwardReports" p:order="10"/>
                 <bean parent="Kc-Header-Reports-ProposalReports" p:order="20"/>
+                <bean parent="Kc-Header-Reports-AdHoc" p:order="30"/>
             </list>
         </property>
     </bean>
@@ -1453,23 +1448,23 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
 		<property name="items">
 			<list>
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=Active_Awards"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=Active_Awards"
 					p:target="reportWindow" p:linkText="Active Awards" p:order="10" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=AwardsByPI"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=AwardsByPI"
 					p:target="reportWindow" p:linkText="Awards by PI" p:order="20" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=AwardsBySponsor"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=AwardsBySponsor"
 					p:target="reportWindow" p:linkText="Awards by Sponsor" p:order="30" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=Awards_By_Sponsor_Type"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=Awards_By_Sponsor_Type"
 					p:target="reportWindow" p:linkText="Awards by Sponsor Type"
 					p:order="40" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=AwardsByAwardType"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=AwardsByAwardType"
 					p:target="reportWindow" p:linkText="Awards by Award Type" p:order="50" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=AWARDS_BY_START_DATE"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=AWARDS_BY_START_DATE"
 					p:target="reportWindow" p:linkText="Awards by Notice Date" p:order="60" />
 
 			</list>
@@ -1481,24 +1476,36 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
 		<property name="items">
 			<list>
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=ProposalsBySponsor"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=ProposalsBySponsor"
 					p:target="reportWindow" p:linkText="Institutional Proposals by Sponsor"
 					p:order="10" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=ProposalbyProposaType"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=ProposalbyProposaType"
 					p:target="reportWindow" p:linkText="Institutional Proposals by Proposal Type"
 					p:order="20" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=InvestigatorHistory"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=InvestigatorHistory"
 					p:target="reportWindow" p:linkText="Investigator Proposal History"
 					p:order="30" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=FundingStatus"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=FundingStatus"
 					p:target="reportWindow" p:linkText="Funding Status" p:order="40" />
 				<bean parent="Uif-Link"
-					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?awardId=PendingProposals"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do?reportId=PendingProposals"
 					p:target="reportWindow" p:linkText="Institutional Proposals By Lead Unit"
 					p:order="50" />
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="Kc-Header-Reports-AdHoc" parent="Kc-Header-Reports-AdHoc-parentBean" />
+	<bean id="Kc-Header-Reports-AdHoc-parentBean" abstract="true"
+		parent="Uif-MenuList" p:headerText="Ad Hoc Reports">
+		<property name="items">
+			<list>
+				<bean parent="Uif-Link"
+					p:href="@{#ConfigProperties['application.url']}/displayExternalReport.do"
+					p:target="reportWindow" p:linkText="Ad Hoc Report List" p:order="10" />
 			</list>
 		</property>
 	</bean>

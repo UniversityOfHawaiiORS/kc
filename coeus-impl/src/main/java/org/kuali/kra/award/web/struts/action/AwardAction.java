@@ -186,17 +186,19 @@ public class AwardAction extends BudgetParentActionBase {
         
         AwardDocument awardDocument = (AwardDocument) awardForm.getDocument();
         //check to see if this document might be a part of an active award sync(if it is lock it)
-        AwardDocument parentSyncAward = 
-            getAwardSyncService().getAwardLockingHierarchyForSync(awardDocument, GlobalVariables.getUserSession().getPrincipalId()); 
-        if (parentSyncAward != null) {
-            KNSGlobalVariables.getMessageList().add("error.award.awardhierarchy.sync.locked", parentSyncAward.getDocumentNumber());
-            awardForm.setViewOnly(true);
+        if (awardForm.getMethodToCall().equals("docHandler")){
+            AwardDocument parentSyncAward = 
+                    getAwardSyncService().getAwardLockingHierarchyForSync(awardDocument, GlobalVariables.getUserSession().getPrincipalId()); 
+            if (parentSyncAward != null) {
+                KNSGlobalVariables.getMessageList().add("error.award.awardhierarchy.sync.locked", parentSyncAward.getDocumentNumber());
+                awardForm.setViewOnly(true);
+            }
+            setBooleanAwardInMultipleNodeHierarchyOnForm (awardDocument.getAward());
+            awardForm.initializeFormOrDocumentBasedOnCommand();
+            setBooleanAwardHasTandMOrIsVersioned(awardDocument.getAward());
+            setSubAwardDetails(awardDocument.getAward());
+            handlePlaceHolderDocument(awardForm, awardDocument);
         }
-        handlePlaceHolderDocument(awardForm, awardDocument);
-        awardForm.initializeFormOrDocumentBasedOnCommand();
-        setBooleanAwardInMultipleNodeHierarchyOnForm (awardDocument.getAward());
-        setBooleanAwardHasTandMOrIsVersioned(awardDocument.getAward());
-        setSubAwardDetails(awardDocument.getAward());
         return forward;
     }
 
@@ -464,25 +466,17 @@ public class AwardAction extends BudgetParentActionBase {
 
     /**
      * This method returns the award associated with the AwardDocument on the AwardForm
-     * @return
      */
     protected Award getAward(ActionForm form) {
         return getAwardDocument(form).getAward(); 
     }
-    
-    /**
-     * This method returns the AwardDocument
-     * 
-     * @param form
-     * @return
-     */
+
     protected AwardDocument getAwardDocument(ActionForm form) {
         return ((AwardForm) form).getAwardDocument();
     }
     
     /**
      * This method sets an award number on an award if the award number hasn't been initialized yet.
-     * @param award
      */
     protected void checkAwardNumber(Award award) {
         if (Award.DEFAULT_AWARD_NUMBER.equals(award.getAwardNumber())) {
@@ -525,16 +519,12 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      * 
      * This method is a helper method to retrieve AwardNumberService.
-     * @return
      */
     protected AwardNumberService getAwardNumberService() {
         return KcServiceLocator.getService(AwardNumberService.class);
     }
     
     /**
-     * @see org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase#initialDocumentSave(org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase)
-     *
-     * TODO JF: Handle initial save
      * 
      * One of these conditions exist when this method is called:
        1) This is a new award, created from the "Create Award" portal action. A new root node needs to be created
@@ -580,7 +570,6 @@ public class AwardAction extends BudgetParentActionBase {
      *
      * This method populates the initial static AwardCloseout reports upon the creation of an Award.
      *
-     * @param form
      */
     protected void populateStaticCloseoutReports(AwardForm form){
         CloseoutReportTypeValuesFinder closeoutReportTypeValuesFinder = new CloseoutReportTypeValuesFinder();
@@ -605,8 +594,7 @@ public class AwardAction extends BudgetParentActionBase {
         if (StringUtils.isNotEmpty(leadUnitNumber) && checkNoMoreThanOnePI(awardDocument.getAward())) {
             String userId = GlobalVariables.getUserSession().getPrincipalId();
             UnitAuthorizationService authService = KcServiceLocator.getService(UnitAuthorizationService.class);
-            //List<Unit> userUnits = authService.getUnits(userId, Constants.MODULE_NAMESPACE_AWARD, AwardPermissionConstants.CREATE_AWARD.getAwardPermission());
-            return authService.hasMatchingQualifiedUnits(userId, Constants.MODULE_NAMESPACE_AWARD, 
+            return authService.hasMatchingQualifiedUnits(userId, Constants.MODULE_NAMESPACE_AWARD,
                     AwardPermissionConstants.MODIFY_AWARD.getAwardPermission(), leadUnitNumber);
         }
         return false; 
@@ -625,8 +613,6 @@ public class AwardAction extends BudgetParentActionBase {
         }
         boolean valid = piCount <= 1;
         if (!valid) {
-            //projectPersonnelBean.contactRoleCode
-            //projectPersonnelBean.projectPersonnel[0].contactRoleCode
             for (String field  : fields) {
                 GlobalVariables.getMessageMap().putError(field, AwardProjectPersonsSaveRule.ERROR_AWARD_PROJECT_PERSON_MULTIPLE_PI_EXISTS);
             }
@@ -647,9 +633,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method builds the string for the ActionForward
-     * @param forwardPath
-     * @param docIdRequestParameter
-     * @return
      */
     public String buildForwardStringForActionListCommand(String forwardPath, String docIdRequestParameter){
         StringBuilder sb = new StringBuilder();
@@ -665,18 +648,14 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Awards tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward home(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
         AwardForm awardForm = (AwardForm) form;
         AwardDocument awardDocument = (AwardDocument) awardForm.getDocument();
-        setBooleanAwardInMultipleNodeHierarchyOnForm (awardDocument.getAward());
+        setBooleanAwardInMultipleNodeHierarchyOnForm(awardDocument.getAward());
         setBooleanAwardHasTandMOrIsVersioned(awardDocument.getAward());
+        setSubAwardDetails(awardDocument.getAward());
         AwardAmountInfoService awardAmountInfoService = KcServiceLocator.getService(AwardAmountInfoService.class);
         int index = awardAmountInfoService.fetchIndexOfAwardAmountInfoWithHighestTransactionId(awardDocument.getAward().getAwardAmountInfos());
         
@@ -732,11 +711,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Contacts tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward contacts(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         Award award = getAward(form);
@@ -749,11 +723,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Commitments tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward commitments(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
@@ -975,14 +944,7 @@ public class AwardAction extends BudgetParentActionBase {
     /*
      * 
      * This method creates a transactionDetail object and adds it to the list for persistence later.
-     * 
-     * @param sourceAwardNumber
-     * @param destinationAwardNumber
-     * @param sequenceNumber
-     * @param pendingTransaction
-     * @param currentAwardNumber
-     * @param documentNumber
-     * @param transactionDetailItems
+     *
      */
     protected TransactionDetail addTransactionDetails(String sourceAwardNumber, String destinationAwardNumber, Integer sequenceNumber, String documentNumber, 
             String commentsString, Award rootAward){
@@ -1122,8 +1084,6 @@ public class AwardAction extends BudgetParentActionBase {
 
     /**
      * This method tests if the award is new by checking the size of AwardDirectFandADistributions on the Award.
-     * @param awardForm
-     * @return
      */
     public boolean isNewAward(AwardForm awardForm) {
         return awardForm.getAwardDocument().getAward().getAwardDirectFandADistributions().size() == 0;
@@ -1132,7 +1092,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method is a helper method to retrieve AwardSponsorTermService.
-     * @return
      */
     protected AwardDirectFandADistributionService getAwardDirectFandADistributionService() {
         return KcServiceLocator.getService(AwardDirectFandADistributionService.class);
@@ -1141,11 +1100,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Payment, Reports and Terms tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     @SuppressWarnings("all")
     public ActionForward paymentReportsAndTerms(ActionMapping mapping, ActionForm form
@@ -1182,7 +1136,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method is a helper method to retrieve AwardSponsorTermService.
-     * @return
      */
     protected AwardSponsorTermService getAwardSponsorTermService() {
         return KcServiceLocator.getService(AwardSponsorTermService.class);
@@ -1191,11 +1144,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Special Review tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward specialReview(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
@@ -1206,11 +1154,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Special Review tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward customData(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
@@ -1222,11 +1165,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Custom Data tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward questions(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
@@ -1236,11 +1174,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Questions tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward permissions(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
@@ -1251,11 +1184,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Permissions tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward notesAndAttachments(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
@@ -1268,11 +1196,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
     *
     * This method gets called upon navigation to Medusa tab.
-    * @param mapping
-    * @param form
-    * @param request
-    * @param response
-    * @return
     */
    public ActionForward medusa(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
        AwardForm awardForm = (AwardForm) form;
@@ -1290,11 +1213,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Award Actions tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */ 
     public ActionForward awardActions(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1317,11 +1235,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method gets called upon navigation to Awards tab.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward budgets(ActionMapping mapping, ActionForm form
             , HttpServletRequest request, HttpServletResponse response) {
@@ -1329,36 +1242,26 @@ public class AwardAction extends BudgetParentActionBase {
         getAwardBudgetService().populateBudgetLimitSummary(awardForm.getBudgetLimitSummary(), awardForm.getAwardDocument().getAward());
         return mapping.findForward(Constants.MAPPING_AWARD_BUDGET_VERSIONS_PAGE);
     }
-    
-    /**
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @param awardForm
-     * @return
-     * @throws Exception
-     */
+
     ActionForward handleDocument(ActionMapping mapping, ActionForm form, HttpServletRequest request,
                                   HttpServletResponse response, AwardForm awardForm) throws Exception {
 
-        ActionForward forward = null;
-        
+        ActionForward forward;
+
         String command = awardForm.getCommand();
         if (KewApiConstants.ACTIONLIST_INLINE_COMMAND.equals(command)) {
             loadDocumentInForm(request, awardForm);
-            String docIdRequestParameter = request.getParameter(KRADConstants.PARAMETER_DOC_ID);
             ActionForward baseForward = mapping.findForward(Constants.MAPPING_COPY_PROPOSAL_PAGE);
             forward = new ActionForward(buildForwardStringForActionListCommand(
                     baseForward.getPath(),awardForm.getDocument().getDocumentNumber()));
         } else if (Constants.MAPPING_AWARD_ACTIONS_PAGE.equals(command)) {
             loadDocument(awardForm);
+            forward = awardActions(mapping, awardForm, request, response);
+        } else if (Constants.MAPPING_AWARD_BUDGET_VERSIONS_PAGE.equals(command)) {
+            loadDocument(awardForm);
+            forward = budgets(mapping,awardForm,request,response);
         } else {
             forward = super.docHandler(mapping, form, request, response);
-        }
-
-        if (Constants.MAPPING_AWARD_ACTIONS_PAGE.equals(command)) {
-            forward = awardActions(mapping, awardForm, request, response);
         }
         
         return forward;
@@ -1367,7 +1270,9 @@ public class AwardAction extends BudgetParentActionBase {
     protected void loadDocument(KualiDocumentFormBase kualiForm) throws WorkflowException {
         super.loadDocument(kualiForm);
         Award award = ((AwardForm) kualiForm).getAwardDocument().getAward();
-        award.setSponsorNihMultiplePi(getSponsorHierarchyService().isSponsorNihMultiplePi(award.getSponsorCode()));
+        if (!((AwardForm) kualiForm).getAwardDocument().isPlaceHolderDocument()) {
+        	award.setSponsorNihMultiplePi(getSponsorHierarchyService().isSponsorNihMultiplePi(award.getSponsorCode()));
+        }
     }
    
    /**
@@ -1392,7 +1297,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      *
      * This method is a helper method to retrieve KualiRuleService.
-     * @return
      */
     protected KualiRuleService getKualiRuleService() {
         return KcServiceLocator.getService(KualiRuleService.class);
@@ -1415,13 +1319,7 @@ public class AwardAction extends BudgetParentActionBase {
      * and the map to indicate if confirmation is necessary from the user before
      * a particular scope is synchronized and then forwards to the method the handles
      * the request loop.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     *
      */
     public ActionForward syncAwardTemplate(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) throws Exception{
@@ -1503,13 +1401,7 @@ public class AwardAction extends BudgetParentActionBase {
     
     /**
      * This method sets up a full template sync.  This is called on return from a Sponsor Template Lookup.
-     * 
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
+     *
      */
     public ActionForward fullSyncToAwardTemplate(ActionMapping mapping, ActionForm form,
             HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1684,7 +1576,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      * Parses the method to call attribute to pick off the scopes to sync.
      *
-     * @param request
      * @return returns the colon delimited list of scopes.  
      */
     protected String getSyncScopesString(HttpServletRequest request) {
@@ -1735,16 +1626,6 @@ public class AwardAction extends BudgetParentActionBase {
      * This should be called when an add or delete action is called that might be added to the sync queue.
      * It checks to ensure that syncMode is already enabled and will return an ActionForward for
      * the question or for the returnForward specified by the caller.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @param syncType
-     * @param object
-     * @param attrName
-     * @param returnForward
-     * @return
-     * @throws Exception
      */
     protected ActionForward confirmSyncAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response,
             AwardSyncType syncType, PersistableBusinessObject object, String awardAttrName, String attrName, ActionForward returnForward) 
@@ -1763,14 +1644,6 @@ public class AwardAction extends BudgetParentActionBase {
      * This should be called when a group add or delete action is called that might be added to the sync queue.
      * It checks to ensure that syncMode is already enabled and will return an ActionForward for
      * the question or for the returnForward specified by the caller.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @param pendingChanges
-     * @param returnForward
-     * @return
-     * @throws Exception
      */
     protected ActionForward confirmSyncAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response,
             List<AwardSyncPendingChangeBean> pendingChanges, ActionForward returnForward) 
@@ -1788,12 +1661,6 @@ public class AwardAction extends BudgetParentActionBase {
     /**
      * When synchronizing a new addition or deletion call this method. It will confirm the change
      * and then add the change.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
-     * @throws Exception
      */
     public ActionForward syncActionCaller(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) 
         throws Exception {
@@ -1817,11 +1684,6 @@ public class AwardAction extends BudgetParentActionBase {
     
     /**
      * If the user answers yes to a confirm sync action question call this method.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward confirmSyncAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         AwardForm awardForm = (AwardForm) form;
@@ -1831,11 +1693,6 @@ public class AwardAction extends BudgetParentActionBase {
     
     /**
      * If the user answers no to a confirm sync action question call this method.
-     * @param mapping
-     * @param form
-     * @param request
-     * @param response
-     * @return
      */
     public ActionForward refuseSyncAction(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         AwardForm awardForm = (AwardForm) form;
@@ -1860,13 +1717,14 @@ public class AwardAction extends BudgetParentActionBase {
     
     /**
      * @see org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase#populateAuthorizationFields(org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase)
-     * If Award Infos or dates have been edited in a T&M document, then we want to suppress the cancel action.
+     * If Award Infos or dates have been edited in a T&amp;M document, then we want to suppress the cancel action.
      */
     @SuppressWarnings("unchecked")
     @Override
     protected void populateAuthorizationFields(KualiDocumentFormBase formBase) {
-        super.populateAuthorizationFields(formBase);
+        
         AwardForm awardForm = (AwardForm) formBase;
+        super.populateAuthorizationFields(formBase);
         AwardDocument awardDocument = awardForm.getAwardDocument();
         Award award = awardDocument.getAward();
         Map documentActions = formBase.getDocumentActions();
@@ -1899,7 +1757,6 @@ public class AwardAction extends BudgetParentActionBase {
     }
     /**
      * This method will populate the subawards  if award is added as a funding source to perticular subaward
-     * @param award
      */
     protected void setSubAwardDetails(Award award){
         award.setSubAwardList(getSubAwardService().getLinkedSubAwards(award));

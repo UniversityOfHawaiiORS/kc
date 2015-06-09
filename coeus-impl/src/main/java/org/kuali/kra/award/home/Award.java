@@ -99,17 +99,13 @@ import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
 
-/**
- * 
- * This class is Award Business Object.
- * It implements ProcessKeywords to process all operations related to AwardScenceKeywords.
- */
 @SuppressWarnings({ "deprecation", "unchecked" })
 public class Award extends KcPersistableBusinessObjectBase implements KeywordsManager<AwardScienceKeyword>, Permissionable,
         SequenceOwner<Award>, BudgetParent, Sponsorable, Negotiable, Disclosurable {
     public static final String DEFAULT_AWARD_NUMBER = "000000-00000";
     public static final String BLANK_COMMENT = "";
     public static final String ICR_RATE_CODE_NONE = "ICRNONE";
+    private static final String NONE = "None";
 
     private static final String NO_FLAG = "N";
     private static final int TOTAL_STATIC_REPORTS = 5;
@@ -124,7 +120,14 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     public static final String NOTIFICATION_IRB_SPECIAL_REVIEW_LINK_DELETED = "553";
     public static final String NOTIFICATION_IACUC_SPECIAL_REVIEW_LINK_ADDED = "554";
     public static final String NOTIFICATION_IACUC_SPECIAL_REVIEW_LINK_DELETED = "555";
+    public static final String BUDGET_STATUS = "2";
+
+    /*
+     * Used by Current Report to determine if award in Active, Pending, or Hold state.
+     */
+    private static String REPORT_STATUSES = "1 3 6";
     
+
     private static final long serialVersionUID = 3797220122448310165L;
     private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(Award.class);
     private Long awardId;
@@ -177,8 +180,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     private Date financialAccountCreationDate;
     private String financialChartOfAccountsCode;
     private String awardSequenceStatus;
-//    private String sequenceOwnerVersionNameValue;
-//    private Integer sequenceOwnerSequenceNumber;
 
 
     private boolean newVersion;
@@ -283,22 +284,12 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
     private List<AwardCgb> awardCgbList;
 
-    /**
-     * 
-     * Constructs an Award BO.
-     */
     public Award() {
         super();
         initializeAwardWithDefaultValues();
         initializeCollections();
     }
 
-    /**
-     * 
-     * This method sets the default values for initial persistence as part of skeleton.
-     * As various panels are developed; corresponding field initializations should be removed from
-     * this method.  
-     */
     private void initializeAwardWithDefaultValues() {
         setAwardNumber(DEFAULT_AWARD_NUMBER);
         setSequenceNumber(1);
@@ -311,7 +302,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         setScienceCodeIndicator(NO_FLAG);
         setSpecialReviewIndicator(NO_FLAG);
         setTransferSponsorIndicator(NO_FLAG);
-        awardComments = new AutoPopulatingList<AwardComment>(AwardComment.class);
+        awardComments = new AutoPopulatingList<>(AwardComment.class);
         setCurrentActionComments("");
         setNewVersion(false);
         awardSequenceStatus = VersionStatus.PENDING.name();
@@ -320,7 +311,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
     private Map<String, AwardComment> getCommentMap() {
         if (commentMap == null || getNewVersion()) {
-            commentMap = new HashMap<String, AwardComment>();
+            commentMap = new HashMap<>();
             for (AwardComment ac : awardComments) {
                 if (getNewVersion() && ac.getCommentType().getCommentTypeCode().equals(Constants.CURRENT_ACTION_COMMENT_TYPE_CODE))
                 { 
@@ -332,10 +323,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return commentMap;
     }
 
-    /**
-     * Gets the templateCode attribute.
-     * @return Returns the templateCode.
-     */
     public Integer getTemplateCode() {
         return templateCode;
     }
@@ -353,10 +340,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardId;
     }
 
-    /**
-     * 
-     * @param awardId
-     */
     public void setAwardId(Long awardId) {
         this.awardId = awardId;
     }
@@ -367,10 +350,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardNumber;
     }
 
-    /**
-     * 
-     * @param awardNumber
-     */
     public void setAwardNumber(String awardNumber) {
         this.awardNumber = awardNumber;
     }
@@ -381,10 +360,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return sequenceNumber;
     }
 
-    /**
-     * 
-     * @param sequenceNumber
-     */
     public void setSequenceNumber(Integer sequenceNumber) {
         this.sequenceNumber = sequenceNumber;
     }
@@ -447,7 +422,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
     /**
-     * If the Award is copied then initially the AwardAmountInfos will have two entries without AwardAmountInfoId's.  We need to recognize this
+     * If the Award is copied then initially the AwardAmountInfos will
+     * have two entries without AwardAmountInfoId's.  We need to recognize this
      * so we can display the correct data on initialization.
      * @return
      */
@@ -464,10 +440,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return returnValue;
     }
 
-    /**
-     * Gets the awardAmountInfoService attribute.
-     * @return Returns the awardAmountInfoService.
-     */
     public AwardAmountInfoService getAwardAmountInfoService() {
         awardAmountInfoService = KcServiceLocator.getService(AwardAmountInfoService.class);
         return awardAmountInfoService;
@@ -487,10 +459,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return timeAndMoneyHistoryService;
     }
 
-    /**
-     * Sets the awardAmountInfoService attribute value.
-     * @param awardAmountInfoService The awardAmountInfoService to set.
-     */
     public void setAwardAmountInfoService(AwardAmountInfoService awardAmountInfoService) {
         this.awardAmountInfoService = awardAmountInfoService;
     }
@@ -501,10 +469,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return sponsorCode;
     }
 
-    /**
-     * 
-     * @param sponsorCode
-     */
     public void setSponsorCode(String sponsorCode) {
         this.sponsorCode = sponsorCode;
     }
@@ -526,10 +490,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return statusCode;
     }
 
-    /**
-     * 
-     * @param statusCode
-     */
     public void setStatusCode(Integer statusCode) {
         this.statusCode = statusCode;
     }
@@ -539,10 +499,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return accountNumber;
     }
 
-    /**
-     * 
-     * @param accountNumber
-     */
     public void setAccountNumber(String accountNumber) {
         this.accountNumber = accountNumber;
     }
@@ -557,20 +513,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardUnitContacts;
     }
 
-    /**
-     * @param index
-     * @return
-     */
     public AwardPerson getProjectPerson(int index) {
         return projectPersons.get(index);
     }
 
-    /**
-     * Retrieve the AwardPerson for the given personId, if it exists.
-     * 
-     * @param personId String
-     * @return AwardPerson
-     */
     public AwardPerson getProjectPerson(String personId) {
         if (!StringUtils.isBlank(personId)) {
             for (AwardPerson awardPerson : this.getProjectPersons()) {
@@ -582,12 +528,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return null;
     }
 
-    /**
-     * Retrieve the AwardPerson for the given rolodexId, if it exists.
-     * 
-     * @param rolodexId Integer
-     * @return AwardPerson
-     */
     public AwardPerson getProjectPerson(Integer rolodexId) {
         if (rolodexId != null) {
             for (AwardPerson awardPerson : this.getProjectPersons()) {
@@ -616,10 +556,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return aList;
     }
 
-    /**
-     * This method returns all PIs and co-PIs.
-     * @return
-     */
     public List<AwardPerson> getInvestigators() {
         List<AwardPerson> investigators = new ArrayList<AwardPerson>();
         for (AwardPerson person : projectPersons) {
@@ -631,10 +567,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return investigators;
     }
 
-    /**
-     * This method returns all co-PIs.
-     * @return
-     */
     public List<AwardPerson> getCoInvestigators() {
         List<AwardPerson> coInvestigators = new ArrayList<AwardPerson>();
         for (AwardPerson person : projectPersons) {
@@ -646,10 +578,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return coInvestigators;
     }
 
-    /**
-     * When the sponsor is in the NIH multiple PI hierarchy this will return any multiple pis, otherwise, empty list.
-     * @return
-     */
     public List<AwardPerson> getMultiplePis() {
         List<AwardPerson> multiplePis = new ArrayList<AwardPerson>();
         if (isSponsorNihMultiplePi()) {
@@ -663,10 +591,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return multiplePis;
     }
 
-    /**
-     * This method returns all key persons
-     * @return
-     */
     public List<AwardPerson> getKeyPersons() {
         List<AwardPerson> keyPersons = new ArrayList<AwardPerson>();
         for (AwardPerson person : projectPersons) {
@@ -678,10 +602,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return keyPersons;
     }
 
-    /**
-     * This method returns the combined number of units for all project personnel.
-     * @return
-     */
     public int getTotalUnitCount() {
         int count = 0;
         for (AwardPerson person : projectPersons)
@@ -723,9 +643,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.approvedEquipmentItems = awardApprovedEquipmentItems;
     }
 
-    /**
-     * 
-     */
     public void setApprovedForeignTravelTrips(List<AwardApprovedForeignTravel> approvedForeignTravelTrips) {
         this.approvedForeignTravelTrips = approvedForeignTravelTrips;
     }
@@ -735,10 +652,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return approvedEquipmentIndicator;
     }
 
-    /**
-     * 
-     * @param approvedEquipmentIndicator
-     */
     public void setApprovedEquipmentIndicator(String approvedEquipmentIndicator) {
         this.approvedEquipmentIndicator = approvedEquipmentIndicator;
     }
@@ -749,10 +662,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return approvedForeignTripIndicator;
     }
 
-    /**
-     * 
-     * @param approvedForeignTripIndicator
-     */
     public void setApprovedForeignTripIndicator(String approvedForeignTripIndicator) {
         this.approvedForeignTripIndicator = approvedForeignTripIndicator;
     }
@@ -763,10 +672,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return subContractIndicator;
     }
 
-    /**
-     * 
-     * @param subContractIndicator
-     */
     public void setSubContractIndicator(String subContractIndicator) {
         this.subContractIndicator = subContractIndicator;
     }
@@ -777,10 +682,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardEffectiveDate;
     }
 
-    /**
-     * 
-     * @param awardEffectiveDate
-     */
     public void setAwardEffectiveDate(Date awardEffectiveDate) {
         this.awardEffectiveDate = awardEffectiveDate;
     }
@@ -791,10 +692,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardExecutionDate;
     }
 
-    /**
-     * 
-     * @param awardExecutionDate
-     */
     public void setAwardExecutionDate(Date awardExecutionDate) {
         this.awardExecutionDate = awardExecutionDate;
     }
@@ -805,10 +702,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return beginDate;
     }
 
-    /**
-     * This method returns the project end date which is housed in the Amount Info list index[0] on the award.
-     * @return
-     */
     public Date getProjectEndDate() {
         // KC-489 Project Ends Dates displayed incorrectly in Award Search results
     	try {
@@ -821,16 +714,11 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         // END KC-489
     }
 
-    /**
-     * This method sets the project end date which is housed in the Amount Info list index[0] on the award.
-     * @return
-     */
     public void setProjectEndDate(Date date) {
         this.awardAmountInfos.get(0).setFinalExpirationDate(date);
     }
 
     public Date getObligationExpirationDate() {
-        // return awardAmountInfos.get(0).getObligationExpirationDate();
         return getLastAwardAmountInfo().getObligationExpirationDate();
     }
 
@@ -838,10 +726,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardAmountInfos.get(0).setObligationExpirationDate(date);
     }
 
-    /**
-     * 
-     * @param beginDate
-     */
     public void setBeginDate(Date beginDate) {
         this.beginDate = beginDate;
     }
@@ -852,10 +736,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return costSharingIndicator;
     }
 
-    /**
-     * 
-     * @param costSharingIndicator
-     */
     public void setCostSharingIndicator(String costSharingIndicator) {
         this.costSharingIndicator = costSharingIndicator;
     }
@@ -869,7 +749,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
      * 
      * For ease of use in JSP and tag files; the getter method uses acronym instead of full meaning.
      * idcIndicator is an acronym. Its full meaning is Indirect Cost Indicator 
-     * @return
      */
     public String getIdcIndicator() {
         return indirectCostIndicator;
@@ -891,27 +770,14 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return modificationNumber;
     }
 
-    /**
-     * 
-     * @param modificationNumber
-     */
     public void setModificationNumber(String modificationNumber) {
         this.modificationNumber = modificationNumber;
     }
 
-
-    /**
-     * NSFCode is an acronym. Its full meaning is National Science Foundation.
-     * @return
-     */
     public String getNsfCode() {
         return nsfCode;
     }
 
-    /**
-     * NSFCode is an acronym. Its full meaning is National Science Foundation.
-     * @param nsfCode
-     */
     public void setNsfCode(String nsfCode) {
         this.nsfCode = nsfCode;
     }
@@ -922,10 +788,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return paymentScheduleIndicator;
     }
 
-    /**
-     * 
-     * @param paymentScheduleIndicator
-     */
     public void setPaymentScheduleIndicator(String paymentScheduleIndicator) {
         this.paymentScheduleIndicator = paymentScheduleIndicator;
     }
@@ -936,10 +798,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return scienceCodeIndicator;
     }
 
-    /**
-     * 
-     * @param scienceCodeIndicator
-     */
     public void setScienceCodeIndicator(String scienceCodeIndicator) {
         this.scienceCodeIndicator = scienceCodeIndicator;
     }
@@ -950,27 +808,14 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return specialReviewIndicator;
     }
 
-    /**
-     * 
-     * @param specialReviewIndicator
-     */
     public void setSpecialReviewIndicator(String specialReviewIndicator) {
         this.specialReviewIndicator = specialReviewIndicator;
     }
 
-
-    /**\
-     * 
-     * @return
-     */
     public String getSponsorAwardNumber() {
         return sponsorAwardNumber;
     }
 
-    /**
-     * 
-     * @param sponsorAwardNumber
-     */
     public void setSponsorAwardNumber(String sponsorAwardNumber) {
         this.sponsorAwardNumber = sponsorAwardNumber;
     }
@@ -981,19 +826,11 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return transferSponsorIndicator;
     }
 
-    /**
-     * This method finds the lead unit name, if any
-     * @return
-     */
     public String getUnitName() {
         Unit leadUnit = getLeadUnit();
         return leadUnit != null ? leadUnit.getUnitName() : null;
     }
 
-    /**
-     * This method finds the lead unit number, if any
-     * @return
-     */
     public String getUnitNumber() {
         return unitNumber;
     }
@@ -1003,10 +840,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return getUnitNumber();
     }
 
-    /**
-     * 
-     * @param transferSponsorIndicator
-     */
     public void setTransferSponsorIndicator(String transferSponsorIndicator) {
         this.transferSponsorIndicator = transferSponsorIndicator;
     }
@@ -1016,10 +849,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return accountTypeCode;
     }
 
-    /**
-     * 
-     * @param accountTypeCode
-     */
     public void setAccountTypeCode(Integer accountTypeCode) {
         this.accountTypeCode = accountTypeCode;
     }
@@ -1030,10 +859,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return activityTypeCode;
     }
 
-    /**
-     * 
-     * @param activityTypeCode
-     */
     public void setActivityTypeCode(String activityTypeCode) {
         this.activityTypeCode = activityTypeCode;
     }
@@ -1044,10 +869,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardTypeCode;
     }
 
-    /**
-     * 
-     * @param awardTypeCode
-     */
     public void setAwardTypeCode(Integer awardTypeCode) {
         this.awardTypeCode = awardTypeCode;
     }
@@ -1107,7 +928,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
      * @param preAwardAuthorizedAmount
      */
     public void setPreAwardAuthorizedAmount(ScaleTwoDecimal preAwardAuthorizedAmount) {
-        // if preAwardAuthorizedAmount is negative, make it positive
         if (preAwardAuthorizedAmount != null && preAwardAuthorizedAmount.isNegative()) {
             this.preAwardAuthorizedAmount = ScaleTwoDecimal.ZERO.subtract(preAwardAuthorizedAmount);
         }
@@ -1116,100 +936,58 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
     }
 
-
-
     public Date getPreAwardEffectiveDate() {
         return preAwardEffectiveDate;
     }
 
-    /**
-     * 
-     * @param preAwardEffectiveDate
-     */
     public void setPreAwardEffectiveDate(Date preAwardEffectiveDate) {
         this.preAwardEffectiveDate = preAwardEffectiveDate;
     }
-
-
 
     public String getProcurementPriorityCode() {
         return procurementPriorityCode;
     }
 
-    /**
-     * 
-     * @param procurementPriorityCode
-     */
     public void setProcurementPriorityCode(String procurementPriorityCode) {
         this.procurementPriorityCode = procurementPriorityCode;
     }
-
-
 
     public String getProposalNumber() {
         return proposalNumber;
     }
 
-    /**
-     * 
-     * @param proposalNumber
-     */
     public void setProposalNumber(String proposalNumber) {
         this.proposalNumber = proposalNumber;
     }
-
-
 
     public ScaleTwoDecimal getSpecialEbRateOffCampus() {
         return specialEbRateOffCampus;
     }
 
-    /**
-     * 
-     * @param specialEbRateOffCampus
-     */
     public void setSpecialEbRateOffCampus(ScaleTwoDecimal specialEbRateOffCampus) {
         this.specialEbRateOffCampus = specialEbRateOffCampus;
     }
-
-
 
     public ScaleTwoDecimal getSpecialEbRateOnCampus() {
         return specialEbRateOnCampus;
     }
 
-    /**
-     * 
-     * @param specialEbRateOnCampus
-     */
     public void setSpecialEbRateOnCampus(ScaleTwoDecimal specialEbRateOnCampus) {
         this.specialEbRateOnCampus = specialEbRateOnCampus;
     }
-
-
 
     public String getSubPlanFlag() {
         return subPlanFlag;
     }
 
-    /**
-     * 
-     * @param subPlanFlag
-     */
     public void setSubPlanFlag(String subPlanFlag) {
         this.subPlanFlag = subPlanFlag;
     }
-
-
 
     public String getTitle() {
         return title;
     }
 
-    /**
-     * 
-     * @param title
-     */
     public void setTitle(String title) {
         this.title = title;
     }
@@ -1230,58 +1008,30 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.closeoutDate = closeoutDate;
     }
 
-
-    /**
-     * Gets the awardTransactionTypeCode attribute.
-     * @return Returns the awardTransactionTypeCode.
-     */
     public Integer getAwardTransactionTypeCode() {
         return awardTransactionTypeCode;
     }
 
-    /**
-     * Sets the awardTransactionTypeCode attribute value.
-     * @param awardTransactionTypeCode The awardTransactionTypeCode to set.
-     */
     public void setAwardTransactionTypeCode(Integer awardTransactionTypeCode) {
         this.awardTransactionTypeCode = awardTransactionTypeCode;
     }
 
-    /**
-     * Gets the noticeDate attribute.
-     * @return Returns the noticeDate.
-     */
     public Date getNoticeDate() {
         return noticeDate;
     }
 
-    /**
-     * Sets the noticeDate attribute value.
-     * @param noticeDate The noticeDate to set.
-     */
     public void setNoticeDate(Date noticeDate) {
-        if (getNewVersion())
-        {
+        if (getNewVersion()) {
             this.noticeDate = null;
-        }
-        else
-        {
+        } else {
             this.noticeDate = noticeDate;
         }
     }
 
-    /**
-     * Gets the currentActionComments attribute.
-     * @return Returns the currentActionComments.
-     */
     public String getCurrentActionComments() {
         return currentActionComments;
     }
 
-    /**
-     * Sets the currentActionComments attribute value.
-     * @param currentActionComments The currentActionComments to set.
-     */
     public void setCurrentActionComments(String currentActionComments) {
         if (getNewVersion())
         {
@@ -1293,10 +1043,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
     }
 
-    /**
-     * sets newVersion to specified value
-     * @param newVersion the newVersion to be set
-     */
     public void setNewVersion (boolean newVersion)
     {
         this.newVersion = newVersion;
@@ -1308,28 +1054,15 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
     }
 
-    /**
-     * Gets the newVersion attribute
-     * @return Returns the newVersion attribute
-     */
     public boolean getNewVersion ()
     {
         return this.newVersion;
     }
 
-
-    /**
-     * Gets the awardTransactionType attribute.
-     * @return Returns the awardTransactionType.
-     */
     public AwardTransactionType getAwardTransactionType() {
         return awardTransactionType;
     }
 
-    /**
-     * Sets the awardTransactionType attribute value.
-     * @param awardTransactionType The awardTransactionType to set.
-     */
     public void setAwardTransactionType(AwardTransactionType awardTransactionType) {
         this.awardTransactionType = awardTransactionType;
     }
@@ -1389,161 +1122,84 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardApprovedSubawards = awardApprovedSubawards;
     }
 
-    /**
-     * 
-     * Get the award Cost Share Comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardCostShareComment() {
         return getAwardCommentByType(Constants.COST_SHARE_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true);
     }
 
-    /**
-     * 
-    * Get the award PreAward Sponsor Authorizations comments.  If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getawardPreAwardSponsorAuthorizationComment() {
         return getAwardCommentByType( Constants.PREAWARD_SPONSOR_AUTHORIZATION_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true );
     }
 
-    /**
-     * 
-    * Get the award PreAward Institutional Authorizations comments.  If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getawardPreAwardInstitutionalAuthorizationComment() {
         return getAwardCommentByType( Constants.PREAWARD_INSTITUTIONAL_AUTHORIZATION_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true );
     }
 
-    /**
-     * 
-     * Get the award F & A Rates Comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardFandaRateComment() {
         return getAwardCommentByType(Constants.FANDA_RATE_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true);
     }
 
-    /**
-     * 
-    * Get the award AwardPaymentAndInvoiceRequirementsComments.  If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardPaymentAndInvoiceRequirementsComments() {
         return getAwardCommentByType( Constants.PAYMENT_AND_INVOICES_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true );
     }
 
-    /**
-     * 
-     * Get the award Benefits Rate comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardBenefitsRateComment() {
         return getAwardCommentByType(Constants.BENEFITS_RATES_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true);
     }
 
-    /**
-     * 
-     * Get the award General Comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardGeneralComments() {
         return getAwardCommentByType(Constants.GENERAL_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true);
     }
 
-    /**
-     * 
-     * Get the award fiscal report comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardFiscalReportComments() {
         return getAwardCommentByType(Constants.FISCAL_REPORT_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true);
     }
 
-    /**
-     * 
-     * Get the award current action comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardCurrentActionComments() {
         return getAwardCommentByType( Constants.CURRENT_ACTION_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true );
     }
 
-    /**
-     * 
-     * Get the award Intellectual Property comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardIntellectualPropertyComments() {
         return getAwardCommentByType( Constants.INTELLECTUAL_PROPERTY_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true );
     }
 
-    /**
-     * 
-     * Get the award Procurement Comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardProcurementComments() {
         return getAwardCommentByType(Constants.PROCUREMENT_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true);
     }
 
-    /**
-     * 
-     * Get the award Award Property Comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardPropertyComments() {
         return getAwardCommentByType(Constants.PROPERTY_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_INCLUDE_IN_CHECKLIST, true);
     }
 
-    /**
-     * 
-     * Get the award Special Rate comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardSpecialRate() {
         return getAwardCommentByType(Constants.SPECIAL_RATE_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true);
     }
 
-    /**
-     * 
-     * Get the award Special Review Comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardSpecialReviewComments() {
         return getAwardCommentByType( Constants.SPECIAL_REVIEW_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true );
     }
 
-    /**
-     * 
-     * Get the award Proposal Summary comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getawardProposalSummary() {
         return getAwardCommentByType( Constants.PROPOSAL_SUMMARY_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true );
     }
 
-    /**
-     * 
-     * Get the award Proposal comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getawardProposalComments() {
         return getAwardCommentByType(Constants.PROPOSAL_COMMENT_TYPE_CODE, Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true);
     }
 
-    /**
-     * 
-     * Get the award Proposal IP Review Comments. If the comment has not been set...... initialize and return new Comment.
-     */
     public AwardComment getAwardProposalIPReviewComment() {
         return getAwardCommentByType( Constants.PROPOSAL_IP_REVIEW_COMMENT_TYPE_CODE,Constants.AWARD_COMMENT_EXCLUDE_FROM_CHECKLIST, true );
     }
 
-    /*
-     * Get a comment by type. If it does not exist, then create it.
-     */
-
-    public AwardComment getAwardCommentByType(String awardTypeCode, Boolean checklistPrintFlag, boolean createNew) {
+    public AwardComment getAwardCommentByType(String awardCommentTypeCode, Boolean checklistPrintFlag, boolean createNew) {
         AwardCommentFactory awardCommentFactory = new AwardCommentFactory();
-        AwardComment awardComment = getCommentMap().get(awardTypeCode);
+        AwardComment awardComment = getCommentMap().get(awardCommentTypeCode);
         if ((awardComment == null && createNew)) {
-            awardComment = awardCommentFactory.createAwardComment(awardTypeCode, (checklistPrintFlag == null ? false : checklistPrintFlag.booleanValue()));
+            awardComment = awardCommentFactory.createAwardComment(awardCommentTypeCode, (checklistPrintFlag == null ? false : checklistPrintFlag.booleanValue()));
             add(awardComment);
             commentMap.put(awardComment.getCommentType().getCommentTypeCode(), awardComment);
         }
         return awardComment;
     }
-
-
-    /*
-     * Get a sponsor term by sponsor term id.
-     */
 
     public AwardSponsorTerm getAwardSponsorTermByTemplateTerm(AwardTemplateTerm templateTerm, boolean createNew) {
         AwardSponsorTerm result = null;
@@ -1561,19 +1217,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return result;
     }
 
-    /**
-     * This method calls getTotalAmount to calculate the total of all Commitment Amounts.
-     * @return
-     */
     public ScaleTwoDecimal getTotalCostShareCommitmentAmount() {
         return getTotalAmount(awardCostShares);
     }
 
-    /**
-     * This method calculates the total Cost Share Met amount for all Award Cost Shares.
-     * @param valuableItems
-     * @return The total value
-     */
     public ScaleTwoDecimal getTotalCostShareMetAmount() {
         ScaleTwoDecimal returnVal = new ScaleTwoDecimal(0.00);
         for (AwardCostShare awardCostShare : awardCostShares) {
@@ -1583,10 +1230,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return returnVal;
     }
 
-    /**
-     * This method calculates the total Direct Cost Amount for all Direct F and A Distributions.
-     * @return The total value
-     */
     public ScaleTwoDecimal getTotalDirectFandADistributionDirectCostAmount() {
         ScaleTwoDecimal returnVal = new ScaleTwoDecimal(0.00);
         for (AwardDirectFandADistribution awardDirectFandADistribution : awardDirectFandADistributions) {
@@ -1601,10 +1244,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return returnVal;
     }
 
-    /**
-     * This method calculates the total Direct Cost Amount for all Direct F and A Distributions.
-     * @return The total value
-     */
     public ScaleTwoDecimal getTotalDirectFandADistributionIndirectCostAmount() {
         ScaleTwoDecimal returnVal = new ScaleTwoDecimal(0.00);
         for (AwardDirectFandADistribution awardDirectFandADistribution : awardDirectFandADistributions) {
@@ -1619,10 +1258,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return returnVal;
     }
 
-    /**
-     * This method calculates the total Direct Cost Amount for all Direct F and A Distributions.
-     * @return The total value
-     */
     public ScaleTwoDecimal getTotalDirectFandADistributionAnticipatedCostAmount() {
         ScaleTwoDecimal returnVal = new ScaleTwoDecimal(0.00);
         returnVal = returnVal.add(getTotalDirectFandADistributionDirectCostAmount());
@@ -1630,26 +1265,14 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return returnVal;
     }
 
-    /**
-     * This method totals Approved SubAward amounts
-     * @return
-     */
     public ScaleTwoDecimal getTotalApprovedSubawardAmount() {
         return getTotalAmount(awardApprovedSubawards);
     }
 
-    /**
-     * This method totals Approved Equipment amounts
-     * @return
-     */
     public ScaleTwoDecimal getTotalApprovedEquipmentAmount() {
         return getTotalAmount(approvedEquipmentItems);
     }
 
-    /**
-     * This method Approved Foreign Travel trip amounts
-     * @return
-     */
     public ScaleTwoDecimal getTotalApprovedApprovedForeignTravelAmount() {
         return getTotalAmount(approvedForeignTravelTrips);
     }
@@ -1662,26 +1285,15 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardFandaRate = awardFandaRate;
     }
 
-    /**
-     * Gets the keywords attribute.
-     * @return Returns the keywords.
-     */
     @Override
     public List<AwardScienceKeyword> getKeywords() {
         return keywords;
     }
 
-    /**
-     * Sets the keywords attribute value.
-     * @param keywords The keywords to set.
-     */
     public void setKeywords(List<AwardScienceKeyword> keywords) {
         this.keywords = keywords;
     }
 
-    /**
-     * @param leadUnit
-     */
     public void setLeadUnit(Unit leadUnit) {
         this.leadUnit = leadUnit;
         this.unitNumber = leadUnit != null ? leadUnit.getUnitNumber() : null;
@@ -1691,77 +1303,42 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.unitNumber = unitNumber;
     }
 
-    /**
-     * Add selected science keyword to award science keywords list.
-     * @see org.kuali.coeus.common.framework.keyword.KeywordsManager#addKeyword(org.kuali.coeus.common.framework.keyword.ScienceKeyword)
-     */
     public void addKeyword(ScienceKeyword scienceKeyword) {
         AwardScienceKeyword awardScienceKeyword = new AwardScienceKeyword(getAwardId(), scienceKeyword);
         getKeywords().add(awardScienceKeyword);
     }
 
-    /**
-     * It returns the ScienceKeyword object from keywords list
-     * @see org.kuali.coeus.common.framework.keyword.KeywordsManager#getKeyword(int)
-     */
     public AwardScienceKeyword getKeyword(int index) {
         return getKeywords().get(index);
     }
 
-    /**
-     * Sets the awardSpecialReviews attribute value.
-     * @param awardSpecialReviews The awardSpecialReviews to set.
-     */
     public void setSpecialReviews(List<AwardSpecialReview> awardSpecialReviews) {
         this.specialReviews = awardSpecialReviews;
     }
 
-    /**
-     * Add AwardSpecialReview to the AwardSpecialReview list
-     * @see org.kuali.kra.document.SpecialReviewHandler#addSpecialReview(java.lang.Object)
-     */
     public void addSpecialReview(AwardSpecialReview specialReview) {
         specialReview.setSequenceOwner(this);
         getSpecialReviews().add(specialReview);
     }
 
-    /**
-     * Get AwardSpecialReview from special review list
-     * @see org.kuali.kra.document.SpecialReviewHandler#getSpecialReview(int)
-     */
     public AwardSpecialReview getSpecialReview(int index) {
         return getSpecialReviews().get(index);
     }
 
-    /**
-     * Get special review list
-     * @see org.kuali.kra.document.SpecialReviewHandler#getSpecialReviews()
-     */
     public List<AwardSpecialReview> getSpecialReviews() {
         return specialReviews;
     }
 
-    /**
-     * Add an ApprovedEquipment item
-     * @param newAwardApprovedEquipment
-     */
     public void add(AwardApprovedEquipment approvedEquipmentItem) {
         approvedEquipmentItems.add(0, approvedEquipmentItem);
         approvedEquipmentItem.setAward(this);
     }
 
-    /**
-     * Add an AwardFandaRate
-     * @param fandaRate
-     */
     public void add(AwardFandaRate fandaRate) {
         awardFandaRate.add(fandaRate);
         fandaRate.setAward(this);
     }
 
-    /**
-     * @param awardSpecialReview
-     */
     public void add(AwardSpecialReview awardSpecialReview) {
         specialReviews.add(awardSpecialReview);
         awardSpecialReview.setSequenceOwner(this);
@@ -1796,11 +1373,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
                 }
                 return 0;
               }});
-        // https://github.com/rSmart/issues/issues/361
-        // java.lang.IndexOutOfBoundsException: Index: 5, Size: 4
-        // at org.kuali.kra.award.home.Award.add(Award.java:1931)
-        // Be aware, this *could* be a behavioral change - not sure.
-        // awardCloseoutItems.addAll(TOTAL_STATIC_REPORTS, awardCloseoutNewItems);
+
         awardCloseoutItems.addAll(awardCloseoutNewItems);
         awardCloseoutItem.setAward(this);
     }
@@ -1810,22 +1383,11 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         awardCloseoutItem.setAward(this);
     }
 
-    /**
-     * Add an Award Unit or Central Administration contact
-     * @param newAwardApprovedEquipment
-     */
     public void add(AwardUnitContact awardUnitContact) {
         awardUnitContacts.add(awardUnitContact);
         awardUnitContact.setAward(this);
     }
 
-    /**
-     * Creates an AwardFundingProposal and adds it to the collection
-     * 
-     * It also adds the AwardFundingProposal to the InstitutionalProposal
-     * 
-     * @param institutionalProposal
-     */
     public void add(InstitutionalProposal institutionalProposal) {
         if (institutionalProposal != null) {
             AwardFundingProposal afp = new AwardFundingProposal(this, institutionalProposal);
@@ -1834,27 +1396,16 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
     }
 
-    /**
-     * @param awardSponsorContact
-     */
     public void addSponsorContact(AwardSponsorContact awardSponsorContact) {
         sponsorContacts.add(awardSponsorContact);
         awardSponsorContact.setAward(this);
     }
 
-    /**
-     * This method adds a Project Person to the award
-     * @param projectPerson
-     */
     public void add(AwardPerson projectPerson) {
         projectPersons.add(projectPerson);
         projectPerson.setAward(this);
     }
 
-    /**
-     * Add an
-     * @param newAwardPaymentSchedule
-     */
     public void add(AwardPaymentSchedule paymentScheduleItem) {
         paymentScheduleItems.add(paymentScheduleItem);
         paymentScheduleItem.setAward(this);
@@ -1888,6 +1439,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         awardUnitContacts = new ArrayList<AwardUnitContact>();
         sponsorContacts = new ArrayList<AwardSponsorContact>();
         awardBudgetLimits = new ArrayList<AwardBudgetLimit>();
+        awardCgbList = new ArrayList<>();
 
         fundingProposals = new ArrayList<AwardFundingProposal>();
         initializeAwardHierarchyTempObjects();
@@ -1895,7 +1447,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         syncChanges = new ArrayList<AwardSyncChange>();
         syncStatuses = new ArrayList<AwardSyncStatus>();
         subAwardList = new ArrayList<SubAward>();
-        budgets = new ArrayList<AwardBudgetExt>();
+        currentVersionBudgets = new ArrayList<AwardBudgetExt>();
     }
 
     public void initializeAwardAmountInfoObjects() {
@@ -1951,10 +1503,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         awardComment.setAward(this);
     }
 
-    /**
-     * This method adds template comments to award when sync to template is being applied.
-     * @param awardComment
-     */
     public void addTemplateComments(List<AwardTemplateComment> awardTemplateComments) {
         AwardCommentFactory awardCommentFactory = new AwardCommentFactory();
         for (AwardTemplateComment awardTemplateComment : awardTemplateComments) {
@@ -1976,10 +1524,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         awardSponsorTerm.setAward(this);
     }
 
-    /**
-     * This method adds template sponsor terms to award when sync to template is being applied.
-     * @param awardTemplateTerms
-     */
     public void addTemplateTerms(List<AwardTemplateTerm> awardTemplateTerms) {
         List<AwardSponsorTerm> tempAwardSponsorTerms = new ArrayList<AwardSponsorTerm>();
         for (AwardTemplateTerm awardTemplateTerm : awardTemplateTerms) {
@@ -1988,20 +1532,12 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         setAwardSponsorTerms(tempAwardSponsorTerms);
     }
 
-    /**
-     * This method adds AwardDirectFandADistribution to end of list.
-     * @param awardDirectFandADistribution
-     */
     public void add(AwardDirectFandADistribution awardDirectFandADistribution) {
         awardDirectFandADistributions.add(awardDirectFandADistribution);
         awardDirectFandADistribution.setAward(this);
         awardDirectFandADistribution.setBudgetPeriod(awardDirectFandADistributions.size());
     }
 
-    /**
-     * This method adds AwardDirectFandADistribution to the given index in the list.
-     * @param awardDirectFandADistribution
-     */
     public void add(int index, AwardDirectFandADistribution awardDirectFandADistribution) {
         awardDirectFandADistributions.add(index, awardDirectFandADistribution);
         awardDirectFandADistribution.setAward(this);
@@ -2016,22 +1552,12 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         awardNotepad.setAward(this);
     }
 
-    /**
-     * This method updates the budget periods in the Award after insertion of new Award Direct F and A Distribution into list.
-     * @param index
-     */
     public void updateDirectFandADistributionBudgetPeriods(int index) {
         for (int newIndex = index; newIndex < awardDirectFandADistributions.size(); newIndex++) {
             awardDirectFandADistributions.get(newIndex).setBudgetPeriod(newIndex + 1);
         }
     }
 
-
-    /**
-     * This method calculates the total value of a list of ValuableItems
-     * @param valuableItems
-     * @return The total value
-     */
     ScaleTwoDecimal getTotalAmount(List<? extends ValuableItem> valuableItems) {
         ScaleTwoDecimal returnVal = new ScaleTwoDecimal(0.00);
         for (ValuableItem item : valuableItems) {
@@ -2041,10 +1567,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return returnVal;
     }
 
-    /**
-     * Gets the awardSponsorTerms attribute.
-     * @return Returns the awardSponsorTerms.
-     */
     public List<AwardSponsorTerm> getAwardSponsorTerms() {
         return awardSponsorTerms;
     }
@@ -2057,10 +1579,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return awardStatus;
     }
 
-    /**
-     * Sets the awardSponsorTerms attribute value.
-     * @param awardSponsorTerms The awardSponsorTerms to set.
-     */
     public void setAwardSponsorTerms(List<AwardSponsorTerm> awardSponsorTerms) {
         this.awardSponsorTerms = awardSponsorTerms;
     }
@@ -2112,27 +1630,15 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.icrRateCode = icrRateCode;
     }
 
-    /**
-     * This method adds an approved foreign travel trip
-     * @param approvedForeignTravelTrip
-     */
     public void add(AwardApprovedForeignTravel approvedForeignTravelTrip) {
         approvedForeignTravelTrips.add(approvedForeignTravelTrip);
         approvedForeignTravelTrip.setAward(this);
     }
 
-    /**
-     * Gets the paymentScheduleItems attribute.
-     * @return Returns the paymentScheduleItems.
-     */
     public List<AwardPaymentSchedule> getPaymentScheduleItems() {
         return paymentScheduleItems;
     }
 
-    /**
-     * Sets the paymentScheduleItems attribute value.
-     * @param paymentScheduleItems The paymentScheduleItems to set.
-     */
     public void setPaymentScheduleItems(List<AwardPaymentSchedule> paymentScheduleItems) {
         this.paymentScheduleItems = paymentScheduleItems;
     }
@@ -2147,8 +1653,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return amount;
     }
 
-    // Note: following the pattern of Sponsor, this getter indirectly calls a service.
-    // Is there a better way?
     public Sponsor getPrimeSponsor() {
         if (!StringUtils.isEmpty(getPrimeSponsorCode())) {
             this.refreshReferenceObject("primeSponsor");
@@ -2175,18 +1679,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardTransferringSponsors = awardTransferringSponsors;
     }
 
-    /**
-     * Gets the awardDirectFandADistribution attribute.
-     * @return Returns the awardDirectFandADistribution.
-     */
     public List<AwardDirectFandADistribution> getAwardDirectFandADistributions() {
         return awardDirectFandADistributions;
     }
 
-    /**
-     * Sets the awardDirectFandADistribution attribute value.
-     * @param awardDirectFandADistribution The awardDirectFandADistribution to set.
-     */
     public void setAwardDirectFandADistributions(List<AwardDirectFandADistribution> awardDirectFandADistributions) {
         for (AwardDirectFandADistribution awardDirectFandADistribution : awardDirectFandADistributions) {
             awardDirectFandADistribution.setAward(this);
@@ -2194,48 +1690,24 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardDirectFandADistributions = awardDirectFandADistributions;
     }
 
-    /**
-     * Gets the awardNotepads attribute.
-     * @return Returns the awardNotepads.
-     */
     public List<AwardNotepad> getAwardNotepads() {
         return awardNotepads;
     }
 
-    /**
-     * Sets the awardNotepads attribute value.
-     * @param awardNotepads The awardNotepads to set.
-     */
     public void setAwardNotepads(List<AwardNotepad> awardNotepads) {
         this.awardNotepads = awardNotepads;
     }
 
-    /**
-     * Gets the indirectCostIndicator attribute.
-     * @return Returns the indirectCostIndicator.
-     */
     public String getIndirectCostIndicator() {
         return indirectCostIndicator;
     }
 
-    /**
-     * Sets the indirectCostIndicator attribute value.
-     * @param indirectCostIndicator The indirectCostIndicator to set.
-     */
     public void setIndirectCostIndicator(String indirectCostIndicator) {
         this.indirectCostIndicator = indirectCostIndicator;
     }
 
-
-    /**
-     * Gets the obligatedTotal attribute.
-     * @return Returns the obligatedTotal.
-     */
     public ScaleTwoDecimal getObligatedTotal() {
         ScaleTwoDecimal returnValue = new ScaleTwoDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAmountObligatedToDate()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAmountObligatedToDate());
-        // }
         if (getLastAwardAmountInfo().getAmountObligatedToDate() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getAmountObligatedToDate());
         }
@@ -2265,75 +1737,44 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
     }
 
-    /**
-     * Gets the obligatedTotal attribute.
-     * @return Returns the obligatedTotal.
-     */
     public ScaleTwoDecimal getObligatedTotalDirect() {
         ScaleTwoDecimal returnValue = new ScaleTwoDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAmountObligatedToDate()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAmountObligatedToDate());
-        // }
+
         if (getLastAwardAmountInfo().getObligatedTotalDirect() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getObligatedTotalDirect());
         }
         return returnValue;
     }
 
-    /**
-     * Gets the obligatedTotal attribute.
-     * @return Returns the obligatedTotal.
-     */
     public ScaleTwoDecimal getObligatedTotalIndirect() {
         ScaleTwoDecimal returnValue = new ScaleTwoDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAmountObligatedToDate()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAmountObligatedToDate());
-        // }
+
         if (getLastAwardAmountInfo().getObligatedTotalIndirect() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getObligatedTotalIndirect());
         }
         return returnValue;
     }
 
-    /**
-     * Gets the anticipatedTotal attribute.
-     * @return Returns the anticipatedTotal.
-     */
     public ScaleTwoDecimal getAnticipatedTotal() {
         ScaleTwoDecimal returnValue = new ScaleTwoDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAnticipatedTotalAmount()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAnticipatedTotalAmount());
-        // }
+
         if (getLastAwardAmountInfo().getAnticipatedTotalAmount() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getAnticipatedTotalAmount());
         }
         return returnValue;
     }
 
-    /**
-     * Gets the anticipatedTotal attribute.
-     * @return Returns the anticipatedTotal.
-     */
     public ScaleTwoDecimal getAnticipatedTotalDirect() {
         ScaleTwoDecimal returnValue = new ScaleTwoDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAnticipatedTotalAmount()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAnticipatedTotalAmount());
-        // }
         if (getLastAwardAmountInfo().getAnticipatedTotalDirect() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getAnticipatedTotalDirect());
         }
         return returnValue;
     }
 
-    /**
-     * Gets the anticipatedTotal attribute.
-     * @return Returns the anticipatedTotal.
-     */
     public ScaleTwoDecimal getAnticipatedTotalIndirect() {
         ScaleTwoDecimal returnValue = new ScaleTwoDecimal(0.00);
-        // if(awardAmountInfos.get(0).getAnticipatedTotalAmount()!=null){
-        // returnValue = returnValue.add(awardAmountInfos.get(0).getAnticipatedTotalAmount());
-        // }
+
         if (getLastAwardAmountInfo().getAnticipatedTotalIndirect() != null) {
             returnValue = returnValue.add(getLastAwardAmountInfo().getAnticipatedTotalIndirect());
         }
@@ -2379,10 +1820,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return getAwardAmountInfoService().fetchAwardAmountInfoWithHighestTransactionId(awardAmountInfos);
     }
 
-    /**
-     * Find the lead unit for the award
-     * @return
-     */
     public Unit getLeadUnit() {
         if (leadUnit == null && unitNumber != null) {
             loadLeadUnit();
@@ -2470,17 +1907,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return principalInvestigatorName;
     }
 
-    /**
-     * @param principalInvestigatorName
-     */
     public void setPrincipalInvestigatorName(String principalInvestigatorName) {
         this.principalInvestigatorName = principalInvestigatorName;
     }
 
-    /**
-     * This method returns the status description
-     * @return
-     */
     public String getStatusDescription() {
         AwardStatus status = getAwardStatus();
         statusDescription = status != null ? status.getDescription() : null;
@@ -2539,122 +1969,62 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardCloseoutItems = awardCloseoutItems;
     }
 
-    /**
-     * Gets the awardCloseoutNewItems attribute. 
-     * @return Returns the awardCloseoutNewItems.
-     */
     public List<AwardCloseout> getAwardCloseoutNewItems() {
         return awardCloseoutNewItems;
     }
 
-    /**
-     * Sets the awardCloseoutNewItems attribute value.
-     * @param awardCloseoutNewItems The awardCloseoutNewItems to set.
-     */
     public void setAwardCloseoutNewItems(List<AwardCloseout> awardCloseoutNewItems) {
         this.awardCloseoutNewItems = awardCloseoutNewItems;
     }
 
-    /**
-     * Sets the templateCode attribute value.
-     * @param templateCode The templateCode to set.
-     */
     public void setTemplateCode(Integer templateCode) {
         this.templateCode = templateCode;
     }
 
-    /**
-     * Gets the primeSponsorCode attribute.
-     * @return Returns the primeSponsorCode.
-     */
     public String getPrimeSponsorCode() {
         return primeSponsorCode;
     }
 
-    /**
-     * Sets the primeSponsorCode attribute value.
-     * @param primeSponsorCode The primeSponsorCode to set.
-     */
     public void setPrimeSponsorCode(String primeSponsorCode) {
         this.primeSponsorCode = primeSponsorCode;
     }
 
-    /**
-     * Gets the basisOfPaymentCode attribute.
-     * @return Returns the basisOfPaymentCode.
-     */
     public String getBasisOfPaymentCode() {
         return basisOfPaymentCode;
     }
 
-    /**
-     * Sets the basisOfPaymentCode attribute value.
-     * @param basisOfPaymentCode The basisOfPaymentCode to set.
-     */
     public void setBasisOfPaymentCode(String basisOfPaymentCode) {
         this.basisOfPaymentCode = basisOfPaymentCode;
     }
 
-    /**
-     * Gets the methodOfPaymentCode attribute.
-     * @return Returns the methodOfPaymentCode.
-     */
     public String getMethodOfPaymentCode() {
         return methodOfPaymentCode;
     }
 
-    /**
-     * Sets the methodOfPaymentCode attribute value.
-     * @param methodOfPaymentCode The methodOfPaymentCode to set.
-     */
     public void setMethodOfPaymentCode(String methodOfPaymentCode) {
         this.methodOfPaymentCode = methodOfPaymentCode;
     }
 
-    /**
-     * Gets the awardTemplate attribute.
-     * @return Returns the awardTemplate.
-     */
     public AwardTemplate getAwardTemplate() {
         return awardTemplate;
     }
 
-    /**
-     * Sets the awardTemplate attribute value.
-     * @param awardTemplate The awardTemplate to set.
-     */
     public void setAwardTemplate(AwardTemplate awardTemplate) {
         this.awardTemplate = awardTemplate;
     }
 
-    /**
-     * Gets the awardBasisOfPayment attribute.
-     * @return Returns the awardBasisOfPayment.
-     */
     public AwardBasisOfPayment getAwardBasisOfPayment() {
         return awardBasisOfPayment;
     }
 
-    /**
-     * Sets the awardBasisOfPayment attribute value.
-     * @param awardBasisOfPayment The awardBasisOfPayment to set.
-     */
     public void setAwardBasisOfPayment(AwardBasisOfPayment awardBasisOfPayment) {
         this.awardBasisOfPayment = awardBasisOfPayment;
     }
 
-    /**
-     * Gets the awardMethodOfPayment attribute.
-     * @return Returns the awardMethodOfPayment.
-     */
     public AwardMethodOfPayment getAwardMethodOfPayment() {
         return awardMethodOfPayment;
     }
 
-    /**
-     * Sets the awardMethodOfPayment attribute value.
-     * @param awardMethodOfPayment The awardMethodOfPayment to set.
-     */
     public void setAwardMethodOfPayment(AwardMethodOfPayment awardMethodOfPayment) {
         this.awardMethodOfPayment = awardMethodOfPayment;
     }
@@ -2689,18 +2059,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return "awardNumber";
     }
 
-    /**
-     * Gets the activityType attribute.
-     * @return Returns the activityType.
-     */
     public ActivityType getActivityType() {
         return activityType;
     }
 
-    /**
-     * Sets the activityType attribute value.
-     * @param activityType The activityType to set.
-     */
     public void setActivityType(ActivityType activityType) {
         this.activityType = activityType;
     }
@@ -2753,8 +2115,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
     public String getBudgetStatus() {
-        // hard coded as completed
-        return "2";
+        return BUDGET_STATUS;
     }
 
     public List getPersonRolodexList() {
@@ -2826,10 +2187,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     public void setBudgetStatus(String budgetStatus) {
     }
 
-    /**
-     * Gets the attachmentsw. Cannot return {@code null}.
-     * @return the attachments
-     */
     public List<AwardAttachment> getAwardAttachments() {
         if (this.awardAttachments == null) {
             this.awardAttachments = new ArrayList<AwardAttachment>();
@@ -2842,29 +2199,15 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardAttachments = attachments;
     }
 
-    /**
-     * Gets an attachment.
-     * @param index the index
-     * @return an attachment personnel
-     */
     public AwardAttachment getAwardAttachment(int index) {
         return this.awardAttachments.get(index);
     }
 
-    /**
-     * add an attachment.
-     * @param attachment the attachment
-     * @throws IllegalArgumentException if attachment is null
-     */
     public void addAttachment(AwardAttachment attachment) {
         this.getAwardAttachments().add(attachment);
         attachment.setAward(this);
     }
 
-    /**
-     * This method indicates if the Awrd has been persisted
-     * @return True if persisted
-     */
     public boolean isPersisted() {
         return awardId != null;
     }
@@ -2902,7 +2245,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
     /**
-     * This method gets the obligated, distributable amount for the Award. This may be replacable with the Award TimeAndMoney obligatedAmount value, but
+     * This method gets the obligated, distributable amount for the Award.
+     * This may be replacable with the Award TimeAndMoney obligatedAmount value, but
      * at the time of its creation, TimeAndMoney wasn't complete
      * @return
      */
@@ -2938,10 +2282,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return KeyConstants.AWARD_BUDGET_STATUS_IN_PROGRESS;
     }
 
-    /**
-     * 
-     * @return awardHierarchyTempObjects
-     */
     public List<AwardHierarchyTempObject> getAwardHierarchyTempObjects() {
         return awardHierarchyTempObjects;
     }
@@ -2962,12 +2302,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.awardType = awardType;
     }
 
-    /**
-     * 
-     * This method text area tag need this method.
-     * @param index
-     * @return
-     */
     public AwardComment getAwardComment(int index) {
         while (getAwardComments().size() <= index) {
             getAwardComments().add(new AwardComment());
@@ -2996,11 +2330,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return lookupOspAdministratorName;
     }
 
-    /**
-     * 
-     * Returns a list of central admin contacts based on the lead unit of this award.
-     * @return
-     */
     public List<AwardUnitContact> getCentralAdminContacts() {
         if (centralAdminContacts == null) {
             initCentralAdminContacts();
@@ -3083,13 +2412,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.sponsorNihMultiplePi = sponsorNihMultiplePi;
     }
 
-    /*
-     * Used by Current Report to determine if award in Active, Pending, or Hold state.
-     */
-    private static String reportedStatus = "1 3 6";
-
     public boolean isActiveVersion() {
-        return (reportedStatus.indexOf(getAwardStatus().getStatusCode()) != -1);
+        return (REPORT_STATUSES.indexOf(getAwardStatus().getStatusCode()) != -1);
     }
 
     public List<AwardBudgetLimit> getAwardBudgetLimits() {
@@ -3265,19 +2589,15 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return flag;
     }
     
-    /**
-     * This method gets the current rate.
-     * If there are multiple current rates, return the one with the higher rate
-     * @param award
-     * @return currentFandaRate
-     */
     public AwardFandaRate getCurrentFandaRate() {
         List<AwardFandaRate> rates = this.getAwardFandaRate();
         Calendar calendar = Calendar.getInstance();
         int currentYear = calendar.get(Calendar.YEAR);
         
         AwardFandaRate currentFandaRate;
-        // when both On and Off campus rates are in, send the higher one. Ideally only one should be there
+
+        // when both On and Off campus rates are in, send the higher one.
+        // Ideally only one should be there
         // the single rate validation parameter needs to be set on award
         ScaleTwoDecimal currentRateValue = new ScaleTwoDecimal(0.0);
         currentFandaRate = rates.get(0);
@@ -3384,28 +2704,32 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
     public String getAwardDescriptionLine() {
-        AwardAmountInfo aai = getLastAwardAmountInfo();
+		String noticeDate;
         String transactionTypeDescription;
         String versionNumber;
-        if(aai == null || aai.getOriginatingAwardVersion() == null) {
+
             versionNumber = getSequenceNumber().toString();
-        }else {
-            versionNumber = aai.getOriginatingAwardVersion().toString();
+
+		if (!(getNoticeDate() == null)) {
+			noticeDate = getNoticeDate().toString();
+		} else {
+			noticeDate = NONE;
         }
-        if(!(getAwardTransactionType() == null)) {
+		if (!(getAwardTransactionType() == null)) {
             transactionTypeDescription = getAwardTransactionType().getDescription();
-        }else {
-            transactionTypeDescription = "None";
+		} else {
+			transactionTypeDescription = NONE;
         }
-        return "Award Version " + versionNumber + ", " + transactionTypeDescription + ", updated " + getUpdateTimeAndUser(); 
+		return "Award Version " + versionNumber + ", " + transactionTypeDescription + ", notice date: " + noticeDate + ", updated " + getUpdateTimeAndUser() + ". Comments:"
+				+ (getAwardCurrentActionComments().getComments() == null ? NONE + "." : getAwardCurrentActionComments().getComments());
     }
 
     public String getUpdateTimeAndUser() {
         String createDateStr = null;
         String updateUser = null;
         if (getUpdateTimestamp() != null) {
-            createDateStr = CoreApiServiceLocator.getDateTimeService().toString(getUpdateTimestamp(), "hh:mm a MM/dd/yyyy");
-            updateUser = getUpdateUser().length() > 30 ? getUpdateUser().substring(0, 30) : getUpdateUser(); 
+            createDateStr = CoreApiServiceLocator.getDateTimeService().toString(awardDocument.getUpdateTimestamp(), "hh:mm a MM/dd/yyyy");
+            updateUser = awardDocument.getUpdateUser().length() > 30 ? getUpdateUser().substring(0, 30) : getUpdateUser(); 
         }
         return createDateStr + ", by " + updateUser;
     }
@@ -3436,7 +2760,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
     /*
-     * This method is used by the tag file to display the F&A rate totals.
+     * This method is used by the tag file to display the F&amp;A rate totals.
      * Needed to convert to KualiDecimal to avoid rounding issues.
      */
     public ScaleTwoDecimal getFandATotals() {
@@ -3463,31 +2787,31 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 	public Budget getNewBudget() {
 		return new AwardBudgetExt();
 	}
+    private List<AwardBudgetExt> currentVersionBudgets;
     private List<AwardBudgetExt> budgets;
-    private List<AwardBudgetExt> allAwardBudgets;
 
 	@Override
 	public Integer getNextBudgetVersionNumber() {
 		return getAwardDocument().getNextBudgetVersionNumber();
 	}
 
-	public List<AwardBudgetExt> getAllAwardBudgets() {
-		if (allAwardBudgets == null || allAwardBudgets.isEmpty()) {
-			allAwardBudgets = KcServiceLocator.getService(AwardBudgetService.class).getAllBudgetsForAward(this);
-		}
-		return allAwardBudgets;
-	}
-
-	public void setAllAwardBudgets(List<AwardBudgetExt> budgets) {
-		this.allAwardBudgets = budgets;
-	}
-
 	public List<AwardBudgetExt> getBudgets() {
+		if (budgets == null || budgets.isEmpty()) {
+			budgets = KcServiceLocator.getService(AwardBudgetService.class).getAllBudgetsForAward(this);
+		}
 		return budgets;
 	}
 
 	public void setBudgets(List<AwardBudgetExt> budgets) {
 		this.budgets = budgets;
+	}
+
+	public List<AwardBudgetExt> getCurrentVersionBudgets() {
+		return currentVersionBudgets;
+	}
+
+	public void setCurrentVersionBudgets(List<AwardBudgetExt> budgets) {
+		this.currentVersionBudgets = budgets;
 	}
 
     public AwardComment getAdditionalFormsDescriptionComment() {
