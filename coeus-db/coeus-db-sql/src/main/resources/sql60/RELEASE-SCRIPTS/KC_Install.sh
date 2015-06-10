@@ -387,12 +387,16 @@ case "${dbtype}" in
         sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 601_oracle_kc_rice_server_upgrade.sql
         sqlplus "${un}"/"${pw}${DBSvrNm}" < 601_oracle_kc_upgrade.sql
 
-        # Update to 1504.3
-        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 1504_oracle_kc_rice_server_upgrade.sql
-        sqlplus "${un}"/"${pw}${DBSvrNm}" < 1504_oracle_kc_upgrade.sql
+        # Update to 6.0.2
+        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 602_oracle_kc_rice_server_upgrade.sql
+        sqlplus "${un}"/"${pw}${DBSvrNm}" < 602_oracle_kc_upgrade.sql
+
+        #Update to 1505
+        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 1505_oracle_kc_rice_server_upgrade.sql
+        sqlplus "${un}"/"${pw}${DBSvrNm}" < 1505_oracle_kc_upgrade.sql
 
         # Run UH fixes for issues found
-        sqlplus "${un}"/"${pw}${DBSvrNm}" < uh_fix_issues_missed_by_kualico.sql
+        #sqlplus "${un}"/"${pw}${DBSvrNm}" < uh_fix_issues_missed_by_kualico.sql
 
         mv *.log ../../../../../../../sql60/RELEASE-SCRIPTS/LOGS
         cd ../../../../../../../sql60/RELEASE-SCRIPTS
