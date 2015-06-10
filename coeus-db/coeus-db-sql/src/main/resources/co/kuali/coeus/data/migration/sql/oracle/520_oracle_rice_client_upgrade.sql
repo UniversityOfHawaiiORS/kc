@@ -21,6 +21,9 @@ set define off
 set sqlblanklines on
 
 spool 520_oracle_rice_client_upgrade.sql.log
-@./kc/embedded_client_scripts/V520_034__KRC_RICE_01_2.2.1-2.2.2_2013-03-18_B000.sql
+-- RRG Removed this script because it duplicates
+-- rice_server\bootstrap\V520_003__KR_RICE_01_2.2.1-2.2.2_2013-03-18_B000.sql
+-- causing failures
+-- @./kc/embedded_client_scripts/V520_034__KRC_RICE_01_2.2.1-2.2.2_2013-03-18_B000.sql
 @./kc/embedded_client_scripts/V520_035__KRC_RICE_02_2.2.1-2.2.2_CLEANUP-2013-03-18_B000.sql
 commit;
