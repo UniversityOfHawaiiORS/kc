@@ -24,19 +24,10 @@ set -o verbose
 # build kc
 MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC" mvn -DskipTests -Dmaven.test.skip=true clean install 
 
-# or only build impl and webapp to save time...
-#/path/to/kc$ JAVA_OPTS="-Xmx2g -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC" mvn -DskipTests -Dmaven.test.skip=true clean install -pl coeus-impl,coeus-webapp
+# if you just want to build impl and webapp projects, add this:
+#  -pl coeus-impl,coeus-webapp
 
 # start coeus-webapp via jetty server
-#cd coeus-webapp 
-#MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Doracle.jdbc.Trace=true -javaagent:/home/jlolofie/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
 ./start
-
-# debug via jetty cmd line
-# new way:
-#/home/jlolofie/src-luna-ee/kc/coeus-webapp/$ MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Xdebug -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=y -javaagent:/home/jlolofie/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
-
-# old way:
-#/path/to/kc/coeus-webapp/$ MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=y" mvn jetty:run
 
 
