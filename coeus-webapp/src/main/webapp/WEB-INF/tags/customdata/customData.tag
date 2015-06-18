@@ -81,7 +81,7 @@
 					
 				<c:choose>
                 	<c:when test="${readOnly}">
-                		<c:out value="${customAttributeValue}" />
+                		<c:out value="${fn:escapeXml(customAttributeValue)}" />
                 	</c:when>
                 	<c:otherwise>
                 		${kfunc:registerEditableProperty(KualiForm, customAttributeId)}
@@ -90,15 +90,15 @@
 						    <%-- If dataLength isn't passed in then behave as before --%>
 						    <c:choose>
 						    <c:when test="${empty dataLength}">
-						        <input id="${customAttributeId}" type="text" name="${customAttributeId}" value='${customAttributeValue}' style="${customAttributeErrorStyle}"/>
+						        <input id="${customAttributeId}" type="text" name="${customAttributeId}" value='${fn:escapeXml(customAttributeValue)}' style="${customAttributeErrorStyle}"/>
 						    </c:when>
 						    <%-- If dataLength is provided and < 100 make the size of the text control = to dataLength and limit the maxLength so user can't type more than allowed --%>
 						    <c:when test="${dataLength < 100}">
-						        <input id="${customAttributeId}" type="text" name="${customAttributeId}" value='${customAttributeValue}' style="${customAttributeErrorStyle}" size="${dataLength}" maxlength="${dataLength}"/>          
+						        <input id="${customAttributeId}" type="text" name="${customAttributeId}" value='${fn:escapeXml(customAttributeValue)}' style="${customAttributeErrorStyle}" size="${dataLength}" maxlength="${dataLength}"/>          
 						    </c:when>
 						    <%-- If dataLength is provided and >= 100 make the control a textarea hard coded to 5 rows 100 cols --%>
 						    <c:when test="${dataLength >= 100}">
-						           <textarea id="${customAttributeId}" name="${customAttributeId}" style="${customAttributeErrorStyle}" rows="5" cols="100" onkeyup="textLimit(this, ${dataLength});"><c:out value="${fn:trim(customAttributeValue)}" /></textarea>
+						           <textarea id="${customAttributeId}" name="${customAttributeId}" style="${customAttributeErrorStyle}" rows="5" cols="100" onkeyup="textLimit(this, ${dataLength});"><c:out value="${fn:trim(fn:escapeXml(customAttributeValue))}" /></textarea>
 						           <%-- If dataLength is > 500 add expandedTextAreaOption --%>
 						           <c:if test="${dataLength > 500}">
 						               <c:if test="${readOnly}">
