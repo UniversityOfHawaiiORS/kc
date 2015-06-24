@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -o verbose
+
+
+# check java version > 1.8
+
+# build schemaspy 1505.5
+
+# build rice 2.5.3.1505.13
+#/path/to/rice$ JAVA_OPTS="-Xmx2g -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC" mvn clean install 
+
+# build coeus-api 1505.3
+
+# build coeus-s2sgen 1505.7
+
+# make sure oracle driver is in .m2 repo (ron added oracle dependency to kc pom.xml)
+
+# copy kc-config.xml to ~kuali/main/dev60 and modify where needed
+
+# make sure VPN or ssh tunnel is set up for db access
+
+# build kc
+MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -XX:+UseConcMarkSweepGC" mvn -DskipTests -Dmaven.test.skip=true clean install 
+
+# if you just want to build impl and webapp projects, add this:
+#  -pl coeus-impl,coeus-webapp
+
+# start coeus-webapp via jetty server
+./start
+
+

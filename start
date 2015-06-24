@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+set -o verbose
+
+cd coeus-webapp 
+
+# start in jetty
+MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Doracle.jdbc.Trace=true -javaagent:$HOME/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
+
+# remote debug port 4000
+#MAVEN_OPTS="-Xmx2g -XX:MaxPermSize=512m -Xdebug -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=4000,server=y,suspend=y -javaagent:$HOME/.m2/repository/org/springframework/spring-instrument/3.2.12.RELEASE/spring-instrument-3.2.12.RELEASE.jar" mvn jetty:run
+
+
