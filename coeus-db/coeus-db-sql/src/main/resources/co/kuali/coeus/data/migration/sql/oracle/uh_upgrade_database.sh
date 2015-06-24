@@ -116,6 +116,8 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 602_oracle_kc_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1505_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1505_oracle_kc_upgrade.sql
 
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
+
 echo "Done Grepping for errors in the logs"
 mv *.log ${LOGDIR}
 grep -i error ${LOGDIR}/*.log
