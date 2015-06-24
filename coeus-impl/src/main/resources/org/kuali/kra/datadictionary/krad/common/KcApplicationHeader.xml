@@ -836,6 +836,23 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </list>
                     </property>
                 </bean>
+
+                <bean parent="Uif-HorizontalBoxSection" p:order="35">
+                    <property name="items">
+                        <list>
+                            <bean parent="Uif-Message" p:messageText="IP Advanced" p:order="10" />
+                            <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
+                                  p:iconClass="icon-search" p:order="30">
+                                <property name="actionUrl.requestParameters">
+                                    <map>
+                                        <entry key="href"
+                                               value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=edu.hawaii.institutionalproposal.home.InstitutionalProposalAdvancedSearch&amp;docFormKey=88888888&amp;includeCustomActionUrls=true&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
+                                    </map>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
                 
                 <bean parent="Uif-HorizontalBoxSection" p:order="40">
                     <property name="items">
@@ -898,6 +915,22 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                                     <map>
                                         <entry key="href"
                                                value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.kra.award.home.Award&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
+                                    </map>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+
+                <bean parent="Uif-HorizontalBoxSection" p:order="15">
+                    <property name="items">
+                        <list>
+                            <bean parent="Uif-Message" p:messageText="Award Advanced" p:order="10" />
+                            <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView" p:iconClass="icon-search" p:order="35">
+                                <property name="actionUrl.requestParameters">
+                                    <map>
+                                        <entry key="href"
+                                               value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=edu.hawaii.award.home.AwardAdvancedSearch&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
                                     </map>
                                 </property>
                             </bean>

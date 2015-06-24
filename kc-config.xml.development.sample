@@ -111,10 +111,18 @@
 		<param name="security.directory">/usr/local/rice/</param>
 		<param name="settings.directory">/usr/local/rice/</param>
 		
-		<param name="portal.show.sample.app">false</param>
-		<param name="config.location">classpath:META-INF/uh-config-defaults.xml</param>
+                <!-- Do we need this one anymore ? -->
 		<!--<param name="rice.additionalSpringFiles">classpath:org/kuali/rice/kim/config/UHSpringBeans.xml, classpath:org/kuali/rice/kim/config/KCUHRiceSpringBeans.xml</param>-->
-		<!--
+                <param name="portal.show.sample.app">false</param>
+                <param name="config.location">classpath:META-INF/uh-config-defaults.xml</param>
+                <param name="rice.kew.additionalSpringFiles">classpath:edu/hawaii/UHKEWOverrideSpringBeans.xml</param>
+                <param name="rice.kr.additionalSpringFiles">classpath:org/kuali/rice/krad/config/UHKRADOverrideSpringBeans.xml</param>
+                <param name="kc.kc.award.additionalSpringFiles">classpath:edu/hawaii/UHCustomAwardSpringBeans.xml</param>
+                <param name="kc.kc.ip.additionalSpringFiles">classpath:edu/hawaii/UHCustomInstitutionalProposalSpringBeans.xml</param>
+<!-- Causing errors
+                <param name="kc.kc.pd.additionalSpringFiles">classpath:edu/hawaii/UHCustomProposalDevelopmentSpringBeans.xml</param>
+-->
+
 		<param name="rice.kew.additionalSpringFiles">classpath:org/kuali/rice/kew/config/UHKEWOverrideSpringBeans.xml</param>
 		<param name="rice.kr.additionalSpringFiles">classpath:org/kuali/rice/krad/config/UHKRADOverrideSpringBeans.xml</param>
 		<param name="rice.kc.award.additionalSpringFiles">classpath:edu/hawaii/UHCustomAwardSpringBeans.xml</param>
