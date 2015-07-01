@@ -1441,8 +1441,11 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </map>
                     </property>
                 </bean>
-                <bean parent="Uif-MenuAction" p:actionLabel="Logout" p:actionUrl.viewId="DummyLoginView"
-                      p:actionUrl.controllerMapping="/login" p:actionUrl.methodToCall="logout"/>
+                <!-- KC-1005 Fix Logout -->
+                <bean parent="Kc-Header-IframeMenuAction" p:baseUrl="@{#ConfigProperties['application.url']}/kc-krad"
+                      p:actionLabel="Logout" p:actionUrl.viewId="Kc-Header-IframeView"
+                      p:actionUrl.controllerMapping="/landingPage" p:actionUrl.methodToCall="logout"/>
+                <!-- KC-1005 End -->
             </list>
         </property>
     </bean>

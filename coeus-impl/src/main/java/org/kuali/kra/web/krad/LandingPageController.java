@@ -20,8 +20,12 @@ package org.kuali.kra.web.krad;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.struts.action.ActionForward;
 import org.kuali.coeus.sys.framework.controller.KcCommonControllerService;
+import org.kuali.rice.core.api.CoreApiServiceLocator;
+import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.krad.web.service.ControllerService;
 import org.kuali.rice.krad.web.service.ModelAndViewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Properties;
 
 @Controller
 public class LandingPageController {
@@ -80,6 +86,51 @@ public class LandingPageController {
     public ModelAndView checkForm(@ModelAttribute(value = "KualiForm") LandingPageForm form, BindingResult result, HttpServletRequest request, HttpServletResponse response) {
         return getModelAndViewService().checkForm(form);
     }
+
+    // KC-1005 Fix logout
+    @Transactional @RequestMapping(value = "/landingPage", params = "methodToCall=logout")
+    public ModelAndView logout(@ModelAttribute(value = "KualiForm") LandingPageForm form, BindingResult result, HttpServletRequest request,
+                                       HttpServletResponse response) {
+
+        ConfigurationService configService =  CoreApiServiceLocator.getKualiConfigurationService();
+        String logoutUrlBase = configService.getPropertyValueAsString("rice.portal.logout.redirectUrl");
+
+        StringBuffer casLogoutUrl = new StringBuffer(logoutUrlBase);
+        casLogoutUrl.append("?service=");
+        casLogoutUrl.append(buildContextUrlBase(request));
+        casLogoutUrl.append("/portal.do");
+
+        // destroy the session
+        HttpSession session = request.getSession();
+        if (session != null) {
+            try {
+                session.invalidate();
+            }
+            catch (IllegalStateException e) {
+                // ignore failure, since that just means that the session has
+                // already been
+                // invalidated
+            }
+        }
+
+        // get 'em out of here
+        System.out.println("DEBUG DEBUG " + casLogoutUrl.toString());
+        return modelAndViewService.performRedirect(form,casLogoutUrl.toString(),new Properties());
+    }
+
+    private String buildContextUrlBase(HttpServletRequest request)
+    {
+        StringBuffer contextUrlBase = new StringBuffer();
+        contextUrlBase.append(request.getScheme());
+        contextUrlBase.append("://");
+        contextUrlBase.append(request.getServerName());
+        contextUrlBase.append(":");
+        contextUrlBase.append(request.getServerPort());
+        contextUrlBase.append(request.getContextPath());
+
+        return contextUrlBase.toString();
+    }
+    // KC-1005 end
 
     public ModelAndViewService getModelAndViewService() {
         return modelAndViewService;
