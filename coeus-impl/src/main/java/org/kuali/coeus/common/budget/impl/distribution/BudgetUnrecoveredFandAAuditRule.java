@@ -19,6 +19,7 @@
 package org.kuali.coeus.common.budget.impl.distribution;
 
 import org.apache.commons.lang3.StringUtils;
+import org.kuali.coeus.common.framework.fiscalyear.FiscalYearMonthService;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.budget.framework.core.BudgetAuditEvent;
@@ -34,9 +35,12 @@ import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.rice.krad.util.AuditCluster;
 import org.kuali.rice.krad.util.AuditError;
 import org.kuali.rice.krad.util.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static org.kuali.rice.krad.util.GlobalVariables.getAuditErrorMap;
@@ -48,6 +52,10 @@ public class BudgetUnrecoveredFandAAuditRule extends BudgetAuditRuleBase {
     
     String[] params = { "Unrecovered F and A" };
     private static final int YEAR_CONSTANT = 1900;
+
+    @Autowired
+    @Qualifier("fiscalYearMonthService")
+    private FiscalYearMonthService fiscalYearMonthService;
 
     // Proposal Budget only event possibly
     @KcEventMethod
@@ -114,20 +122,29 @@ public class BudgetUnrecoveredFandAAuditRule extends BudgetAuditRuleBase {
             *
             *END KC-800 
             */
+            // KC-1003 Fiscal Year validation is incorrect
             if (null == fiscalYear || fiscalYear.intValue() <= 0) {
                 retval = false;
                 getAuditErrors().add(new AuditError("document.budget.budgetUnrecoveredFandA["+i+"].fiscalYear",
                                                     KeyConstants.AUDIT_ERROR_BUDGET_DISTRIBUTION_FISCALYEAR_MISSING,
                                                     Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_UNRECOVERED_F_AND_A_PANEL_ANCHOR,
                                                     params));
+            } else {
+                Calendar startDateCal = new java.util.GregorianCalendar();
+                startDateCal.setTime(projectStartDate);
+                Integer startDateFY = fiscalYearMonthService.getFiscalYearFromDate(startDateCal);
+                Calendar endDateCal = new java.util.GregorianCalendar();
+                endDateCal.setTime(projectStartDate);
+                Integer endDateFY = fiscalYearMonthService.getFiscalYearFromDate(endDateCal);
+
+                if (fiscalYear < startDateFY || fiscalYear > endDateFY) {
+                    getAuditWarnings().add(new AuditError("document.budget.budgetUnrecoveredFandA[" + i + "].fiscalYear",
+                            KeyConstants.AUDIT_WARNING_BUDGET_DISTRIBUTION_FISCALYEAR_INCONSISTENT,
+                            Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_UNRECOVERED_F_AND_A_PANEL_ANCHOR,
+                            params));
+                }
             }
-            
-            if (fiscalYear != null && (fiscalYear < projectStartDate.getYear() + YEAR_CONSTANT || fiscalYear > projectEndDate.getYear() + YEAR_CONSTANT)) {
-                getAuditWarnings().add(new AuditError("document.budget.budgetUnrecoveredFandA["+i+"].fiscalYear", 
-                                                      KeyConstants.AUDIT_WARNING_BUDGET_DISTRIBUTION_FISCALYEAR_INCONSISTENT, 
-                                                      Constants.BUDGET_DISTRIBUTION_AND_INCOME_PAGE + "." + Constants.BUDGET_UNRECOVERED_F_AND_A_PANEL_ANCHOR, 
-                                                      params));
-            }
+            // END KC-1003
             
             if(!duplicateEntryFound) {
                 j=0;
@@ -219,19 +236,28 @@ public class BudgetUnrecoveredFandAAuditRule extends BudgetAuditRuleBase {
                                                     budgetUnrecoveredFARule.getPageId(), params));
                 retval = false;
             }
+            // KC-1003 Fiscal Year validation is incorrect
             if (fiscalYear == null || fiscalYear.intValue() <= 0) {
                 auditErrors.add(new AuditError(budgetUnrecoveredFARule.getPageId(),
                                                     KeyConstants.AUDIT_ERROR_BUDGET_DISTRIBUTION_FISCALYEAR_MISSING,
                                                     budgetUnrecoveredFARule.getPageId(), params));
                 retval = false;
-           }
-            
-            if (fiscalYear != null && (fiscalYear < projectStartDate.getYear() + YEAR_CONSTANT || fiscalYear > projectEndDate.getYear() + YEAR_CONSTANT)) {
-            	auditWarnings.add(new AuditError(budgetUnrecoveredFARule.getPageId(), 
-                                                      KeyConstants.AUDIT_WARNING_BUDGET_DISTRIBUTION_FISCALYEAR_INCONSISTENT, 
-                                                      budgetUnrecoveredFARule.getPageId(), params));
-                retval = false;
+           } else {
+                Calendar startDateCal = new java.util.GregorianCalendar();
+                startDateCal.setTime(projectStartDate);
+                Integer startDateFY = fiscalYearMonthService.getFiscalYearFromDate(startDateCal);
+                Calendar endDateCal = new java.util.GregorianCalendar();
+                endDateCal.setTime(projectStartDate);
+                Integer endDateFY = fiscalYearMonthService.getFiscalYearFromDate(endDateCal);
+
+                if (fiscalYear < startDateFY || fiscalYear > endDateFY) {
+                    auditWarnings.add(new AuditError(budgetUnrecoveredFARule.getPageId(),
+                            KeyConstants.AUDIT_WARNING_BUDGET_DISTRIBUTION_FISCALYEAR_INCONSISTENT,
+                            budgetUnrecoveredFARule.getPageId(), params));
+                    retval = false;
+                }
             }
+            // END KC-1003
             
             if(!duplicateEntryFound) {
                 j=0;
