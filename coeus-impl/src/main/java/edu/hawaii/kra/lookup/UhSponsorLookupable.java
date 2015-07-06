@@ -1,7 +1,5 @@
-/*  NOTE: Placing this in edu.hawaii.kra.lookup; makes it file to find the service
-          perhaps we have to tell spring what folders to search for annotations ?
-*/
-package org.kuali.coeus.common.framework.sponsor;
+/* KC-959 Improve search for Performance Site, Unit and Sponsor using SOLR */
+package edu.hawaii.kra.lookup;
 
 import edu.hawaii.kra.lookup.UhSolrExternalSearch;
 import org.eclipse.osgi.framework.util.ArrayMap;
@@ -19,10 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-/**
- * Created by ronald on 6/30/2015.
- */
 
 @Component("uhSponsorLookupable")
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
