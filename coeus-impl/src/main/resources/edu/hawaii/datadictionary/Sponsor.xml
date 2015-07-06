@@ -6,6 +6,7 @@
         http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
 <!-- KC-530 Lookup screens are too difficult for users, make searches easier by implementing search engine  -->
+<!-- KC-959 Improve search for Performance Site, Unit and Sponsor using SOLR (Fix for KC 6.0  KRAD changes) -->
 <bean id="Sponsor" parent="Sponsor-parentBean">
          <property name="attributes">
 			<list merge="true">
@@ -31,16 +32,29 @@
             p:rows="5"
             p:cols="40" />
     </property>
+    <property name="controlField">
+        <bean p:size="40" parent="Uif-TextControl"/>
+    </property>
     <property name="summary" value="Sponsor Search" />
     <property name="description" value="SponsorSearchInput Data to be sent to solr." />
   </bean>
   
-<bean id="Sponsor-lookupDefinition" parent="Sponsor-lookupDefinition-parentBean">
-   <property name="lookupFields" >
-      <list>
-        <bean parent="FieldDefinition"
-              p:attributeName="sponsorSearchInput"/>
-      </list>
+    <bean id="Sponsor-lookupDefinition" parent="Sponsor-lookupDefinition-parentBean">
+       <property name="lookupFields" >
+          <list>
+            <bean parent="FieldDefinition"
+                  p:attributeName="sponsorSearchInput"/>
+          </list>
+        </property>
+    </bean>
+
+    <bean id="Sponsor-LookupView" parent="Sponsor-LookupView-parentBean">
+    <property name="viewHelperService" value="#{#getService('uhSponsorLookupable')}"/>
+    <property name="headerText" value="Sponsor Lookup"/>
+    <property name="criteriaFields">
+        <list>
+            <bean p:propertyName="sponsorSearchInput" parent="Uif-LookupCriteriaInputField"/>
+        </list>
     </property>
 </bean>
         
