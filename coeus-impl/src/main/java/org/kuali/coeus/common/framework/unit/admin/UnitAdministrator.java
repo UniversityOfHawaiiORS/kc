@@ -61,7 +61,10 @@ public class UnitAdministrator extends KcPersistableBusinessObjectBase implement
     private Unit unit;
 
     // KC-679 New routing for 5.1.1 (Added to/from dates to unit admin)
+    @Column(name = "ACTV_FRM_DT")
     private Date fromDate;
+
+    @Column(name = "ACTV_TO_DT")
     private Date toDate;
     // KC-679 END
 
