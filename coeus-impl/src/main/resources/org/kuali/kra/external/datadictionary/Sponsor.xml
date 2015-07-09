@@ -317,12 +317,6 @@
   <bean id="Sponsor-LookupView-parentBean" abstract="true" parent="Uif-LookupView">
     <property name="dataObjectClassName" value="org.kuali.coeus.common.framework.sponsor.Sponsor"/>
     <property name="headerText" value="Sponsor Lookup"/>
-    <property name="defaultSortAscending" value="false"/>
-    <property name="defaultSortAttributeNames">
-      <list>
-        <value>sponsorCode</value>
-      </list>
-    </property>
     <property name="criteriaFields">
       <list>
         <bean p:propertyName="sponsorCode" parent="Uif-LookupCriteriaInputField"/>
