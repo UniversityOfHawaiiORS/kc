@@ -584,7 +584,8 @@ public class KeyPersonnelServiceImpl implements KeyPersonnelService, Constants {
                 unitTotalLine.setDescription("Unit Total:");
                 unitTotalLine.setLineType("unit-total");
                 for (Map.Entry<String,ProposalUnitCreditSplit> entry : totalUnitSplits.entrySet()) {
-                    unitTotalLine.getCreditSplits().add(0,entry.getValue());
+                    // KC-987 For the Credit Allocation, the RTRF and Effort columns for Unit Total and Investigator Total are swapped
+                    unitTotalLine.getCreditSplits().add(entry.getValue());
                 }
                 creditSplitListItems.add(unitTotalLine);
             }
@@ -595,7 +596,8 @@ public class KeyPersonnelServiceImpl implements KeyPersonnelService, Constants {
             investigatorTotalLine.setDescription("Investigator Total:");
             investigatorTotalLine.setLineType("investigator-total");
             for (Map.Entry<String,ProposalPersonCreditSplit> entry : totalInvestigatorSplits.entrySet()) {
-                investigatorTotalLine.getCreditSplits().add(0,entry.getValue());
+                // KC-987 For the Credit Allocation, the RTRF and Effort columns for Unit Total and Investigator Total are swapped
+                investigatorTotalLine.getCreditSplits().add(entry.getValue());
             }
             creditSplitListItems.add(investigatorTotalLine);
         }
