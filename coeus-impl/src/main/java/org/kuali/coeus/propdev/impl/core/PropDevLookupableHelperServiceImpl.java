@@ -102,10 +102,13 @@ public class PropDevLookupableHelperServiceImpl extends LookupableImpl implement
         Map<String,String> modifiedSearchCriteria = new HashMap<String,String>();
         modifiedSearchCriteria.putAll(adjustedSearchCriteria);
         List<String> proposalNumbers = new ArrayList<String>();
+        // KC-929 KC 6.0 All My Proposals no longer works
+        //               improving performance while making this fix
+        String initiator = null;
         if (StringUtils.isEmpty(adjustedSearchCriteria.get("proposalNumber"))) {
             String principalInvestigatorName = adjustedSearchCriteria.get("principalInvestigatorName");
             String proposalPerson = adjustedSearchCriteria.get("proposalPerson");
-            String initiator = adjustedSearchCriteria.get("initiator");
+            initiator = adjustedSearchCriteria.get("initiator");
             List<String> piProposals = getPiProposalNumbers(principalInvestigatorName);
             List<String> personProposals = getPersonProposalNumbers(proposalPerson);
             List<String> initiatorProposals = getInitiatorProposalNumbers(initiator);
@@ -136,10 +139,18 @@ public class PropDevLookupableHelperServiceImpl extends LookupableImpl implement
         final List<DevelopmentProposal> proposals = getDataObjectService().findMatching(DevelopmentProposal.class, query.build()).getResults();
 
         boolean doNotFilter = false;
+
         if (CollectionUtils.isNotEmpty(proposals) && proposals.size() > SMALL_NUMBER_OF_RESULTS) {
             //if the proposal result list is more than a few proposals then attempt to figure out if a principal
             //has access to all proposals
-            doNotFilter = canAccessAllProposals();
+            // KC-929 KC 6.0 All My Proposals no longer works
+            // improving performance while making this fix
+            // adding check for initiator search is session user in which case no point in checking permission
+            if (StringUtils.isNotEmpty(initiator) && initiator.equals(getGlobalVariableService().getUserSession().getPrincipalName())) {
+                doNotFilter = true;
+            } else {
+                doNotFilter = canAccessAllProposals();
+            }
         }
 
         return doNotFilter ? proposals : filterPermissions(proposals);
