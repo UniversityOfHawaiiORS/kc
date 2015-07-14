@@ -639,7 +639,8 @@
 				<kul:htmlControlAttribute property="document.awardList[0].extension.assignedToPersonId" attributeEntry="${uhAwardExtensionAttributes.assignedToPersonId}" />
 				<c:if test="${!readOnly}">
 					<%-- Could add the following to prepopulate the lookup with the currently assigned person -> lookupParameters="document.awardList[0].extension.assignedToPersonId:personId" --%>
-					<kul:lookup boClassName="org.kuali.kra.bo.KcPerson"
+					<%-- KC-985 STE if you click on the Assigned To lookup in award --%>
+					<kul:lookup boClassName="org.kuali.coeus.common.framework.person.KcPerson"
 						fieldConversions="personId:document.awardList[0].extension.assignedToPersonId"
 						anchor="${tabKey}"
 						baseLookupUrl="kr/lookup.do" />
