@@ -12,6 +12,8 @@ then
     exit
 fi
 
+
+
 CURRENT_DIR=`pwd`
 
 getAnswer() {
@@ -24,6 +26,15 @@ getAnswer() {
         echo "${answer}"
         echo 1>&2
         }
+
+if [ -f ../../../../../../../../../../../coeus-db-data-conv/ojdbc6-11.2.0.3.jar ]
+then
+    echo "found ojdbc file proceeding"
+else
+    echo "ERROR: didn't find ojdbc file in coeus-db-conv directory aborting"
+    exit 1
+fi
+
 
 un=`getAnswer 'Enter KC Database Username'`
 
