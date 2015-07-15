@@ -21,6 +21,7 @@ package org.kuali.coeus.propdev.impl.copy;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.budget.framework.core.Budget;
+import org.kuali.coeus.common.budget.framework.period.BudgetPeriod;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocValue;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocument;
 import org.kuali.coeus.common.framework.org.Organization;
@@ -73,6 +74,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -212,6 +214,8 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                 }
 
                 newDoc.getDevelopmentProposal().setS2sOpportunity(null);
+                
+                clearProposalPersonNotificationDetails(newDoc);
 
                 // all copied proposals should always be in progress.
                 newDoc.getDevelopmentProposal().setProposalStateTypeCode(ProposalState.IN_PROGRESS);
@@ -222,6 +226,8 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                 addAbstracts(abstracts, newDoc);
 
                 modifyNewProposal(doc, newDoc, criteria);
+
+                addCreateDetails(newDoc);
 
                 getDocumentService().saveDocument(newDoc);
 
@@ -298,10 +304,10 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
 
     protected void removeAttachments(ProposalDevelopmentDocument newDoc) {
-        newDoc.getDevelopmentProposal().setNarratives(new ArrayList<Narrative>());
-        newDoc.getDevelopmentProposal().setInstituteAttachments(new ArrayList<Narrative>());
-        newDoc.getDevelopmentProposal().setProposalAbstracts(new ArrayList<ProposalAbstract>());
-        newDoc.getDevelopmentProposal().setPropPersonBios(new ArrayList<ProposalPersonBiography>());
+        newDoc.getDevelopmentProposal().setNarratives(new ArrayList<>());
+        newDoc.getDevelopmentProposal().setInstituteAttachments(new ArrayList<>());
+        newDoc.getDevelopmentProposal().setProposalAbstracts(new ArrayList<>());
+        newDoc.getDevelopmentProposal().setPropPersonBios(new ArrayList<>());
     }
 
     /**
@@ -324,7 +330,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         copyOverviewProperties(srcDoc, newDoc);
         
         copyRequiredProperties(srcDoc, newDoc);
-        
+
         // Set lead unit.
         setLeadUnit(newDoc, criteria.getLeadUnitNumber());
         
@@ -365,6 +371,12 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         }
 
         copyCustomDataFromDocument(oldDoc, newDoc);
+
+    }
+
+    private void addCreateDetails(ProposalDevelopmentDocument proposalDevelopmentDocument) {
+        proposalDevelopmentDocument.getDevelopmentProposal().setCreateTimestamp(new Timestamp(System.currentTimeMillis()));
+        proposalDevelopmentDocument.getDevelopmentProposal().setCreateUser(getGlobalVariableService().getUserSession().getLoggedInUserPrincipalName());
     }
 
     /**
@@ -438,7 +450,10 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         fixNextValues(oldDoc, newDoc);
 
         DevelopmentProposal copy = (DevelopmentProposal) deepCopy(oldDoc.getDevelopmentProposal());
-        
+        // remove attachments since they cause issues in oracle while persisting. They
+        // are repopulated later at any rate.
+        removeBioAttachments(copy);
+
         copy.getBudgets().clear();
         copy.setFinalBudget(null);
 
@@ -446,6 +461,12 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
         copy.setProposalDocument(newDoc);
 
+    }
+
+    private void removeBioAttachments(DevelopmentProposal copy) {
+        for(ProposalPersonBiography bio : copy.getPropPersonBios()) {
+            bio.setPersonnelAttachment(null);
+        }
     }
 
     protected KcDataObject deepCopy(KcDataObject src) throws Exception {
@@ -543,10 +564,24 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
         }
 
+        if (criteria.getIncludeBudget()) {
+            modifyBudgetModular(newDoc);
+        }
+
         copyOpportunity(newDoc, srcDoc);
 
         fixS2sUserAttachedForms(newDoc);
 
+    }
+
+    private void modifyBudgetModular(ProposalDevelopmentDocument newDoc) {
+        for(Budget budget : newDoc.getDevelopmentProposal().getBudgets()) {
+            for (BudgetPeriod budgetPeriod : budget.getBudgetPeriods()) {
+                if (budgetPeriod.getBudgetModular() != null) {
+                    budgetPeriod.getBudgetModular().setBudgetId(budget.getBudgetId());
+                }
+            }
+        }
     }
 
     /*
@@ -620,7 +655,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     protected void copyAttachmentFiles(DevelopmentProposal oldProposal, DevelopmentProposal newProposal) {
         copyNarrativeAttachments(oldProposal.getNarratives(), newProposal.getNarratives());
         copyNarrativeAttachments(oldProposal.getInstituteAttachments(), newProposal.getInstituteAttachments());
-        copyPropPersonBiosAttachments(oldProposal.getPropPersonBios(),newProposal.getPropPersonBios());
+        copyPropPersonBiosAttachments(oldProposal.getPropPersonBios(), newProposal.getPropPersonBios());
     }
 
     protected void copyPropPersonBiosAttachments(List<ProposalPersonBiography> oldBiographies, List<ProposalPersonBiography> newBiographies) {
@@ -850,6 +885,18 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             	dest.getDevelopmentProposal().getBudgets().add(budgetCopy);   		
         	}
         }
+    }
+    
+    private void clearProposalPersonNotificationDetails(ProposalDevelopmentDocument proposalDevelopmentDocument){
+    	List<ProposalPerson> proposalPersons = new ArrayList();
+    	for(ProposalPerson proposalPerson : proposalDevelopmentDocument.getDevelopmentProposal().getProposalPersons()){
+    		proposalPerson.setLastNotification(null);
+    		proposalPerson.setCertifiedBy(null);
+    		proposalPerson.setCertifiedTime(null);
+    		proposalPersons.add(proposalPerson);
+    	}
+    	 proposalDevelopmentDocument.getDevelopmentProposal().setProposalPersons(proposalPersons);
+    	
     }
 
     public void setDataObjectService(DataObjectService dataObjectService) {

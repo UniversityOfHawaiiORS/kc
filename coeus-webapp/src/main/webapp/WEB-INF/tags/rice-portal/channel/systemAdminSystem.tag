@@ -36,7 +36,8 @@
     <br>
     <li><portal:portalLink displayTitle="true" title="Process UHIMS messages now (Wait for result)" url="${ConfigProperties.application.url}/uh_processUHIMS.jsp"/></li>
     <%-- KC-901 END --%>
-      <li><portal:portalLink displayTitle="true" title="Database Schema Information" url="${ConfigProperties.application.url}/schemaspy/index.html" /></li>
+    <li><portal:portalLink displayTitle="true" title="Database Schema Information" url="${ConfigProperties.application.url}/schemaspy/index.html" /></li>
+    <li><portal:portalLink displayTitle="true" title="Monitoring" url="${ConfigProperties.application.url}/monitoring/jm" /></li>
   </ul>
 </div>
 <channel:portalChannelBottom />
