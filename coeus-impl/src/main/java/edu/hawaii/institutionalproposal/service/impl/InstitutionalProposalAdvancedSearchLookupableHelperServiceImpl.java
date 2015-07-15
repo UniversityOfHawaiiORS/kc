@@ -39,7 +39,7 @@ public class InstitutionalProposalAdvancedSearchLookupableHelperServiceImpl
 	 */
 	@Override
     @SuppressWarnings("unchecked")
-    public List<? extends BusinessObject> getSearchResults(Map<String, String> fieldValues) {
+    public List<InstitutionalProposal> getSearchResults(Map<String, String> fieldValues) {
         
 		// KC-624 IP advanced search is not working
 		// Add a field indicating this is an advanced search and just call parent
