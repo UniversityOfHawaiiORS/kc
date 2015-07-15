@@ -127,6 +127,11 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 602_oracle_kc_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1505_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1505_oracle_kc_upgrade.sql
 
+#Update to 1506
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_upgrade.sql
+
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
 
 echo "Done Grepping for errors in the logs"
