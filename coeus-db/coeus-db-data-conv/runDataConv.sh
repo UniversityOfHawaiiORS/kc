@@ -1,9 +1,7 @@
 #TODO
 # add options for DB_PORT and TNS_NAME
-JARFILE=coeus-db-data-conv-1505.61.jar
+JARFILE=coeus-db-data-conv-1506.69.jar
 logdir="LOGDIR"
-database_sid="kcdev"
-database_port=1530
 
 usage()
 {
@@ -11,7 +9,6 @@ cat << HERE
 usage: $0 -u {db_userid} -p {db_password} -l {log dir}
 
 Run the data conversion process.
-NOTE:  Only working in gitbash right now.....need to fix for CYGWIN 
 
 OPTIONS:
         -d dryrun
@@ -22,7 +19,7 @@ OPTIONS:
 HERE
 }
 
-while getopts "s:l:u:p:hd" OPTION
+while getopts "s:l:u:p:hdn:" OPTION
 do
         case $OPTION in
                 h) usage
@@ -44,6 +41,9 @@ do
 		   ;;
                 s) 
                    database_sid=$OPTARG
+                   ;;
+                n) 
+                   database_port=$OPTARG
                    ;;
                 ?)
                    usage

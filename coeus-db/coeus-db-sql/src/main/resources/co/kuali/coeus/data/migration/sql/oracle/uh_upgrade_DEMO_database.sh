@@ -42,7 +42,17 @@ pw=`getAnswer 'Enter KC Database Password'`
 
 DBSvrNm=`getAnswer 'Enter KC Database TNS Name'`
 
-PORT=`getAnswer 'Enter KC Database port forwarding port number'`
+PORT=`getAnswer 'Enter Database portforwarding PORT'`
+
+# Make sure username has kcxxxx name
+if [ "${un}" == "${un/kc//}" ]
+then
+    echo "*************************************************"
+    echo "ERROR:user name doesn't contain kc"
+    echo "aborting: this doesn't seem to be a demo database"
+    echo "*************************************************"
+    exit 1
+fi
 
 if [ "${DBSvrNm}" != "kcdev" ] && [ "${DBSvrNm}" != "kc" ]
 then
@@ -69,35 +79,36 @@ timestamp=`date +%Y%m%d%H%M`
 LOGDIR=${CURRENT_DIR}/LOGS.${un}.${timestamp}
 mkdir -p ${LOGDIR}
 
+# DEMO IS ALREADY created at 6.0 level so skip
 # Update to 5.2.0
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_rice_server_upgrade.sql
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_rice_client_upgrade.sql
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_kc_rice_server_upgrade.sql
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_kc_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_rice_server_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_rice_client_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_kc_rice_server_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_kc_upgrade.sql
 
 # Update to 5.2.1
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 521_oracle_kc_rice_server_upgrade.sql
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 521_oracle_kc_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 521_oracle_kc_rice_server_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 521_oracle_kc_upgrade.sql
 
 # Update to 6.0.0
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_rice_server_upgrade.sql
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_rice_client_upgrade.sql
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_kc_rice_server_upgrade.sql
-sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_kc_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_rice_server_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_rice_client_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_kc_rice_server_upgrade.sql
+#sqlplus "${un}"/"${pw}@${DBSvrNm}" < 600_oracle_kc_upgrade.sql
 
-echo "Grepping for errors in the logs"
-mv *.log ${LOGDIR}
-grep -i error ${LOGDIR}/*.log
+#echo "Grepping for errors in the logs"
+#mv *.log ${LOGDIR}
+#grep -i error ${LOGDIR}/*.log
 
-while [ "${ans}" != "y" ] && [ "${ans}" != "n" ]
-do
-    read -p "Next Step Run Database Conversion Process Continue ? (y/n)" ans
-done
+#while [ "${ans}" != "y" ] && [ "${ans}" != "n" ]
+#do
+#    read -p "Next Step Run Database Conversion Process Continue ? (y/n)" ans
+#done
 
-if [ "${ans}" == "n" ]
-then
-    exit 1
-fi
+#if [ "${ans}" == "n" ]
+#then
+#    exit 1
+#fi
 
 cd ../../../../../../../../../../../coeus-db-data-conv
 ./runDataConv.sh -u ${un} -p ${pw} -l ${LOGDIR} -n ${PORT} -s ${DBSvrNm}
@@ -133,6 +144,8 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1505_oracle_kc_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_demo.sql
+
 
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
 

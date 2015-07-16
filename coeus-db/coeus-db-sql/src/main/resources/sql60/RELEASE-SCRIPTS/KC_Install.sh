@@ -18,11 +18,6 @@
 ########################################
 #!/bin/sh
 
-if [ ! -d LOGS ]
-then
-	mkdir LOGS
-fi
-
 getChoice() {
 	prompt="$1"
 	shift
@@ -119,12 +114,20 @@ else
 	RiceDBSvrNm="${DBSvrNm}"
 fi
 
+LOGS=LOGS.${un}
+
+if [ ! -d ${LOGS} ]
+then
+	mkdir ${LOGS}
+fi
+
+
 case "${dbtype}" in
 	"ORACLE")
 	
 		cd KC-RELEASE-0_0_0-SCRIPT
         sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-0_0_0-Upgrade-ORACLE.sql
-        mv *.log ../LOGS/
+        mv *.log ../${LOGS}/
         cd ..
         
         cd KC-RELEASE-3_0-CLEAN/oracle
@@ -160,7 +163,7 @@ case "${dbtype}" in
             fi
             sqlplus "${un}"/"${pw}${DBSvrNm}" < oracle_client.sql
         
-			mv *.log ../../LOGS/
+			mv *.log ../../${LOGS}/
 	        cd ../..
 
 			cd KC-RELEASE-3_0_1-SCRIPT
@@ -172,7 +175,7 @@ case "${dbtype}" in
 				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-Release-3_0-3_0_1-SR-Oracle-Install.sql
 			fi
 			
-			mv *.log ../LOGS/
+			mv *.log ../${LOGS}/
 			cd .. 
 
 			cd KC-RELEASE-3_1_SP1-SCRIPT
@@ -186,7 +189,7 @@ case "${dbtype}" in
 			else
 				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-Release-3_0_1-3_1_S1-SR-Oracle-Install.sql
 			fi
-			mv *.log ../LOGS/
+			mv *.log ../${LOGS}/
 			cd ..
 			
 			cd KC-RELEASE-3_1_SP2-SCRIPT
@@ -198,7 +201,7 @@ case "${dbtype}" in
 			else
 				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_SP2-SR-ORACLE.sql
 			fi
-			mv *.log ../LOGS/
+			mv *.log ../${LOGS}/
 			cd ..
 
 			cd KC-RELEASE-3_1_SP3-SCRIPT
@@ -210,7 +213,7 @@ case "${dbtype}" in
 			else
 				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_SP3-SR-ORACLE.sql
 			fi
-			mv *.log ../LOGS/
+			mv *.log ../${LOGS}/
 			cd ..
 			
 			cd KC-RELEASE-3_1_SP4-SCRIPT
@@ -223,7 +226,7 @@ case "${dbtype}" in
             else
             	sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_SP4-SR-ORACLE.sql
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 
 			cd KC-RELEASE-3_1_1-SCRIPT
@@ -234,7 +237,7 @@ case "${dbtype}" in
 			else
 				sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_1_1-SR-ORACLE.sql
 			fi
-			mv *.log ../LOGS/
+			mv *.log ../${LOGS}/
 			cd ..
 		fi
 		
@@ -248,7 +251,7 @@ case "${dbtype}" in
             else
             	sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-3_2-SR-ORACLE.sql
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 
             cd KC-RELEASE-4_0-SCRIPT
@@ -265,7 +268,7 @@ case "${dbtype}" in
             	sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-4_0-SR-ORACLE.sql
             fi
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-4_0-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 
             cd KC-RELEASE-5_0-SCRIPT
@@ -279,7 +282,7 @@ case "${dbtype}" in
             fi
             sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-5_0-Upgrade-ORACLE.sql
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-5_0-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi 
 
@@ -288,7 +291,7 @@ case "${dbtype}" in
             cd KC-RELEASE-5_0_1-SCRIPT
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-5_0_1-Upgrade-ORACLE.sql
             sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-5_0_1-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
 
@@ -305,7 +308,7 @@ case "${dbtype}" in
             fi
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-5_1_0-Upgrade-ORACLE.sql
             sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-5_1_0-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 		fi
 
@@ -322,7 +325,7 @@ case "${dbtype}" in
             fi
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-5_1_1-Upgrade-ORACLE.sql
             sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-5_1_1-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 		fi
 		
@@ -339,7 +342,7 @@ case "${dbtype}" in
             fi
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-5_2_0-Upgrade-ORACLE.sql
             sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-5_2_0-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 		fi
 		
@@ -348,7 +351,7 @@ case "${dbtype}" in
             cd KC-RELEASE-5_2_1-SCRIPT
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-5_2_1-Upgrade-ORACLE.sql
             sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-5_2_1-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 		fi
 		
@@ -365,53 +368,26 @@ case "${dbtype}" in
             fi
             sqlplus "${un}"/"${pw}${DBSvrNm}" < KC-RELEASE-6_0_0-Upgrade-ORACLE.sql
             sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-6_0_0-Upgrade-ORACLE.sql
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 		fi
 		
 	cd KC-RELEASE-99_9_9-SCRIPT
 	sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < KR-RELEASE-99_9_9-Upgrade-ORACLE.sql
-	mv *.log ../LOGS/
+	mv *.log ../${LOGS}/
 	cd ..
 			
 	cd KC-RELEASE-3_0-CLEAN/oracle
 	sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < krrelease/datasql/KR_00_CLEAN_SEQ_BS.sql
-        mv *.log ../../LOGS/
-        cd ../..
+        mv *.log ../../${LOGS}/
+        cd ../.. ;;
 
-        # ADDED STEPS RRG to make upgrades easier
-        # Process upgrade scripts which KualiCo is no longer supporing in these install scripts.
-        cd ../../co/kuali/coeus/data/migration/sql/oracle
-
-        # Update to 6.0.1
-        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 601_oracle_kc_rice_server_upgrade.sql
-        sqlplus "${un}"/"${pw}${DBSvrNm}" < 601_oracle_kc_upgrade.sql
-
-        # Update to 6.0.2
-        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 602_oracle_kc_rice_server_upgrade.sql
-        sqlplus "${un}"/"${pw}${DBSvrNm}" < 602_oracle_kc_upgrade.sql
-
-        #Update to 1505
-        sqlplus "${Riceun}"/"${Ricepw}${RiceDBSvrNm}" < 1505_oracle_kc_rice_server_upgrade.sql
-        sqlplus "${un}"/"${pw}${DBSvrNm}" < 1505_oracle_kc_upgrade.sql
-
-        # Run UH fixes for issues found
-        #sqlplus "${un}"/"${pw}${DBSvrNm}" < uh_fix_issues_missed_by_kualico.sql
-
-        mv *.log ../../../../../../../sql60/RELEASE-SCRIPTS/LOGS
-        cd ../../../../../../../sql60/RELEASE-SCRIPTS
-        # Move logs folder so running for more than one schema will create multiple log folders
-        mv LOGS "LOGS.${un}" ;;
-
-        # ADDED STEPS RRG DONE
-        
-		
 	"MYSQL")
 	
 		cd KC-RELEASE-0_0_0-SCRIPT
         mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-0_0_0-Upgrade-MYSQL.sql > KC-RELEASE-0_0_0-Upgrade-MYSQL-Install.log 2>&1
         mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-0_0_0-Upgrade-MYSQL.sql > KR-RELEASE-0_0_0-Upgrade-MYSQL-Install.log 2>&1
-        mv *.log ../LOGS/
+        mv *.log ../${LOGS}/
         cd ..
 	
         cd KC-RELEASE-3_0-CLEAN/mysql
@@ -434,7 +410,7 @@ case "${dbtype}" in
 		
         mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < krrelease/datasql/KR_00_SEQ_BS.sql > KR_SEQ_BS-Mysql-Install.log 2>&1
         
-        mv *.log ../../LOGS/
+        mv *.log ../../${LOGS}/
         cd ../..
         
         if [ "${version}" = "NEW" ]
@@ -448,7 +424,7 @@ case "${dbtype}" in
             fi
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < mysql_client.sql > KC-Release-3_0-Clean-Client-Mysql-Install.log 2>&1
         
-    	    mv *.log ../../LOGS/
+    	    mv *.log ../../${LOGS}/
 	        cd ../..
 		
 
@@ -460,7 +436,7 @@ case "${dbtype}" in
             else
             	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-Release-3_0-3_0_1-SR-Mysql-Install.sql > KR-Release-3_0-3_0_1-SR-Mysql-Install.log 2>&1
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd .. 
 
 	    cd KC-RELEASE-3_1_SP1-SCRIPT
@@ -473,7 +449,7 @@ case "${dbtype}" in
 		else
 			mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-Release-3_0_1-3_1_S1-SR-Mysql-Install.sql > KR-Release-3_0_1-3_1_S1-SR-Mysql-Install.log 2>&1
 		fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
             
             cd KC-RELEASE-3_1_SP2-SCRIPT
@@ -485,7 +461,7 @@ case "${dbtype}" in
             else
             	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-3_1_SP2-SR-MYSQL.sql > KR-RELEASE-3_1_SP2-SR-MYSQL-Install.log 2>&1
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 
             cd KC-RELEASE-3_1_SP3-SCRIPT
@@ -497,7 +473,7 @@ case "${dbtype}" in
             else
             	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-3_1_SP3-SR-MYSQL.sql > KR-RELEASE-3_1_SP3-SR-MYSQL-Install.log 2>&1
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 
 		cd KC-RELEASE-3_1_SP4-SCRIPT
@@ -510,7 +486,7 @@ case "${dbtype}" in
             else
             	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-3_1_SP4-SR-MYSQL.sql > KR-RELEASE-3_1_SP4-SR-MYSQL-Install.log 2>&1
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
  
             cd KC-RELEASE-3_1_1-SCRIPT
@@ -521,7 +497,7 @@ case "${dbtype}" in
             else
             	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-3_1_1-SR-MYSQL.sql > KR-RELEASE-3_1_1-SR-MYSQL-Install.log 2>&1
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 		fi
 		
@@ -535,7 +511,7 @@ case "${dbtype}" in
             else
             	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-3_2-SR-MYSQL.sql > KR-RELEASE-3_2-SR-MYSQL-Install.log 2>&1
             fi
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 
             cd KC-RELEASE-4_0-SCRIPT
@@ -552,7 +528,7 @@ case "${dbtype}" in
             	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-4_0-SR-MYSQL.sql > KR-RELEASE-4_0-SR-MYSQL-Install.log 2>&1
             fi
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-4_0-Upgrade-MYSQL.sql > KC-RELEASE-4_0-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
 
             cd KC-RELEASE-5_0-SCRIPT
@@ -566,7 +542,7 @@ case "${dbtype}" in
             fi
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-5_0-Upgrade-MYSQL.sql > KC-RELEASE-5_0-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-5_0-Upgrade-MYSQL.sql > KR-RELEASE-5_0-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
 
@@ -575,7 +551,7 @@ case "${dbtype}" in
             cd KC-RELEASE-5_0_1-SCRIPT
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-5_0_1-Upgrade-MYSQL.sql > KC-RELEASE-5_0_1-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-5_0_1-Upgrade-MYSQL.sql > KR-RELEASE-5_0_1-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
 
@@ -592,7 +568,7 @@ case "${dbtype}" in
             fi
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-5_1_0-Upgrade-MYSQL.sql > KC-RELEASE-5_1_0-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-5_1_0-Upgrade-MYSQL.sql > KR-RELEASE-5_1_0-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
 
@@ -609,7 +585,7 @@ case "${dbtype}" in
             fi
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-5_1_1-Upgrade-MYSQL.sql > KC-RELEASE-5_1_1-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-5_1_1-Upgrade-MYSQL.sql > KR-RELEASE-5_1_1-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
         
@@ -626,7 +602,7 @@ case "${dbtype}" in
             fi
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-5_2_0-Upgrade-MYSQL.sql > KC-RELEASE-5_2_0-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-5_2_0-Upgrade-MYSQL.sql > KR-RELEASE-5_2_0-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
   
@@ -635,7 +611,7 @@ case "${dbtype}" in
             cd KC-RELEASE-5_2_1-SCRIPT
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-5_2_1-Upgrade-MYSQL.sql > KC-RELEASE-5_2_1-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-5_2_1-Upgrade-MYSQL.sql > KR-RELEASE-5_2_1-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
         
@@ -652,18 +628,18 @@ case "${dbtype}" in
             fi
             mysql -u ${un} -p${pw} -D ${DBSvrNm} -s -f < KC-RELEASE-6_0_0-Upgrade-MYSQL.sql > KC-RELEASE-6_0_0-Upgrade-MYSQL-Install.log 2>&1
             mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-6_0_0-Upgrade-MYSQL.sql > KR-RELEASE-6_0_0-Upgrade-MYSQL-Install.log 2>&1
-            mv *.log ../LOGS/
+            mv *.log ../${LOGS}/
             cd ..
         fi
                       
 	cd KC-RELEASE-99_9_9-SCRIPT
 	mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < KR-RELEASE-99_9_9-Upgrade-MYSQL.sql > KR-RELEASE-99_9_9-Upgrade-MYSQL-Install.log 2>&1
-	mv *.log ../LOGS/
+	mv *.log ../${LOGS}/
 	cd ..
 				
         cd KC-RELEASE-3_0-CLEAN/mysql
         mysql -u ${Riceun} -p${Ricepw} -D ${RiceDBSvrNm} -s -f < krrelease/datasql/KR_00_CLEAN_SEQ_BS.sql > KR_CLEAN_SEQ_BS-Mysql-Install.log 2>&1
-        mv *.log ../../LOGS/
+        mv *.log ../../${LOGS}/
         cd ../.. ;;
 
 esac
