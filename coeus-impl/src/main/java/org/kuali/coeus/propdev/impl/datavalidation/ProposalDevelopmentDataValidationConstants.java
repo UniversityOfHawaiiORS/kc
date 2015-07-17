@@ -53,6 +53,8 @@ public final class ProposalDevelopmentDataValidationConstants {
     public static final String ORGANIZATION_PAGE_NAME = "Organizations & Locations";
     public static final String APPLICANT_ORGANIZATION_SECTION_ID = "PropDev-ApplicantOrganizationPage-Section";
     public static final String APPLICANT_ORGANIZATION_SECTION_NAME = "Applicant Organization";
+    // KC-952 Project Performance Site Improvements ; KC called it performing organization, UH calls it primary performance site
+    public static final String PERFORMING_ORGANIZATION_SECTION_ID = "PropDev-PerformingOrganizationPage-Section";
     public static final String ORIGINAL_PROPOSAL_ID_KEY = "document.developmentProposal.continuedFrom";
 
     public static final String PERSONNEL_PAGE_ID = "PropDev-PersonnelPage";
@@ -96,7 +98,7 @@ public final class ProposalDevelopmentDataValidationConstants {
     public static final String ABSTRACTS_ATTACHMENTS = "abstractsAttachments";
     public static final String QUESTIONS = "questions";
     public static final String KEY_PERSONNEL = "keyPersonnel";
-    public static final String PROPOSAL_ORGANIZATION_LOCATION = "proposal.Organization/Location";
+    public static final String PROPOSAL_ORGANIZATION_LOCATION = "Proposal.Organization/Location";
 
     private ProposalDevelopmentDataValidationConstants() {
         throw new UnsupportedOperationException("do not call");

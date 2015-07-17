@@ -41,7 +41,7 @@
 			<property name="items">
 				<list>
 					<bean parent="PropDev-ApplicantOrganizationPage-Section" p:headerText="Applicant Organization" p:order="10" />
-					<bean parent="PropDev-PerformingOrganizationPage-Section" p:headerText="Performing Organization" p:order="20" />
+					<bean parent="PropDev-PerformingOrganizationPage-Section" p:headerText="Primary Performance Site" p:order="20" />
 					<bean parent="PropDev-PerformanceSitesPage-Section"	p:headerText="Performance Site Locations" p:order="30" />
 					<bean parent="PropDev-OtherOrganizationsPage-Section" p:headerText="Other Organizations" p:order="40" />
 				</list>
@@ -64,7 +64,8 @@
 	<bean id="PropDev-ApplicantOrganizationPage-Details" parent="PropDev-ApplicantOrganizationPage-Details-parentBean" />
 	<bean id="PropDev-ApplicantOrganizationPage-Details-parentBean"
 		abstract="true" parent="Uif-GridCondensedSubSection">
-		<property name="items">
+        <property name="id" value="PropDev-ApplicantOrganizationPage-Section"></property>
+        <property name="items">
 			<list>
 			 	<bean parent="Uif-DataField-condensedTable" p:propertyName="organization.organizationName"
 					p:order="10" />
@@ -87,6 +88,7 @@
 	<bean id="PropDev-PerformingOrganizationPage-Section" parent="PropDev-PerformingOrganizationPage-Section-parentBean" />
 	<bean id="PropDev-PerformingOrganizationPage-Section-parentBean"
 		parent="Uif-VerticalBoxSubSection" p:fieldBindingObjectPath="document.developmentProposal.performingOrganization">
+        <property name="id" value="PropDev-PerformingOrganizationPage-Section"></property>
 		<property name="items">
 			<list>
 			    <bean parent="PropDev-PerformingOrganization-OrganizationSearch" p:order="10" />
@@ -116,7 +118,7 @@
 				<property name="quickfinderAction">
 					<bean parent="Uif-PrimaryActionButton-Small" p:methodToCall="performLookup"
 					    p:focusOnIdAfterSubmit="NEXT_INPUT" p:wrapperCssClasses="input-group-btn"
-						p:actionLabel="Select Different Organization" p:iconClass="icon-search" />
+						p:actionLabel="Select Primary Performance Site" p:iconClass="icon-search" />
 				</property>
 			</bean>
 		</property>
