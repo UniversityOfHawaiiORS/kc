@@ -18,7 +18,12 @@ public final class UhKeyConstants {
     public static final String ERROR_NEGOTIATION_DESCRIPTION_REQUIRED = "error.negotiation.description.required";
     
     // KC-892  Enforce some negotiation activity type entries to single occurrence per award 
-    public static final String ERROR_NEGOTIATION_SINGLE_ACTIVITY_ALLOWED = "error.negotiation.single_activity.allowed"; 
+    public static final String ERROR_NEGOTIATION_SINGLE_ACTIVITY_ALLOWED = "error.negotiation.single_activity.allowed";
+
+    // KC-954 Add Sponsor Deadline features
+    // KC-735 Add warning for Sponsor Deadline Time not entered
+    public static final String SPONSOR_DEADLINE_TIME_WARNING = "warning.empty.sponsor.deadlinetime";
+
     
     /**
      * private utility class ctor.

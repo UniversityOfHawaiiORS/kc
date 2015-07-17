@@ -114,12 +114,30 @@
 						</list>
 					</property>
 				</bean>
+				<!-- KC-954 Add Sponsor Deadline features -->
 				<bean parent="Uif-InputField" p:propertyName="deadlineTime" p:colSpan="6" p:fieldLabel.render="false">
 					<property name="control">
-				           <bean parent="Uif-TextControl" p:textExpand="false" p:watermarkText="hh:mm"/>
+				           <bean parent="Uif-TextControl" p:textExpand="false" p:watermarkText="hh:mm timezone"/>
 				    </property>
 				</bean>
+				<bean parent="Uif-Space" p:colSpan="6" />
+				<bean parent="Uif-Link" p:colSpan="6" p:href="@{#ConfigProperties['application.url']}/static/timeZones.html" p:linkText="Supported Timezones"
+					  p:openInDialog="true" p:linkDialogId="Demo-Link-CustomDialog"/>
+
+				<!-- Customized iframe dialog with a header and footer change -->
+				<bean id="Demo-Link-CustomDialog" parent="Uif-DialogGroup-Iframe">
+					<property name="headerText" value="Supported Timezones"/>
+					<property name="footer.render" value="true"/>
+					<property name="footer.items">
+						<list>
+							<bean parent="Uif-PrimaryActionButton" p:actionLabel="Close"
+								  p:actionScript="dismissDialog('Demo-Link-CustomDialog');"/>
+						</list>
+					</property>
+				</bean>
+				<!-- KC-954 End -->
 			</list>
 		</property>
+
 	</bean>
 </beans>

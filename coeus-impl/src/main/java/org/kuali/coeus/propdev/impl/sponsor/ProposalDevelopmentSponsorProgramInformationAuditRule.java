@@ -2,22 +2,23 @@
  * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
  * Copyright 2005-2015 Kuali, Inc.
- *
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.kuali.coeus.propdev.impl.sponsor;
 
+import edu.hawaii.infrastructure.UhKeyConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateMidnight;
 import org.joda.time.DateTime;
@@ -56,10 +57,6 @@ public class ProposalDevelopmentSponsorProgramInformationAuditRule implements Do
     private DataObjectService dataObjectService;
     private SubmissionInfoService submissionInfoService;
     private ProposalTypeService proposalTypeService;
-    // KC-735 Add warning for Sponsor Deadline Time not entered
-    static final String DEADLINE_TIME_KEY = "document.developmentProposalList[0].deadlineTime";
-    static final String WARNING_EMPTY_DEADLINE_TIME = "warning.empty.sponsor.deadlinetime";  
-    // KC-735 END
     
     @Override
     public boolean processRunAuditBusinessRules(Document document) {
@@ -67,29 +64,26 @@ public class ProposalDevelopmentSponsorProgramInformationAuditRule implements Do
 
         ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument)document;
         DevelopmentProposal proposal = proposalDevelopmentDocument.getDevelopmentProposal();
-        
+
         //The Proposal Deadline Date should return a warning during validation for the
         //following conditions: a) if the date entered is older than the current date,
-        //or b) if there is no data entered.        
-        // KC-735 Add warning for Sponsor Deadline Time not entered
-        if (proposal.getDeadlineTime() == null) {
-        	// RRG code no longer valid and not sure of how to fix.....Need to fix this later
-        	//auditErrors.add(new AuditError(DEADLINE_TIME_KEY, WARNING_EMPTY_DEADLINE_TIME, Constants.PROPOSAL_PAGE + "." + Constants.REQUIRED_FIELDS_PANEL_ANCHOR));
+        //or b) if there is no data entered.
+        // KC-954 Add Sponsor Deadline features
+        // Elevate Missing Sponsor Deadline from warning to Error
+        if (proposal.getDeadlineDate() == null) {
             valid = false;
-            getAuditErrors(SPONSOR_PROGRAM_INFO_PAGE_NAME,AUDIT_WARNINGS).add(new AuditError(DEADLINE_DATE_KEY, KeyConstants.WARNING_EMPTY_DEADLINE_DATE, SPONSOR_PROGRAM_INFO_PAGE_ID));
-            // KC-658 - Improve PD required field placement 
-            // RRG code no longer valid and not sure of how to fix.....Need to fix this later
-            // auditErrors.add(new AuditError(Constants.DEADLINE_DATE_KEY, KeyConstants.WARNING_EMPTY_DEADLINE_DATE, Constants.PROPOSAL_PAGE + "." + Constants.REQUIRED_FIELDS_PANEL_ANCHOR));
-            //UH KC-83 rbl added code to fix sponsor deadline date warning message being displayed when sponsor deadline date is todays date
-            //because java Date class is a timestamp, need to add an additional check to compare the 2 date objects to see if they are on the same day while ignoring time
+            getAuditErrors(SPONSOR_PROGRAM_INFO_PAGE_NAME,AUDIT_ERRORS).add(new AuditError(DEADLINE_DATE_KEY, KeyConstants.WARNING_EMPTY_DEADLINE_DATE, SPONSOR_PROGRAM_INFO_PAGE_ID));
         } else if (isDeadlineDateBeforeCurrentDate(proposal)) {
             valid = false;
             getAuditErrors(SPONSOR_PROGRAM_INFO_PAGE_NAME,AUDIT_WARNINGS).add(new AuditError(DEADLINE_DATE_KEY, KeyConstants.WARNING_PAST_DEADLINE_DATE, SPONSOR_PROGRAM_INFO_PAGE_ID));
-            // KC-658 - Improve PD required field placement 
-            // RRG code no longer valid and not sure of how to fix.....Need to fix this later
-            // auditErrors.add(new AuditError(Constants.DEADLINE_DATE_KEY, KeyConstants.WARNING_PAST_DEADLINE_DATE, Constants.PROPOSAL_PAGE + "." + Constants.REQUIRED_FIELDS_PANEL_ANCHOR));
         }
-        // KC-735 END
+
+        // KC-954 Add Sponsor Deadline features
+        // Warn if deadline time not entered
+        if (proposal.getDeadlineTime() == null) {
+            valid = false;
+            getAuditErrors(SPONSOR_PROGRAM_INFO_PAGE_NAME,AUDIT_WARNINGS).add(new AuditError(DEADLINE_TIME_KEY, UhKeyConstants.SPONSOR_DEADLINE_TIME_WARNING, SPONSOR_PROGRAM_INFO_PAGE_ID));
+        }
         
         if (proposal.getS2sOpportunity() != null) {
             if (proposal.getS2sOpportunity().getOpportunityId() != null && proposal.getProgramAnnouncementNumber() != null 
@@ -152,9 +146,9 @@ public class ProposalDevelopmentSponsorProgramInformationAuditRule implements Do
                     && (StringUtils.isBlank(sponsorProposalNumber))) {
                 valid = false;
                 getAuditErrors(SPONSOR_PROGRAM_INFO_PAGE_NAME,AUDIT_ERRORS).add(new AuditError(SPONSOR_PROPOSAL_KEY, KeyConstants.ERROR_PROPOSAL_REQUIRE_PRIOR_AWARD_FOR_RESUBMIT, SPONSOR_PROGRAM_INFO_PAGE_ID));
+            }            
         }
-        }
-        
+
         if (!StringUtils.isEmpty(proposal.getPrimeSponsorCode())) {
             Sponsor sp = (Sponsor) getDataObjectService().find(Sponsor.class, proposal.getPrimeSponsorCode());
             if (sp == null) {
@@ -162,7 +156,7 @@ public class ProposalDevelopmentSponsorProgramInformationAuditRule implements Do
                 valid &= false;
             }
         }
-        
+
 
         return valid;
     }
@@ -207,23 +201,23 @@ public class ProposalDevelopmentSponsorProgramInformationAuditRule implements Do
 
     public void setSubmissionInfoService(SubmissionInfoService submissionInfoService) {
         this.submissionInfoService = submissionInfoService;
-    }          
-    
+    }
+
     protected ParameterService getParameterService() {
         if (this.parameterService == null) {
             this.parameterService = KcServiceLocator.getService(ParameterService.class);
         }
         return this.parameterService;
-    } 
-    
+    }
+
     public void setParameterService(ParameterService parameterService) {
         this.parameterService = parameterService;
-        }
+    }
 
     public DataObjectService getDataObjectService() {
         if (this.dataObjectService == null) {
             this.dataObjectService = KcServiceLocator.getService(DataObjectService.class);
-    }
+        }
         return this.dataObjectService;
     }
 
@@ -240,6 +234,6 @@ public class ProposalDevelopmentSponsorProgramInformationAuditRule implements Do
 
 	public void setProposalTypeService(ProposalTypeService proposalTypeService) {
 		this.proposalTypeService = proposalTypeService;
-    }
-    
+	}
+
 }

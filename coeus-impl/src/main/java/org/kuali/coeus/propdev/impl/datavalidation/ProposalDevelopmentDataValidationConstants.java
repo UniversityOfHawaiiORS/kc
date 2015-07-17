@@ -38,6 +38,8 @@ public final class ProposalDevelopmentDataValidationConstants {
     public static final String SPONSOR_PROGRAM_INFO_PAGE_ID = "PropDev-SponsorProgramInfoPage";
     public static final String SPONSOR_PROGRAM_INFO_PAGE_NAME = "Sponsor & Program Info";
     public static final String DEADLINE_DATE_KEY = "document.developmentProposal.deadlineDate";
+    // KC-954 Add Sponsor Deadline features
+    public static final String DEADLINE_TIME_KEY = "document.developmentProposal.deadlineTime";
     public static final String OPPORTUNITY_ID_KEY="document.developmentProposal.programAnnouncementNumber";
     public static final String CFDA_NUMBER_KEY = "document.developmentProposal.cfdaNumber";
     public static final String OPPORTUNITY_TITLE_KEY="document.developmentProposal.programAnnouncementTitle";
