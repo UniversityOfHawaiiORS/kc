@@ -40,7 +40,6 @@ public class
         return null;
     }
 
-    @Override
     public boolean canReturnToPreviousRouteNode(String principalId, DocumentRouteHeaderValue document) {
         return getPermissionService().hasPermission(principalId, Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT,
                 PermissionConstants.REJECT_PROPOSAL_DEVELOPMENT_DOCUMENT);

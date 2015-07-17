@@ -146,6 +146,10 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_demo.sql
 
+#Update to 1507 (Note this was released with 1506 release.....may change in 1507 version
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1507_oracle_kc_rice_server_upgrade.sql
+
+
 
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
 
