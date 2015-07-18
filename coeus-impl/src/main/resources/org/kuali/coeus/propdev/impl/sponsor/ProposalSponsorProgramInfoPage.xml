@@ -122,16 +122,16 @@
 				</bean>
 				<bean parent="Uif-Space" p:colSpan="6" />
 				<bean parent="Uif-Link" p:colSpan="6" p:href="@{#ConfigProperties['application.url']}/static/timeZones.html" p:linkText="Supported Timezones"
-					  p:openInDialog="true" p:linkDialogId="Demo-Link-CustomDialog"/>
+					  p:openInDialog="true" p:linkDialogId="Timezone-Link-Dialog"/>
 
 				<!-- Customized iframe dialog with a header and footer change -->
-				<bean id="Demo-Link-CustomDialog" parent="Uif-DialogGroup-Iframe">
+				<bean id="Timezone-Link-Dialog" parent="Uif-DialogGroup-Iframe">
 					<property name="headerText" value="Supported Timezones"/>
 					<property name="footer.render" value="true"/>
 					<property name="footer.items">
 						<list>
 							<bean parent="Uif-PrimaryActionButton" p:actionLabel="Close"
-								  p:actionScript="dismissDialog('Demo-Link-CustomDialog');"/>
+								  p:actionScript="dismissDialog('Timezone-Link-Dialog');"/>
 						</list>
 					</property>
 				</bean>
