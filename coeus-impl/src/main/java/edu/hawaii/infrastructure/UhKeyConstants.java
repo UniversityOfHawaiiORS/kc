@@ -7,6 +7,7 @@ public final class UhKeyConstants {
     
     public static final String ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_MISSING = "error.document.abstract.projectSummary.missing";
     //KC-306 - Primary performance site is not set as a default so it must be a required field now.
+    // KC-952 Project Performance Site Improvements
     public static final String ERROR_PROPOSAL_SITES_PRIMARY_REQUIRED = "error.required.primaryPerformanceSite";
     //KC-515 limit length of Project Summary to 1000 chars or less
     public static final String ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_TOOLONG = "error.document.abstract.projectSummary.toolong";

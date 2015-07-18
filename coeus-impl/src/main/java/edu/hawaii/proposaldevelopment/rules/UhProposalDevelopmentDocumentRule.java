@@ -22,6 +22,7 @@ import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentRule;
+import org.kuali.coeus.propdev.impl.location.ProposalSite;
 import org.kuali.coeus.propdev.impl.location.SaveProposalSitesEvent;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.rice.krad.document.Document;
@@ -32,6 +33,8 @@ import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.kns.util.KNSGlobalVariables;
 
 import edu.hawaii.infrastructure.UhKeyConstants;
+
+import static org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants.*;
 
 /**
  * UH Extension of ProposalDevelopmentDocumentRule UH CHANGES:
@@ -89,6 +92,20 @@ public class UhProposalDevelopmentDocumentRule extends
 			}
 		}
 		//UH KC-515 END
+
+
+		// KC-952 Project Performance Site Improvements
+		// We removed the default primary performance site but want to make sure user selects one
+        DevelopmentProposal dp = proposalDevelopmentDocument.getDevelopmentProposal();
+        ProposalSite po = dp.getPerformingOrganization();
+        if (po == null || po.getOrganizationId() == null) {
+            List<AuditError> errors = new ArrayList<AuditError>();
+            errors.add(new AuditError(AUDIT_ERROR_KEY, UhKeyConstants.ERROR_PROPOSAL_SITES_PRIMARY_REQUIRED, ORGANIZATION_PAGE_ID + "." + PERFORMING_ORGANIZATION_SECTION_ID));
+            GlobalVariables.getAuditErrorMap().put(PROPOSAL_ORGANIZATION_LOCATION, new AuditCluster(PROPOSAL_ORGANIZATION_LOCATION, errors, AUDIT_ERRORS));
+        }
+		// KC-952 Project Performance Site Improvements END
+
+
 
 /*   KC-933 Turning on PD Audit Rules generates blank screen in KC 6.0 upgrade
  *   NOTE: commenting out to see if we still need this fix in new KC6.0 design I don't think we do

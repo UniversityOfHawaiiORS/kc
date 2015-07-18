@@ -954,6 +954,13 @@ public class DevelopmentProposal extends KcPersistableBusinessObjectBase impleme
     @Override
     public ProposalSite getPerformingOrganization() {
         ProposalSite performingOrganization = getProposalSiteForType(ProposalSite.PROPOSAL_SITE_PERFORMING_ORGANIZATION);
+        //KC-952 Project Performance Site Improvements
+        // We removed default performingOrganization during save on organization/location tab
+        if (performingOrganization == null) {
+            return null;
+        }
+        //KC-952 Project Performance Site Improvements END
+
         if (outOfSync(performingOrganization.getRolodexId(), performingOrganization.getRolodex())) {
             performingOrganization.refreshReferenceObject("rolodex");
         }

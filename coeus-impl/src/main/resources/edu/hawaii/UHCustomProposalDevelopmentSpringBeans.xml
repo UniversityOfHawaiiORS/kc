@@ -22,6 +22,7 @@
 						   
     <!-- KC-306: Make Proposal Performance Site Location More Intuitive -->
     <!-- Commented out for KC6.0 causing issues
+    - KC-952 Project Performance Site Improvements; UhProposalDevelopmentServiceImpl no longer needed
 		<bean id="proposalDevelopmentService"
 			class="edu.hawaii.proposaldevelopment.service.impl.UhProposalDevelopmentServiceImpl">
 			<property name="businessObjectService" ref="businessObjectService" />

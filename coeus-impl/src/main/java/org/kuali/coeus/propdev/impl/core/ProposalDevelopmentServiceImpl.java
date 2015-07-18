@@ -123,16 +123,8 @@ public class ProposalDevelopmentServiceImpl implements ProposalDevelopmentServic
             developmentProposal.setApplicantOrganization(applicantOrganization);
         }
 
-        // On first save, set Performing Organization if not selected
-        ProposalSite performingOrganization = developmentProposal.getPerformingOrganization();
-        if (StringUtils.isEmpty(developmentProposal.getProposalNumber()) && performingOrganization.getOrganization() == null
-                && developmentProposal.getOwnedByUnitNumber() != null) {
-            String performingOrganizationId = developmentProposal.getOwnedByUnit().getOrganizationId();
-            performingOrganization = createProposalSite(performingOrganizationId);
-            performingOrganization.setDevelopmentProposal(developmentProposal);
-            developmentProposal.setPerformingOrganization(performingOrganization);
-        }
     }
+
 
     /**
      * Constructs a ProposalSite; initializes the organization, and locationName fields, and sets the default district if there is
