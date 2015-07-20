@@ -523,6 +523,7 @@
 
 <!-- Rice content End -->
 <!-- IE Compatability Filter KC-415 -->
+    <!--  KC-1006 Site broken in IE  (KC 6.0 KRAD doesn't work with compatibility mode turned on so removing this fix)
         <filter>
         <filter-name>UserAgentCompatibleFilter</filter-name>
         <filter-class>edu.hawaii.filters.UserAgentCompatibleFilter</filter-class>
@@ -536,6 +537,7 @@
             <filter-name>UserAgentCompatibleFilter</filter-name>
             <url-pattern>/*</url-pattern>
         </filter-mapping>
+      -->
 <!-- IE Compatability Filter End -->
 
 </web-app>
