@@ -41,7 +41,12 @@
 		p:fieldBindingObjectPath="document.developmentProposal">
 		<property name="items">
 			<list>
-				<bean parent="PropDev-SponsorProgramInfo-DateSection" p:order="10" />
+				<!-- KC-954 Add Sponsor Deadline features
+				     Adding our modal caused the datapicker to display when the timezone help modal was opened more than once
+				     Justin found this known issue with datepicker http://stackoverflow.com/questions/9749895/date-picker-automatically-opens
+				     It happens if the data picker is on the first field.  So I am moving Deadline Date after the deadline type to fix this issue
+				-->
+				<bean parent="PropDev-SponsorProgramInfo-DateSection" p:order="25" />
 				<bean parent="Uif-InputField" p:propertyName="deadlineType" p:enableAutoQuickfinder="false"
 				p:order="20" />
 				<bean parent="Uif-InputField" p:propertyName="noticeOfOpportunityCode" p:enableAutoQuickfinder="false"
