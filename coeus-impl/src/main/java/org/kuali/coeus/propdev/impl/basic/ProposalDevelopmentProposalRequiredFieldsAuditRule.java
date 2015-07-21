@@ -61,6 +61,12 @@ public class ProposalDevelopmentProposalRequiredFieldsAuditRule implements Docum
         if (StringUtils.isNotEmpty(proposal.getContinuedFrom())) {
            proposalId = getSubmissionInfoService().getProposalContinuedFromVersionProposalId(proposal.getContinuedFrom());
         }
+
+        /*  KC-1098 S2S Change/Corrected Application requires an Original Institutional Proposal ID
+            The message for this check was unclear and when I reviewed the logic with Royce he said that sponsor proposal number is optional so
+            this check should not prevent submission.  Therefore I am removing it.  Keeping the setup above in case future versions of this method
+            add additional rules in the hope this will merge cleaner and still work.
+
         String changeCorrectedType = getParameterService().getParameterValueAsString(ProposalDevelopmentDocument.class, "s2s.submissiontype.changedCorrected");
         if (proposal.getS2sOpportunity() != null && isProposalTypeNew(proposal.getProposalTypeCode())
                 && StringUtils.equals(proposal.getS2sOpportunity().getS2sSubmissionTypeCode(), changeCorrectedType)) {
@@ -75,6 +81,7 @@ public class ProposalDevelopmentProposalRequiredFieldsAuditRule implements Docum
                         KeyConstants.ERROR_PROPOSAL_REQUIRE_ID_CHANGE_APP, DETAILS_PAGE_ID));
             }
         }
+        */
 
         return valid;
     }
