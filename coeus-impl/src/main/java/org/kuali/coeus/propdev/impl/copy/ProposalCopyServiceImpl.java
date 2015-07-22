@@ -461,6 +461,8 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         // remove attachments since they cause issues in oracle while persisting. They
         // are repopulated later at any rate.
         removeBioAttachments(copy);
+        removeNarrativeAttachments(copy);
+        removeInstituteAttachments(copy);
 
 
         copy.getBudgets().clear();
@@ -480,6 +482,18 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             if (ynq.getYnq().getStatus().equals("I")) {
                 ynqIter.remove();
             }
+        }
+    }
+
+    private void removeInstituteAttachments(DevelopmentProposal copy) {
+        for(Narrative narrative : copy.getInstituteAttachments()) {
+            narrative.setNarrativeAttachment(null);
+        }
+    }
+
+    private void removeNarrativeAttachments(DevelopmentProposal copy) {
+        for(Narrative narrative : copy.getNarratives()) {
+            narrative.setNarrativeAttachment(null);
         }
     }
     // KC-865 END
