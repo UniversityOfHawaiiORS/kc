@@ -150,4 +150,17 @@
                 <!-- Replace Standard support link -->
                 <param name="feedback.link.url">http://www.ors.hawaii.edu/helpline/</param>
                 <param name="feedback.link.text">Contact ORS Helpline</param>
+
+                <!-- Help with debugging (comment out in production) -->
+                <param name="rice.krad.dev.mode">true</param>
+                <param name="rice.krad.script.cleanup">false</param>
+<!-- Creates Beans on startup, catch errors which might be missed until runtime, but slower
+                <param name="rice.krad.preInstantiateBeans.enabled">true</param>
+-->
+
+                <!-- Disable Java Melody -->
+                <param name="kc.monitoring.enabled">false</param>
+
+                <!-- Resource param for KRAD new for KC 6.0 -->
+		<param name="kc.resourceBundleNames">ApplicationResources,UhApplicationResources</param>
 </config>
