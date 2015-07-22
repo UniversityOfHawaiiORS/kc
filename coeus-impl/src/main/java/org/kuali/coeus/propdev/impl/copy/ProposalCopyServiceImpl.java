@@ -49,6 +49,7 @@ import org.kuali.coeus.propdev.impl.questionnaire.ProposalDevelopmentModuleQuest
 import org.kuali.coeus.propdev.impl.s2s.*;
 import org.kuali.coeus.propdev.impl.s2s.question.ProposalDevelopmentS2sModuleQuestionnaireBean;
 import org.kuali.coeus.propdev.impl.state.ProposalState;
+import org.kuali.coeus.propdev.impl.ynq.ProposalYnq;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.model.KcDataObject;
 import org.kuali.kra.bo.*;
@@ -449,10 +450,18 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         //We need to copy DocumentNextValues to properly handle copied collections
         fixNextValues(oldDoc, newDoc);
 
+        // KC-1034 Cannot copy PD document - receive incident report
+        // is fixed by
+        // KC-865 inactive ynq questions should not be copied during copy proposal process
+        // not sure if copy will work if we start using yes no questions but we should not anyway
+        // questionnaires work better
+        uh_fixYesNoQuestions(oldDoc);
+
         DevelopmentProposal copy = (DevelopmentProposal) deepCopy(oldDoc.getDevelopmentProposal());
         // remove attachments since they cause issues in oracle while persisting. They
         // are repopulated later at any rate.
         removeBioAttachments(copy);
+
 
         copy.getBudgets().clear();
         copy.setFinalBudget(null);
@@ -462,6 +471,18 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         copy.setProposalDocument(newDoc);
 
     }
+
+    // KC-865 BEGIN inactive ynq questions should not be copied during copy proposal process
+    protected void uh_fixYesNoQuestions(ProposalDevelopmentDocument pdDoc) {
+        List<ProposalYnq> ynqList = pdDoc.getDevelopmentProposal().getProposalYnqs();
+        for (Iterator<ProposalYnq> ynqIter = ynqList.listIterator(); ynqIter.hasNext();) {
+            ProposalYnq ynq = ynqIter.next();
+            if (ynq.getYnq().getStatus().equals("I")) {
+                ynqIter.remove();
+            }
+        }
+    }
+    // KC-865 END
 
     private void removeBioAttachments(DevelopmentProposal copy) {
         for(ProposalPersonBiography bio : copy.getPropPersonBios()) {
