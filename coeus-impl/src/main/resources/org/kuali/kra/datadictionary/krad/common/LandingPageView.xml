@@ -61,6 +61,7 @@
                             p:methodToCall="docHandler"
                             p:requestParameters="command:initiate"/>
                     </property>
+
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                     p:actionLabel="Find My Proposals"
@@ -86,28 +87,27 @@
 
 
 
-
                 <bean parent="Uif-MessageField" p:messageText="Get help" p:colSpan="12" p:additionalCssClasses="uh_help_section_header"/>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                       p:actionLabel="ORS Helpline"
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-question-sign"
                       p:additionalCssClasses="btn-warning uh_help_button"
-                      p:actionScript="alert('ORS Helpline Coming soon!');">
+                      p:actionScript="window.open('http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/4');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                       p:actionLabel="Add a sponsor"
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-address-book"
                       p:additionalCssClasses="btn-warning uh_help_button"
-                      p:actionScript="alert('Add a sponsor Coming soon!');">
+                      p:actionScript="window.open('http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/5');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                      p:actionLabel="Add a performance site"
-                      p:actionIconPlacement="TOP"
-                      p:iconClass="icon-home"
-                      p:additionalCssClasses="btn-warning uh_help_button"
-                      p:actionScript="alert('Add a performance site Coming soon!');">
+                    p:actionLabel="Add a performance site"
+                    p:actionIconPlacement="TOP"
+                    p:iconClass="icon-home"
+                    p:additionalCssClasses="btn-warning uh_help_button"
+                    p:actionScript="window.open('http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/7');">
                 </bean>
 
 
@@ -119,14 +119,14 @@
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-shuffle"
                       p:additionalCssClasses="btn-primary uh_help_button"
-                      p:actionScript="alert('Workflow routing Coming soon!');">
+                      p:actionScript="window.open('@{#ConfigProperties['uh.apps.url']}/routing');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                    p:actionLabel="Delegations"
-                    p:actionIconPlacement="TOP"
-                    p:iconClass="icon-profile"
-                    p:additionalCssClasses="btn-primary uh_help_button"
-                    p:actionScript="alert('Delegations Coming soon!');">
+                      p:actionLabel="Delegations"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-profile"
+                      p:additionalCssClasses="btn-primary uh_help_button"
+                      p:actionScript="window.open('@{#ConfigProperties['uh.apps.url']}/delegation');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                       p:actionLabel="Award Status"
