@@ -1,0 +1,13 @@
+.uh_help_button {
+	width:250px;
+	height:120px;
+	font-size: 20px;
+}
+
+.uh_help_section_header {
+	font-size: 25px;
+}
+
+.uh_help_button [class^="icon-"] {
+	font-size: 40px;
+}
