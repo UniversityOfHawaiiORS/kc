@@ -82,7 +82,7 @@
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-drawer2"
                       p:additionalCssClasses="btn-success uh_help_button"
-                      p:actionScript="alert('User Guides Coming soon!');">
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.user.guides.url')}');">
                 </bean>
 
 
@@ -93,21 +93,21 @@
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-question-sign"
                       p:additionalCssClasses="btn-warning uh_help_button"
-                      p:actionScript="window.open('http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/4');">
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.helpline.request.url')}');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                       p:actionLabel="Add a sponsor"
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-address-book"
                       p:additionalCssClasses="btn-warning uh_help_button"
-                      p:actionScript="window.open('http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/5');">
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.add.sponsor.url')}');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                     p:actionLabel="Add a performance site"
                     p:actionIconPlacement="TOP"
                     p:iconClass="icon-home"
                     p:additionalCssClasses="btn-warning uh_help_button"
-                    p:actionScript="window.open('http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/7');">
+                    p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.add.performance.site.url')}');">
                 </bean>
 
 
@@ -119,21 +119,21 @@
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-shuffle"
                       p:additionalCssClasses="btn-primary uh_help_button"
-                      p:actionScript="window.open('@{#ConfigProperties['uh.apps.url']}/routing');">
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.routing.url')}');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                       p:actionLabel="Delegations"
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-profile"
                       p:additionalCssClasses="btn-primary uh_help_button"
-                      p:actionScript="window.open('@{#ConfigProperties['uh.apps.url']}/delegation');">
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.delegation.url')}');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                       p:actionLabel="Award Status"
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-clock"
                       p:additionalCssClasses="btn-primary uh_help_button"
-                      p:actionScript="alert('Award Status Coming soon!');">
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.award.status.url')}');">
                 </bean>
             </list>
         </property>
