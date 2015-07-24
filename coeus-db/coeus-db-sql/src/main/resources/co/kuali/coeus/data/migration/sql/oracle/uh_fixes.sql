@@ -26,7 +26,7 @@ values ('KC-GEN','All','uh.helpbutton.helpline.request.url',sys_guid(),1,'CONFG'
 
 insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
 values ('KC-GEN','All','uh.helpbutton.user.guides.url',sys_guid(),1,'CONFG'
-	,'http://www.ors.hawaii.edu/','URL for User Guides help button','A','KC');
+	,'http://www.ors.hawaii.edu/index.php/apply/83-quick-links/302','URL for User Guides help button','A','KC');
 
 insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
 values ('KC-GEN','All','uh.helpbutton.routing.url',sys_guid(),1,'CONFG'
