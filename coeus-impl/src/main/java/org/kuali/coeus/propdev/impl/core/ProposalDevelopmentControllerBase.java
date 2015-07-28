@@ -19,8 +19,10 @@
 package org.kuali.coeus.propdev.impl.core;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.kuali.coeus.common.framework.compliance.exemption.ExemptionType;
 import org.kuali.coeus.common.framework.keyword.ScienceKeyword;
+import org.kuali.coeus.common.framework.org.Organization;
 import org.kuali.coeus.common.notification.impl.bo.KcNotification;
 import org.kuali.coeus.common.notification.impl.bo.NotificationTypeRecipient;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
@@ -31,6 +33,7 @@ import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValida
 import org.kuali.coeus.propdev.impl.docperm.ProposalRoleTemplateService;
 import org.kuali.coeus.propdev.impl.docperm.ProposalUserRoles;
 import org.kuali.coeus.propdev.impl.keyword.PropScienceKeyword;
+import org.kuali.coeus.propdev.impl.location.ProposalSite;
 import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationContext;
 import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationRenderer;
 import org.kuali.coeus.propdev.impl.person.ProposalPerson;
@@ -80,14 +83,12 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 public abstract class ProposalDevelopmentControllerBase {
 
     protected static final String PROPDEV_DEFAULT_VIEW_ID = "PropDev-DefaultView";
+    private static final Logger LOG = Logger.getLogger(ProposalDevelopmentViewHelperServiceImpl.class);
 
     @Autowired
     @Qualifier("uifExportControllerService")
@@ -258,6 +259,36 @@ public abstract class ProposalDevelopmentControllerBase {
 
          ((ProposalDevelopmentViewHelperServiceImpl)form.getViewHelperService()).setOrdinalPosition(form.getDevelopmentProposal().getProposalPersons());
          saveAnswerHeaders(form, form.getPageId());
+
+
+         //KC-952 Project Performance Site Improvements
+         // Shell of a proposal site is created when user visits organization location tab
+         // since we removed default performingOrganization, we need to remove it here so
+         // we dont try to save an empty proposal site record
+         List<ProposalSite> sites = form.getDevelopmentProposal().getProposalSites();
+         List<Integer> siteIndexesToRemove = new ArrayList<Integer>();
+         for (Iterator<ProposalSite> siteIter = sites.iterator(); siteIter.hasNext();) {
+             ProposalSite site = siteIter.next();
+             // Stuff is lazy loaded so organizationId might be null before getOrganizationId() is called but non-null afterwards
+             site.getOrganizationId();
+             if (site.getLocationTypeCode() != null
+                 && site.getLocationTypeCode() == 2) {
+
+                    if (site.getOrganizationId() == null) {
+                        siteIter.remove();
+                    } else {
+                        Organization o = site.getOrganization();
+                        if (o == null) {
+                            LOG.warn("Couldn't set location name for primary performance site because there is no organization associated with proposal site obj_id = " + site.getObjectId());
+                        } else {
+                            // this used to happen in initializeUnitOrganizationLocation during create proposal
+                            site.setLocationName(o.getOrganizationName());
+                        }
+                    }
+              }
+         }
+         //KC-952 Project Performance Site Improvements END
+
 
          getTransactionalDocumentControllerService().save(form);
          if (form.isAuditActivated()){

@@ -180,27 +180,6 @@ public class ProposalDevelopmentHomeController extends ProposalDevelopmentContro
 
    @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=save")
    public ModelAndView save(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
-
-       //KC-952 Project Performance Site Improvements
-       // Shell of a proposal site is created when user visits organization location tab
-       // since we removed default performingOrganization, we need to remove it here so
-       // we dont try to save an empty proposal site record
-       List<ProposalSite> sites = form.getDevelopmentProposal().getProposalSites();
-       List<Integer> siteIndexesToRemove = new ArrayList<Integer>();
-       int i = 0;
-       for (ProposalSite site : sites) {
-           // Stuff is lazy loaded so organizationId might be null before getOrganizationId() is called but non-null afterwards
-           site.getOrganizationId();
-           if (site.getOrganizationId() == null) {
-                siteIndexesToRemove.add(i); // dont remove while iterating
-           }
-           i++;
-       }
-       for (Integer siteIndexToRemove : siteIndexesToRemove) {
-           sites.remove(siteIndexToRemove.intValue());
-       }
-       //KC-952 Project Performance Site Improvements END
-
        return super.save(form);
    }
 

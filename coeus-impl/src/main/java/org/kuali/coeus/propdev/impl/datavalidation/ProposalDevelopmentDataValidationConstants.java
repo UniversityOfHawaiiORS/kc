@@ -98,7 +98,7 @@ public final class ProposalDevelopmentDataValidationConstants {
     public static final String ABSTRACTS_ATTACHMENTS = "abstractsAttachments";
     public static final String QUESTIONS = "questions";
     public static final String KEY_PERSONNEL = "keyPersonnel";
-    public static final String PROPOSAL_ORGANIZATION_LOCATION = "Proposal.Organization/Location";
+    public static final String PROPOSAL_ORGANIZATION_LOCATION = "Proposal.Organization and Location";
 
     private ProposalDevelopmentDataValidationConstants() {
         throw new UnsupportedOperationException("do not call");
