@@ -35,7 +35,7 @@
     </bean>
 
     <bean id="Kc-LandingPage-DefaultPage" parent="Kc-LandingPage-DefaultPage-parentBean"/>
-    <bean id="Kc-LandingPage-DefaultPage-parentBean" abstract="true" parent="Uif-Page">
+    <bean id="Kc-LandingPage-DefaultPage-parentBean" abstract="true" parent="Uif-Page" p:additionalCssClasses="uh_help_page">
         <property name="items">
             <list>
                 <bean parent="Kc-LandingPage-UhGrid"/>

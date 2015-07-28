@@ -11,3 +11,9 @@
 .uh_help_button [class^="icon-"] {
 	font-size: 40px;
 }
+
+.uh_help_page {
+	max-width: 800px;
+	margin: 0 auto;
+	text-align: center;
+}
