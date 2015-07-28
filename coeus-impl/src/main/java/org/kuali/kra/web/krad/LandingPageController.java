@@ -98,7 +98,6 @@ public class LandingPageController {
         StringBuffer casLogoutUrl = new StringBuffer(logoutUrlBase);
         casLogoutUrl.append("?service=");
         casLogoutUrl.append(buildContextUrlBase(request));
-        casLogoutUrl.append("/portal.do");
 
         // destroy the session
         HttpSession session = request.getSession();
