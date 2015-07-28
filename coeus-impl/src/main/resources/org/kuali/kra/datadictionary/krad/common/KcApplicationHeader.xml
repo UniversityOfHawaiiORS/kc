@@ -130,7 +130,8 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                         </list>
                     </property>
                 </bean>
-                <bean parent="Uif-Link" p:href="@{#ConfigProperties['application.url']}/portal.do"
+                <!-- KC-1206 Modify System Admin Portal header link to take you to the System Admin Tab -->
+                <bean parent="Uif-Link" p:href="@{#ConfigProperties['application.url']}/portal.do?selectedTab=portalSystemAdminBody"
                     p:wrapperCssClasses="pull-right" p:target="_new"
                     p:linkText="SYSTEM ADMIN PORTAL" p:order="50"/>
             </list>
