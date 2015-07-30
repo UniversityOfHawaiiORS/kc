@@ -220,6 +220,14 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
                 ProposalPersonUnit unit = (ProposalPersonUnit)addLine;
                 ProposalPerson proposalPerson = (ProposalPerson) PropertyUtils.getNestedProperty(form.getDevelopmentProposal(),StringUtils.replace(collectionPath,".units",""));
                 unit.setProposalPerson(proposalPerson);
+                // KC-1045 Opt-in for Key Person in credit split not working
+                // credit types are created as investigators are added however
+                // key people are not considered "investigator" until a unit is added (credit OPT IN)
+                // so we have to check if credit types have been added for this user yet.
+                if (proposalPerson.isKeyPerson() && proposalPerson.isEmployee()) {
+                    // This is a key person and an employee so lets add credit types if no there already
+                    getKeyPersonnelService().createCreditTypes(proposalPerson);
+                }
                 unit.getCreditSplits().addAll(getKeyPersonnelService().createCreditSplits(unit));
             } catch (Exception e) {
                 throw new RuntimeException("proposal person cannot be retrieved from development proposal",e);
@@ -418,6 +426,9 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
                 ObjectPropertyUtils.setPropertyValue(model, collectionPath, collection);
             }
         }
+
+
+
     }
 
     public static class SponsorSuggestResult {
