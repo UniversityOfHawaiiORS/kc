@@ -441,6 +441,14 @@ public class KeyPersonnelServiceImpl implements KeyPersonnelService, Constants {
             person.addUnit(unit);
             unit.refreshReferenceObject(UNIT);
         }
+        // KC-1045 Opt-in for Key Person in credit split not working
+        // Key Persons don't get credit splits when created because they are not considered investigator until
+        // the unit is entered to "opt-in"
+        // This method only gets called when "Primary Unit" is found for PI/MPI/COI but just in case
+        // we modify to auto fill for KeyPerson I added this check
+        if (person.isKeyPerson() && person.getCreditSplits() == null || person.getCreditSplits().isEmpty()) {
+            populateCreditTypes(person);
+        }
     }
 
     /**
@@ -489,6 +497,12 @@ public class KeyPersonnelServiceImpl implements KeyPersonnelService, Constants {
             retVal.add(creditSplit);
         }
         return retVal;
+    }
+
+    // KC-1045 Opt-in for Key Person in credit split not working
+    public void createCreditTypes(ProposalPerson person) {
+        // Add credit types to person if opted in by adding a unit.
+        populateCreditTypes(person);
     }
     /**
      * Accessor method for dependency injection
