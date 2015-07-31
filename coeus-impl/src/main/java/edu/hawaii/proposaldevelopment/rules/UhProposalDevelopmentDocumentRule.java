@@ -22,9 +22,11 @@ import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentRule;
+import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants;
 import org.kuali.coeus.propdev.impl.location.ProposalSite;
 import org.kuali.coeus.propdev.impl.location.SaveProposalSitesEvent;
 import org.kuali.kra.infrastructure.Constants;
+import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.util.AuditCluster;
 // KC-933 Turning on PD Audit Rules generates blank screen in KC 6.0 upgrade
@@ -59,7 +61,6 @@ public class UhProposalDevelopmentDocumentRule extends
 		boolean valid = super.processRunAuditBusinessRules(document);
 
 		ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument) document;
-		List<AuditError> auditErrors = new ArrayList<AuditError>();
 		DevelopmentProposal developmentProposal = proposalDevelopmentDocument
 				.getDevelopmentProposal();
 		boolean hasProjectSummary = false;
@@ -83,12 +84,18 @@ public class UhProposalDevelopmentDocumentRule extends
 		if (!hasProjectSummary) {
 			valid = false;
 			if(isProjectSummaryTooLong) {
-				auditErrors.add(new AuditError(
-						AUDIT_ERROR_KEY, UhKeyConstants.ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_TOOLONG, Constants.ATTACHMENTS_PAGE));
+				// KC-951 Fix Project Summary Required UH Enhancement
+				List<AuditError> errors = new ArrayList<AuditError>();
+				errors.add(new AuditError(AUDIT_ERROR_KEY, UhKeyConstants.ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_TOOLONG,
+						ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID + "." + ProposalDevelopmentDataValidationConstants.ATTACHMENT_ABSTRACTS_SECTION_ID));
+				GlobalVariables.getAuditErrorMap().put(ProposalDevelopmentDataValidationConstants.ATTACHMENT_ABSTRACTS_SECTION_NAME, new AuditCluster(ProposalDevelopmentDataValidationConstants.ATTACHMENT_ABSTRACTS_SECTION_NAME, errors, AUDIT_ERRORS));
 			}
 			else {
-			auditErrors.add(new AuditError(
-				AUDIT_ERROR_KEY, UhKeyConstants.ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_MISSING, Constants.ATTACHMENTS_PAGE));
+				// KC-951 Fix Project Summary Required UH Enhancement
+				List<AuditError> errors = new ArrayList<AuditError>();
+				errors.add(new AuditError(AUDIT_ERROR_KEY, UhKeyConstants.ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_MISSING,
+						ProposalDevelopmentDataValidationConstants.ATTACHMENT_PAGE_ID + "." + ProposalDevelopmentDataValidationConstants.ATTACHMENT_ABSTRACTS_SECTION_ID));
+				GlobalVariables.getAuditErrorMap().put(ProposalDevelopmentDataValidationConstants.ATTACHMENT_ABSTRACTS_SECTION_NAME, new AuditCluster(ProposalDevelopmentDataValidationConstants.ATTACHMENT_ABSTRACTS_SECTION_NAME, errors, AUDIT_ERRORS));
 			}
 		}
 		//UH KC-515 END
@@ -127,14 +134,6 @@ public class UhProposalDevelopmentDocumentRule extends
 
 		return valid;
 	}
-	
-	/**
-	 * KC-306 - Make Primary performance site required
-	 * 
-	 * @see org.kuali.rice.kns.rule.SaveDocumentRule#processSaveDocument(org.kuali.rice.kns.document.Document)
-	 */
-	@Override
-	public boolean processSaveProposalSiteBusinessRules(SaveProposalSitesEvent saveProposalSitesEvent) {
-		return new UhProposalDevelopmentProposalLocationRule().processSaveProposalSiteBusinessRules(saveProposalSitesEvent);
-	  }
 }
+
+
