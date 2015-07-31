@@ -40,4 +40,11 @@ insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_
 values ('KC-GEN','All','uh.helpbutton.award.status.url',sys_guid(),1,'CONFG'
 	,'https://cognos.reports.hawaii.edu/ibmcognos/cgi-bin/cognos.cgi?b_action=cognosViewer\&ui.action=run\&ui.object=%2fcontent%2ffolder%5b%40name%3d%27ORS%27%5d%2ffolder%5b%40name%3d%27ORS%20Reports%20Authenticated%27%5d%2freport%5b%40name%3d%27Award%20Status%20DWH%27%5d\&ui.name=Award%20Status%20DWH\&run.outputFormat=\&run.prompt=true','URL for Award Status help button','A','KC');
 
+
+-- KC-1183 Incident report - Do you want to receive future approval requests?
+update KREW_RTE_NODE_CFG_PARM_T
+set val = '<requests name="PeopleFlows"><activationType>R</activationType><rulesEngine executorClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentRulesEngineExecutorImpl"/></requests>'
+where VAL like '%ProposalDevelopmentRulesEngineExecutorImpl%';
+
+
 commit;
