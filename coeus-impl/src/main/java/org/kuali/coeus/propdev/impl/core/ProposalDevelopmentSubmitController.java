@@ -642,6 +642,19 @@ public class ProposalDevelopmentSubmitController extends
         boolean receiveFutureRequests = false;
         boolean doNotReceiveFutureRequests = false;
 
+        // KC-963 Remove Question about seeing future approvals
+        // Keep old behavior for help desk since they need to see all approvals requests
+        // workflow nodes missing assigned approvers are routed to help desk and I want them
+        // to always see them.  They will get the question so they can answer no if they know what
+        // they are doing.
+        if (!groupService.isMemberOfGroup(principalId, groupService.getGroupByNamespaceCodeAndName("KC-WKFLW","myGRANT Help Desk").getId())) {
+            // Since member is not in help desk lets short circuit the future approvals question and simply return false as if user
+            // has answered the question before not wanting to see future approvals.
+            // Please note that although the name of this method implies that true = "user has asked NOT to see future requests" in fact
+            // returning false prevents the user from seeing future requests....Ahhhhhhhhh.....
+            return false;
+        }
+
         Map<String, String> variables = workflowDoc.getVariables();
 
            for (Map.Entry<String,String> entry : variables.entrySet()) {
