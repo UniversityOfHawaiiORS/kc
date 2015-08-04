@@ -634,10 +634,15 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     }
 
     public void populateQuestionnaires(ProposalDevelopmentDocumentForm form) {
-        form.setQuestionnaireHelper(new ProposalDevelopmentQuestionnaireHelper(form));
         form.setS2sQuestionnaireHelper(new ProposalDevelopmentS2sQuestionnaireHelper(form));
 
-        form.getQuestionnaireHelper().populateAnswers();
+        // KC-1171 Document does not auto save questionnaire when moving from the questionnaire tab to summary/submit
+        if (form.getQuestionnaireHelper().getAnswerHeaders() == null) {
+            form.setQuestionnaireHelper(new ProposalDevelopmentQuestionnaireHelper(form));
+            form.getQuestionnaireHelper().populateAnswers();
+        }
+        // KC-1171 END
+
         form.getQuestionnaireHelper().updateChildIndicators();
 
         form.getS2sQuestionnaireHelper().populateAnswers();
