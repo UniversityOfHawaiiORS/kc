@@ -303,8 +303,9 @@
             <list />
         </property>
         <property name="layoutManager.lineGroupPrototype">
+            <!-- KC-1096 Improve Key Personnel Certification -->
             <bean parent="Uif-CollectionHorizontalBoxItem"
-                  p:disclosure.render="true" p:disclosure.defaultOpen="false" p:disclosure.ajaxRetrievalWhenOpened="true">
+                  p:disclosure.render="true" p:disclosure.defaultOpen="true" p:disclosure.ajaxRetrievalWhenOpened="true">
                 <property name="dataAttributes">
                     <map>
                         <entry key="full_name" value="@{#line.fullName}"/>

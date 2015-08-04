@@ -71,10 +71,10 @@ public final class ProposalDevelopmentDataValidationConstants {
     public static final String ATTACHMENT_PROPOSAL_SECTION_NAME = "Proposal Attachments";
     public static final String ATTACHMENT_PERSONNEL_SECTION_ID = "PropDev-AttachmentsPage-PersonnelSection";
     public static final String ATTACHMENT_PERSONNEL_SECTION_NAME = "Personnel Attachments";
-    // KC-933 Turning on PD Audit Rules generates blank screen in KC 6.0 upgrade
-    public static final String ATTACHMENT_ABSTRACTS_SECTION_ID = "PropDev-AttachmentsPage-AbstractsSection";
-    public static final String ATTACHMENT_ABSTRACTS_SECTION_NAME = "Personnel Attachments";
-    // KC-993 End
+    // KC-951 Fix Project Summary Required UH Enhancement
+    public static final String ATTACHMENT_ABSTRACTS_SECTION_ID = "AbstractsSection";
+    public static final String ATTACHMENT_ABSTRACTS_SECTION_NAME = "Abstracts";
+    // KC-951 End
     
     public static final String ATTACHMENT_INTERNAL_SECTION_ID =  "PropDev-AttachmentsPage-InternalSection";
     public static final String ATTACHMENT_INTERNAL_SECTION_NAME = "Internal Attachments";

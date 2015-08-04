@@ -348,6 +348,8 @@
             </list>
         </property>
         <property name="fieldBindingObjectPath" value="document.developmentProposal" />
+        <!-- KC-951 Fix Project Summary Required UH Enhancement -->
+        <property name="id" value="AbstractsSection"/>
     </bean>
 
     <bean id="PropDev-AttachmentsPage-AbstractsCollection" parent="PropDev-AttachmentsPage-AbstractsCollection-parentBean" />

@@ -69,6 +69,9 @@ public interface KeyPersonnelService {
      */
     public void addUnitToPerson(ProposalPerson person, ProposalPersonUnit unit);
 
+    // KC-1045 Opt-in for Key Person in credit split not working
+    public void createCreditTypes(ProposalPerson person);
+
     /**
      * Everytime something changes that will effect credit split values, this gets called to generate a graph of the
      * new data.

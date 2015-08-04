@@ -70,6 +70,14 @@
                 <bean p:propertyName="unitSearchInput" parent="Uif-LookupCriteriaInputField"/>
             </list>
         </property>
+        <!-- KC-1212 Improve Unit search results in 6.0 -->
+        <property name="resultFields">
+            <list>
+                <bean p:propertyName="unitNumber" parent="Uif-DataField"/>
+                <bean p:propertyName="unitName" parent="Uif-DataField"/>
+                <bean p:propertyName="parentUnit.unitName" parent="Uif-DataField"/>
+            </list>
+        </property>
     </bean>
      
 </beans>

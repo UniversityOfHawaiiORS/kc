@@ -82,5 +82,9 @@ public class KeyPersonnelServiceAdapter implements KeyPersonnelService {
 
     @Override
     public void populateCreditSplit(ProposalDevelopmentDocument document) {}
+
+    @Override
+    // KC-1045 Opt-in for Key Person in credit split not working
+    public void createCreditTypes(ProposalPerson person) {}
     
 }

@@ -486,8 +486,10 @@ public class ProposalPerson extends KcPersistableBusinessObjectBase implements N
 
 
     public boolean getInvestigatorFlag() {
-        return isPrincipalInvestigator() || isMultiplePi() || isCoInvestigator()
-                || (isKeyPerson() && getOptInUnitStatus());
+        // KC-1045 Opt-in for Key Person in credit split not working
+        // Added check for isEmployee we don't want credit option for non-employee
+        // Added isKeyPerson and has unit assigned (opt in for credit)
+        return isEmployee() && (isPrincipalInvestigator() || isMultiplePi() || isCoInvestigator() || isKeyPersonWithUnitOptIn());
     }
 
     @Override
@@ -891,9 +893,25 @@ public class ProposalPerson extends KcPersistableBusinessObjectBase implements N
         this.otherSignificantContributorFlag = otherSignificantContributorFlag;
     }
 
+
+    // KC-1045 Opt-in for Key Person in credit split not working
+    public boolean isEmployee() {
+        // Non-Employee identified using getRolodexID check, null = employee
+        return (getRolodexId() == null);
+    }
+
+    public boolean isKeyPersonWithUnitOptIn() {
+        // Credit Split Opt in for employee's only
+        // If unit was added then this is credit split opt in
+        return (isKeyPerson() && getUnits() != null && !getUnits().isEmpty());
+    }
+    // KC-1045 End
+
     @Override
     public Boolean getOptInUnitStatus() {
-        return optInUnitStatus;
+
+        // KC-1045 Opt-in for Key Person in credit split not working
+        return optInUnitStatus || isKeyPersonWithUnitOptIn();
     }
 
     public void setOptInUnitStatus(Boolean optInUnitStatus) {

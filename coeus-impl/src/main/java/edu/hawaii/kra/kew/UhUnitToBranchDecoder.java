@@ -62,7 +62,10 @@ public class UhUnitToBranchDecoder {
         if (unitNumber!=null) {
         	List<Unit> units = KcServiceLocator.getService(UnitService.class).getUnitHierarchyForUnit(unitNumber);
         	if (CollectionUtils.isNotEmpty(units)) {
-                for(Unit unit: Lists.reverse(units)) {
+				// KC-1063 UH-H Route Log - Missing Chancellor Approval Role
+				// KC6.0 getUnitHierarchyForUnit order returned has been reversed to no need to reverse the list
+				// altered next line to just use units instead of List.reverse(units)
+                for(Unit unit: units) {
                 	String branchFound=getUnitToBranchMap().get(unit.getUnitNumber());
                 	if (branchFound != null) {
                 		branch=branchFound;
