@@ -403,6 +403,13 @@ div[class^="col-"] .uif-inputField span[id$="_control"] {
     margin-bottom: 5px;
 }
 
+/* KC-939 Make the sponsor search drop down slightly larger
+   KRAD overrides jquery, we override KRAD here
+*/
+.ui-autocomplete {
+	max-height: 20%;
+}
+
 .ui-autocomplete-input {
 	background-image: none;
 }
