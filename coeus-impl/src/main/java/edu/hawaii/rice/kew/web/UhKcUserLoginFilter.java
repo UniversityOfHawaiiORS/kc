@@ -137,10 +137,11 @@ public class UhKcUserLoginFilter extends UserLoginFilter
                 	// User is not in "UH KC Users" group so redirect them to permission denied page.
         	        // Check if request is already forwarded to Permission Denied to prevent redirect loop
         	        String channelTitle=(String)request.getParameter("channelTitle");
-        	        if (channelTitle != null && !channelTitle.contains("PermissionDenied")) {
+        	        // KC-1204 Only allow users in the "UH KC Users" group to access myGRANT
+                    if (request.getRequestURL() != null && !request.getRequestURL().toString().contains("PermissionDenied")) {
         		        ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
         		        String appUrl= configService.getPropertyValueAsString("application.url");
-        		        response.sendRedirect("portal.do?channelTitle=PermissionDenied&channelUrl=" + appUrl + "/PermissionDenied.do");
+        		        response.sendRedirect(appUrl + "/PermissionDenied.do");
         		        return;
         	        }
                 }
