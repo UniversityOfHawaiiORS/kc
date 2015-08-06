@@ -46,5 +46,43 @@ update KREW_RTE_NODE_CFG_PARM_T
 set val = '<requests name="PeopleFlows"><activationType>R</activationType><rulesEngine executorClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentRulesEngineExecutorImpl"/></requests>'
 where VAL like '%ProposalDevelopmentRulesEngineExecutorImpl%';
 
+-- KC-955 Remove menu items from Researcher and Unit Tab
+-- Add Central admin tab view permission
+insert into krim_perm_t (PERM_ID,OBJ_ID,VER_NBR,PERM_TMPL_ID,NMSPC_CD,NM,DESC_TXT,ACTV_IND)
+                 values (KRIM_PERM_ID_S.nextval, sys_guid(), 1, 1,'KC-GEN','uh-view-central-admin-tab','View Central Admin Tab in KRAD portal permission','Y');
+
+-- Add Central admin tab view permission to role
+insert into krim_role_perm_t (role_perm_id, OBJ_ID,VER_NBR,ROLE_ID,PERM_ID,ACTV_IND)
+                  values (KRIM_ROLE_PERM_ID_S.nextval, sys_guid(), 1,
+                  (select role_id from krim_role_t where ROLE_NM = 'UH Central Admin Tab Viewer'),
+                  (select perm_id from krim_perm_t where nm = 'uh-view-central-admin-tab'),
+                  'Y');
+
+-- Add System Admin Portal permission
+insert into krim_perm_t (PERM_ID,OBJ_ID,VER_NBR,PERM_TMPL_ID,NMSPC_CD,NM,DESC_TXT,ACTV_IND)
+                 values (KRIM_PERM_ID_S.nextval, sys_guid(), 1, 1,'KC-GEN','uh-view-sys-admin-portal','View sys admin krns portal from KRAD portal permission','Y');
+
+-- Add System Admin Portal permission to role
+insert into krim_role_perm_t (role_perm_id, OBJ_ID,VER_NBR,ROLE_ID,PERM_ID,ACTV_IND)
+                  values (KRIM_ROLE_PERM_ID_S.nextval, sys_guid(), 1,
+                  (select role_id from krim_role_t where ROLE_NM = 'Technical Administrator'),
+                  (select perm_id from krim_perm_t where nm = 'uh-view-sys-admin-portal'),
+                  'Y');
+
+-- Add View All Links permission
+insert into krim_perm_t (PERM_ID,OBJ_ID,VER_NBR,PERM_TMPL_ID,NMSPC_CD,NM,DESC_TXT,ACTV_IND)
+                 values (KRIM_PERM_ID_S.nextval, sys_guid(), 1, 1,'KC-GEN','uh-view-all-links','View irb links in KRAD portal permission','Y');
+
+-- Add View All Links permission to role
+insert into krim_role_perm_t (role_perm_id, OBJ_ID,VER_NBR,ROLE_ID,PERM_ID,ACTV_IND)
+                  values (KRIM_ROLE_PERM_ID_S.nextval, sys_guid(), 1,
+                  (select role_id from krim_role_t where ROLE_NM = 'UH VIEW ALL LINKS ROLE'),
+                  (select perm_id from krim_perm_t where nm = 'uh-view-all-links'),
+                  'Y');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.change.my.info.helpline.url',sys_guid(),1,'CONFG'
+	,'http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/4','URL for Change My Info on Researcher Tab','A','KC');
+-- KC-955 End
 
 commit;

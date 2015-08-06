@@ -91,6 +91,14 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
         <property name="items">
             <list>
+                <!-- KC-955 Remove menu items from Researcher and Unit Tab
+                            We list researched tab three different ways
+                            Original with all 4 columns (Permission Based)
+                            Modified with only 2 columns
+                            Permission based with IRB Only
+                            Permission based with COI or IACUC Only
+                            Only 1 of these 4 should logically render
+                -->
                 <bean parent="Kc-Header-ResearcherMenu" p:order="10">
                     <property name="wrapperCssClasses">
                         <list merge="true">
@@ -99,6 +107,17 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                         </list>
                     </property>
                 </bean>
+
+                <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+                <bean parent="Kc-Header-ResearcherMenu-Uh-Modified" p:order="12">
+                    <property name="wrapperCssClasses">
+                        <list merge="true">
+                            <value>kc-researcherDropdown</value>
+                            <value>kc-listIconDropdown</value>
+                        </list>
+                    </property>
+                </bean>
+
                 <bean parent="Kc-Header-DefaultMenu" p:toggleText="UNIT"
                       p:order="20">
                     <property name="wrapperCssClasses">
@@ -108,8 +127,19 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                         </list>
                     </property>
                 </bean>
-                <bean parent="Kc-Header-DefaultMenu" p:toggleText="CENTRAL ADMIN"
-                      p:order="30">
+                <bean parent="Kc-Header-DefaultMenu-Uh-Modified" p:toggleText="UNIT"
+                      p:order="25">
+                    <property name="wrapperCssClasses">
+                        <list merge="true">
+                            <value>kc-unitDropdown</value>
+                            <value>kc-listIconDropdown</value>
+                        </list>
+                    </property>
+                </bean>
+
+                <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+                <bean parent="Kc-Header-DefaultMenu-UH-Central" p:toggleText="CENTRAL ADMIN"
+                      p:order="30" p:render="@{#hasPerm('KC-GEN','uh-view-central-admin-tab')}">
                     <property name="wrapperCssClasses">
                         <list merge="true">
                             <value>kc-centralAdminDropdown</value>
@@ -117,6 +147,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                         </list>
                     </property>
                 </bean>
+
 				<bean parent="Kc-Header-ReportsMenu" p:toggleText="REPORTS"
                       p:order="40" p:render="@{#getParamAsBoolean('KC-GEN','All','JASPER_REPORTS_ENABLED') and #userSession != null 
                       	and #getService('unitAuthorizationService').hasPermission(#userSession.getPrincipalId(), 
@@ -130,9 +161,11 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                         </list>
                     </property>
                 </bean>
+                <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
                 <!-- KC-1206 Modify System Admin Portal header link to take you to the System Admin Tab -->
                 <bean parent="Uif-Link" p:href="@{#ConfigProperties['application.url']}/portal.do?selectedTab=portalSystemAdminBody"
                     p:wrapperCssClasses="pull-right" p:target="_new"
+                    p:render="@{#hasPerm('KC-GEN','uh-view-sys-admin-portal')}"
                     p:linkText="SYSTEM ADMIN PORTAL" p:order="50"/>
             </list>
         </property>
@@ -190,8 +223,10 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
     <bean id="Kc-Header-ApplicationLogo-parentBean" parent="Uif-Image"
           abstract="true" p:source="../static/uh-images/myGRANT.png"/>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-ResearcherMenu" parent="Kc-Header-ResearcherMenu-parentBean"/>
     <bean id="Kc-Header-ResearcherMenu-parentBean" abstract="true"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"
           parent="Kc-Header-DefaultMenu" p:toggleText="RESEARCHER">
         <property name="menuGroup">
             <bean parent="Uif-AppMenuGroup">
@@ -209,21 +244,43 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-ResearcherMenu-Uh-Modified" parent="Kc-Header-ResearcherMenu-Uh-Modified-parentBean"/>
+    <bean id="Kc-Header-ResearcherMenu-Uh-Modified-parentBean" abstract="true"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links') == false}"
+          parent="Kc-Header-DefaultMenu" p:toggleText="RESEARCHER">
+        <property name="menuGroup">
+            <bean parent="Uif-AppMenuGroup">
+                <property name="layoutManager.defaultItemSizes.smSize" value="6"/>
+                <property name="layoutManager.defaultItemSizes.mdSize" value="6"/>
+                <property name="items">
+                    <list>
+                        <bean parent="Kc-Header-Researcher-Group1" p:order="10"/>
+                        <bean parent="Kc-Header-Researcher-Group4" p:order="40"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-Group1" parent="Kc-Header-Researcher-Group1-parentBean"/>
     <bean id="Kc-Header-Researcher-Group1-parentBean" abstract="true"
           parent="Uif-SimpleGroup">
         <property name="items">
             <list>
                 <bean parent="Kc-Header-Researcher-ProposalGroup" p:order="10"/>
+                <bean parent="Kc-Header-Researcher-ProposalGroup-UH-HideSubGroup" p:order="15"/>
                 <bean parent="Kc-Header-Researcher-AwardGroup" p:order="20"/>
                 <bean parent="Kc-Header-Researcher-NegotiationGroup" p:order="30"/>
             </list>
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-Group2" parent="Kc-Header-Researcher-Group2-parentBean"/>
     <bean id="Kc-Header-Researcher-Group2-parentBean" abstract="true"
-          parent="Uif-SimpleGroup">
+          parent="Uif-SimpleGroup" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                 <bean parent="Kc-Header-Researcher-IRBGroup" p:order="10"/>
@@ -231,9 +288,10 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-Group3" parent="Kc-Header-Researcher-Group3-parentBean"/>
     <bean id="Kc-Header-Researcher-Group3-parentBean" abstract="true"
-          parent="Uif-SimpleGroup">
+          parent="Uif-SimpleGroup" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                 <bean parent="Kc-Header-Researcher-COIGroup" p:order="10"/>
@@ -242,6 +300,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-Group4" parent="Kc-Header-Researcher-Group4-parentBean"/>
     <bean id="Kc-Header-Researcher-Group4-parentBean" abstract="true"
           parent="Uif-SimpleGroup">
@@ -249,11 +308,13 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
             <list>
                 <bean parent="Kc-Header-Researcher-QuicklinksGroup" p:order="10"/>
                 <bean parent="Kc-Header-Researcher-PersonnelGroup" p:order="20"/>
+                <bean parent="Kc-Header-Researcher-PersonnelGroup-Uh-Modified" p:order="25"/>
                 <bean parent="Kc-Header-Researcher-WorkflowGroup" p:order="30"/>
             </list>
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-ProposalGroup" parent="Kc-Header-Researcher-ProposalGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-ProposalGroup-parentBean" abstract="true"
           parent="Uif-MenuList" p:headerText="Proposals">
@@ -283,6 +344,14 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                       p:actionUrl.methodToCall="search"
                       p:actionUrl.controllerMapping="/lookup" p:order="40"   />
 
+            </list>
+        </property>
+    </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-Researcher-ProposalGroup-UH-HideSubGroup" parent="Uif-MenuList" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
+        <property name="items">
+            <list>
                 <bean parent="Uif-SimpleHeaderFour" p:headerText="Lists"
                       p:order="50"/>
                 <bean parent="Uif-MenuAction" p:actionLabel="Search Proposals"
@@ -290,9 +359,9 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                       p:actionUrl.viewId="DevelopmentProposals-LookupViewId"
                       p:actionParameters="viewName:DevelopmentProposals-LookupViewName"
                       p:actionUrl.controllerMapping="/lookup"
-                      p:order="60" />
+                      p:order="60"/>
                 <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
-                      p:actionLabel="Search Proposal Log" p:order="70" >
+                      p:actionLabel="Search Proposal Log" p:order="70">
                     <property name="actionUrl.requestParameters">
                         <map>
                             <entry key="href"
@@ -301,7 +370,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                     </property>
                 </bean>
                 <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
-                      p:actionLabel="Search Institutional Proposals" p:order="80" >
+                      p:actionLabel="Search Institutional Proposals" p:order="80">
                     <property name="actionUrl.requestParameters">
                         <map>
                             <entry key="href"
@@ -313,6 +382,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-AwardGroup" parent="Kc-Header-Researcher-AwardGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-AwardGroup-parentBean" abstract="true"
           parent="Uif-MenuList" p:headerText="Awards">
@@ -332,7 +402,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
     </bean>
 <bean id="Kc-Header-Researcher-NegotiationGroup" parent="Kc-Header-Researcher-NegotiationGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-NegotiationGroup-parentBean"
-          abstract="true" parent="Uif-MenuList" p:headerText="Negotiations">
+          abstract="true" parent="Uif-MenuList" p:headerText="Negotiations" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
               <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
@@ -349,9 +419,10 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
     </bean>
 
-   
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-IRBGroup" parent="Kc-Header-Researcher-IRBGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-IRBGroup-parentBean" abstract="true"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"
           parent="Uif-MenuList" p:headerText="IRB Protocols">
         <property name="items">
             <list>
@@ -485,8 +556,10 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-COIGroup" parent="Kc-Header-Researcher-COIGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-COIGroup-parentBean" abstract="true"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"
           parent="Uif-MenuList" p:headerText="Conflict of Interest">
         <property name="items">
             <list>
@@ -608,8 +681,10 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-IacucGroup" parent="Kc-Header-Researcher-IacucGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-IacucGroup-parentBean" abstract="true" parent="Uif-MenuList"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"
           p:headerText="IACUC Protocols">
         <property name="items">
             <list>
@@ -707,9 +782,11 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-PersonnelGroup" parent="Kc-Header-Researcher-PersonnelGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-PersonnelGroup-parentBean"
-          abstract="true" parent="Uif-MenuList" p:headerText="Personnel">
+          abstract="true" parent="Uif-MenuList" p:headerText="Personnel"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                
@@ -722,13 +799,47 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </map>
                     </property>
                 </bean>
+
+                <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
+                      p:actionLabel="Change My Information" p:order="10" >
+                    <property name="actionUrl.requestParameters">
+                        <map>
+                            <entry key="href"
+                                   value="@{#getParam('KC-GEN','All','uh.change.my.info.helpline.url')}"/>
+                        </map>
+                    </property>
+                </bean>
                 
             </list>
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-Researcher-PersonnelGroup-Uh-Modified" parent="Kc-Header-Researcher-PersonnelGroup-Uh-Modified-parentBean"/>
+    <bean id="Kc-Header-Researcher-PersonnelGroup-Uh-Modified-parentBean"
+          abstract="true" parent="Uif-MenuList" p:headerText="Personnel"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links') == false}">
+        <property name="items">
+            <list>
+
+                <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
+                      p:actionLabel="Change My Information" p:order="10" >
+                    <property name="actionUrl.requestParameters">
+                        <map>
+                            <entry key="href"
+                                   value="@{#getParam('KC-GEN','All','uh.change.my.info.helpline.url')}"/>
+                        </map>
+                    </property>
+                </bean>
+
+            </list>
+        </property>
+    </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-WorkflowGroup" parent="Kc-Header-Researcher-WorkflowGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-WorkflowGroup-parentBean" abstract="true"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"
           parent="Uif-MenuList" p:headerText="Workflow">
         <property name="items">
             <list>
@@ -744,9 +855,10 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-DefaultMenu" parent="Kc-Header-DefaultMenu-parentBean"/>
     <bean id="Kc-Header-DefaultMenu-parentBean" abstract="true"
-          parent="Uif-DropdownToggleMenu" p:toggleCaretClass="">
+          parent="Uif-DropdownToggleMenu" p:toggleCaretClass="" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="wrapperCssClasses">
             <list merge="true">
                 <value>kc-navMenuDropdown</value>
@@ -771,11 +883,56 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-DefaultMenu-Uh-Modified" parent="Kc-Header-DefaultMenu-Uh-Modified-parentBean"/>
+    <bean id="Kc-Header-DefaultMenu-Uh-Modified-parentBean" abstract="true"
+          parent="Uif-DropdownToggleMenu" p:toggleCaretClass="" p:render="@{#hasPerm('KC-GEN','uh-view-all-links') == false}">
+        <property name="wrapperCssClasses">
+            <list merge="true">
+                <value>kc-navMenuDropdown</value>
+            </list>
+        </property>
+        <property name="menuGroup">
+            <bean parent="Uif-AppMenuGroup">
+                <property name="layoutManager.defaultItemSizes.smSize" value="6"/>
+                <property name="layoutManager.defaultItemSizes.mdSize" value="6"/>
+                <property name="items">
+                    <list>
+                        <bean parent="Kc-Header-Unit-Group1" p:order="10"/>
+                        <bean parent="Kc-Header-Unit-Group2-Uh-Modified" p:order="20"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-DefaultMenu-UH-Central" parent="Kc-Header-DefaultMenu-parentBean">
+        <property name="menuGroup">
+            <bean parent="Uif-AppMenuGroup">
+                <property name="layoutManager.defaultItemSizes.smSize" value="4"/>
+                <property name="layoutManager.defaultItemSizes.mdSize" value="3"/>
+                <property name="items">
+                    <list>
+                        <bean parent="Kc-Header-Unit-Group1-UH-Central" p:order="10"/>
+                        <bean parent="Kc-Header-Unit-Group2" p:order="20"/>
+                        <bean parent="Kc-Header-Unit-Group3" p:order="30"/>
+                        <bean parent="Kc-Header-Unit-Group4" p:order="40"/>
+                        <bean parent="Kc-Header-Unit-Group5" p:order="50"/>
+                        <bean parent="Kc-Header-Unit-Group5-Uh-Modified" p:order="55"/>
+                        <bean parent="Kc-Header-Unit-Group6" p:order="60"/>
+                        <bean parent="Kc-Header-Unit-Group7" p:order="70"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Unit-Group1" parent="Kc-Header-Unit-Group1-parentBean"/>
     <bean id="Kc-Header-Unit-Group1-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Pre-Award">
         <property name="items">
             <list>
-
                 <bean parent="Uif-HorizontalBoxSection" p:order="10">
                     <property name="items">
                         <list>
@@ -821,7 +978,6 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                     </property>
                 </bean>
 
-
                 <bean parent="Uif-HorizontalBoxSection" p:order="30">
                     <property name="items">
                         <list>
@@ -848,6 +1004,16 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                     </property>
                 </bean>
 
+            </list>
+        </property>
+
+    </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-Unit-Group1-UH-Central" parent="Kc-Header-Unit-Group1-parentBean">
+        <property name="items">
+            <list merge="true">
+
                 <bean parent="Uif-HorizontalBoxSection" p:order="35">
                     <property name="items">
                         <list>
@@ -863,13 +1029,13 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </list>
                     </property>
                 </bean>
-                
+
                 <bean parent="Uif-HorizontalBoxSection" p:order="40">
                     <property name="items">
                         <list>
                             <bean parent="Uif-Message" p:messageText="Negotiations" p:order="10" />
                             <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
-                                  p:iconClass="icon-plus" p:order="20">
+                                  p:iconClass="icon-plus" p:order="20" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
                                 <property name="actionUrl.requestParameters">
                                     <map>
                                         <entry key="href"
@@ -889,21 +1055,15 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </list>
                     </property>
                 </bean>
-                <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
-                      p:actionLabel="All My Negotiations" p:order="50">
-                    <property name="actionUrl.requestParameters">
-                        <map>
-                        <entry key="href" value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&amp;businessObjectClassName=org.kuali.kra.negotiations.bo.Negotiation&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true&amp;negotiatorName=@{#userSession == null ? '' : #userSession.getPerson().getFirstName()+'*'+#userSession.getPerson().getLastName()}&amp;lookupProtocolPersonId=@{#userSession == null ? '' : #userSession.getPerson().getPrincipalId()}&amp;searchCriteriaEnabled=true"/>
-                        </map>
-                    </property>
-                </bean>
             </list>
         </property>
-
     </bean>
 
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Unit-Group2" parent="Kc-Header-Unit-Group2-parentBean"/>
-    <bean id="Kc-Header-Unit-Group2-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Post-Award">
+    <bean id="Kc-Header-Unit-Group2-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Post-Award"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links') or #hasPerm('KC-GEN','uh-view-central-admin-tab')}">
         <property name="items">
             <list>
 
@@ -988,8 +1148,55 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
 
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-Unit-Group2-Uh-Modified" parent="Kc-Header-Unit-Group2-Uh-Modified-parentBean"/>
+    <bean id="Kc-Header-Unit-Group2-Uh-Modified-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Post-Award"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links') == false}">
+        <property name="items">
+            <list>
+
+                <bean parent="Uif-HorizontalBoxSection" p:order="10">
+                    <property name="items">
+                        <list>
+                            <bean parent="Uif-Message" p:messageText="Award" p:order="10" />
+                            <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView" p:iconClass="icon-search" p:order="30">
+                                <property name="actionUrl.requestParameters">
+                                    <map>
+                                        <entry key="href"
+                                               value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.kra.award.home.Award&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
+                                    </map>
+                                </property>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+
+                <bean parent="Uif-HorizontalBoxSection" p:order="30">
+                    <property name="items">
+                        <list>
+                            <bean parent="Uif-Message" p:messageText="Subaward" p:order="10" />
+
+                            <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView" p:iconClass="icon-search" p:order="30">
+                                <property name="actionUrl.requestParameters">
+                                    <map>
+                                        <entry key="href"
+                                               value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.kra.subaward.bo.SubAward&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
+                                    </map>
+                                </property>
+                            </bean>
+
+                        </list>
+                    </property>
+                </bean>
+            </list>
+        </property>
+
+    </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Unit-Group3" parent="Kc-Header-Unit-Group3-parentBean"/>
     <bean id="Kc-Header-Unit-Group3-parentBean" abstract="true" parent="Uif-MenuList"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"
           p:headerText="Pre-Submission Compliance">
         <property name="items">
             <list>
@@ -1125,8 +1332,11 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
             </list>
         </property>
     </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Unit-Group4" parent="Kc-Header-Unit-Group4-parentBean"/>
     <bean id="Kc-Header-Unit-Group4-parentBean" abstract="true" parent="Uif-MenuList"
+          p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"
           p:headerText="Post-Submission Compliance">
         <property name="items">
             <list>
@@ -1226,8 +1436,10 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
             </list>
         </property>
     </bean>
+
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Unit-Group5" parent="Kc-Header-Unit-Group5-parentBean"/>
-    <bean id="Kc-Header-Unit-Group5-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Quicklinks">
+    <bean id="Kc-Header-Unit-Group5-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Quicklinks" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                 <!-- KC-949 Change wording of "Pessimistic Lock" on the Research Tab -->
@@ -1254,7 +1466,7 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                     <property name="actionUrl.requestParameters">
                         <map>
                             <entry key="href"
-      value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.coeus.common.framework.rolodex.Rolodex&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true&amp;docFormKey=88888888"/>
+                                   value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.coeus.common.framework.rolodex.Rolodex&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true&amp;docFormKey=88888888"/>
 
                         </map>
                     </property>
@@ -1330,13 +1542,51 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </map>
                     </property>
                 </bean>
-                
+
             </list>
         </property>
     </bean>
 
+    <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
+    <bean id="Kc-Header-Unit-Group5-Uh-Modified" parent="Kc-Header-Unit-Group5-Uh-Modified-parentBean"/>
+    <bean id="Kc-Header-Unit-Group5-Uh-Modified-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Quicklinks" p:render="@{#hasPerm('KC-GEN','uh-view-all-links') == false}">
+        <property name="items">
+            <list>
+                <!-- KC-949 Change wording of "Pessimistic Lock" on the Research Tab -->
+                <bean parent="Kc-Header-IframeMenuAction"
+                      p:actionUrl.viewId="Kc-Header-IframeView" p:actionLabel="Document Lock"
+                      p:order="10">
+                    <property name="actionUrl.requestParameters">
+                        <map>
+                            <entry key="href"
+                                   value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=start&amp;businessObjectClassName=org.kuali.rice.krad.document.authorization.PessimisticLock&amp;showMaintenanceLinks=true&amp;docFormKey=88888888&amp;returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView&amp;hideReturnLink=true"/>
+                        </map>
+                    </property>
+                </bean>
+
+                <bean parent="Uif-MenuAction" p:actionLabel="Grants.gov Opportunity Lookup"
+                      p:actionUrl.baseUrl="@{#ConfigProperties['application.url']}/kr-krad"
+                      p:actionUrl.viewId="S2sOpportunity-LookupView"
+                      p:actionUrl.methodToCall="search"
+                      p:actionUrl.controllerMapping="/lookup" p:order="20"   />
+
+                <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
+                      p:actionLabel="Current &amp; Pending Support" p:order="60">
+                    <property name="actionUrl.requestParameters">
+                        <map>
+                            <entry key="href"
+                                   value="@{#ConfigProperties['application.url']}/currentOrPendingReport.do?returnLocation=@{#ConfigProperties['application.url']}%2Fkc-krad%2FlandingPage%3FviewId%3DKc-LandingPage-RedirectView"/>
+                        </map>
+                    </property>
+                </bean>
+
+            </list>
+        </property>
+    </bean>
+
+
     <bean id="Kc-Header-Unit-Group6" parent="Kc-Header-Unit-Group6-parentBean"/>
-    <bean id="Kc-Header-Unit-Group6-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Workflow">
+    <bean id="Kc-Header-Unit-Group6-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Workflow" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                 <bean parent="Uif-MenuAction" p:actionLabel="People Flow"
@@ -1397,7 +1647,7 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
           p:actionUrl.methodToCall="start" p:actionUrl.controllerMapping="/lookup"/>
 
     <bean id="Kc-Header-Unit-Group7" parent="Kc-Header-Unit-Group7-parentBean"/>
-    <bean id="Kc-Header-Unit-Group7-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Business Rules">
+    <bean id="Kc-Header-Unit-Group7-parentBean" abstract="true" parent="Uif-MenuList" p:headerText="Business Rules"  p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                 <bean parent="Kc-BusinessRules-MenuAction" p:actionLabel="Agenda"
