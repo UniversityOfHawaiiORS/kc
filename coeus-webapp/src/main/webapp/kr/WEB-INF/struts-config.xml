@@ -84,11 +84,6 @@
                 type="org.kuali.rice.kns.web.struts.action.AuthorizationExceptionAction">
             <forward name="basic" path="/WEB-INF/jsp/AuthorizationException.jsp" />
         </action>
-        <!-- BEGIN KC-535 If SOLR is down search's result in incident report -->
-   	    <action path="/lookup" name="LookupForm" scope="request" attribute="KualiForm" parameter="methodToCall" type="edu.hawaii.rice.kns.web.struts.action.UhKualiLookupAction">
-	        <forward name="basic" path="/WEB-INF/jsp/KualiLookup.jsp" />
-	    </action>	     
-	    <!-- END KC-535 If SOLR is down search's result in incident report -->     
 	    <action path="/multipleValueLookup" name="MultipleValueLookupForm" scope="request" attribute="KualiForm" parameter="methodToCall" type="org.kuali.rice.kns.web.struts.action.KualiMultipleValueLookupAction">
             <set-property property="cancellable" value="true" />
             <forward name="basic" path="/WEB-INF/jsp/KualiMultipleValueLookup.jsp" />
