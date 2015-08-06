@@ -50,12 +50,14 @@
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['principalName']" p:order="40"
                       p:dictionaryAttributeName="userName" />
+                <!-- KC-958 Remove Fields from Employee Search and Non-Employee Search
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['emailAddress']" p:order="50"
                       p:dictionaryAttributeName="emailAddress" />
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['officePhone']" p:order="60"
                       p:dictionaryAttributeName="officePhone" />
+                      -->
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['primaryDepartmentCode']"
                       p:order="70" p:dictionaryAttributeName="organizationIdentifier">
@@ -82,8 +84,10 @@
             <bean parent="Uif-HorizontalBoxGroup">
                 <property name="items">
                     <list>
+                        <!-- KC-986 Hide "Add New Address Book" button on Address Book Lookup
                         <bean parent="Rolodex-AddNewAddressButton"  p:order="10"
                               p:render="@{#editModes['addAddressBook']}"/>
+                              -->
                     </list>
                 </property>
             </bean>
@@ -99,12 +103,14 @@
                 <bean parent="Kc-Wizard-RolodexInputField"
                       p:propertyName="lookupFieldValues['lastName']"
                       p:dictionaryAttributeName="lastName" p:order="30" />
+                <!-- KC-958 Remove Fields from Employee Search and Non-Employee Search
                 <bean parent="Kc-Wizard-RolodexInputField"
                       p:propertyName="lookupFieldValues['emailAddress']"
                       p:dictionaryAttributeName="emailAddress" p:order="40" />
                 <bean parent="Kc-Wizard-RolodexInputField"
                       p:propertyName="lookupFieldValues['phoneNumber']"
                       p:dictionaryAttributeName="phoneNumber" p:order="50" />
+                -->
                 <bean parent="Kc-Wizard-RolodexInputField"
                       p:propertyName="lookupFieldValues['organization']"
                       p:dictionaryAttributeName="organization" p:order="60" />
