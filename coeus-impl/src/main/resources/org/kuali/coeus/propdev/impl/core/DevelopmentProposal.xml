@@ -1138,12 +1138,18 @@
 				<bean parent="FieldDefinition" p:attributeName="title" />
 				<bean parent="FieldDefinition" p:attributeName="deadlineDate" />
 				<bean parent="FieldDefinition" p:attributeName="sponsorCode" />
+				<!-- KC-1106 Remove fields from Development Proposal Lookup
 				<bean parent="FieldDefinition" p:attributeName="sponsor.sponsorName" />
+				-->
 				<bean parent="FieldDefinition" p:attributeName="ownedByUnitNumber" />
+				<!-- KC-1106 Remove fields from Development Proposal Lookup
 				<bean parent="FieldDefinition" p:attributeName="ownedByUnit.unitName" />
 				<bean parent="FieldDefinition" p:attributeName="currentAwardNumber" />
+				-->
 				<bean parent="FieldDefinition" p:attributeName="opportunityIdForGG" />
+				<!-- KC-1106 Remove fields from Development Proposal Lookup
 				<bean parent="FieldDefinition" p:attributeName="hierarchyStatus" />
+				-->
 				<bean parent="FieldDefinition" p:attributeName="proposalDocument.documentNumber" />
 			</list>
 		</property>
@@ -1207,6 +1213,7 @@
                     p:inquiryParameters="sponsorCode:sponsorCode"/>
           </property>
         </bean>
+		<!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="sponsor.sponsorName" parent="Uif-LookupCriteriaInputField">
             <property name="inquiry">
                 <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.sponsor.Sponsor"
@@ -1217,7 +1224,9 @@
                       p:fieldConversions="sponsorName:sponsor.sponsorName"/>
             </property>
         </bean>
+        -->
 		<bean parent="DevelopmentProposal-Lookup-UnitField"/>
+		<!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="ownedByUnit.unitName" parent="Uif-LookupCriteriaInputField">
             <property name="inquiry">
                 <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.unit.Unit"
@@ -1225,8 +1234,11 @@
             </property>
         </bean>
         <bean p:propertyName="currentAwardNumber" parent="Uif-LookupCriteriaInputField"/>
+        -->
         <bean p:propertyName="programAnnouncementNumber" parent="Uif-LookupCriteriaInputField"/>
+		<!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="hierarchyStatus" parent="Uif-LookupCriteriaInputField"/>
+        -->
       </list>
     </property>
     <property name="resultFields">
@@ -1335,13 +1347,16 @@
                     p:inquiryParameters="sponsorCode:sponsorCode"/>
           </property>
         </bean>
+		<!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="sponsor.sponsorName" parent="Uif-LookupCriteriaInputField">
             <property name="inquiry">
                 <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.sponsor.Sponsor"
                       p:inquiryParameters="sponsorCode:sponsorCode"/>
             </property>
         </bean>
-		<bean parent="DevelopmentProposal-Lookup-UnitField"/>
+        -->
+        <bean parent="DevelopmentProposal-Lookup-UnitField"/>
+		  <!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="ownedByUnit.unitName" parent="Uif-LookupCriteriaInputField">
             <property name="inquiry">
                 <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.unit.Unit"
@@ -1349,15 +1364,18 @@
             </property>
         </bean>
         <bean p:propertyName="currentAwardNumber" parent="Uif-LookupCriteriaInputField"/>
+        -->
         <bean p:propertyName="opportunityIdForGG" parent="Uif-LookupCriteriaInputField"/>
+		<!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="hierarchyStatus" parent="Uif-LookupCriteriaInputField"/>
+        -->
       </list>
     </property>
   </bean>
 
 
-<bean id="EnrouteDevelopmentProposals-LookupViewId" parent="EnrouteDevelopmentProposals-lookupView-parentBean"/>    
-<bean id="EnrouteDevelopmentProposals-lookupView-parentBean" abstract="true" parent="DevelopmentProposal-LookupView"     p:viewName="EnrouteLookupableDevelopmentProposals-LookupViewName" p:headerText="Enroute Development Proposals Lookup" 
+<bean id="EnrouteDevelopmentProposals-LookupViewId" parent="EnrouteDevelopmentProposals-lookupView-parentBean"/>
+<bean id="EnrouteDevelopmentProposals-lookupView-parentBean" abstract="true" parent="DevelopmentProposal-LookupView"     p:viewName="EnrouteLookupableDevelopmentProposals-LookupViewName" p:headerText="Enroute Development Proposals Lookup"
      p:viewHelperService="#{#getService('enrouteDevelopmentProposalLookupable')}">
      <property name="criteriaFields">
       <list>
@@ -1366,8 +1384,11 @@
         <bean p:propertyName="title" parent="Uif-LookupCriteriaInputField" p:order="30"/>
         <bean p:propertyName="deadlineDate" parent="Uif-LookupCriteriaInputField" p:order="40"/>
         <bean p:propertyName="sponsorCode" parent="Uif-LookupCriteriaInputField" p:order="50" />
+        <!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="sponsor.sponsorName" parent="Uif-LookupCriteriaInputField" p:order="60" />
+        -->
         <bean parent="DevelopmentProposal-Lookup-UnitField" p:order="70"/>
+		<!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="ownedByUnit.unitName" parent="Uif-LookupCriteriaInputField" p:order="80">
             <property name="inquiry">
                 <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.unit.Unit"
@@ -1375,8 +1396,11 @@
             </property>
         </bean>
         <bean p:propertyName="currentAwardNumber" parent="Uif-LookupCriteriaInputField" p:order="90" />
+        -->
         <bean p:propertyName="opportunityIdForGG" parent="Uif-LookupCriteriaInputField" p:order="100"/>
+		<!-- KC-1106 Remove fields from Development Proposal Lookup
         <bean p:propertyName="hierarchyStatus" parent="Uif-LookupCriteriaInputField" p:order="110"/>
+        -->
         <bean p:propertyName="proposalDocument.documentNumber" parent="Uif-LookupCriteriaInputField" p:order="120"/>
       </list>
   </property>
@@ -1407,7 +1431,7 @@
     </bean>
     
     <bean id="DevelopmentProposal-Lookup-UnitField" p:propertyName="ownedByUnitNumber" 
-		p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField">
+        p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField">
      <property name="inquiry">
          <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.unit.Unit"
                p:inquiryParameters="ownedByUnitNumber:unitNumber"/>
