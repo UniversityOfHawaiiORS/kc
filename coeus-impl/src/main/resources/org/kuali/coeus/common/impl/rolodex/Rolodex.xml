@@ -102,8 +102,9 @@
   <bean abstract="true" id="Rolodex-rolodexId-parentBean" parent="AttributeDefinition">
     <property name="name" value="rolodexId"/>
     <property name="forceUppercase" value="false"/>
-    <property name="label" value="Address Book Id"/>
-    <property name="shortLabel" value="Address Book Id"/>
+    <!-- KC-1126 Modal window controls are not visible if there are too many search results -->
+    <property name="label" value="Address Id"/>
+    <property name="shortLabel" value="Address Id"/>
     <property name="maxLength" value="6"/>
     <property name="validationPattern">
       <bean parent="NumericValidationPattern"/>
@@ -379,7 +380,7 @@
       </bean>
     </property>
     <property name="control">
-      <bean parent="TextareaControlDefinition" 
+      <bean parent="TextareaControlDefinition"
             p:rows="5"
             p:cols="40" />
     </property>
@@ -505,7 +506,7 @@
       <bean parent="AlphaNumericPatternConstraint"/>
     </property>
     <property name="control">
-      <bean parent="SelectControlDefinition" 
+      <bean parent="SelectControlDefinition"
       p:valuesFinderClass="org.kuali.coeus.common.impl.rolodex.RolodexAddressFlagValuesFinder"
       p:script="updateOrganizationLookupReturn(this)"/>
     </property>
@@ -553,7 +554,11 @@
   <bean id="Rolodex-state" parent="Rolodex-state-parentBean"/>
   <bean abstract="true" id="Rolodex-state-parentBean" parent="KraAttributeReferenceDummy-state"/>
   <bean id="Rolodex-countryCode" parent="Rolodex-countryCode-parentBean"/>
-  <bean abstract="true" id="Rolodex-countryCode-parentBean" parent="KraAttributeReferenceDummy-countryCode"/>
+  <!-- KC-1126 Modal window controls are not visible if there are too many search results -->
+  <bean abstract="true" id="Rolodex-countryCode-parentBean" parent="KraAttributeReferenceDummy-countryCode">
+    <property name="label" value="Country"/>
+    <property name="shortLabel" value="Country"/>
+  </bean>
   <bean id="Rolodex-suffix" parent="Rolodex-suffix-parentBean"/>
   <bean abstract="true" id="Rolodex-suffix-parentBean" parent="AttributeDefinition">
     <property name="name" value="suffix"/>
@@ -601,7 +606,7 @@
     <property name="summary" value="Title"/>
     <property name="description" value="Title"/>
   </bean>
-  
+
   <bean id="Rolodex-active" parent="Rolodex-active-parentBean"/>
 
   <bean id="Rolodex-active-parentBean" abstract="true" parent="AttributeReferenceDummy-genericBoolean">
@@ -611,7 +616,7 @@
 		<property name="summary" value="Active" />
 		<property name="description" value="Active" />
    </bean>
-  
+
   <bean id="Rolodex-versionNumber" parent="Rolodex-versionNumber-parentBean"/>
   <bean abstract="true" id="Rolodex-versionNumber-parentBean" parent="AttributeReferenceDummy-versionNumber"/>
 <!-- Business Object Inquiry Definition -->
@@ -735,22 +740,28 @@
     <property name="resultFields">
       <list>
         <bean p:attributeName="rolodexId" p:forceInquiry="true" parent="FieldDefinition"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:attributeName="organization" parent="FieldDefinition"/>
         <bean p:attributeName="lastName" parent="FieldDefinition"/>
         <bean p:attributeName="firstName" parent="FieldDefinition"/>
         <bean p:attributeName="middleName" parent="FieldDefinition"/>
+        -->
         <bean p:attributeName="addressLine1" parent="FieldDefinition"/>
         <bean p:attributeName="addressLine2" parent="FieldDefinition"/>
         <bean p:attributeName="addressLine3" parent="FieldDefinition"/>
         <bean p:attributeName="city" parent="FieldDefinition"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:attributeName="county" parent="FieldDefinition"/>
+        -->
         <bean p:attributeName="state" parent="FieldDefinition"/>
         <bean p:attributeName="countryCode" parent="FieldDefinition"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:attributeName="postalCode" parent="FieldDefinition"/>
         <bean p:attributeName="emailAddress" parent="FieldDefinition"/>
         <bean p:attributeName="sponsorAddressFlag" parent="FieldDefinition"/>
         <bean p:attributeName="sponsorCode" parent="FieldDefinition"/>
-         <bean p:attributeName="active" parent="FieldDefinition"/>
+        <bean p:attributeName="active" parent="FieldDefinition"/>
+        -->
       </list>
     </property>
   </bean>
@@ -783,22 +794,28 @@
     <property name="resultFields">
       <list>
         <bean p:propertyName="rolodexId" parent="Uif-DataField"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:propertyName="organization" parent="Uif-DataField"/>
         <bean p:propertyName="lastName" parent="Uif-DataField"/>
         <bean p:propertyName="firstName" parent="Uif-DataField"/>
         <bean p:propertyName="middleName" parent="Uif-DataField"/>
+        -->
         <bean p:propertyName="addressLine1" parent="Uif-DataField"/>
         <bean p:propertyName="addressLine2" parent="Uif-DataField"/>
         <bean p:propertyName="addressLine3" parent="Uif-DataField"/>
         <bean p:propertyName="city" parent="Uif-DataField"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:propertyName="county" parent="Uif-DataField"/>
+        -->
         <bean p:propertyName="state" parent="Uif-DataField"/>
         <bean p:propertyName="countryCode" parent="Uif-DataField"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:propertyName="postalCode" parent="Uif-DataField"/>
         <bean p:propertyName="emailAddress" parent="Uif-DataField"/>
         <bean p:propertyName="sponsorAddressFlag" parent="Uif-DataField"/>
         <bean p:propertyName="sponsorCode" parent="Uif-DataField"/>
         <bean p:propertyName="active" parent="Uif-DataField"/>
+        -->
       </list>
     </property>
   </bean>

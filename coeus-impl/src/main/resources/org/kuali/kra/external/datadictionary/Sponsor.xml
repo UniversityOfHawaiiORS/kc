@@ -302,13 +302,17 @@
         <bean parent="FieldDefinition" p:attributeName="sponsorName" />
         <bean parent="FieldDefinition" p:attributeName="acronym" />
         <bean parent="FieldDefinition" p:attributeName="sponsorType.description" />
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean parent="FieldDefinition" p:attributeName="dunAndBradstreetNumber" />
         <bean parent="FieldDefinition" p:attributeName="dodacNumber" />
         <bean parent="FieldDefinition" p:attributeName="cageNumber" />
+        -->
         <bean parent="FieldDefinition" p:attributeName="rolodex.state" />
         <bean parent="FieldDefinition" p:attributeName="rolodex.countryCode" />
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean parent="FieldDefinition" p:attributeName="dunningCampaignId"/>
         <bean parent="FieldDefinition" p:attributeName="active" />
+        -->
       </list>
     </property>
     <property name="resultSetLimit" value="8000" />
@@ -342,12 +346,16 @@
         <bean p:propertyName="sponsorName" parent="Uif-DataField"/>
         <bean p:propertyName="acronym" parent="Uif-DataField"/>
         <bean p:propertyName="sponsorType.description" parent="Uif-DataField"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:propertyName="dunAndBradstreetNumber" parent="Uif-DataField"/>
         <bean p:propertyName="dodacNumber" parent="Uif-DataField"/>
         <bean p:propertyName="cageNumber" parent="Uif-DataField"/>
+        -->
         <bean p:propertyName="state" parent="Uif-DataField"/>
         <bean p:propertyName="countryCode" parent="Uif-DataField"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean parent="Uif-DataField" p:propertyName="dunningCampaignId"/>
+        -->
       </list>
     </property>
   </bean>
