@@ -58,14 +58,17 @@
                     <bean p:actionLabel="Send Adhoc" parent="Uif-PrimaryActionButton" p:methodToCall="sendAdHocRequests"  p:order="5"
                           p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_SEND_ADHOC_REQUESTS]}"/>
 
-					<bean  p:actionLabel="Submit for Review" parent="Uif-PrimaryActionButton" p:methodToCall="submitForReview"  p:order="10"
+                    <!-- KC-945 Change Route Log and More Actions on Summary/Submit screen to buttons -->
+                    <bean  p:actionLabel="Submit for Review" parent="Uif-PrimaryActionButton" p:methodToCall="submitForReview"  p:order="10"
+                           p:additionalCssClasses="btn-success"
                            p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_ROUTE] and document.documentHeader.workflowDocument.saved and !#parent.readOnly}"/>
 
                     <bean  p:actionLabel="Ad Hoc Recipients" parent="Uif-PrimaryActionButton" p:methodToCall="populateAdHocs"  p:order="20"
                            p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_ADD_ADHOC_REQUESTS] and (!#parent.readOnly or document.documentHeader.workflowDocument.enroute) and !document.developmentProposal.isChild()}" />
 
-
+                    <!-- KC-945 Change Route Log and More Actions on Summary/Submit screen to buttons -->
                     <bean parent="Uif-PrimaryActionButton" p:actionLabel="Approve" p:methodToCall="approve" p:order="30"
+                          p:additionalCssClasses="btn-success"
                           p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_APPROVE]}"/>
 
                     <bean parent="Uif-SecondaryActionButton" p:methodToCall="disapproveProposal" p:actionLabel="Disapprove"
@@ -78,22 +81,25 @@
 
                     <!-- KC-950 Rename "Reject" button within the Proposal Actions tab -->
                     <bean parent="Uif-SecondaryActionButton" p:actionLabel="Return for Changes" p:actionScript="showDialog('PropDev-SubmitPage-RejectDialog')" p:order="50"
-                          p:render="@{#editModes['rejectProposal']}"/>
+                          p:additionalCssClasses="btn-danger" p:render="@{#editModes['rejectProposal']}"/>
 
+                    <!-- KC-945 Change Route Log and More Actions on Summary/Submit screen to buttons -->
                     <bean parent="Uif-LinkField" p:linkText="View Route Log"
+                          p:link.additionalCssClasses="btn,btn-primary"
                           p:render="@{!document.developmentProposal.child}"
-                          p:href="@{#ConfigProperties['rice.server.url']}/kew/RouteLog.do?documentId=@{document.developmentProposal.proposalDocument.documentNumber}"  p:order="60"
-                    p:link.openInDialog="true" />
+                          p:href="@{#ConfigProperties['rice.server.url']}/kew/RouteLog.do?documentId=@{document.developmentProposal.proposalDocument.documentNumber}"
+                          p:order="60"
+                          p:link.openInDialog="true" />
 
                     <bean parent="Uif-RecallAction" p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_RECALL] and !document.developmentProposal.child}"  p:order="70">
               			<property name="confirmationDialog">
              				<bean id="ConfirmRecallDialog" parent="Uif-DialogGroup-OkCancelExpl" p:promptText="Reason for recall?"/>
             			</property>
            			</bean>
-           			
 
-
+                    <!-- KC-945 Change Route Log and More Actions on Summary/Submit screen to buttons -->
 			   		<bean parent="Uif-SecondaryActionButton" p:actionLabel="Cancel proposal" p:methodToCall="cancelProposal" p:order="80"
+                        p:additionalCssClasses="btn-danger"
 						p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_CANCEL] and !#parent.readOnly}">
 					 	<property name="confirmationDialog">
 			          		<bean id="ProposalCancelDialog" parent="Uif-DialogGroup-OkCancel" p:promptText="Are you sure you want to cancel ?"/>
@@ -115,9 +121,10 @@
 					
 					<bean parent="Uif-SecondaryActionButton" p:actionLabel="Submit to S2S" p:methodToCall="submitToS2s" p:order="110"
 					 	p:render="@{#actionFlags[#{submitToS2s}] and !document.developmentProposal.child}" p:successCallback="jQuery('#PropDev-OpportunityPage-SubmissionDetailsSection_tab').click()">
-					</bean>				
-						
-					<bean parent="Uif-DropdownToggleMenu" p:toggleText="More Actions"  p:align="right" p:order="120">
+					</bean>
+
+                    <!-- KC-945 Change Route Log and More Actions on Summary/Submit screen to buttons -->
+                    <bean parent="Uif-DropdownToggleMenu" p:toggleText="More Actions"  p:align="right" p:order="120" p:additionalCssClasses="btn">
 					  <property name="menuItems">
 					    <list>
 					      <bean parent="Uif-MenuAction" p:actionLabel="Send Notifications" p:order="10" p:refreshId="Kc-SendNotification-Wizard" p:methodToCall="prepareNotificationWizard"
