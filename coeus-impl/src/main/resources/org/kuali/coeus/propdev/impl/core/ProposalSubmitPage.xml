@@ -76,14 +76,15 @@
                         </property>
                     </bean>
 
-                    <bean parent="Uif-SecondaryActionButton" p:actionLabel="Reject" p:actionScript="showDialog('PropDev-SubmitPage-RejectDialog')" p:order="50"
+                    <!-- KC-950 Rename "Reject" button within the Proposal Actions tab -->
+                    <bean parent="Uif-SecondaryActionButton" p:actionLabel="Return for Changes" p:actionScript="showDialog('PropDev-SubmitPage-RejectDialog')" p:order="50"
                           p:render="@{#editModes['rejectProposal']}"/>
 
                     <bean parent="Uif-LinkField" p:linkText="View Route Log"
                           p:render="@{!document.developmentProposal.child}"
                           p:href="@{#ConfigProperties['rice.server.url']}/kew/RouteLog.do?documentId=@{document.developmentProposal.proposalDocument.documentNumber}"  p:order="60"
                     p:link.openInDialog="true" />
-                    
+
                     <bean parent="Uif-RecallAction" p:render="@{#actionFlags[#Constants.KUALI_ACTION_CAN_RECALL] and !document.developmentProposal.child}"  p:order="70">
               			<property name="confirmationDialog">
              				<bean id="ConfirmRecallDialog" parent="Uif-DialogGroup-OkCancelExpl" p:promptText="Reason for recall?"/>
