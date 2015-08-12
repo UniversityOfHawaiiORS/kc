@@ -85,4 +85,9 @@ values ('KC-GEN','All','uh.change.my.info.helpline.url',sys_guid(),1,'CONFG'
 	,'http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/4','URL for Change My Info on Researcher Tab','A','KC');
 -- KC-955 End
 
+-- KC-1174 notifyAggregatorWhenAllCertificationsComplete parameter does not appear to be working
+update KRCR_PARM_T
+set val = 'N' where PARM_NM = 'KEY_PERSON_CERTIFICATION_SELF_CERTIFY_ONLY';
+-- KC-1174 End
+
 commit;
