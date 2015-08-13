@@ -57,4 +57,20 @@ then
    fi
 fi
 
+if [ -f last_build.sha1 ]
+then
+    last_revision=`cat last_build.sha1`
+fi
+
+echo ${git_revision} > last_build.sha1
+
+
 mvn -Denvironment=mygrant -Dbuild.version=${build_version} -Dmaven.test.skip=true ${PRE_COMPILE} clean install
+
+
+if [ "${last_revision}" != "" ] 
+then
+    #changes since last build
+    git log --name-status --oneline ${last_revision}..${git_revision} > git.log
+fi
+
