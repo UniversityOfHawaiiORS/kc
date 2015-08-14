@@ -61,10 +61,7 @@ jq(document).ready(function() {
     createLoading(false);
 });
 
-
-var formHasAlreadyBeenSubmitted = false;
-var excludeSubmitRestriction = false;
-window.hasFormAlreadyBeenSubmitted = function(){
+function hasFormAlreadyBeenSubmitted() {
 	try {
 		// save the current scroll position
 		saveScrollPosition();
@@ -72,15 +69,27 @@ window.hasFormAlreadyBeenSubmitted = function(){
 		// do nothing - don't want to stop submit
 	}
 
-    createLoading(true);
-    if (excludeSubmitRestriction) {
-        timeout = setTimeout(function() {
- 	      excludeSubmitRestriction = false;
-          createLoading(false);
-        }, 500);
-    }
+	if ( document.getElementById( "formComplete" ) ) { 
+	    if (formHasAlreadyBeenSubmitted && !excludeSubmitRestriction) {
+	       alert("Page already being processed by the server.");
+	       return false;
+	    } else {
+	       createLoading(true);
+	       if (excludeSubmitRestriction) {
+	    	   timeout = setTimeout(function() {
+	    		   createLoading(false);
+	    	   }, 1000);
+	    	   excludeSubmitRestriction = false;
+	       } else {
+	    	   formHasAlreadyBeenSubmitted = true;
+	       }
+	       return true;
+	    }
+    } else {
+	       alert("Page has not finished loading.");
+	       return false;
+	} 
 }
-
 
 /**
  * Uses jQuery plug-in to show a loading notification for a page request. See
@@ -92,8 +101,8 @@ window.hasFormAlreadyBeenSubmitted = function(){
  *          (true) or hidden (false)
  */
 function createLoading(showLoading) {
-	//var jq = jQuery.noConflict();
-    var processingMessage = '<h1><img src="' + "krad/images/" + 'loading.gif" alt="working..." />Page is being processed by the server....</h1>';
+
+    var processingMessage = '<h1><img src="' + getUrlWithContext() + '/krad/images/loading.gif" alt="working..." />Page is being processed by the server....</h1>';
     
         if (showLoading) {
             getContext().blockUI({message: processingMessage});
@@ -378,17 +387,6 @@ function showTable(id) {
     }
 }
 
-function setComment() {
-  passData=document.location.search.substring(1);
-  var idx=passData.indexOf("&commentFieldName=")
-  var idx2=passData.indexOf("&commentFieldLabel=")
-  fieldName=passData.substring(idx+18,idx2)
-  text = window.opener.document.getElementById(fieldName).value;
-  document.getElementById(fieldName).value = text;
-  
-
-}
-
 /*
  * Load the Sponsor Name field based on the Sponsor Code passed in.
  */
@@ -487,37 +485,6 @@ function loadStartAndEndDates(fiscalYear,startDate,endDate){
 		AwardFandaRateService.getStartAndEndDatesBasedOnFiscalYear(fiscalYearValue,dwrReply);
 	}
 }
- 
-/*
- * Load the Unit Name field based on the Unit Number passed in.
- */
-function loadUnitName(unitNumberFieldName) {
-	var unitNumber = dwr.util.getValue( unitNumberFieldName );
-    var elPrefix = findElPrefix( unitNumberFieldName );
-	var unitNameFieldName = elPrefix + ".unitName";
-	if (unitNumber=='') {
-		clearRecipients( unitNameFieldName, "(select)" );
-	} else {
-		var dwrReply = {
-			callback:function(data) {
-				if ( data != null ) {
-					if ( unitNameFieldName != null && unitNameFieldName != "" ) {
-						setRecipientValue( unitNameFieldName, data );
-					}
-				} else {
-					if ( unitNameFieldName != null && unitNameFieldName != "" ) {
-						setRecipientValue(  unitNameFieldName, wrapError( "not found" ), true );
-					}
-				}
-			},
-			errorHandler:function( errorMessage ) {
-				window.status = errorMessage;
-				setRecipientValue( unitNameFieldName, wrapError( "not found" ), true );
-			}
-		};
-		UnitService.getUnitName(unitNumber,dwrReply);
-	}
-}
 
 /*
  * Load the Unit Name field based on the Unit Number passed in.
@@ -591,8 +558,7 @@ function openNewWindow(action,methodToCall,lineNumber,docFormKey, sessionDocumen
   if (sessionDocument == "true") {
       documentWebScope="session"
   }
-//function openNewWindow(action,methodToCall,lineNumber){
-//  window.open(extractUrlBase()+"/"+action+".do?methodToCall="+methodToCall+"&line="+lineNumber);
+
   window.open(extractUrlBase()+"/"+action+".do?methodToCall="+methodToCall+"&line="+lineNumber+"&docFormKey="+docFormKey+"&documentWebScope="+documentWebScope);
 }
 
@@ -1918,8 +1884,10 @@ function setDefaultReviewerTypeCode(methodToCall, committeeId, scheduleId, proto
 	);
 }
 
+var REVIEWERS_ARRAY_ELEMENTS_PER_RECORD = 4;
+
 function setModifySubmissionDefaultReviewerTypeCode(methodToCall, committeeId, scheduleId, protocolId, beanName, protocolReviewTypeCode) {	
-	var reviewerBean = "actionHelper." + beanName + ".reviewer[";			
+	var reviewerBean = "actionHelper." + beanName + ".reviewer[";
 	var cmtId = dwr.util.getValue(committeeId); 
 	var schedId = $j(jq_escape(scheduleId)).attr("value");
 	var reviewTypeCode = $j(jq_escape(protocolReviewTypeCode)).attr("value");
@@ -1932,8 +1900,7 @@ function setModifySubmissionDefaultReviewerTypeCode(methodToCall, committeeId, s
 				var reviewersArr = reviewersReturned.split(";");
 				
 				var defaultReviewTyper;
-				//just to note, this will probably be higher than the actual number of reviewers, but is a good number to loop through.
-   			var numberOfRevierwers = reviewersArr.length;
+   			var numberOfRevierwers = reviewersArr.length/REVIEWERS_ARRAY_ELEMENTS_PER_RECORD;
    			var dwrReply = {
    					callback:function(data) {
    						if ( data != null ) {	
@@ -1945,8 +1912,14 @@ function setModifySubmissionDefaultReviewerTypeCode(methodToCall, committeeId, s
    						for (i=0; i<numberOfRevierwers; i++) {
 					  		var selectField = document.getElementsByName(reviewerBean + i + '].reviewerTypeCode')[0];
 					  		if (selectField != null) {
-						  		for (j=0; j<selectField.length; j++) {
-						  			if (selectField.options[j].value == defaultReviewTyper) {
+						  		var rt = reviewersArr[(i * REVIEWERS_ARRAY_ELEMENTS_PER_RECORD) + 3];
+								for (j=0; j<selectField.length; j++) {
+						  			if (rt) {
+										if (selectField.options[j].value == rt.trim()) {
+											selectField.options[j].setAttribute("selected", "selected");
+											selectField.selectedIndex = j;
+										}
+									} else if (selectField.options[j].value == defaultReviewTyper) {
 						  				selectField.options[j].setAttribute("selected", "selected");
 						  				selectField.selectedIndex = j;
 						  			}
@@ -2055,12 +2028,12 @@ function updateReviewerHtml(reviewerData, reviewerTypesData) {
 	document.getElementById("reviewers").style.display = '';
 	var reviewersArr = reviewerData.split(";");
 	var arrLength = reviewersArr.length;
-	var numReviewers = Math.floor(reviewersArr.length / 3);
+	var numReviewers = Math.floor(reviewersArr.length / REVIEWERS_ARRAY_ELEMENTS_PER_RECORD);
 	var numRows = Math.floor((numReviewers+1) / 2);
 	var reviewersTableLeft = document.getElementById("reviewersTableLeft");
 	var reviewersTableRight = document.getElementById("reviewersTableRight");
-	setReviewers(reviewersArr, 0, 3*numRows, reviewerTypes, reviewersTableLeft);
-	setReviewers(reviewersArr, 3*numRows, 3*numReviewers, reviewerTypes, reviewersTableRight);
+	setReviewers(reviewersArr, 0, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, reviewerTypes, reviewersTableLeft);
+	setReviewers(reviewersArr, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numReviewers, reviewerTypes, reviewersTableRight);
 	//finally set the number of reviewers for proper trucation
 	document.getElementById("numberOfReviewers").value = numReviewers;
 }
@@ -2070,12 +2043,12 @@ function updateProtocolReviewerHtml(reviewerData, reviewerTypesData, beanName) {
 	document.getElementById("reviewers").style.display = '';
 	var reviewersArr = reviewerData.split(";");
 	var arrLength = reviewersArr.length;
-	var numReviewers = Math.floor(reviewersArr.length / 3);
+	var numReviewers = Math.floor(reviewersArr.length / REVIEWERS_ARRAY_ELEMENTS_PER_RECORD);
 	var numRows = Math.floor((numReviewers+1) / 2);
 	var reviewersTableLeft = document.getElementById("reviewersTableLeft");
 	var reviewersTableRight = document.getElementById("reviewersTableRight");
-	setProtocolReviewers(reviewersArr, 0, 3*numRows, reviewerTypes, reviewersTableLeft, beanName);
-	setProtocolReviewers(reviewersArr, 3*numRows, 3*numReviewers, reviewerTypes, reviewersTableRight, beanName);
+	setProtocolReviewers(reviewersArr, 0, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, reviewerTypes, reviewersTableLeft, beanName);
+	setProtocolReviewers(reviewersArr, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numReviewers, reviewerTypes, reviewersTableRight, beanName);
 	//finally set the number of reviewers for proper trucation
 	document.getElementById("numberOfReviewers").value = numReviewers;
 }
@@ -2084,8 +2057,8 @@ function setProtocolReviewers(reviewers, beginIndex, endIndex, reviewerTypes, ht
 	removeAllChildren(htmlElement);
 	var reviewerBean = "actionHelper." + beanName + ".reviewer[";			
     var tbody = document.createElement('tbody');
-	for (var i = beginIndex; i < endIndex; i += 3) {
-		reviewerIndex = i/3;
+	for (var i = beginIndex; i < endIndex; i += REVIEWERS_ARRAY_ELEMENTS_PER_RECORD) {
+		reviewerIndex = i/REVIEWERS_ARRAY_ELEMENTS_PER_RECORD;
 		
 		var row = document.createElement('tr');
 		var data = document.createElement('td');
@@ -2140,8 +2113,8 @@ function setReviewers(reviewers, beginIndex, endIndex, reviewerTypes, htmlElemen
 	removeAllChildren(htmlElement);
 				
     var tbody = document.createElement('tbody');
-	for (var i = beginIndex; i < endIndex; i += 3) {
-		reviewerIndex = i/3;
+	for (var i = beginIndex; i < endIndex; i += REVIEWERS_ARRAY_ELEMENTS_PER_RECORD) {
+		reviewerIndex = i/REVIEWERS_ARRAY_ELEMENTS_PER_RECORD;
 		
 		var row = document.createElement('tr');
 		var data = document.createElement('td');
@@ -2361,7 +2334,7 @@ function nextPeriodSet() {
 
 function showAllPanels() {
 	var test = showTab(document, 'Summary');
-	expandAll('true', false); 
+	expandAll('true', false);
 }
 
 function selectAllFundedAwards(document) {
@@ -2849,15 +2822,9 @@ function loadUnitFormulatedCost(unitNumber, propertyFieldName ) {
 	}
 }
 
-function addErrorForItem(item, errorMsg) {
-	var tab = jQuery(item).parents('div.tab-container').parent();
-	var lastErrorMessage = jQuery(tab).find('div.tab-container-error div.left-errmsg-tab div div').last();
-	if (lastErrorMessage.length == 0) {
-		var errorContainer = jQuery('<div class="tab-container-error addedByRequireOnAdd"/>').html('<div class="left-errmsg-tab"><div><img alt="error" src="kr/static/images/errormark.gif"><strong>Errors found in this Section:</strong></div></div>');
-		tab.children().first().before(errorContainer);
-		lastErrorMessage = errorContainer.find('strong');
-	}
-	lastErrorMessage.after('<div style="display:list-item;margin-left:20px;" class="addedByRequireOnAdd">' + errorMsg + '</div>');
+/** Gets the full url with context.  Ex: Http://127.0.0.1:8080/kc-dev */
+function getUrlWithContext() {
+	return document.URL.substr(0, document.URL.indexOf("/", document.URL.indexOf("/", document.URL.indexOf("//") + 2) + 1));
 }
 
 var WarningOnAddRow = (function($) {
@@ -2865,8 +2832,8 @@ var WarningOnAddRow = (function($) {
 		emptyValues: [' ', '0.00', '(new group)'],
 		inputs: '.addline input, .addline select, .addline textarea',
 		elementsToIgnore: ['input[name="multiSelectToReset"]', 'input[name="checkboxToReset"]', 'input[name^="document.budget.budgetCategoryType["]'],
-		asterisk: $('<img class="changedNotice changedAsterisk" src="static/images/asterisk_orange.png"/>'),
-		resetBtn: $('<img class="changedNotice changedResetBtn" src="static/images/tinybutton-reset1.gif"/>'),
+		asterisk: $('<img class="changedNotice changedAsterisk" src="' + getUrlWithContext() + '/static/images/asterisk_orange.png"/>'),
+		resetBtn: $('<img class="changedNotice changedResetBtn" src="' + getUrlWithContext() + '/static/images/tinybutton-reset1.gif"/>'),
 		pageNotice: $('<div class="changedNotice changedPageNotice">Unsaved changes will be lost.</div>'),
 		init: function() {
 			this.checkModification = this.checkModification.bind(this);

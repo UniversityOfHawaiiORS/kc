@@ -145,6 +145,7 @@ public interface Constants {
     //public static final String ABSTRACTS_AND_ATTACHMENTS_PAGE = "abstractsAttachments";
     public static final String PROPOSAL_PAGE = "proposal";
     public static final String CUSTOM_ATTRIBUTES_PAGE = "customData";
+    public static final String CERTIFICATION_PAGE = "PropDev-CertificationView-Page";
     public static final String QUESTIONS_PAGE = "PropDev-QuestionnairePage";
     public static final String PROP_DEV_PERMISSIONS_PAGE = "PropDev-PermissionsPage";
     public static final String PERMISSIONS_PAGE = "permissions";
@@ -458,6 +459,7 @@ public interface Constants {
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_INTELLECTUAL_PROPERTY_REVIEW_PAGE = "intellectualPropertyReview";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_DISTRIBUTION_PAGE = "distribution";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_ACTIONS_PAGE = "institutionalProposalActions";
+    public static final String MAPPING_INSTITUTIONAL_PROPOSAL_ATTACHMENTS_PAGE = "attachments";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_MEDUSA_PAGE = "medusa";
 
     public static final String INSTITUTIONAL_PROPOSAL_IP_PANEL_ANCHOR = "institutionalProposal";
@@ -562,6 +564,7 @@ public interface Constants {
 
     public static final String PROTOCOL_CREATE_CONTINUATION_SUMMARY_KEY = "actionHelper.continuationSummary";
     public static final String PROTOCOL_CREATE_CONTINUATION_WITH_AMENDMENT_KEY = "actionHelper.protocolCreateContinuationWithAmendment";
+    String PROTOCOL_ATTACHMENT_PREFIX = "Protocol: ";
     
     // Protocol edit modes
     public static final String CAN_VIEW_REVIEW_COMMENTS = "viewReviewComments";
@@ -903,5 +906,7 @@ public interface Constants {
     public static final String SPONSOR_HIERACHY_REQ_DIV_PROG_CODES = "SPONSOR_HIERACHY_REQ_DIV_PROG_CODES";
 
     public static final String MM_DD_YYYY_HH_MM_A_DATE_FORMAT = "MM/dd/yyyy hh:mm a";
+    String CAN_MAINTAIN_IP_ATTACHMENTS = "CAN_MAINTAIN_IP_ATTACHMENTS";
+    String CAN_VIEW_IP_ATTACHMENTS = "CAN_VIEW_IP_ATTACHMENTS";
 }
 

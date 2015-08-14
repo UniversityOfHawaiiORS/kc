@@ -18,16 +18,15 @@
  */
 package org.kuali.kra.award.home;
 
+import org.apache.commons.lang.ObjectUtils;
+import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
+import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.award.AwardAssociate;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 
-/**
- * AwardAmountInfo BO
- * 
- * @author Kuali Coeus development team (kc.dev@kuali.org)
- */
 public class AwardAmountInfo extends AwardAssociate {
 
     private static final long serialVersionUID = 1L;
@@ -80,8 +79,8 @@ public class AwardAmountInfo extends AwardAssociate {
 
     private Integer originatingAwardVersion;
 
-    // private AwardBudgetInfo awardBudgetInfo;   
-    // private AwardAmtFnaDistribution awardAmtFnaDistribution;   
+    private transient GlobalVariableService globalVariableService;
+
     public AwardAmountInfo() {
         anticipatedTotalAmount = new ScaleTwoDecimal(0.00);
         antDistributableAmount = new ScaleTwoDecimal(0.00);
@@ -115,6 +114,8 @@ public class AwardAmountInfo extends AwardAssociate {
     }
 
     public void setAnticipatedTotalAmount(ScaleTwoDecimal anticipatedTotalAmount) {
+        changeUpdateElements(this.anticipatedTotalAmount, anticipatedTotalAmount);
+
         this.anticipatedTotalAmount = anticipatedTotalAmount;
         if (!(getAward() == null)) {
             if (getAward().getAwardAmountInfos().size() == 1 && getAward().getSequenceNumber() == 1) {
@@ -139,6 +140,7 @@ public class AwardAmountInfo extends AwardAssociate {
     }
 
     public void setFinalExpirationDate(Date finalExpirationDate) {
+        changeUpdateElements(finalExpirationDate, this.finalExpirationDate);
         this.finalExpirationDate = finalExpirationDate;
     }
 
@@ -158,6 +160,8 @@ public class AwardAmountInfo extends AwardAssociate {
     }
 
     public void setAmountObligatedToDate(ScaleTwoDecimal amountObligatedToDate) {
+        changeUpdateElements(amountObligatedToDate, this.amountObligatedToDate);
+
         this.amountObligatedToDate = amountObligatedToDate;
         if (!(getAward() == null)) {
             if (getAward().getAwardAmountInfos().size() == 1 && getAward().getSequenceNumber() == 1) {
@@ -182,7 +186,26 @@ public class AwardAmountInfo extends AwardAssociate {
     }
 
     public void setObligationExpirationDate(Date obligationExpirationDate) {
+        changeUpdateElements(obligationExpirationDate, this.obligationExpirationDate);
         this.obligationExpirationDate = obligationExpirationDate;
+    }
+
+    private void changeUpdateElements(Object newObject, Object oldObject) {
+        if (!ObjectUtils.equals(newObject, oldObject)) {
+            super.setUpdateTimestamp(new Timestamp(new java.util.Date().getTime()));
+            super.setUpdateUser(getGlobalVariableService().getUserSession().getPrincipalName());
+        }
+    }
+
+    public GlobalVariableService getGlobalVariableService() {
+        if (globalVariableService == null) {
+            globalVariableService = KcServiceLocator.getService(GlobalVariableService.class);
+        }
+        return globalVariableService;
+    }
+
+    public void setGlobalVariableService(GlobalVariableService globalVariableService) {
+        this.globalVariableService = globalVariableService;
     }
 
     public Long getTransactionId() {
@@ -319,21 +342,6 @@ public class AwardAmountInfo extends AwardAssociate {
         this.obligatedTotalIndirect = obligatedTotalIndirect;
     }
 
-    //    public AwardBudgetInfo getAwardBudgetInfo() {  
-    //        return awardBudgetInfo;  
-    //    }  
-    //  
-    //    public void setAwardBudgetInfo(AwardBudgetInfo awardBudgetInfo) {  
-    //        this.awardBudgetInfo = awardBudgetInfo;  
-    //    }A  
-    //  
-    //    public AwardAmtFnaDistribution getAwardAmtFnaDistribution() {  
-    //        return awardAmtFnaDistribution;  
-    //    }  
-    //  
-    //    public void setAwardAmtFnaDistribution(AwardAmtFnaDistribution awardAmtFnaDistribution) {  
-    //        this.awardAmtFnaDistribution = awardAmtFnaDistribution;  
-    //    }  
     /**
      * Gets the originatingAwardVersion attribute. 
      * @return Returns the originatingAwardVersion.
@@ -396,23 +404,18 @@ public class AwardAmountInfo extends AwardAssociate {
         setAnticipatedChangeIndirect(new ScaleTwoDecimal(0));
     }
 
-//TODO: For debugging, to be taken out eventually
-public String toString() {
-  return 
-  "anticipatedTotalAmount = " +      anticipatedTotalAmount +         
-  ", antDistributableAmount = " +      antDistributableAmount +         
-  ", amountObligatedToDate = " +       amountObligatedToDate +          
-  ", obliDistributableAmount = " +     obliDistributableAmount +        
-  ", anticipatedChange = " +           anticipatedChange +              
-  ", obligatedChange = " +             obligatedChange +                
-  ", obligatedChangeDirect = " +       obligatedChangeDirect +          
-  ", obligatedChangeIndirect = " +     obligatedChangeIndirect +        
-  ", anticipatedChangeDirect = " +     anticipatedChangeDirect +        
-  ", anticipatedChangeIndirect = " +   anticipatedChangeIndirect +      
-  ", anticipatedTotalDirect = " +      anticipatedTotalDirect +         
-  ", anticipatedTotalIndirect = " +    anticipatedTotalIndirect +       
-  ", obligatedTotalDirect = " +        obligatedTotalDirect +           
-  ", obligatedTotalIndirect = " +      obligatedTotalIndirect;
-}
+   @Override
+    public void setUpdateTimestamp(Timestamp updateTimestamp) {
+        if (this.getUpdateTimestamp() == null) {
+            super.setUpdateTimestamp(updateTimestamp);
+        }
+    }
+
+    @Override
+    public void setUpdateUser(String updateUser) {
+        if (this.getUpdateUser() == null) {
+            super.setUpdateUser(updateUser);
+        }
+    }
 
 }

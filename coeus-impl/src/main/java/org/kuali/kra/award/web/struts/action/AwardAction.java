@@ -56,6 +56,7 @@ import org.kuali.kra.award.home.AwardAmountInfo;
 import org.kuali.kra.award.home.AwardComment;
 import org.kuali.kra.award.home.AwardService;
 import org.kuali.kra.award.home.approvedsubawards.AwardApprovedSubaward;
+import org.kuali.kra.award.notesandattachments.attachments.AwardAttachmentFormBean;
 import org.kuali.kra.award.paymentreports.ReportClass;
 import org.kuali.kra.award.paymentreports.awardreports.AwardReportTerm;
 import org.kuali.kra.award.paymentreports.awardreports.AwardReportTermRecipient;
@@ -73,11 +74,13 @@ import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.coeus.common.framework.krms.KrmsRulesExecutionService;
 import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
 import org.kuali.kra.subaward.service.SubAwardService;
+import org.kuali.kra.timeandmoney.AwardHierarchyNode;
 import org.kuali.kra.timeandmoney.document.TimeAndMoneyDocument;
 import org.kuali.kra.timeandmoney.history.TransactionDetail;
 import org.kuali.kra.timeandmoney.history.TransactionDetailType;
 import org.kuali.kra.timeandmoney.rules.TimeAndMoneyAwardDateSaveRuleImpl;
 import org.kuali.kra.timeandmoney.service.TimeAndMoneyExistenceService;
+import org.kuali.kra.timeandmoney.service.TimeAndMoneyVersionService;
 import org.kuali.kra.timeandmoney.transactions.AwardAmountTransaction;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
@@ -101,6 +104,7 @@ import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -145,6 +149,8 @@ public class AwardAction extends BudgetParentActionBase {
     public static final String CONFIRM_SYNC_ACTION = "confirmSyncAction";
     public static final String REFUSE_SYNC_ACTION = "refuseSyncAction";
 
+    public static final String DISABLE_ATTACHMENT_REMOVAL = "disableAttachmentRemoval";
+
     private enum SuperUserAction {
         SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
     }
@@ -156,6 +162,7 @@ public class AwardAction extends BudgetParentActionBase {
     private transient KcNotificationService notificationService;
     private transient SubAwardService subAwardService;
     TimeAndMoneyAwardDateSaveRuleImpl timeAndMoneyAwardDateSaveRuleImpl;
+    private transient TimeAndMoneyVersionService timeAndMoneyVersionService;
     
     private static final Log LOG = LogFactory.getLog( AwardAction.class );
     
@@ -210,6 +217,9 @@ public class AwardAction extends BudgetParentActionBase {
             setSubAwardDetails(awardDocument.getAward());
             handlePlaceHolderDocument(awardForm, awardDocument);
         }
+
+
+       
         return forward;
     }
 
@@ -260,29 +270,14 @@ public class AwardAction extends BudgetParentActionBase {
 
     protected void populateAwardHierarchy(ActionForm form) throws WorkflowException {
         AwardForm awardForm = (AwardForm)form;
+        AwardDocument awardDocument = awardForm.getAwardDocument();
 
         List<String> order = new ArrayList<String>();
         AwardHierarchyBean helperBean = awardForm.getAwardHierarchyBean();
         AwardHierarchy rootNode = helperBean.getRootNode();
-        Map<String, AwardHierarchy> awardHierarchyNodes = helperBean.getAwardHierarchy(rootNode, order);
+        Award currentAward = awardDocument.getAward();
         awardForm.setRootAwardNumber(rootNode.getRootAwardNumber());
-        StringBuilder sb1 = new StringBuilder();
-        StringBuilder sb2 = new StringBuilder();
-        for(String str:order){
-            AwardHierarchy tempAwardNode = awardHierarchyNodes.get(str);
-            sb1.append(tempAwardNode.getAwardNumber());
-            sb1.append(KRADConstants.BLANK_SPACE).append("%3A");
-            if (getVersionHistoryService().findActiveVersion(Award.class, tempAwardNode.getAwardNumber()) != null) {
-                sb2.append(tempAwardNode.getAwardNumber());
-                sb2.append(KRADConstants.BLANK_SPACE).append("%3A");
-            }
-        }
-        
-        for(int i = 0; i < helperBean.getMaxAwardNumber(); i++){
-            AwardHierarchyTempObject temp = awardForm.getAwardHierarchyTempObjects().get(i);
-            temp.setSelectBox1(sb1.toString());
-            temp.setSelectBox2(sb2.toString());
-        }
+        buildAwardHierarchySourceAndTargetList(awardForm, currentAward);
     }
     
 
@@ -401,12 +396,12 @@ public class AwardAction extends BudgetParentActionBase {
     
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        ActionForward forward;
+        ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
         AwardForm awardForm = (AwardForm) form;
 
         Award award = awardForm.getAwardDocument().getAward();
         checkAwardNumber(award);
-
+        
         if (award.getAwardApprovedSubawards() == null || award.getAwardApprovedSubawards().isEmpty()) {
             award.setSubContractIndicator(Constants.NO_FLAG);
         } else {
@@ -700,35 +695,21 @@ public class AwardAction extends BudgetParentActionBase {
         
         
         if(GlobalVariables.getMessageMap().hasNoErrors()){
-            DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
-            boolean firstTimeAndMoneyDocCreation = Boolean.TRUE;
-            TransactionDetail transactionDetail;
-    
+            DocumentService documentService = KcServiceLocator.getService(DocumentService.class);    
             populateAwardHierarchy(form);
     
             Award currentAward = awardDocument.getAward();
     
             Map<String, Object> fieldValues = new HashMap<>();
             String rootAwardNumber = awardForm.getAwardHierarchyNodes().get(currentAward.getAwardNumber()).getRootAwardNumber();
-            fieldValues.put(ROOT_AWARD_NUMBER, rootAwardNumber);
-
-            List<TimeAndMoneyDocument> timeAndMoneyDocuments = 
-                (List<TimeAndMoneyDocument>)getBusinessObjectService().findMatching(TimeAndMoneyDocument.class, fieldValues);
-            Collections.sort(timeAndMoneyDocuments);
+            fieldValues.put(ROOT_AWARD_NUMBER, rootAwardNumber);            
+            String documentNumber = getTimeAndMoneyVersionService().getCurrentTimeAndMoneyDocumentNumber(rootAwardNumber);
             
             Award rootAward = getAwardVersionService().getWorkingAwardVersion(rootAwardNumber);   
-            // check for existing finalized T & M document before creating a new one.
-            TimeAndMoneyDocument timeAndMoneyDocument = getLastFinalTandMDocument(timeAndMoneyDocuments);
-            if(timeAndMoneyDocuments.size() > 0 && timeAndMoneyDocument != null) {
-                firstTimeAndMoneyDocCreation = Boolean.FALSE;
-            }
-    
-            if (timeAndMoneyDocument == null) {
+
+            if(documentNumber == null) {
                 generateDirectFandADistribution(currentAward);
-            }
-                
-            if(firstTimeAndMoneyDocCreation){
-                timeAndMoneyDocument = (TimeAndMoneyDocument) documentService.getNewDocument(TimeAndMoneyDocument.class);
+                TimeAndMoneyDocument timeAndMoneyDocument = (TimeAndMoneyDocument) documentService.getNewDocument(TimeAndMoneyDocument.class);
                 timeAndMoneyDocument.getDocumentHeader().setDocumentDescription(TIMEANDMONEY_DOCUMENT);
                 timeAndMoneyDocument.setRootAwardNumber(rootAwardNumber);
                 timeAndMoneyDocument.setAwardNumber(rootAward.getAwardNumber());
@@ -742,7 +723,7 @@ public class AwardAction extends BudgetParentActionBase {
                 }                
                 aat.setAwardNumber(rootAward.getAwardNumber());
                 //any code for initial transaction and history.
-                transactionDetail  = addTransactionDetails(Constants.AWARD_HIERARCHY_DEFAULT_PARENT_OF_ROOT, rootAward.getAwardNumber(), rootAward.getSequenceNumber(),
+                TransactionDetail transactionDetail  = addTransactionDetails(Constants.AWARD_HIERARCHY_DEFAULT_PARENT_OF_ROOT, rootAward.getAwardNumber(), rootAward.getSequenceNumber(),
                         timeAndMoneyDocument.getDocumentNumber(), INITIAL_TRANSACTION_COMMENT, rootAward);
                 //need this check so we don't add additional AAI object if Award has been copied and then creating first T&M doc.
                 if(rootAward.getAwardAmountInfos().size() < 2) {
@@ -754,33 +735,20 @@ public class AwardAction extends BudgetParentActionBase {
                 timeAndMoneyDocument.getAwardAmountTransactions().add(aat);
                 documentService.saveDocument(timeAndMoneyDocument);
                 getBusinessObjectService().save(transactionDetail);
+                documentNumber = timeAndMoneyDocument.getDocumentHeader().getDocumentNumber();
             }
-            String routeHeaderId = timeAndMoneyDocument.getDocumentHeader().getWorkflowDocument().getDocumentId();
+
+            String routeHeaderId = documentNumber;
             String backUrl = URLEncoder.encode(buildActionUrl(awardDocument.getDocumentNumber(), Constants.MAPPING_AWARD_HOME_PAGE, AWARD_DOCUMENT), StandardCharsets.UTF_8.name());
             String forward = buildForwardUrl(routeHeaderId) + BACK_LOCATION + backUrl;
             actionForward = new ActionForward(forward, true);
             //add this to session and leverage in T&M for return to award action.
-            GlobalVariables.getUserSession  ().addObject(Constants.AWARD_DOCUMENT_STRING_FOR_SESSION + "-" + timeAndMoneyDocument.getDocumentNumber(), awardDocument.getDocumentNumber());            
+            GlobalVariables.getUserSession  ().addObject(Constants.AWARD_DOCUMENT_STRING_FOR_SESSION + "-" + documentNumber, awardDocument.getDocumentNumber());            
         } else {
             actionForward = mapping.findForward(Constants.MAPPING_AWARD_BASIC);
         }
         return actionForward;
 
-    }
-        
-    protected TimeAndMoneyDocument getLastFinalTandMDocument(List<TimeAndMoneyDocument> timeAndMoneyDocuments) throws WorkflowException {
-        TimeAndMoneyDocument returnVal = null;
-        while(timeAndMoneyDocuments.size() > 0) {
-            TimeAndMoneyDocument docWithWorkFlowData = 
-                (TimeAndMoneyDocument) getDocumentService().getByDocumentHeaderId(timeAndMoneyDocuments.get(timeAndMoneyDocuments.size() - 1).getDocumentNumber());
-            if(docWithWorkFlowData.getDocumentHeader().getWorkflowDocument().isCanceled()) {
-                timeAndMoneyDocuments.remove(timeAndMoneyDocuments.size() - 1);
-            }else {
-                returnVal = docWithWorkFlowData;
-                break;
-            }
-        }
-        return returnVal;
     }
 
     protected TransactionDetail addTransactionDetails(String sourceAwardNumber, String destinationAwardNumber, Integer sequenceNumber, String documentNumber, 
@@ -1008,7 +976,15 @@ public class AwardAction extends BudgetParentActionBase {
         AwardForm awardForm = (AwardForm) form;
         awardForm.getAwardCommentBean().setAwardCommentScreenDisplayTypesOnForm();
         awardForm.getAwardCommentBean().setAwardCommentHistoryFlags();
+        setDisableAttachmentRemovalIndicator(((AwardForm) form).getAwardAttachmentFormBean());
         return mapping.findForward(Constants.MAPPING_AWARD_NOTES_AND_ATTACHMENTS_PAGE);
+    }
+
+    protected void setDisableAttachmentRemovalIndicator(AwardAttachmentFormBean awardAttachmentForm) {
+        if (awardAttachmentForm != null) {
+            awardAttachmentForm.setDisableAttachmentRemovalIndicator(getParameterService().getParameterValueAsBoolean(Constants.KC_GENERIC_PARAMETER_NAMESPACE,
+                    ParameterConstants.DOCUMENT_COMPONENT, DISABLE_ATTACHMENT_REMOVAL));
+        }
     }
 
    public ActionForward medusa(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -1621,4 +1597,48 @@ public class AwardAction extends BudgetParentActionBase {
     public ActionForward takeSuperUserActions(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         return superUserActionHelper(SuperUserAction.TAKE_SUPER_USER_ACTIONS, mapping, form, request, response);
     }
+
+    public TimeAndMoneyVersionService getTimeAndMoneyVersionService() {
+		if (timeAndMoneyVersionService == null) {
+			timeAndMoneyVersionService = KcServiceLocator.getService(TimeAndMoneyVersionService.class);
+		}
+		return timeAndMoneyVersionService;
+	}
+
+	public void setTimeAndMoneyVersionService(TimeAndMoneyVersionService timeAndMoneyVersionService) {
+		this.timeAndMoneyVersionService = timeAndMoneyVersionService;
+	}
+	
+	protected void buildAwardHierarchySourceAndTargetList(AwardForm awardForm, Award currentAward) {
+		List<String> order = new ArrayList<String>();
+		if (StringUtils.isBlank(awardForm.getAwardHierarchyTargetAwardNumber())) {
+			awardForm.setAwardHierarchyTargetAwardNumber(currentAward.getAwardNumber());
+		}
+	    Map<String,AwardHierarchyNode> awardHierarchyNodes = new HashMap<String, AwardHierarchyNode>();
+	    Map<String,AwardHierarchy> awardHierarchyItems = 
+	    		awardForm.getAwardHierarchyBean().getAwardHierarchy(awardForm.getAwardHierarchyTargetAwardNumber(), order);
+	    getAwardHierarchyService().populateAwardHierarchyNodes(awardHierarchyItems, awardHierarchyNodes, currentAward.getAwardNumber(), currentAward.getSequenceNumber().toString());
+	    StringBuilder sourceAwardStrList = new StringBuilder();
+	    StringBuilder targetAwardStrList = new StringBuilder();
+	    for(String str:order){
+	        sourceAwardStrList.append("'").append(str).append("',");
+	        if (awardHierarchyNodes.get(str).isAwardDocumentFinalStatus()) {
+	        	targetAwardStrList.append("'").append(str).append("',");
+	        }
+	    }
+	    if (sourceAwardStrList.length() > 1) {
+	    	awardForm.setAwardHierarchySourceAwardStrList(removeTrailingCommaIfExists(sourceAwardStrList.toString()));
+	    }
+	    if (targetAwardStrList.length() > 1) {
+	    	awardForm.setAwardHierarchyTargetAwardStrList(removeTrailingCommaIfExists(targetAwardStrList.toString()));
+	    }
+	}
+	
+	protected String removeTrailingCommaIfExists(final String listStr) {
+		String result = listStr;
+		if (result.endsWith(",")) {
+			result = result.substring(0, result.length()-1);
+		}
+		return result;
+	}
 }

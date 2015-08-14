@@ -43,7 +43,6 @@
 </style>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
-<c:set var="awardPrintAttributes" value="${DataDictionary.AwardPrint.attributes}" />
 <c:set var="awardPrintNoticeAttributes" value="${DataDictionary.AwardPrintNotice.attributes}" />
 <c:set var="awardTransactionSelectorAttributes" value="${DataDictionary.AwardTransactionSelectorBean.attributes}" />
 <c:set var="award" value="${KualiForm.document.award}" />
@@ -191,14 +190,6 @@
 						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif' 
 						alt="Print Award Hierarchy" styleClass="tinybutton" onclick="excludeSubmitRestriction=true"/></td>			 
 			</tr>
-			<!--<tr>
-			 <th colspan="2" style="text-align: left;">
-			  Budget
-			 </th>
-			 <td class="infoline" style="text-align:center;"><html:image property="methodToCall.printBudget"
-						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif' 
-						alt="Print Budget" styleClass="tinybutton" onclick="excludeSubmitRestriction=true"/></td>			 
-			</tr>-->
 			<tr>
 			 <th colspan="2" style="text-align: left;">
 			  Time &amp; Money History

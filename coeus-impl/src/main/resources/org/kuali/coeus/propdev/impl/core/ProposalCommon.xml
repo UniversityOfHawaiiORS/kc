@@ -32,17 +32,20 @@
 		parent="Uif-FooterBase">
 		<property name="items">
 			<list>
+                <bean parent="Uif-SecondaryActionButton" p:ajaxSubmit="true"
+                      p:methodToCall="editProposal" p:actionLabel="Edit" p:order="05"
+                      p:render="@{viewOnly and (#editModes[#proposalAuthConsts.MODIFY_PROPOSAL_EDIT_MODE] or #editModes[#proposalAuthConsts.MODIFY_BUDGET_EDIT_MODE])}"/>
 				<bean parent="Uif-SecondaryActionButton" p:ajaxSubmit="true"
 					p:performClientSideValidation="true" p:methodToCall="navigate" 
 					p:actionLabel="Back" p:finalizeMethodToCall="finalizeNavigationLinks"
 					p:finalizeMethodAdditionalArguments="previous" p:order="10" />
 				<bean parent="Uif-SecondaryActionButton" p:ajaxSubmit="false"
 					p:performClientSideValidation="true" p:methodToCall="save"
-					p:actionLabel="Save" p:order="20" p:render="@{(!#parent.readOnly and canEditView) or #editModes[#proposalAuthConsts.CAN_SAVE_CERTIFICATION] or #editModes[#proposalAuthConsts.MODIFY_S2S]}"/>
+					p:actionLabel="Save" p:order="20" p:render="@{(!#parent.readOnly and canEdit) or #editModes[#proposalAuthConsts.CAN_SAVE_CERTIFICATION] or #editModes[#proposalAuthConsts.MODIFY_S2S]}"/>
 				<bean parent="Uif-PrimaryActionButton" p:ajaxSubmit="true"
 					p:performClientSideValidation="true" p:methodToCall="navigate"
 					p:actionLabel="Save and Continue" p:finalizeMethodToCall="finalizeNavigationLinks"
-					p:finalizeMethodAdditionalArguments="next" p:order="30" p:render="@{!#parent.readOnly and canEditView}"/>
+					p:finalizeMethodAdditionalArguments="next" p:order="30" p:render="@{!#parent.readOnly and canEdit}"/>
                 <bean parent="Uif-SecondaryActionButton" p:actionLabel="Close" p:order="40"
                       p:methodToCall="closeProposal"/>
 			</list>
@@ -147,4 +150,14 @@
             </bean>
         </property>
      </bean>
+
+    <bean id="PropDev-ShortUrl-Dialog" parent="PropDev-ShortUrl-Dialog-parentBean"/>
+    <bean id="PropDev-ShortUrl-Dialog-parentBean" abstract="true" parent="Uif-DialogGroup"
+          p:headerText="Short URL">
+        <property name="items">
+            <list>
+                <bean parent="Uif-InputField" p:propertyName="shortUrl" p:readOnly="false"/>
+            </list>
+        </property>
+    </bean>
 </beans>
