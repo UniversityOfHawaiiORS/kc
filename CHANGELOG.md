@@ -1,6 +1,976 @@
 
 
 ##CURRENT
+* No Changes
+
+
+##coeus-1508.2
+* No Changes
+
+
+##coeus-1508.1
+* Fix to resolving repackaging scripts.
+  * blackcathacker on Fri, 31 Jul 2015 15:53:15 -0700 [View Commit](../../commit/5ebb5aca6fde30fe05092dd1e2c0e9abcad5a923)
+* Update V1507_021__Resolve_repackaging.sql  * Douglas Pace on Fri, 31 Jul 2015 16:01:04 -0700 [View Commit](../../commit/5be60706d38f70c6cf3f2f96d41101d6fd377d35)
+* Update V1507_021__Resolve_repackaging.sql  * Douglas Pace on Fri, 31 Jul 2015 16:01:21 -0700 [View Commit](../../commit/afcc8e9b2df0822a352c4052b1e96fbd3f53b4a2)
+
+##coeus-1507.77
+* Fix minor oracle issues
+
+  * Including a problem with KcPerson lookup related to repackaging causing an error in demo data when navigating to custom attributes
+  * blackcathacker on Fri, 31 Jul 2015 12:40:35 -0700 [View Commit](../../commit/3cfe96a38c15a98ed8bbc102830ab3a08ee79664)
+
+##coeus-1507.76
+* No Changes
+
+
+##coeus-1507.75
+* make the award sequence number values finder more efficient to make the print section load faster
+  * Travis Schneeberger on Thu, 25 Jun 2015 14:34:30 -0400 [View Commit](../../commit/2f6b1b4bc8ba46ccf84bd9026b4bb87e0c9d601c)
+* Fix award hierarchy/award actions for very large hierarchies
+  * blackcathacker on Fri, 26 Jun 2015 23:23:40 -0400 [View Commit](../../commit/13fbdc2018597ffcaa2e8b8d0b5b953db64c9cb0)
+* prevent error when optional parameter doesn't exist
+
+  * When this optional parameter hasn't been added the following error occurs
+  * ```
+  * when-present<#else>when-missing. (These only cover the last step of the expression; to cover the whole expression, use parenthessis: (myOptionVar.foo)!myDefault, (myOptionVar.foo)?? The failing instruction (FTL stack trace): ---------- ==> ${request.contextPath} [in template "krad/WEB-INF/ftl/lib/html.ftl" in macro "html" at line 51, column 25] #else [in template "krad/WEB-INF/ftl/lib/html.ftl" in macro "html" at line 50, column 9] @krad.html view=view [in template "krad/WEB-INF/ftl/fullView.ftl" at line 18, column 1] #include "fullView.ftl" [in template "krad/WEB-INF/ftl/uifRender.ftl" at line 69, column 9] #else [in template "krad/WEB-INF/ftl/uifRender.ftl" at line 68, column 5] ---------- Java stack trace (for programmers): ---------- freemarker.core.InvalidReferenceException: [... Exception message was already printed; see it above ...] at freemarker.core.InvalidReferenceException.getInstance(InvalidReferenceExcept
+  * ```
+  * blackcathacker on Fri, 31 Jul 2015 10:40:53 -0700 [View Commit](../../commit/750e2766552f759917b67af13da9a4b62184fc75)
+
+##coeus-1507.74
+* fix calculated fringe and calculated direct cost display on proposal budget
+
+  * As a proposal user, I am trying to verify that salaries and  employee benefits are being calculated correctly.
+  * When I add a person to a proposal in a unit with Lab Allocation rates, the value displayed in the "Calculated Fringe" field is not correct.
+  * The field should only contain any calculated employee benefit rates for the identified person (which may include EB, Vacation, or any other defined personnel EB type rate).
+
+  * Currently, the Calculated Fringe includes field is displaying
+  * EB + EB ON LA (Incorrect)
+  * (missing vacation)
+
+  * Additionally:
+  * Calculated direct costs includes:
+  * Vacation (Incorrect)
+  * Vacation on LA
+  * (Missing EB on LA)
+
+  * The correct display should include/display the following:
+
+  * Calculated Fringe for a personnel entry SHOULD include individuals';
+  * EB
+  * Vacation
+
+  * Calculated direct costs SHOULD include:
+  * EB ON LA
+  * Vacation on LA
+  * Joe Williams on Wed, 29 Jul 2015 15:34:31 -0500 [View Commit](../../commit/caeb8c6c307a6a6cf22a89ec8e71d5224daa85c5)
+
+##coeus-1507.73
+* apply inflation rates from child budget when calculating line items on parent budget
+
+  * In a Proposal Hierarchy, when you have one child proposal budget that applies inflation to a particular Cost Category and then in another Child Proposal, you set the Inflation Rate for that Cost Category to '0'. When synced to the Parent Proposal, the Parent budget will apply inflation to the Cost, even if the Cost in the child proposal did not have inflation applied. This is causing the Parent budget numbers to be different from the child budget numbers.
+  * Desired Behavior: The Parent Budget should not make any changes/recalculations to the numbers that are brought from the Child Proposal Budgets.
+  * Steps to Reproduce:
+  * 1. Create a Proposal (with minimum info to save) - one year project period is enough. Also, add a PI
+  * 2. Create a Detailed Budget
+  * a) In the Project Personnel, add any person, for example TBA-PostDoc and update the Details with the Base Salary (e.g. 12,000)
+  * b) Go to Assign Personnel To Periods, and click the Assign Personnel Button.
+  * c) In the Add Personnel to Period window, select:
+  * TBA-Post-Doc from the Person drop-down
+  * Form Object Code, select Post-Doctoral Staff-On
+  * Enter 100 in Effort % and Charged %
+  * Click the Assign to Period 1 button
+  * d) Save your budget and click the Return to proposal button
+  * 3. In the Proposal, click the Hierarchy link in the toolbar. In the Hierarchy window select:
+  * a) Hierarchy Budget Type: Sub Budget
+  * b) Click the Create Hierarchy button
+  * c) Note the Parent Proposal number generated
+  * 4. Close out of your proposal
+  * 5. Create another proposal (make sure it has the same project period as the first proposal you created). Also add a PI
+  * 6. Create a Detailed Budget in the second proposal
+  * a) In the Project Personnel, add any person, for example TBA-PostDoc and update the Details with the Base Salary (e.g. 12,000) and also change the Job Code (e.g. enter 1 in the Job Code field just so this TBA has a different Job Code then the TBA we have in the first budget we created)
+  * b) Go to the Rates --> Inflation, and change the Inflation Rate for Post-Doctoral Staff to '0'
+  * c) Go to Assign Personnel To Periods, and click the Assign Personnel Button.
+  * d) In the Add Personnel to Period window, select:
+  * TBA-Post-Doc from the Person drop-down
+  * Form Object Code, select Post-Doctoral Staff-On
+  * Enter 100 in Effort % and Charged %
+  * Click the Assign to Period 1 button (you should notice that the salary requested is not inflated)
+  * e) Save your budget and click the Return to proposal button
+  * 7. In the Proposal, click the Hierarchy link in the toolbar. In the Hierarchy window:
+  * a) Enter your Parent Proposal Number in the Link Proposal field
+  * b) Form the Hierarchy Budget Type select Sub Budget
+  * c) Click the Link this Child to a Parent button
+  * 8. Close out of your proposal
+  * 9. Go to the Parent Proposal and navigate to the Budget
+  * 10. In the Budget go to Project Personnel - Assign Personnel to Periods section
+  * 11. You will see that the Requested Salary for the Post Docs is inflated for both Post-Docs, even though one of them had the salary not inflated in the child proposal
+  * Joe Williams on Thu, 30 Jul 2015 12:49:27 -0500 [View Commit](../../commit/7ce30372b4a05e2bf6974d2d9b0c0e54a3eecb98)
+
+##coeus-1507.72
+* Award Time and Money Improvements
+  * blackcathacker on Wed, 24 Jun 2015 17:56:08 -0400 [View Commit](../../commit/ee71818851e2f92960a9b95c92599e4ff5f4274b)
+* Fixes to the summary and history tab
+  * blackcathacker on Thu, 25 Jun 2015 15:51:30 -0400 [View Commit](../../commit/a9f3efb2ba6c26a23f027076b256d2f08cb4ebdf)
+* Fix T&M summary for single node hierarchies
+  * blackcathacker on Fri, 26 Jun 2015 14:40:23 -0400 [View Commit](../../commit/90abff1f46e7e1fa39245a0349f23176278c8522)
+
+##coeus-1507.71
+* No Changes
+
+
+##coeus-1507.70
+* No Changes
+
+
+##coeus-1507.69
+*  fix irb committee submission when there is a protocol submission using the committee.  Rice will attempt to validate a large object graph and cause the committee to go into exception routing.  Fix irb and iacuc committee submission when there is a protocol submission where routing to final will attempt to save protocol submission lite bo which are mapped to views.
+  * Travis Schneeberger on Wed, 29 Jul 2015 17:20:13 -0400 [View Commit](../../commit/b426e1a655a5cfa2fe65c23855b42a937af66c8a)
+
+##coeus-1507.68
+*  fix doc handler url for iacuc committee document
+  * Travis Schneeberger on Wed, 29 Jul 2015 16:31:40 -0400 [View Commit](../../commit/fc7f4ddfd623283524194f8a8811b3eb43571d61)
+
+##coeus-1507.67
+*  adding missing primary key attribute to iacuc submission lite bo ojb mapping
+  * Travis Schneeberger on Wed, 29 Jul 2015 15:06:00 -0400 [View Commit](../../commit/9b07e4546212857e247de4bced114871e45071d4)
+
+##coeus-1507.66
+* allow modular budget actions from parent budgets in prop dev
+
+  * As a proposal user, I need to build hierarchies to satisfy my multiple campus locations.
+  * Currently, when I need to prepare a modular budget with a hierarchy, I cannot populate the Modular Budget screen in the Parent proposal.
+  * The initiating child is designated as Modular, and populated the modular screen.
+  * Additional linked child proposal budgets were also modular, and successfully populate the modular screen.
+  * When I open the Parent proposal Budget > Modular Budget screen, I should be able to sync the detailed budget information to populate this screen, but the options are all grey - appearing in view only mode.
+  * Nor can I manually add any details to the modular screen.
+  * If the modular budget screen is not populated, then I cannot populate the NIH Modular Budget form. If my total budget is below $250,000 in direct costs, NIH requires that I submit a modular budget, else my submission will be rejected by eCommons. Some opportunities absolutely mandate use of modular budget types and I do not have the option to increase the dollar value of the budget to escape the restriction.
+  * Joe Williams on Wed, 29 Jul 2015 08:14:14 -0500 [View Commit](../../commit/6b5e9ce0ca35a7975038e47d390c3e5753da28f4)
+
+##coeus-1507.65
+*  Trying to fix award budget intermittent issues.
+  * Open an award budget document, navigate into any screen, aka Personnel.
+  * I had been able to create an AB, and Edit it, but eventually, I get the 'not finished loading' message and have to exit out by means of selecting a portal, leaving a lock on the document.
+  * Gayathri Athreya on Tue, 28 Jul 2015 16:05:32 -0700 [View Commit](../../commit/cc29147decd3a9ef49c13ccc7c8bdda32540a66a)
+
+##coeus-1507.64
+*  Budget print doesnt work after assigning a person to period fix
+
+  * This removes an update line that was causing some fields to become null.  The line appears to be unneeded and fixes the bug by removing it.
+  * bsmith83 on Tue, 28 Jul 2015 15:52:29 -0700 [View Commit](../../commit/45affb6fe7d235b65f83f8112edab9681d242e70)
+
+##coeus-1507.63
+* fixes issue where propdev documents are not editable
+  * Joe Williams on Tue, 28 Jul 2015 16:54:05 -0500 [View Commit](../../commit/e1c7cc698212a8294887a518be3c09a1b6db358c)
+
+##coeus-1507.62
+* No Changes
+
+
+##coeus-1507.61
+*  Fixing error
+  * Steps to reproduce:
+  * 1.    Create a proposal with project dates 9/1/15 - 12/31/16 for example. Make sure the project end date is within one Calendar year but spans next fiscal year. In this example the project ends Calendar year 2016 but December 2016 falls into MIT’s F/Y 2017 which runs from 7/1/16 – 6/30/17.
+  * 2.    Create detailed budget with default periods.
+  * 3.    Add non-Personnel and Personnel expenses in each period.
+  * 4.    Go to rates screen and adjust applicable rate to less than rate maintained. Save.
+  * 5.    Go to Institutional Commitments U/R screen. Two Fiscal Years present. Add accounts and amounts. Save.
+  * 6.    At top of same U/R screen do Data Validations > turn on. Error message shows warning for “Unrecovered F&A - The Fiscal Year is outside of the project period.”
+  * This warning acts as error and prevents "Complete" budget which prevents routing.
+  * Gayathri Athreya on Tue, 28 Jul 2015 12:31:44 -0700 [View Commit](../../commit/dc57197592f7a238c782ab29ca27827a1b36c2fd)
+
+##coeus-1507.60
+* add validation on add proposal person to check for key person role
+  * Joe Williams on Mon, 27 Jul 2015 13:59:13 -0500 [View Commit](../../commit/e8672434c80a4c99f1e23fa35fca2bceb810f88b)
+* fix STE when editing budget settings on hierarchy parent
+  * Joe Williams on Tue, 28 Jul 2015 12:55:42 -0500 [View Commit](../../commit/b023e869dfe3576e86095cc84491fd9e78bd86b9)
+* revert unwanted changed
+  * Joe Williams on Tue, 28 Jul 2015 13:29:47 -0500 [View Commit](../../commit/c93189ee4cf6b3b35e961a54800f124180eaaf63)
+
+##coeus-1507.59
+* fixed error with expanding award note text
+  * Joe Williams on Tue, 28 Jul 2015 09:48:18 -0500 [View Commit](../../commit/910160fa8e6b60bd5ce6447d63da60eec1cdfef4)
+
+##coeus-1507.58
+* Unable to submit to sponsor after blanket approve
+
+  * When blanket approving a PD you are sent back to the portal and then if you try to reopen the proposal to submit to s2s or submit to sponsor you are unable to because the only link available is edit. This allows users to still take document actions regardless of the document being in view only mode.
+  * blackcathacker on Mon, 27 Jul 2015 16:46:44 -0700 [View Commit](../../commit/8c3c8e7247f6d8553f78f1d813335cfa1de06121)
+* Fixing proposal summary view in action list
+
+  * When a budget exists the following error occurs
+  * java.lang.RuntimeException: Exception evaluating expression: #view.editModes.containsKey(#budgetAuthConsts.ADD_BUDGET_EDIT_MODE) and !viewOnly and canEditView
+  * blackcathacker on Mon, 27 Jul 2015 16:30:16 -0700 [View Commit](../../commit/0d44769e7675bb5e3bc6f2fb2433b73c0bc8face)
+
+##coeus-1507.57
+* Fix error in IP when trying to use Print Notice
+
+  * When trying to print the IP notice when a noticeOfOpportunity has been selected you get an exception
+  * blackcathacker on Mon, 27 Jul 2015 14:50:41 -0700 [View Commit](../../commit/a5591c00923645ebd6320ef8aaf3556ec4878433)
+
+##coeus-1507.56
+* Fix issue with award special review and missing next values
+  * blackcathacker on Mon, 27 Jul 2015 10:55:32 -0700 [View Commit](../../commit/ff099349a33fede777902a0f9e64ce8fa454922c)
+* Time and Money improvements
+  * blackcathacker on Tue, 23 Jun 2015 15:38:27 -0400 [View Commit](../../commit/22d9d79e8a106eab0ab54a5c26c8c30d0e77b2f0)
+
+##coeus-1507.55
+*  more UR fixes
+  * Gayathri Athreya on Fri, 24 Jul 2015 16:37:56 -0700 [View Commit](../../commit/6e5bbb939abdadd2dcd807d16d69c51b2344170b)
+* Use funding proposals instead of award versions
+  * blackcathacker on Tue, 23 Jun 2015 14:59:37 -0400 [View Commit](../../commit/ba66e750155171e37c718d80351dcb34f659d4f5)
+* Using Comparator.comparing and helper method
+  * blackcathacker on Fri, 24 Jul 2015 19:54:15 -0700 [View Commit](../../commit/143325aaa6c528d4a5bf63fcb80facf8be4d9cd7)
+
+##coeus-1507.54
+* add short url link
+  * Joe Williams on Thu, 23 Jul 2015 10:13:19 -0500 [View Commit](../../commit/2e3e6d4a2d601a9439f7bd008eed0adbf30130e8)
+
+##coeus-1507.53
+* No Changes
+
+
+##coeus-1507.52
+* Adding a profile to cleanup node since these are generated artifacts of the build process.
+  * Travis Schneeberger on Fri, 24 Jul 2015 10:48:02 -0400 [View Commit](../../commit/15a13cd315fd821d33a433163b03939fd4359918)
+
+##coeus-1507.51
+*  Time and money document status performance
+  * Brandon Nicholls on Mon, 22 Jun 2015 16:16:25 -0400 [View Commit](../../commit/7160ff88e64918afdebc52cb5cbb3b2668e3d8f7)
+* Data conversion to support new status column
+  * blackcathacker on Thu, 23 Jul 2015 12:34:07 -0700 [View Commit](../../commit/f69bdc3dd1f888ca7aa5b4a310016522c4231604)
+* Award and T&M Improvements
+  * blackcathacker on Tue, 23 Jun 2015 11:38:33 -0400 [View Commit](../../commit/21087b492d8d05f38482a08bc66601a2179ab683)
+
+##coeus-1507.50
+* No Changes
+
+
+##coeus-1507.49
+* No Changes
+
+
+##coeus-1507.48
+* make the protocol history tab load fater
+  * Travis Schneeberger on Thu, 25 Jun 2015 17:18:36 -0400 [View Commit](../../commit/e8e055d141ebed93732fdacce9991d0510499cd5)
+
+##coeus-1507.47
+* No Changes
+
+
+##coeus-1507.46
+* Fixed several issues with Data Conversion RoleMember -> document_access conversion.
+
+  * 1. after converting only the KRIM_ROLE_MBR_ATTR_DATA_T entries were removed leaving KRIM_ROLE_MBR_T entries with no attribute data. I altered to remove the role member from both tables.
+  * 2. the compare method used to filter duplicate document access role members was incorrect causing data loss. The compare was only comparing document number so for a given role if more than one principal was a member only one would get converted and the others would be lost. I corrected the compare to fix this issue while still removing true duplicates.
+  * 3. We found role member records in our database with null document id attribute. So I added a check to ignore these.
+  * Travis Schneeberger on Wed, 22 Jul 2015 14:22:04 -0400 [View Commit](../../commit/106ffc5c0ed22e9d637e9028a4fbdb4ac2f0d1cb)
+
+##coeus-1507.45
+* Update Grants.gov for SHA-2, port 443, TLS-1.1/1.2
+
+  * Grants.gov needs to be updated. Details on certificate and port requirements:
+  * Additionally, you must utilize Port 443 with the SHA-2 based digital signature. Please note that all intermediate certificates in the certificate chain must also be SHA-2 in order to work with port 443.
+  * Port 443 will only support:
+  * SHA-2 Certificates
+  * TLS v1.1 and TLS v1.2
+
+  * Port 446 will be discontinued soon. MIT has already moved to the new port/transport mechanisms. We can grab their code from Geo's repo.
+  * Joe Williams on Tue, 21 Jul 2015 13:25:33 -0500 [View Commit](../../commit/b0bc615492063caaac0f612c789663a9d312b705)
+* Add 'edit' buttons to read-only instances of Kuali Research Docs
+
+  * As a user I need to be able to begin editing a document that is entered via read-only mode. This already works for Inst Prop and Award. Needs to be added to Prop Dev and any compliance docs where applicable. Should only show up when user otherwise would have edit permissions.
+  * Joe Williams on Mon, 20 Jul 2015 17:02:52 -0500 [View Commit](../../commit/18cc0437c270003c345bb79bf4629bf4c18a4d0e)
+
+##coeus-1507.44
+*  removal of the target tag
+  * Abraham Heward on Wed, 22 Jul 2015 13:30:47 -0700 [View Commit](../../commit/5e04fe7a37c7c393a7ab664c5b3d764cc783ce62)
+*  fix issue with budget line item group names displaying wrong
+
+  * When a budget line item group name is blank and not null extra parentheses are added to the groupname. These extra parentheses cause issues when opening the detail and rates modal.
+  * Joe Williams on Wed, 22 Jul 2015 16:41:03 -0500 [View Commit](../../commit/9bab1bf73efdeed2025b07001b270a7fe861715d)
+
+##coeus-1507.43
+* Summary service rest API documentation
+  * blackcathacker on Fri, 17 Jul 2015 19:51:18 -0700 [View Commit](../../commit/4ec81dc72fe61e3cd01f4757d4815f69baad3358)
+*  Fixing underrecovery
+  * Create a proposal type Research.
+  * Create a budget;
+  * in Settings: select Rate Type of TDC and select Unrecovered Rate Type of MTDC
+  * in Rates screen: set TDC rate to 10%
+  * Add budget non-personnel expenses and generate periods
+  * Review calculated Rate in budget item Details modal: TDC rate calculates correctly.
+  * But UR is negative value
+  * Review the P&T screen: note negative UR amount in column.
+  * Open Commitments> Unrecovered F&A screen. System says no UR generated.
+  * There SHOULD be UR because the TDC rate = 10% and the MTDC is 56%.
+  * Gayathri Athreya on Wed, 22 Jul 2015 10:04:44 -0700 [View Commit](../../commit/9a5773aa89f083a4d916b7c0988e892bbd134b34)
+*  Improvement to All My Proposals Search person fields
+
+  * This commit adds/fixes aggregator, participant, and initiator fields on proposal search.  Changes what All My Proposal retrieves to include aggregator and pi,coi,and mpi for proposals for the current user.Improves some of the logic around how these searches work - unfortunately it is still sub-optimal due to a bug in Rice, see jira https://jira.kuali.org/browse/KULRICE-14269.  Includes small performance improvements due to these changes and using server side paging.
+  * bsmith83 on Wed, 15 Jul 2015 10:09:43 -0700 [View Commit](../../commit/a2427487acb43ead29e54f3ef99ed033390b1f78)
+* Fix jenkins build by moving node install directory to working directory
+  * blackcathacker on Wed, 22 Jul 2015 12:48:33 -0700 [View Commit](../../commit/00c9a2866284141c5dc7fd32dffa4ac09ca8d9a5)
+
+##coeus-1507.42
+* fix ip attachment validation
+
+  * When IP Attachment type is turned on (INSTITUTIONAL_PROPOSAL_ATTACHMENTS_FLAG) and user adds an attachment type to pending IP, If user accesses the IP via document search then an error message appears on screen without the ability to clear it.
+
+  * Steps to reproduce
+
+    create a proposal log
+    create an institute proposal from the proposal log
+    blanket approve
+    turn on IP attachments (INSTITUTIONAL_PROPOSAL_ATTACHMENTS_FLAG to Y)
+    for maintenance, add a type for IP Attachment type
+    find IP and edit
+    select the attachment type
+    add an attachment
+    remember IP document number
+    save and close IP
+    search Doc search for IP and open
+
+  * Error message appears on screen and does not allow user to navigate to other screens
+  * Joe Williams on Tue, 21 Jul 2015 08:23:05 -0500 [View Commit](../../commit/106de79aad859ce32b83a865f1fd23537ea6a2d3)
+* add create amendment permission to iacuc admin role
+  * Joe Williams on Wed, 22 Jul 2015 08:48:05 -0500 [View Commit](../../commit/6ab5d0f1c2b163f7d72853bdbde7e278718da6d4)
+
+##coeus-1507.41
+* switching to bitronix, removing xapool and jotm support
+  * Travis Schneeberger on Tue, 21 Jul 2015 13:29:19 -0400 [View Commit](../../commit/4a237f351230842779994495a372bb328120d5e2)
+
+##coeus-1507.40
+* No Changes
+
+
+##coeus-1507.39
+* No Changes
+
+
+##coeus-1507.38
+* No Changes
+
+
+##coeus-1507.37
+* No Changes
+
+
+##coeus-1507.36
+*  Fix for copy dialog STE on ownedByUnit readonly replacement
+
+  * Read-only replacement was causing an issue with the copy dialog because those fields dont exist on the object for the dialog copy object, copy is never read-only so this removes the replacement
+  * bsmith83 on Mon, 20 Jul 2015 11:48:55 -0700 [View Commit](../../commit/b0e85c6f63a7803023f1d391b37ebdaf19fa0ced)
+
+##coeus-1507.35
+*  creating lite bo for protocol submission to help committee maintenance performance
+  * Travis Schneeberger on Wed, 24 Jun 2015 14:51:54 -0400 [View Commit](../../commit/5440f35e53dcfeecebc01eb690dc619db46fe1e6)
+
+##coeus-1507.34
+*  Online review not getting created for non-employee reviewer and then protocol cannot be approved
+  * Steps to reproduce:
+  * As IACUC Admin:
+  * Create new IACUC committee.
+  * Add a non-employee person as a voting member. Set dates and role so the person is active.
+  * Make sure there are enough members for the quorum not counting the non-employee member.
+  * Complete the rest of the Committee info and blanket approve.
+  * Create a new IACUC protocol and submit.
+  * Modify submission request and assign to committee just created. Set as Designated member review (don’t think the review type matters) .
+  * Make the non-employee reviewer an assigned reviewer (committee, secondary, or primary).
+  * Submit.
+  * Go to Online review tab.
+  * Results:
+  * The online review for the non-employee reviewer is not set up. There is an empty review without a reviewer instead of a review for that reviewer. See screenshot-1.
+  * If you attempt to create a new online review for that reviewer and submit, then you get:
+  * java.lang.IllegalArgumentException: the personId is null or empty
+  * Gayathri Athreya on Wed, 15 Jul 2015 17:19:59 -0700 [View Commit](../../commit/869410ee2afddc052d710409bb749ae93fd5f953)
+* added dialog to edit notification message and subject when sending certification notification for single users
+
+  * As a system Admin I set the 'Prompt User" option to "on" for the Maintenance Documents> Notification >Proposal Person Certification Request Notification)
+  * Currently: the Notification is not generating in proposals for the user to customize the message since the addition of RESKC-504 contribution.
+
+  * Steps:
+  * Create a proposal.
+  * Add several Persons to Key Personnel (PI, several Co-I's).
+  * Click the "Notify" option on a person row.
+*Result*: Notification is immediately sent.
+*Desired Result*: If Prompt User flag is set to On for this notification, a notification window should present to the user allowing the standard notification options.
+  * Joe Williams on Thu, 16 Jul 2015 13:05:46 -0500 [View Commit](../../commit/2d333bc46f2f84fb3018a2fcc7b430e7af1ecc71)
+*  restore valid krms actions to PD and budget contexts
+  * Joe Williams on Thu, 16 Jul 2015 14:06:29 -0500 [View Commit](../../commit/8b0ed453a48fe0f03bb09f4cb665eb171562ed55)
+* fix broken iacuc validation preventing submission
+  * Joe Williams on Thu, 16 Jul 2015 14:31:36 -0500 [View Commit](../../commit/b22d404797541ea63f320f00b4c291201fed146b)
+
+##coeus-1507.33
+* Fix bug with unit hierarchy maint expand all
+
+  * Code to ensure page has finished loading was broken on the unit hierarchy page. This fixes that by adding approriate span to allow script to determine if entire form has loaded.
+  * blackcathacker on Wed, 15 Jul 2015 14:12:06 -0700 [View Commit](../../commit/205ea78ad4e420a8513f69ef5027d23d95ecb031)
+*  Inactive indication on inactive units on in progress/old proposals
+  * bsmith83 on Wed, 15 Jul 2015 14:39:25 -0700 [View Commit](../../commit/fb7d691698459ed04963ded59f43acd7c514ae80)
+
+##coeus-1507.32
+*  reviewers available for designated review
+  * Travis Schneeberger on Wed, 15 Jul 2015 11:49:19 -0400 [View Commit](../../commit/f52c42538e961fbf118c426dcf55aaf5862b5da4)
+
+##coeus-1507.31
+* short url service for quick access to specific records
+
+  * As a user, I want a short URL that I can save that will always resolve/redirect to the correct record in the system.  If a document can be versioned, then the URL should resolve/redirect to the most current active version.
+  * Joe Williams on Mon, 13 Jul 2015 10:12:48 -0500 [View Commit](../../commit/b6131bfbf2f21357aeb169cd9dec6da4405b8b9a)
+
+##coeus-1507.30
+*  Inactive Units Still Show up in Proposal Development Lead Unit Dropdown List
+
+  * Previously, the inactive units would be selectable as an option for new proposals, this fixes that issue.  Read-only unit values in existing proposals still display inactive units correctly.
+  * bsmith83 on Tue, 14 Jul 2015 15:01:17 -0700 [View Commit](../../commit/211e41a24589ee22a07ba71ef8272bc719ee8592)
+
+##coeus-1507.29
+*  Cannot save existing committees
+  * Steps to reproduce:
+  * 1. Create new IRB cmt doc.
+  * 2. Fill out required fields, save, close.
+  * 3. Reopen doc from doc search and save.
+  * 4. Business rules failure on all required fields even though these fields are populated.
+  * Gayathri Athreya on Tue, 14 Jul 2015 14:35:04 -0700 [View Commit](../../commit/e4e83eae94a18ce8b6603d46b2521da80d73b165)
+
+##coeus-1507.28
+*  Fix for invalid start and end date issues with proposal number
+
+  * Previously, the first screen of Proposal Development would let a user through if there was a failing save business rule, and not give the new doc a proposal number which had the potential to cause strange behaviors because some functionality that was now clickable relied on it.  This fix insures that the document can pass the business rules it needs to before creation of the proposal document to avoid creating/assigning un-needed document numbers and creating proposals with incorrect information.  Now the user will be stopped on the first screen if they enter invalid data.
+  * bsmith83 on Mon, 13 Jul 2015 17:34:06 -0700 [View Commit](../../commit/a903cfc7565c01b6841cd71fdaf1ef3b463aef70)
+
+##coeus-1507.27
+* budget personnel perf improvements
+  * Travis Schneeberger on Tue, 23 Jun 2015 13:33:07 -0400 [View Commit](../../commit/ed5a84ae31f5835b0af50d53b148af31a1abfc92)
+*  Fixing validation constraint for principal investigtor id
+  * Gayathri Athreya on Tue, 14 Jul 2015 11:14:42 -0700 [View Commit](../../commit/da650712e7f302e5a582dab99cb20ff9744bc67b)
+
+##coeus-1507.26
+*  Fix for STE in PD if proposal person certification answered by a proposal person during aggregator's sesson
+
+  * If a user tried to update a certification at the same time as another user, this used to error in a optimisticLockException.  This fix checks the versions of the AnswerHeaders being saved and if their exists a newer version of the answer header, shows an error message which explains what happened - and updates the view with the most current answers and certification status/time.
+  * bsmith83 on Thu, 9 Jul 2015 13:18:43 -0700 [View Commit](../../commit/ede7284d462eae80d1fd58640428bcaf0384fd82)
+
+##coeus-1507.25
+*  Fixing copy
+  * On trying to copy a protocol from the lookup results, I get the following STE.
+  * 2015-07-13 15:18:11,185 [http-bio-8080-exec-10] u:quickstart/d: ERROR org.apache.struts.actions.DispatchAction - Action[/protocolProtocol] does not contain method named 'actions'
+  * java.lang.NoSuchMethodException: org.kuali.kra.irb.protocol.ProtocolProtocolAction.actions(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+				 at java.lang.Class.getMethod(Class.java:1786)
+				 at org.apache.struts.actions.DispatchAction.getMethod(DispatchAction.java:348)
+				 at org.apache.struts.actions.DispatchAction.dispatchMethod(DispatchAction.java:252)
+				 at org.kuali.rice.kns.web.struts.action.KualiAction.dispatchMethod(KualiAction.java:173)
+				 at
+  * Gayathri Athreya on Mon, 13 Jul 2015 15:23:27 -0700 [View Commit](../../commit/ce269c9c35d23d063acf0d80d773ef636f4ae563)
+
+##coeus-1507.24
+*  Fixing update user and additional update timestamp issues.
+  * Gayathri Athreya on Wed, 8 Jul 2015 14:01:55 -0700 [View Commit](../../commit/46e70231a001d40fc66e4868e69d4675fa0c5b8d)
+* adding indexes to help performance
+  * Travis Schneeberger on Mon, 13 Jul 2015 09:54:34 -0400 [View Commit](../../commit/6aca467b73f81ecb32ab17aa2d96254561798643)
+* rename
+  * Gayathri Athreya on Mon, 13 Jul 2015 07:26:44 -0700 [View Commit](../../commit/cd147542980ea6b6e5a22bcd1d4412fb946c2cc9)
+*  Display contact address as opposed to prg address in other organizations panel.
+  * Gayathri Athreya on Mon, 13 Jul 2015 08:51:05 -0700 [View Commit](../../commit/6b3d97476bb9a1deea8becb7fdb78cdffc48482e)
+
+##coeus-1507.23
+* code cleanup
+  * Travis Schneeberger on Mon, 13 Jul 2015 09:23:56 -0400 [View Commit](../../commit/83bec91b4d909191207bf3a0e999077d971f6b54)
+
+##coeus-1507.22
+* No Changes
+
+
+##coeus-1507.21
+* Caching getIndexOfAwardAmountInfoForDisplay
+  * blackcathacker on Mon, 22 Jun 2015 11:01:59 -0400 [View Commit](../../commit/6ec4620d6260aeb2a3d35427b7a92db485041c5f)
+* remove html commented out code to avoid possible server-side execution that is not rendered and therefore not needed.
+  * Travis Schneeberger on Mon, 22 Jun 2015 11:46:25 -0400 [View Commit](../../commit/7e418eaedd28367265274f84cde7b2f776bc2c3d)
+* Only check for the most recent valid aai
+  * blackcathacker on Mon, 22 Jun 2015 12:08:19 -0400 [View Commit](../../commit/6b30e9d0534a5b100cdc6373e4811c5ea4cc5717)
+* Fix error in streams modification
+  * blackcathacker on Mon, 22 Jun 2015 13:03:12 -0400 [View Commit](../../commit/fd89f9e1ed3ca414ca943b73ea805c73c05714df)
+* budget personnel perf improvements
+  * Travis Schneeberger on Mon, 22 Jun 2015 21:54:08 -0400 [View Commit](../../commit/f2db411a4e3673f14ec96a98969bccfa6e73001f)
+* irb go fast button to not execute values finder to retrieve ALL protocol persons
+  * Travis Schneeberger on Tue, 23 Jun 2015 15:31:27 -0400 [View Commit](../../commit/b95cf9409a8c97667cb15123153b2b0199e28e01)
+* avoid concurrent modification exception in meeting minutes tag
+  * Travis Schneeberger on Wed, 24 Jun 2015 14:35:45 -0400 [View Commit](../../commit/0411f2e9daab7466454e4db47852ed7bfa049d0c)
+* preventing rice from materializing minutes on validation by making them not updatable, fixing minute maintenance when a cancelled committee document exists.
+  * Travis Schneeberger on Wed, 24 Jun 2015 17:46:55 -0400 [View Commit](../../commit/2255bf3ce2781106d0c971916bee0bfda4d53dff)
+* using a criteria rather than findAll
+  * Travis Schneeberger on Thu, 25 Jun 2015 09:25:38 -0400 [View Commit](../../commit/4e003c318bbc837286a98d1746616b3aded05a52)
+* fix concurrent modification exception on print proposal budget
+  * Travis Schneeberger on Thu, 25 Jun 2015 11:02:43 -0400 [View Commit](../../commit/2d8e3dd0641abe1855d6720fdcf62901b874048d)
+* make transactionIds load faster on award actions tab
+  * Travis Schneeberger on Thu, 25 Jun 2015 11:03:32 -0400 [View Commit](../../commit/98abe6da08f754e768521b5659909a444ac50d2e)
+* make the protocol history tab load faster by removing extra doc service call
+  * Travis Schneeberger on Thu, 25 Jun 2015 17:31:56 -0400 [View Commit](../../commit/f58cb0c784b323a65aedbf561e738c2b56c8e555)
+* Fix cost_element being updated when adding personnel to PD budget
+
+  * When using some db analytics tools it was noticed that PD Budget would sometimes persist changes to a maint doc maintained code table. This was incorrect and can potentially contribute to database deadlocks.
+  * blackcathacker on Fri, 10 Jul 2015 11:36:57 -0700 [View Commit](../../commit/b6ce96f7bc0ae3e4d4b3ed14f546073e05f9ddfc)
+* make edit link show for committee for cancelled document
+  * Travis Schneeberger on Tue, 23 Jun 2015 20:41:42 -0400 [View Commit](../../commit/33e1b3ad9404b5aa7de55ef4698db8e1a43b23c1)
+
+##coeus-1507.20
+*  Fix reviewer selections on IACUC document.
+
+  * To reproduce:
+  * Create IACUC protocol
+  * Submit for Review
+  * Modify Submission Request:
+  * -Assign to committee and schedule
+  * -Make a reviewer "Primary" and some "Secondary"
+  * Submit
+
+  * Result:  Reviewer selections revert back to "Committee"
+  * Travis Schneeberger on Wed, 8 Jul 2015 18:27:40 -0400 [View Commit](../../commit/22b673b29a4c70985671afc41e3f4842df49704e)
+* create unit hierarchy proposal creator and modify proposal roles
+  * Joe Williams on Thu, 9 Jul 2015 14:34:54 -0500 [View Commit](../../commit/9aa336a445b4ac86ba6c1515c04173b7b7c91df7)
+* Replaces Jetty with Tomcat for Integration Tests
+  * Travis Schneeberger on Thu, 9 Jul 2015 14:08:30 -0400 [View Commit](../../commit/f09bacdc513c2502313c9f546d04b86ea2b0a25e)
+* When integration tests fail to startup correctly avoid attempting a startup for each test.
+  * Travis Schneeberger on Thu, 9 Jul 2015 16:23:53 -0400 [View Commit](../../commit/078d8290ab83a4a35691813e649546e4920e6a0f)
+* Restore inprocess and page loading alerts
+  * blackcathacker on Thu, 9 Jul 2015 19:15:00 -0700 [View Commit](../../commit/dfdc8858f5a12a7e344931ec0c7e94cbde6b9494)
+*  Fix reviewer selections on IACUC document.
+
+  * Code Review Comments
+  * Travis Schneeberger on Fri, 10 Jul 2015 12:03:02 -0400 [View Commit](../../commit/7cb276d7eedf8397dae878a61cbb3d61a55c1f5b)
+
+##coeus-1507.19
+* No Changes
+
+
+##coeus-1507.18
+* Institutional Proposal Attachments
+  * Joe Williams on Tue, 16 Jun 2015 16:36:26 -0500 [View Commit](../../commit/bf8dba85cdddb19620515382dd560eaf5fc8ba9f)
+* Award Attachment Disable Removal Option
+  * Joe Williams on Wed, 17 Jun 2015 14:22:36 -0500 [View Commit](../../commit/9a40cea4bb867ae23d47380e9ff90f9355e396a5)
+* Sub Award Attachment Disable Removal Option
+  * Joe Williams on Wed, 17 Jun 2015 15:21:57 -0500 [View Commit](../../commit/8c32c5c677ebd953bc818b6284c1d0173ac378c4)
+* Move Permission Logic To Authorizers
+  * Joe Williams on Fri, 19 Jun 2015 12:53:16 -0500 [View Commit](../../commit/a25316d5381e6d63eff544970f3fc848697f86a7)
+* Institutional Proposal Clean Up
+  * Joe Williams on Wed, 8 Jul 2015 11:55:20 -0500 [View Commit](../../commit/0a48e026de25772ff928ef06ecf58d0c4f3b12e6)
+
+##coeus-1507.17
+* No Changes
+
+
+##coeus-1507.16
+* Support p6spy through the dev maven profile
+  * blackcathacker on Wed, 8 Jul 2015 12:20:07 -0700 [View Commit](../../commit/e81a671cbb1d8729c866afd99ccb01a805923ac3)
+* allow sub award budget non-personnel lineitem rates to be edited
+
+  * User Story
+  * As a budget creator or aggregator preparing a Subaward Budget for my proposal, I need to be remove the application of F&A rates In the Rates tab of the Details modal for these line items so that I do not have to request F&A on the first $25k of a subaward in a proposal when it is not appropriate to do so (for example, if the request is for supplemental funding for an existing subaward or for continuation funding.) I would expect that to add unrecovered F&A, but that may well be appropriate depending on how the school tracks that.
+
+  * Steps to Reproduce
+
+    Create a proposal with the dates 07-01-2016 to 06-30-2020 or dates that correspond to your subaward file
+    Navigate to Budget and create a new budget version
+    Go to Subaward tab
+    Add a new subaward
+    Search for and select any subaward organization
+    Attach a subaward R&R file like the one attached here
+    Click Add Subaward
+    System will read dates and amounts and translate into non-personnel correctly
+    Navigate to Non-personnel and view amounts
+    The system should allow user to modify the F&A Rates inclusion, but currently subawards are not editable
+
+  * Background:
+  * FE issue: provided to MIT Coeus users in 4.5.1.P.2 as missed requirement for the subaward upload tool. (COEUSQA-4060)
+  * Allow the users to turn off OH calculation on these line items that are added by subaward extraction tool. Currently line items added by extraction tool does not allow users to override OH calc flag. The line item details for the lines inserted by the Subaward Budget Upload process needs to let the user to uncheck the F&A ("MTDC") the first $25K cost element line of the subaward costs even though they are normally subject to institutional F&A. As noted by users, there are times when it is not appropriate to request F&A on the first $25k of a subaward in a proposal, if the request is for supplemental funding for an existing subaward or for continuation funding.
+
+  * Acceptance Criteria
+  * Given a user is logged in with 'Modify Budget' Permission to add a new subaward budget R&R file to the budget subaward
+  * When the user Adds the subaward
+  * Then:
+
+    The system shows the direct and indirect costs of subaward as line item expenses in the non-personnel section of the budget (as it does now)
+
+  * When the system adds direct and indirect line items for the subaward
+  * Then:
+
+    The system allows the user to view details of each subaward line item, including the rates
+    The user may modify the apply rate option of the details modal to include or not include the application of a specific rate
+
+  * Given a user is logged in with 'Modify Budget' Permission to add a new subaward by entering direct and indirect costs to the budget subaward details modal
+  * When the user Saves the subaward details
+  * Then:
+
+    The system shows the direct and indirect costs of subaward as line item expenses in the non-personnel section of the budget (as it does now)
+
+  * When the system adds direct and indirect line items for the subaward
+  * Then:
+
+    The system allows the user to view details of each subaward line item, including the rates
+    The user may modify the apply rate option of the details modal to include or not include the application of a specific rate
+  * Joe Williams on Thu, 9 Jul 2015 08:50:58 -0500 [View Commit](../../commit/8c36c7ab04c48ceccdc073d494710131c2b3c2ef)
+* remove unused javascript.
+  * Travis Schneeberger on Thu, 9 Jul 2015 11:06:02 -0400 [View Commit](../../commit/f1fb451ffe48c976f412492c68069006140499e2)
+
+##coeus-1507.15
+* Using absolute urls in global kns javascript file to avoid 404s due to bad paths.  This fixes the broken loading image on the loading screen.
+  * Travis Schneeberger on Thu, 9 Jul 2015 08:51:30 -0400 [View Commit](../../commit/1edc6b767164af876cd820f3d6bc9c79fbdfa350)
+
+##coeus-1507.14
+*  Removing unused KRMS Validation Actions
+  * Travis Schneeberger on Wed, 8 Jul 2015 09:48:11 -0400 [View Commit](../../commit/8ffbc9f18f479f4e4daf1b97ca8a5d9066179a7f)
+*  Remove Negotiation follow up date validation
+  * Travis Schneeberger on Wed, 8 Jul 2015 09:59:31 -0400 [View Commit](../../commit/a604812980b3775ce6dab8517c24d3a7bb2a32a1)
+*  rule cleanup
+  * Travis Schneeberger on Wed, 8 Jul 2015 10:06:27 -0400 [View Commit](../../commit/7fa3a6fcc79a1c8a2d93cbb719ed61849bb933d0)
+*  Prevent the deletion of the last budget period
+
+  * This adds an error message with suggestions on what to do when the user attempts to delete the last budget period on a budget.  This prevents the budget/proposal from breaking from a 0 period budget.
+  * bsmith83 on Tue, 7 Jul 2015 18:14:35 -0700 [View Commit](../../commit/88a39689fd457acf7dd6390ed418da93e50583d2)
+* avoid concurrent modification exception in budget rates, create a new utility function to use in jsps & tags
+
+  * Due to budget rate types getter doing an inline sorting, Java 8 now reports a concurrent modification exception during JSP iteration and access.
+  * Travis Schneeberger on Wed, 24 Jun 2015 13:06:41 -0400 [View Commit](../../commit/ae9dd041143e5a65bd9f238910ad3a85a4e3f82f)
+* disable severity sorting since we are grouping by severity
+  * Joe Williams on Wed, 8 Jul 2015 15:40:44 -0500 [View Commit](../../commit/8604eac562232fb2929c0c5fef9fa2b8231f1fbe)
+* Avoid Java8 concurrency issue with sorting on Award Reporting
+
+  * Due to Java 8 handling of sorting and iterator concurrency modification you will recieve this error when payment terms have been added to the award
+  * ```
+  * java.util.ConcurrentModificationException
+        at java.util.ArrayList$Itr.checkForComodification(ArrayList.java:901)
+        at java.util.ArrayList$Itr.next(ArrayList.java:851)
+        at org.apache.taglibs.standard.tag.common.core.ForEachSupport$SimpleForEachIterator.next(ForEachSupport.java:153)
+        at org.apache.taglibs.standard.tag.common.core.ForEachSupport.next(ForEachSupport.java:175)
+        at javax.servlet.jsp.jstl.core.LoopTagSupport.doAfterBody(LoopTagSupport.java:330)
+        at org.apache.jsp.tag.webaward.awardReportClasses_tag._jspx_meth_c_005fforEach_005f4(awardReportClasses_tag.java:2138)```
+  * blackcathacker on Wed, 8 Jul 2015 15:22:17 -0700 [View Commit](../../commit/9613562ad80b7494919234e707eabb8b0d2f83e0)
+* Remove dwr script that no longer exists.
+  * Travis Schneeberger on Wed, 8 Jul 2015 18:58:37 -0400 [View Commit](../../commit/40ed4ed219d88635ad9afc798654764c56522f47)
+* Remove integration test for removed logic
+  * blackcathacker on Wed, 8 Jul 2015 16:11:01 -0700 [View Commit](../../commit/065827b774f952078968db71670688fc6b6765e6)
+
+##coeus-1507.13
+*  Adding missing primary key columns and constraints
+  * Travis Schneeberger on Tue, 7 Jul 2015 16:40:56 -0400 [View Commit](../../commit/eaf72e3e589d6bb08685f95c80d1f9f2a4666a76)
+* revert changes to ProtocolFormBase that were causing issues
+
+  * Create a protocol
+  * Submit and approve protocol
+  * On approved protocol, take create an amendment action (A001)
+  * Select section (like "General Info"), add comment, submit
+  * Close amendment A001
+  * Go to original, approved protocol
+  * Create another amendment (A002)
+
+  * Actual Result: User can select the same section as selected on A001. After submitting A002, the section is now editable in both A001 and A002 at the same.
+
+  * Expected Result: User cannot select the same section as selected on A001. The system should prevent the user from being able to amend the same section in more than one amendment in progress.
+  * Joe Williams on Wed, 8 Jul 2015 08:00:01 -0500 [View Commit](../../commit/f04f7e6bc1ee7862b6b507d38eadbb3901433c22)
+
+##coeus-1507.12
+* add prompt to warn users before they apply line items to later periods
+
+  * If changes are made to a future year's existing expense via the Save and Apply to Other Periods, the user should confirm that change will impact future years, otherwise they may be surprised when data was unintentionally overwritten.
+  * (see screenshot)
+
+steps to reproduce
+  * Create a budget
+  * Add non-personnel expense
+  * Select Details to Save and Apply to Other Periods
+  * Open Details again, change the amount and choose Save and Apply to Other Periods,
+
+  * Current Result: following year expense is automatically updated to reflect change and any inflation.
+
+  * Expected Result: user should see message to confirm before change is made
+  * "There is already a line item on period 2 based on this line item. Do you want to apply changes to existing items on later periods? Yes or No"
+  * After user confirms, then the following year expense should update to reflect amount change including any inflation, if inflation was selected
+  * Joe Williams on Tue, 7 Jul 2015 10:06:20 -0500 [View Commit](../../commit/59fa4fe900c44a6c4e3efe7ed93fd54bde993a15)
+
+##coeus-1507.11
+* only run cost share and unrecovered audit rules if flag is turned on
+
+  * Changed parameter BudgetUnrecoveredFandAEnforcementFlag to N.
+  * (This should allow the user to mark a budget complete without distributing the unrecovered f&A.)
+  * Created a new proposal type = Research
+  * Created a budget version.
+  * Added a Non-Personnel Line Item (Other > Conference Expenses) for $10,000
+  * Edited the line item details and unchecked apply MTDC.
+  * Saved.
+  * Generated all periods
+  * Opened Commitments screen > Unrecovered F&A. Confirmed amounts exist.
+  * Clicked Complete: got validation errors that the UR must be distributed.
+
+  * Expected result: The budget should have been able to be completed because the enforcement flag was set to N prior to creating this proposal and budget.
+  * Joe Williams on Tue, 7 Jul 2015 12:25:26 -0500 [View Commit](../../commit/4fcb55b2b7ecd85d7f9466287356389d47993986)
+*  upgrading ojb to fix a concurrency issue under heavy load.
+  * Travis Schneeberger on Tue, 7 Jul 2015 14:11:26 -0400 [View Commit](../../commit/c6410385351fe187f79d5c1e88a4716f576bb56c)
+
+##coeus-1507.10
+*  Fix to search on OSP Administrator for awards
+
+  * Previously the search was looking at the wrong table to pull out osp adminstrator ids for the search, this corrects this and searches within the object returned for the OSP administrator.  This also adds a quickfinder and changes the search to use username for OSP administrator.  Caveat: If there are multiple OSP administrators for a single award, the one you you search on may not be the one shown in the results as it only shows the first OSP Admin in the result rows.
+  * bsmith83 on Mon, 6 Jul 2015 18:39:28 -0700 [View Commit](../../commit/47323a7744291659a4940ec0d54f8e676e489ef3)
+
+##coeus-1507.9
+* sort data validation screen
+
+  * Steps to Recreate
+  * 1 Create a New Proposal Development Document
+  * 2 Connect to S2S opportunity PA-C-F32
+  * 3 Turn on Validation
+  * When you do this there is a long series of validation errors, and apparent sort logic. There are also no sort options for this table.
+  * In KNS the Validation screen sorted out your errors from your warnings, from your Grants.gov errors and warnings.
+  * Can sort functions be built into this table? I don't think we need anything more involved then default behavior sort icons for the headings, but that would go a long way towards avoiding any regression from the KNS validation organization.
+  * Joe Williams on Mon, 6 Jul 2015 13:54:38 -0500 [View Commit](../../commit/19b54cfd919444f1714c65aa1e00eb991cd750a8)
+* fix view attachment from IACUC Summary and History
+
+  * In a new IACUC protocol add two attachments and navigate to IACUC Protocol Actions/Summary and History/Summary . Click "view" action for the two attachments displayed in Summary.
+  * Result: Clicking "view" does not perform any action. The files do not open.
+  * Joe Williams on Mon, 6 Jul 2015 14:31:54 -0500 [View Commit](../../commit/0f508705a49d5adfb981b8241563b8da68edd32f)
+*  Fixing update timestamp for award amount info
+  * Disrupts reporting.
+  * Subsequent routing of T&M docs in award, changes the update timestamp of previous award amount info entries in the table. While routing a T&M doc, only the update timestamp field of the award amount info entries for that doc should be updated.
+  * Gayathri Athreya on Mon, 6 Jul 2015 15:27:02 -0700 [View Commit](../../commit/6186a4a6fd21fe12b1abdb2ccfe0c6d46ec4b60e)
+
+##coeus-1507.8
+* No Changes
+
+
+##coeus-1507.7
+* Changing unit back to a dropdown but using the advanced select box which includes a filter
+
+  * This change will return the lead unit select to a drop down but using the advanced drop down currently in use by keywords and other places that also includes a filter such that a user can free-form type a partial number or name for the unit and have the displayed lists restricted by that value.
+  * blackcathacker on Mon, 6 Jul 2015 10:47:26 -0700 [View Commit](../../commit/908fbbc3cb3f89e622870414aa647f4126227072)
+
+##coeus-1507.6
+* Updating project docs to reflect supported Maven version
+  * Travis Schneeberger on Mon, 6 Jul 2015 10:29:34 -0400 [View Commit](../../commit/016fb17106b439a5bde10c0b62ecdfe33def8db8)
+* display correct messaging on lookup resutls if the search is bounded
+
+  * when some searches hit the upper limit for returned results, the system does not provide a message to user that not all results are displayed. 3 lookups found so far with no upper limit message:
+  * The SysAdmin->Person lookup in Training
+  * Unit lookup
+  * KCPersonExtendedAttributes lookup
+  * Joe Williams on Mon, 6 Jul 2015 09:40:31 -0500 [View Commit](../../commit/939a5fa9fbf635c6be6e70350f53e97f40c6bae2)
+
+##coeus-1507.5
+*  Adding confirmation dialog.
+  * PD Budget – Need a confirmation/warning prompt when user hits the Delete icon on Periods and Totals
+  * We have had multiple users report that they have mistakenly deleted Period 1 of their budget by clicking on the "trash can" icon under the Actions header in PD Budget > Periods and totals.
+  * There is no warning or confirmation message given to the user, and the deletion is immediate.
+  * Gayathri Athreya on Thu, 2 Jul 2015 11:41:03 -0700 [View Commit](../../commit/91dff255d9fa02474e77ab00d173611b6468cd84)
+*  Fixing proposal copy
+  * Tried to copy proposal (status Approved and Submitted) from search results Action link "Copy"
+  * (proposal had no subawards)
+
+  * In Copy modal:
+  * Selected same lead unit 264000
+  * Selected:
+  * Copy budget, final version
+  * Copy Attachments
+  * Copy Questionnaire.
+  * Clicked Copy. Got error message (see screenshot) and STE below.
+
+  * Tried again
+  * All same selections but did not select to include Attachments.
+  * Same errors & STE
+
+  * STE:
+
+  * Stacktrace (only in dev mode)
+
+  * java.lang.RuntimeException: An error occured while trying to copy the proposal development document.
+  * at org.kuali.coeus.propdev.impl.copy.ProposalCopyServiceImpl.copyProposal(ProposalCopyServiceImpl.java:239)
+  * at org.kuali.coeus.propdev.impl.copy.ProposalDevelopmentCopyController.copy(ProposalDevelopmentCopyController.java:62)
+  * Caused by: org.kuali.rice.krad.exception.ValidationException: business rule evaluation failed
+  * at org.kuali.rice.krad.document.DocumentBase.validateBusinessRules(DocumentBase.java:521)
+  * at org.kuali.coeus.sys.framework.model.KcTransactionalDocumentBase.validateBusinessRules(KcTransactionalDocumentBase.java:146)
+  * at org.kuali.rice.krad.service.impl.DocumentServiceImpl.validateAndPersistDocument(DocumentServiceImpl.java:876)
+  * at org.kuali.rice.krad.service.impl.DocumentServiceImpl.validateAndPersistDocumentAndSaveAdHocRoutingRecipients(DocumentServiceImpl.java:502)
+  * at org.kuali.rice.krad.service.impl.DocumentServiceImpl.saveDocument(DocumentServiceImpl.java:156)
+  * Gayathri Athreya on Thu, 2 Jul 2015 12:32:44 -0700 [View Commit](../../commit/50a08c95453104169de26d94960edfd8337fd22d)
+* RESKC-403 Fix to use id wildcards in combination with other properties for Proposal Lookup
+
+  * This was a bug in the lookupable code that would assume if id was entered it was the actual full id and would ignore some other properties entered, this corrects this and expands on the searches in a couple fields which use people by allowing username, person id, full name, and last name as valid search values for those fields.  It also corrects an error with bad values being inserted into the database that caused the fullName stored to have 2 spaces inbetween first and last names which previously caused Full Name searches to fail on the fields above.
+  * bsmith83 on Thu, 2 Jul 2015 18:19:02 -0700 [View Commit](../../commit/6597e9e0db5cdd8dcb737b4f7872f4dbe0c8b641)
+
+##coeus-1507.4
+* fixes issues when adding coi role to an instituional proposal
+
+  * Steps:
+
+  * Create Proposal Log
+
+    Click on Central Admin
+    Click on + sign by Proposal Log
+    Enter Document description
+    Select Proposal Type (New)
+    Enter Title
+    Lookup PI and return value
+    Lookup Sponsor and return value (NIH)
+    Save and copy or write down Proposal Number
+    Submit
+
+  * Create IP
+
+    Click on Central Admin tab
+    Search for Institutional Proposal
+    Enter or paste Proposal Number from steps
+    Search for Proposal Log
+    Click on Proposal Number to open document
+    Enter Document description
+    Leave status as Pending
+    Verify Sponsor and Program info
+    Select NSF Science code (Medical - Life Sciences)
+    Goto Financial panel
+    Enter Requested Start and End dates
+    Enter Total Direct Costs and F&A
+    Click recalculate
+    Goto Contacts Tab
+    Search to Add Employee
+    Return value
+    Choose Project Role (CO-I , or Key Person)
+    Click to Add person
+
+  * Expected Behavior:
+
+  * You would see panels for Combined Credit Split and Unit Contacts
+  * You would see Action buttons on bottom of page to Save/Close etc
+
+  * Actual Behavior
+
+  * There is nothing below Project Personnel panel
+
+    Click on any tab to exit page
+    Get HTTP Status 500 error (see attached)
+  * Joe Williams on Tue, 30 Jun 2015 14:01:16 -0500 [View Commit](../../commit/dd5645ca605a59dbe79e6e3fae8bf3785941b2ac)
+
+##coeus-1507.3
+* return user to landing page when canceling/closing proposal log
+
+  * Steps to Reproduce
+  * 1. In the KRAD portal, Central Admin tab > Pre-Award > Proposal Log, create a proposal log,
+  * 2. Then cancel rather than submit/blanket approve.
+  * Result: User is returned to the System Admin Portal, and must select KRAD portal.
+
+  * Expected Result: User should be returned to the KRAD portal.
+  * Joe Williams on Thu, 2 Jul 2015 08:54:29 -0500 [View Commit](../../commit/04147d723be04e2c7de31618a73e1ce7b698c689)
+
+##coeus-1507.2
+* Display print actions on award budgets
+
+  * Customer updated from 5.2.1 to 6.0 asked for instructions on how to print Award Budget.
+  * 6.0 is missing the Actions > Print Forms panel!
+
+  * Award > Budget Versions(tab) > Open (budget) > Budget Actions (tab) > Print Forms (panel)
+  * Joe Williams on Wed, 1 Jul 2015 10:36:21 -0500 [View Commit](../../commit/e2e11ad64849dcf0b155be4b5d8e7db47bc9e07f)
+* RESKC-397 Rice update - people flow route log annotation fix
+  * bsmith83 on Wed, 1 Jul 2015 09:01:00 -0700 [View Commit](../../commit/f12e907ac0a8a4e0f63eebe661d2ec705a120baa)
+
+##coeus-1507.1
+* RESKC-344 Changed lead unit selection from dropdown to suggest field
+
+  * Changes the lead unit field in proposal details and proposal copy to a suggestion based field that limits results based on what the user types
+  * bsmith83 on Tue, 30 Jun 2015 09:25:30 -0700 [View Commit](../../commit/e38a69e8b2cc22cf57e217c19d3700305c79ff72)
+* RESKC-571 Fix to notes on protocols 'appearing' to overwrite eachother - tag file exception
+
+  * Fix to the getter method sorting the content of the notes  list  (in reverse order)  each time it was called causing concurrent modification exceptions when it was iterated over by the tag file.  Instead new notes are now inserted to the top of the list
+  * bsmith83 on Tue, 30 Jun 2015 18:11:30 -0700 [View Commit](../../commit/1e214160a9736b59a91f4ebef719648922d02d40)
+
+##coeus-1506.73
+* fix issue with adding award personnel details for rolodex and to be named
+
+  * Steps To Recreate:
+
+  * 1.) Create and Submit Award
+  * 2.) Create and Submit T&M Doc for Award
+  * 3.) Create Award Budget for Award
+  * 4.) Add To Be Named Person.
+  * 5.) Add Salary to To Be Named Person.
+  * 6.) Add Personnel Detail for To Be Named Person.
+  * 7.) Try To Save.
+  * 8.) get STE
+
+* SQLException during execution of sql-statement:
+* sql statement was 'INSERT INTO BUDGET_PERSONNEL_DETAILS (BUDGET_PERSONNEL_DETAILS_ID,BUDGET_DETAILS_ID,LINE_ITEM_NUMBER,PERSON_NUMBER,BUDGET_ID,BUDGET_PERIOD,ON_OFF_CAMPUS_FLAG,PERSON_SEQUENCE_NUMBER,PERSON_ID,JOB_CODE,END_DATE,START_DATE,UPDATE_TIMESTAMP,UPDATE_USER,VER_NBR,OBJ_ID,APPLY_IN_RATE_FLAG,BUDGET_JUSTIFICATION,COST_SHARING_AMOUNT,COST_SHARING_PERCENT,LINE_ITEM_DESCRIPTION,PERCENT_CHARGED,PERCENT_EFFORT,PERIOD_TYPE,SALARY_REQUESTED,SEQUENCE_NUMBER,UNDERRECOVERY_AMOUNT,SUBMIT_COST_SHARING) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) '
+* Exception message is [Column 'PERSON_ID' cannot be null]
+* Vendor error code [1048]
+* SQL state code [23000=INTEGRITY CONSTRAINT VIOLATION]
+* Target class is 'org.kuali.coeus.common.budget.framework.personnel.BudgetPersonnelDetails'
+* PK of the target object is [budgetPersonnelLineItemId=10]
+* Source object: org.kuali.kra.award.budget.AwardBudgetPersonnelDetailsExt@28d9a5f8[serialVersionUID=4480947148039922420,budgetPersonnelLineItemId=10,budgetLineItemId=10,lineItemNumber=1,budgetId=1,budgetPeriod=1,onOffCampusFlag=true,budgetJustification=<null>,lineItemDescription=<null>,applyInRateFlag=true,personNumber=1,jobCode=AA000,periodTypeCode=3,personId=<null>,sequenceNumber=1,budgetPeriodId=1,personSequenceNumber=4,submitCostSharingFlag=true,costElement=400250,budgetCategoryCode=26,basedOnLineItem=0,quantity=0,lineItemSequence=1,groupName=,formulatedCostElementFlag=false,serialVersionUID=-6717116777934188909,serialVersionUID=8356817148151906918,updateUser=quickstart,updateUserSet=false,serialVersionUID=-3519927021539948875,serialVersionUID=1451642350593233282,versionNumber=0,objectId=1db3f017-cbbe-4d0b-a88a-29be036dcebb,newCollectionRecord=false,serialVersionUID=5563310175227245001,_persistence_shouldRefreshFetchGroup=false]
+* The root stack trace is -->
+* com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException: Column 'PERSON_ID' cannot be null
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+	at java.lang.reflect.Constructor.newInstance(Constructor.java:422)
+  * Joe Williams on Tue, 30 Jun 2015 17:04:18 -0500 [View Commit](../../commit/480b0e4c24b7f1750e766843da3cb98ba88ec038)
+
+##coeus-1506.72
+* RESKC-573
+
+  * Checking for both 'Y' and 'Yes' when matching on the descends units flag.  * tdurkin on Tue, 30 Jun 2015 11:16:41 -0400 [View Commit](../../commit/e335202b4ada74d12ac27c56887b3510f2508db5)
+
+##coeus-1506.71
+* fix proposal credit allocation totals issue
+
+  * Proposal Key Personnel Credit allocation calculations not accurate if one or more key personnel have three or four units assigned
+
+steps to reproduce
+
+    Create proposal
+    add key personnel
+    add two or three additional units for the person
+    navigate to credit allocation
+    add amounts to allocation and see that the figures to not sum correctly
+  * Joe Williams on Tue, 30 Jun 2015 09:45:00 -0500 [View Commit](../../commit/f5a647c6bbd022514b6b8611552a4f007f047bc8)
+
+##coeus-1506.70
+* prevent users from being assigned derived roles on protocol copy
+
+  * Steps to add derived role to a principle.
+
+  * 1.) create protocol
+  * 2.) add PI that is not current user
+  * 3.) go protocol actions and copy protocol. (again be sure PI is not logged in user)
+
+  * After you copy the protocol the PI is assigned the PI derived role, and will show up on every protocol as a PI.
+  * Joe Williams on Fri, 26 Jun 2015 12:31:38 -0500 [View Commit](../../commit/1be730aacc797e9eb80a8bc3cb5b65ef403ba1e6)
+* display correcct obligated amount and end date immediately upon adding award to subward
+
+  * 1. Create and finalize an award.
+  * 2. Create and finalize a T&M document for $50,000 using the Transactions panel for entering the amount.
+  * 3. Edit T&M (which creates a new T&M document) and finalize it for $25,000 more using the Transactions panel for entering the amount.
+  * 4. Create and finalize a subaward document, linking the subaward to the award created in step 1.
+
+  * RESULT: The amount appearing in the Funding Source panel will show $50,000 in KC 5.0.1 and $0 in KC 5.1.
+
+  * EXPECTED RESULT: The amount appearing in the Funding Source panel should be $75,000.
+  * Joe Williams on Mon, 29 Jun 2015 08:34:33 -0500 [View Commit](../../commit/55a2efc019e2cf6c47e6f78122fa81d9d117814c)
+* display credit splits for award unit and persons home unit on award
+
+  * 1. Create an Award, completing all required fields to save the document, enter the following for Lead Unit ID: IN-IN
+  * 2. Click the Contacts tab
+  * 3. Enter the following for Employee User Name: oblood
+  * 4. Click Add to add OLBOOD as a Principal Investigator
+  * 5. Click Save
+  * 6. Observe the Unit Details and Combined Credit Split subpanels
+  * Actual Behavior: The system displays a Unit Details subpanel row for the Lead Unit defined on the Award tab (IN-IN). The system does not display any rows for the Primary Department Code defined for the Person in the Person record (BL-RCEN). The system displays a Combined Credit Split subpanel row for the one Unit defined on the Unit Details subpanel (which is the Lead Unit entered on the Award tab).
+  * Expected Behavior: The system should display a Unit Details subpanel row for the Lead Unit defined on the Award tab and a row for the Primary Department Code defined for the Person in the Person record. The system should display a Combined Credit Split subpanel row for each Unit defined on the Unit Details subpanel, one for the Lead Unit entered on the Award tab and one for the Primary Department Code defined for the person in the Person record.
+  * Joe Williams on Mon, 29 Jun 2015 09:34:46 -0500 [View Commit](../../commit/78155087a4f526f691625685f801d4597f84a0cb)
+* fix issue when copying proposal with manually entered sub award budgets
+
+  * Copying Proposals that has Subaward budgets uploaded in the budget throws STE. You can copy proposal if you choose not to copy the budget.
+
+  * At this point users cannot copy any proposals that has a subaward budget.
+
+  * Comments: User is having an issue copying a budget version. Has a Subaward manually entered, not file upload. Get incident report when trying to copy budget.
+  * Joe Williams on Mon, 29 Jun 2015 09:49:48 -0500 [View Commit](../../commit/237a8977a0de5b938038cd95a4c911417c6be333)
+
+##coeus-1506.69
 * add certification questions update mechanism
 
   * User needs to be able to answer newly added certification questions rather than being forced to create a new proposal to answer new question

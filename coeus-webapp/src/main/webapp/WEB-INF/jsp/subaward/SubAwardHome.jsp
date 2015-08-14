@@ -31,7 +31,10 @@
   	
 
 <c:set var="readOnly" value="${not KualiForm.editingMode['fullEntry']}" scope="request" />
-<div align="right"><kul:help documentTypeName="SubAwardDocument" pageName="Subaward" /></div>
+<div align="right">
+	<kra:shortUrl shortUrl="${KualiForm.shortUrl}"/>
+	<kul:help documentTypeName="SubAwardDocument" pageName="Subaward" />
+</div>
 
 <kul:documentOverview editingMode="${KualiForm.editingMode}" />
 
@@ -46,7 +49,6 @@ var kualiForm = document.forms['KualiForm'];
 var kualiElements = kualiForm.elements;
 </SCRIPT>
 <script language="javascript" src="scripts/kuali_application.js"></script>
-<!-- <script type="text/javascript" src="scripts/jquery/jquery.js"></script> -->
 <script>
   $j = jQuery.noConflict();
 </script>

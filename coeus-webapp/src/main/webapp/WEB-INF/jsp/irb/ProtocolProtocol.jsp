@@ -33,10 +33,12 @@
 <script type="text/javascript">
    var $j = jQuery.noConflict();
 </script>
- 
 
   	
-<div align="right"><kul:help documentTypeName="ProtocolDocument" pageName="Protocol" /></div>
+<div align="right">
+	<kra:shortUrl shortUrl="${KualiForm.shortUrl}"/>
+	<kul:help documentTypeName="ProtocolDocument" pageName="Protocol" />
+</div>
 <kul:documentOverview editingMode="${KualiForm.editingMode}" />
 
 <kra-irb:protocolRequiredFields />
@@ -53,6 +55,11 @@
 <kra-irb:protocolParticipants />
 
 <kul:panelFooter />
+	<c:if test="${readOnly && KualiForm.editingMode['canModify']}">
+		<c:set var="extraButtonSource" value="${ConfigProperties.kra.externalizable.images.url}buttonsmall_edit_temp.gif"/>
+		<c:set var="extraButtonProperty" value="methodToCall.edit"/>
+		<c:set var="extraButtonAlt" value="Edit"/>
+	</c:if>
 	<kul:documentControls 
 		transactionalDocument="false"
 		suppressRoutingControls="true"

@@ -159,6 +159,9 @@ public class AwardForm extends BudgetVersionFormBase implements MultiLookupForm,
     private AwardFundingProposalBean fundingProposalBean;
     private String awardHierarchy;
     private String awardNumber;
+    private String awardHierarchyTargetAwardNumber;
+    private String awardHierarchySourceAwardStrList;
+    private String awardHierarchyTargetAwardStrList;
     private String addRA;    
     private String deletedRas;
     private String rootAwardNumber;
@@ -995,7 +998,10 @@ public class AwardForm extends BudgetVersionFormBase implements MultiLookupForm,
         
         return extraButtons;
     }
-    
+
+    public String getShortUrl() {
+        return getBaseShortUrl() + "/kc-common/awards/" + getAwardDocument().getAward().getAwardNumber();
+    }
 
     private ConfigurationService lookupKualiConfigurationService() {
         return CoreApiServiceLocator.getKualiConfigurationService();
@@ -1153,7 +1159,7 @@ public class AwardForm extends BudgetVersionFormBase implements MultiLookupForm,
     public List<Long> getLinkedProposals() {
         List<Long> linkedProposals = new ArrayList<Long>();
         if (this.getAwardDocument() != null && this.getAwardDocument().getAward() != null) {
-            for (AwardFundingProposal fundingProposal : this.getAwardDocument().getAward().getFundingProposals()) {
+            for (AwardFundingProposal fundingProposal : this.getAwardDocument().getAward().getAllFundingProposals()) {
                 linkedProposals.add(fundingProposal.getProposalId());
             }
         }
@@ -1240,17 +1246,7 @@ public class AwardForm extends BudgetVersionFormBase implements MultiLookupForm,
     }
     
     public boolean getDisplayEditButton() {
-        boolean displayEditButton = !isViewOnly() && !getAwardDocument().isCanceled();
-        if (isDocOpenedFromAwardSearch() || getAwardDocument().isPlaceHolderDocument()) {
-            displayEditButton = true;
-        }
-        
-        VersionHistory activeVersion = getVersionHistoryService().findActiveVersion(Award.class, getAwardDocument().getAward().getAwardNumber());
-        if (activeVersion != null) {
-            displayEditButton &= activeVersion.getSequenceOwnerSequenceNumber().equals(getAwardDocument().getAward().getSequenceNumber());
-        }
-        
-        return displayEditButton;
+        return !getAwardDocument().isCanceled();
     }
     
     protected VersionHistoryService getVersionHistoryService() {
@@ -1468,4 +1464,28 @@ public class AwardForm extends BudgetVersionFormBase implements MultiLookupForm,
         Collections.reverse(results);
         return results;
     }
+
+	public String getAwardHierarchyTargetAwardNumber() {
+		return awardHierarchyTargetAwardNumber;
+	}
+
+	public void setAwardHierarchyTargetAwardNumber(String awardHierarchyTargetAwardNumber) {
+		this.awardHierarchyTargetAwardNumber = awardHierarchyTargetAwardNumber;
+	}
+
+	public String getAwardHierarchySourceAwardStrList() {
+		return awardHierarchySourceAwardStrList;
+	}
+
+	public void setAwardHierarchySourceAwardStrList(String awardHierarchySourceAwardStrList) {
+		this.awardHierarchySourceAwardStrList = awardHierarchySourceAwardStrList;
+	}
+
+	public String getAwardHierarchyTargetAwardStrList() {
+		return awardHierarchyTargetAwardStrList;
+	}
+
+	public void setAwardHierarchyTargetAwardStrList(String awardHierarchyTargetAwardStrList) {
+		this.awardHierarchyTargetAwardStrList = awardHierarchyTargetAwardStrList;
+	}
 }

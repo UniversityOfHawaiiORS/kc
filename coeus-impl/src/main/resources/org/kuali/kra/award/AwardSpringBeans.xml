@@ -281,7 +281,9 @@
         <property name="dbPlatform" ref="dbPlatform" />
     </bean>
 
-    <bean id="awardDao" parent="platformAwareDao" class="org.kuali.kra.award.dao.ojb.AwardDaoOjb"/>
+    <bean id="awardDao" parent="platformAwareDao" class="org.kuali.kra.award.dao.ojb.AwardDaoOjb">
+        <property name="dataSource" ref="dataSource" />
+    </bean>
 
     <bean id="awardLookupDao" parent="platformAwareDao" class="org.kuali.kra.award.dao.ojb.AwardLookupDaoOjb">
     	<property name="versionHistoryLookupDao" ref="versionHistoryLookupDao" /> 
@@ -466,9 +468,7 @@
         <property name="businessObjectService" ref="businessObjectService" />
     </bean>
     
-    <bean id="awardVersionService" class="org.kuali.kra.award.version.service.impl.AwardVersionServiceImpl" scope="prototype">
-        <property name="versionHistoryService" ref="versionHistoryService" />
-    </bean>
+    <bean id="awardVersionService" parent="platformAwareDao" class="org.kuali.kra.award.version.service.impl.AwardVersionServiceImpl" />
 
     <!-- Award Printing Services -->
     
@@ -543,6 +543,8 @@
     <bean id="timeAndMoneyVersionService" class="org.kuali.kra.timeandmoney.service.impl.TimeAndMoneyVersionServiceImpl" scope="prototype">
         <property name="awardVersionService" ref="awardVersionService" />
         <property name="documentService" ref="documentService" />
+        <property name="businessObjectService" ref="businessObjectService" />
+        <property name="dataSource" ref="dataSource" />
     </bean>
 
 

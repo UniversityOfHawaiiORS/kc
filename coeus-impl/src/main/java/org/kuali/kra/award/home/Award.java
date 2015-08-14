@@ -98,6 +98,7 @@ import edu.hawaii.award.bo.UhAwardExtension;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @SuppressWarnings({ "deprecation", "unchecked" })
 public class Award extends KcPersistableBusinessObjectBase implements KeywordsManager<AwardScienceKeyword>, Permissionable,
@@ -283,6 +284,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     private transient KcPersonService kcPersonService;
 
     private List<AwardCgb> awardCgbList;
+    
+    private transient Integer indexOfAwardAmountInfoForDisplay;
 
     public Award() {
         super();
@@ -374,6 +377,9 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
     public int getIndexOfAwardAmountInfoForDisplay() throws WorkflowException {
+    	if (indexOfAwardAmountInfoForDisplay != null) {
+    		return indexOfAwardAmountInfoForDisplay;
+    	}
         AwardAmountInfo aai = getAwardAmountInfoService().fetchLastAwardAmountInfoForAwardVersionAndFinalizedTandMDocumentNumber(this);
         int returnVal = 0;
         int index = 0;
@@ -394,7 +400,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
                 }
             }
         }
-        return returnVal;
+        indexOfAwardAmountInfoForDisplay = returnVal;
+        return indexOfAwardAmountInfoForDisplay;
     }
 
     public int getIndexOfAwardAmountInfoForDisplayFromTimeAndMoneyDocNumber(String docNum) throws WorkflowException {
@@ -1392,6 +1399,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         if (institutionalProposal != null) {
             AwardFundingProposal afp = new AwardFundingProposal(this, institutionalProposal);
             fundingProposals.add(afp);
+            allFundingProposals.add(afp);
             institutionalProposal.add(afp);
         }
     }
@@ -1442,6 +1450,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         awardCgbList = new ArrayList<>();
 
         fundingProposals = new ArrayList<AwardFundingProposal>();
+        allFundingProposals = new ArrayList<AwardFundingProposal>();
         initializeAwardHierarchyTempObjects();
 
         syncChanges = new ArrayList<AwardSyncChange>();
@@ -2673,6 +2682,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
     @Override
     public void setUpdateTimestamp(Timestamp updateTimestamp) {
+
         if (isAllowUpdateTimestampToBeReset()) {
             super.setUpdateTimestamp(updateTimestamp);
         } else {
@@ -2683,7 +2693,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     public List<Award> getAwardVersions() {
         Map<String, String> fieldValues = new HashMap<String,String>();
         fieldValues.put("awardNumber", getAwardNumber());
-        BusinessObjectService businessObjectService =  KcServiceLocator.getService(BusinessObjectService.class);
+        BusinessObjectService businessObjectService = KcServiceLocator.getService(BusinessObjectService.class);
         List<Award> awards = (List<Award>)businessObjectService.findMatchingOrderBy(Award.class, fieldValues, "sequenceNumber", true);   
         return awards;
     }
@@ -2720,7 +2730,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
  
     public List<TimeAndMoneyDocumentHistory>getTimeAndMoneyDocumentHistoryList() throws WorkflowException {  
-        List<TimeAndMoneyDocument> tnmDocs = getTimeAndMoneyHistoryService().buildTimeAndMoneyListForAwardDisplay(this);
+        List<TimeAndMoneyDocument> tnmDocs = getTimeAndMoneyHistoryService().buildTimeAndMoneyListForAwardDisplay(this, true);
         List<TimeAndMoneyDocumentHistory> timeAndMoneyHistoryList = 
             getTimeAndMoneyHistoryService().getDocHistoryAndValidInfosAssociatedWithAwardVersion(tnmDocs,getAwardAmountInfos(), this);
         return timeAndMoneyHistoryList;
@@ -2836,5 +2846,11 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
 	public void setAllFundingProposals(List<AwardFundingProposal> allFundingProposals) {
 		this.allFundingProposals = allFundingProposals;
+	}
+
+	public List<AwardFundingProposal> getAllFundingProposalsSortedBySequence() {
+		return getAllFundingProposals().stream()
+				.sorted(Comparator.comparing(AwardFundingProposal::getAwardSequenceNumber))
+				.collect(Collectors.toList());
 	}
 }

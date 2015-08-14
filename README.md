@@ -5,7 +5,7 @@ Kuali Coeus (KC) for Research Administration is a comprehensive system to manage
 ----------
 ##**Installation**
 **Prerequisites**
-[Maven 3.2.x][1]
+[Maven 3.3.x][1]
 [Java 1.8.x][2]
 [Tomcat 7.x][3]
 [MySQL 5.6.x][4]
@@ -60,6 +60,14 @@ When a project specific profile is available, it will be documented in the build
 > **Error Prone:** When building Kuali Coeus Projects you can turn the error-prone profile on as it is off by default.  This will turn on the strict error prone compiler and fail the compile step if certain source code errors are detected. 
 > 
 *mvn clean install -Perror-prone*
+
+> **Dev Profile:**When developing with KC there are some features that are useful only for development purposes. In order to enable these features you should enable the dev profile. Currently the dev profile only provides the p6spy dependency. See the section below on Configuration for how to use this feature.
+>
+*mvn clean install -Pdev*
+
+> **Node Clean:**When building our api documentation, our build process will download node.js and various node dependencies.  By default, these artifacts are deleted on every mvn clean execution.  You can avoid this clean step by sending the following system parameter clean-jsfrontend-node.off on the command line.  This is useful to speed up project builds by avoiding the installation node.js on subsequent clean install iterations. 
+>
+*mvn clean install -Pdev*
 
 All Kuali Coeus projects use standard maven conventions to build and install artifacts.  The following documents how to install source, javadoc, and primary artifacts for each maven projects.
 
@@ -175,6 +183,12 @@ This section contains some useful information about configuring the Kuali Coeus 
 > **Monitoring** The kc.monitoring.enabled config param turns Monitoring on or off.  Monitoring is done through Java Melody and is great for learning about the runtime characteristics of the Kuali Coeus Application.  Java Melody has low overhead and in general can be left on.
 ```
 <param name="kc.monitoring.enabled">false</param>
+```
+
+> **P6Spy** P6Spy can be a useful tool during development that will allow you to view sql statements that are generated and executed against the database in real time. In order to use it in KC you will need to enable the dev profile mentioned above as well as reconfigure your database connection string and driver similar to the below sample. All other kc-config.xml options should remain the same. Additionally you will need to configure the spy.properties file found in *coeus-webapp/src/main/resources/* to specify the correct original driver and potentially the appender method if StdOut is not sufficient.
+```
+<param name="datasource.url">jdbc:p6spy:mysql://localhost:3306/kcdev</param>
+<param name="datasource.driver.name">com.p6spy.engine.spy.P6SpyDriver</param>
 ```
 
   [1]: http://maven.apache.org/download.cgi
