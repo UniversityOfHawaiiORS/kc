@@ -6,7 +6,7 @@
 #VX_oracle_kc_upgrade.sql
 
 CHECK_JAVA=`which java`
-if [ "${CHECK_JAVA}" != "/cygdrive/c/Program Files/Java/jdk1.8.0_45/bin/java" ]
+if [ "${CHECK_JAVA}" != "/cygdrive/c/Program Files/Java/jdk1.8.0_51/bin/java" ]
 then
     echo "Java 8 not detected....exiting"
     exit
@@ -27,7 +27,7 @@ getAnswer() {
         echo 1>&2
         }
 
-if [ -f ../../../../../../../../../../../coeus-db-data-conv/ojdbc6-11.2.0.3.jar ]
+if [ -f ../../../../../../../../../../../coeus-db-data-conv/ojdbc7-12.1.0.2.jar ]
 then
     echo "found ojdbc file proceeding"
 else
@@ -134,8 +134,9 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_upgrade.sql
 
-#Update to 1507 (Note this was released with 1506 release.....may change in 1507 version
+#Update to 1507 
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1507_oracle_kc_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1507_oracle_kc_upgrade.sql
 
 
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
