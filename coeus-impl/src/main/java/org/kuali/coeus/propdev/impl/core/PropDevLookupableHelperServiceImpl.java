@@ -139,13 +139,14 @@ public class PropDevLookupableHelperServiceImpl extends LookupableImpl implement
             proposalNumberWildcarded = true;
         }
 
+        String initiator = new String("");
         List<String> documentNumbers = new ArrayList<>();
         // If a specific proposal is not targeted by the proposal primary key, collect the document numbers of any
         // proposal documents which are associated with the various search person search fields and intersect them
         if (StringUtils.isEmpty(proposalNumberCriteria) || proposalNumberWildcarded) {
             String principalInvestigatorName = adjustedSearchCriteria.get(PRINCIPAL_INVESTIGATOR_NAME);
             String proposalPerson = adjustedSearchCriteria.get(PROPOSAL_PERSON);
-            String initiator = adjustedSearchCriteria.get(INITIATOR);
+            initiator = adjustedSearchCriteria.get(INITIATOR);
             String participant = adjustedSearchCriteria.get(PARTICIPANT);
             String aggregator = adjustedSearchCriteria.get(AGGREGATOR);
 
@@ -192,7 +193,11 @@ public class PropDevLookupableHelperServiceImpl extends LookupableImpl implement
         if (CollectionUtils.isNotEmpty(proposals) && proposals.size() > SMALL_NUMBER_OF_RESULTS) {
             //if the proposal result list is more than a few proposals then attempt to figure out if a principal
             //has access to all proposals
-            doNotFilter = canAccessAllProposals();
+            if (StringUtils.isNotEmpty(initiator) && initiator.equals(getGlobalVariableService().getUserSession().getPrincipalName())) {
+                doNotFilter = true;
+            } else {
+                doNotFilter = canAccessAllProposals();
+            }
         }
 
         return doNotFilter ? proposals : filterPermissions(proposals);
