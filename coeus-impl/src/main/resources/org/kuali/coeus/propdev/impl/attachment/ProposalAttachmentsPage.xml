@@ -428,6 +428,7 @@
     <bean id="PropDev-AttachmentsPage-InternalSection-parentBean"
           abstract="true" parent="Uif-VerticalBoxSection" p:header.headerText="Internal (&lt;span class='internalAttachmentCount'&gt;@{document.developmentProposal.instituteAttachments.size()}&lt;/span&gt;)"
           p:fieldBindingObjectPath="document.developmentProposal">
+        <property name="id" value="PropDev-AttachmentsPage-InternalSection"></property>
         <property name="items">
             <list>
                <bean parent="PropDev-AttachmentPage-InternalAttachmentButtons" p:order="10"/>

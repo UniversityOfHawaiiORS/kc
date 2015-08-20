@@ -16,15 +16,19 @@
 package edu.hawaii.proposaldevelopment.rules;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract;
+import org.kuali.coeus.propdev.impl.attachment.Narrative;
+import org.kuali.coeus.propdev.impl.attachment.NarrativeType;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentRule;
 import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants;
 import org.kuali.coeus.propdev.impl.location.ProposalSite;
 import org.kuali.coeus.propdev.impl.location.SaveProposalSitesEvent;
+import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.rice.krad.document.Document;
@@ -100,11 +104,23 @@ public class UhProposalDevelopmentDocumentRule extends
 		}
 		//UH KC-515 END
 
+		// KC-966 Add FCOI Validation rule
+		Boolean warningSetForFCOI = false;
+		List<ProposalPerson> persons = developmentProposal.getProposalPersons();
+		for (Iterator<ProposalPerson> pIter = persons.iterator(); pIter.hasNext();) {
+			ProposalPerson p = pIter.next();
+			if (! warningSetForFCOI
+					&& ! p.isEmployee()
+					&& ! hasFCOIDisclosure(developmentProposal) ) {
+				warningSetForFCOI = true;
+				getAuditErrors(ATTACHMENT_INTERNAL_LOCATION, AUDIT_WARNINGS).add(new AuditError(ATTACHMENT_PAGE_ID, UhKeyConstants.WARNING_NON_EMPLOYEE_FCOI_REQUIRED, ATTACHMENT_PAGE_ID + "." + ATTACHMENT_INTERNAL_SECTION_ID));
+			}
+		}
+		// KC-966 END
 
 		// KC-952 Project Performance Site Improvements
 		// We removed the default primary performance site but want to make sure user selects one
-        DevelopmentProposal dp = proposalDevelopmentDocument.getDevelopmentProposal();
-        ProposalSite po = dp.getPerformingOrganization();
+        ProposalSite po = developmentProposal.getPerformingOrganization();
         if (po == null || po.getOrganizationId() == null) {
             List<AuditError> errors = new ArrayList<AuditError>();
             errors.add(new AuditError(AUDIT_ERROR_KEY, UhKeyConstants.ERROR_PROPOSAL_SITES_PRIMARY_REQUIRED, ORGANIZATION_PAGE_ID + "." + PERFORMING_ORGANIZATION_SECTION_ID));
@@ -134,6 +150,42 @@ public class UhProposalDevelopmentDocumentRule extends
 
 		return valid;
 	}
+
+	// KC-966 Add FCOI Validation rule
+	private boolean hasFCOIDisclosure(DevelopmentProposal developmentProposal) {
+
+		List<Narrative> attachments = developmentProposal.getInstituteAttachments();
+		for (Narrative attachment : attachments) {
+			NarrativeType nt = attachment.getNarrativeType();
+			if (nt != null
+					&& nt.getDescription().equals("FCOI Disclosure")) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private List<AuditError> getAuditErrors(String errorGroupName, String severity) {
+		List<AuditError> errorsOrWarnings = new ArrayList<AuditError>();
+
+		if (!GlobalVariables.getAuditErrorMap().containsKey(errorGroupName)) {
+			GlobalVariables.getAuditErrorMap().put(errorGroupName, new AuditCluster(errorGroupName, errorsOrWarnings, severity));
+		}
+		else {
+			errorsOrWarnings = GlobalVariables.getAuditErrorMap().get(errorGroupName).getAuditErrorList();
+		}
+		return errorsOrWarnings;
+	}
+	// KC-966 END
+
+
+
 }
+
+
+
+
+
 
 

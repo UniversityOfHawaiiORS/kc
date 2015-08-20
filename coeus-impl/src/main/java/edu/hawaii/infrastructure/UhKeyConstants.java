@@ -6,6 +6,8 @@ package edu.hawaii.infrastructure;
 public final class UhKeyConstants {
     
     public static final String ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_MISSING = "error.document.abstract.projectSummary.missing";
+    // KC-966 Add FCOI Validation rule
+    public static final String WARNING_NON_EMPLOYEE_FCOI_REQUIRED = "warning.nonemployee.fcoi_attachment";
     //KC-306 - Primary performance site is not set as a default so it must be a required field now.
     // KC-952 Project Performance Site Improvements
     public static final String ERROR_PROPOSAL_SITES_PRIMARY_REQUIRED = "error.required.primaryPerformanceSite";
