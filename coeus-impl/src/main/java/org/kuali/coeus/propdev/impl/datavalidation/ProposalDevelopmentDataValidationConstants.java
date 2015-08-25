@@ -100,6 +100,9 @@ public final class ProposalDevelopmentDataValidationConstants {
     public static final String KEY_PERSONNEL = "keyPersonnel";
     public static final String PROPOSAL_ORGANIZATION_LOCATION = "Proposal.Organization and Location";
 
+    // KC-966 Add FCOI Validation rule
+    public static final String ATTACHMENT_INTERNAL_LOCATION = "Attachments.Internal";
+
     private ProposalDevelopmentDataValidationConstants() {
         throw new UnsupportedOperationException("do not call");
     }
