@@ -768,6 +768,13 @@ public class Budget extends AbstractBudget implements BudgetContract {
     }
 
     public void addBudgetPerson(BudgetPerson budgetPerson) {
+
+        // KC-988 STE When assigning Personnel to Budget
+        if (budgetPerson.getJobCode() == null) {
+            budgetPerson.setJobCode("AA000");
+        }
+        // KC-988 END
+
         getBudgetPersons().add(budgetPerson);
         budgetPerson.setBudget(this);
     }
