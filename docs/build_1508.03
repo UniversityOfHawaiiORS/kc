@@ -20,7 +20,7 @@ schemaspy
     run build.sh
 
 rice
-    checkout uh-rice-2.5.3 (Ron needs to merge uh-rice-2.5.3.1507.17 to this branch first and push)
+    checkout uh-rice-2.5.3
     run build.sh
 
 kc-api
@@ -28,12 +28,12 @@ kc-api
     run build.sh
 
 kc-s2sgen
-    checkout uh-modifications (Ron needs to merge uh-modifications-1507.2 and push first)
+    checkout uh-modifications
     run build.sh
 
 
 kc
-    checkout uh-modifications (Ron needs to merge uh-modifications-1508.3 here first)
+    checkout uh-modifications
     run build.sh
 
 Command line build now fails in cygwin because of new requirement.  We need c, python and npm installed.  (Actually the build installs npm each time.)
