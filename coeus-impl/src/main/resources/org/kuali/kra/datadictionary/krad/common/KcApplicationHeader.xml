@@ -958,7 +958,7 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         <list>
                             <bean parent="Uif-Message" p:messageText="Proposal Log" p:order="10" />
                             <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
-                                  p:iconClass="icon-plus" p:order="20">
+                                  p:iconClass="icon-plus" p:order="20" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
                                 <property name="actionUrl.requestParameters">
                                     <map>
                                         <entry key="href"
@@ -984,7 +984,7 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         <list>
                             <bean parent="Uif-Message" p:messageText="Institutional Proposal" p:order="10" />
                             <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
-                                  p:iconClass="icon-plus" p:order="20">
+                                  p:iconClass="icon-plus" p:order="20" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
                                 <property name="actionUrl.requestParameters">
                                     <map>
                                         <entry key="href"
