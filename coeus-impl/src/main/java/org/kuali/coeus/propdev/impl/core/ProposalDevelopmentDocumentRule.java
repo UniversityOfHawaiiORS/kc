@@ -177,6 +177,8 @@ public class ProposalDevelopmentDocumentRule extends KcTransactionalDocumentRule
             valid &= processCustomDataRule(proposalDevelopmentDocument);
             valid &= processAttachmentRules(proposalDevelopmentDocument);
             valid &= processSaveSpecialReviewRule(proposalDevelopmentDocument);
+            // KC-1219 If you add someone that does not have a unit, then turn on data validation, you can no longer navigate around the proposal
+            valid &= processSaveKeyPersonBusinessRules(proposalDevelopmentDocument);
             GlobalVariables.getMessageMap().removeFromErrorPath("document.developmentProposal");
         }
 
