@@ -117,6 +117,11 @@ public class DevelopmentProposal extends KcPersistableBusinessObjectBase impleme
     @Column(name = "PROPOSAL_NUMBER")
     private String proposalNumber;
 
+    // KC-1179 Sort All my proposals with most recent first
+    @Column(name = "LPAD(PROPOSAL_NUMBER, 6, '0')", insertable = false, updatable = false)
+    private String proposalNumberPadded;
+    // KC-1179 END
+
     @Column(name = "PROPOSAL_TYPE_CODE")
     private String proposalTypeCode;
 
@@ -697,6 +702,9 @@ public class DevelopmentProposal extends KcPersistableBusinessObjectBase impleme
     public void setProposalNumber(String proposalNumber) {
         this.proposalNumber = proposalNumber;
     }
+
+    // KC-1179 Sort All my proposals with most recent first
+    public String getProposalNumberPadded() { return proposalNumberPadded; }
 
     @Override
     public String getCurrentAwardNumber() {

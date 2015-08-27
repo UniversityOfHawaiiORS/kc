@@ -1183,9 +1183,10 @@
   <bean id="DevelopmentProposal-LookupView-parentBean" abstract="true" parent="Uif-LookupView" p:viewHelperService="#{#getService('propDevLookupableHelperService')}">
     <property name="dataObjectClassName" value="org.kuali.coeus.propdev.impl.core.DevelopmentProposal"/>
     <property name="headerText" value="Development Proposal Lookup"/>
+	<property name="defaultSortAscending" value="false"/>
     <property name="defaultSortAttributeNames">
       <list>
-        <value>proposalNumber</value>
+        <value>proposalNumberPadded</value>
       </list>
     </property>
     <property name="criteriaFields">
@@ -1288,8 +1289,10 @@
     </property>
     <property name="resultFields">
       <list>
-        <bean p:propertyName="proposalNumber" parent="Uif-DataField"/>
-        <bean p:propertyName="proposalDocument.documentNumber" parent="Uif-DataField"/> 
+	    <!-- KC-1179 Sort All my proposals with most recent first -->
+		<bean p:propertyName="proposalNumberPadded" p:label="Proposal Number" parent="Uif-DataField"/>
+		<!-- KC-1179 END -->
+        <bean p:propertyName="proposalDocument.documentNumber" parent="Uif-DataField"/>
         <bean p:propertyName="proposalType.description" parent="Uif-DataField">
           <property name="inquiry">
                        <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.type.ProposalType"
