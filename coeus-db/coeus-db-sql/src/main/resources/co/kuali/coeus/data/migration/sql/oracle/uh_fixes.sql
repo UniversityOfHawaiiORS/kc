@@ -94,5 +94,10 @@ set val = 'N' where PARM_NM = 'KEY_PERSON_CERTIFICATION_SELF_CERTIFY_ONLY';
 insert into narrative_type (narrative_type_code, description, system_generated, allow_multiple, narrative_type_group, update_timestamp, update_user, ver_nbr, obj_id)
 values ('996', 'FCOI Disclosure', 'N', 'Y', 'O', sysdate, user, 1, sys_guid());
 
+-- KC-988 STE When assigning Personnel to Budget
+update KRCR_PARM_T
+set val = 'AA000' where PARM_NM = 'budgetPersonDefaultJobCode';
+-- KC-988 End
+
 
 commit;
