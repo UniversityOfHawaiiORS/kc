@@ -36,6 +36,10 @@
 
     <bean id="btmConfig" factory-method="getConfiguration" class="bitronix.tm.TransactionManagerServices" lazy-init="true">
         <property name="serverId" value="#{T(org.apache.commons.lang3.RandomStringUtils).randomAlphanumeric(20)}_TM_KC"/>
+        <!-- KC-1228 After 1507 upgrade (1508.3) two instances in one tomcat jvm doesn't work -->
+        <property name="logPart1Filename" value="${datasource.tm.logdir}/btm1.tlog"/>
+        <property name="logPart2Filename" value="${datasource.tm.logdir}/btm2.tlog"/>
+        <!-- KC-1228 END-->
     </bean>
 
     <bean id="transactionManagerBitronix" class="bitronix.tm.TransactionManagerServices"
