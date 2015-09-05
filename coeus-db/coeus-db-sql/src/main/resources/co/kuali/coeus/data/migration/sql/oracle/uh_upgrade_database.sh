@@ -144,3 +144,21 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
 echo "Done Grepping for errors in the logs"
 mv *.log ${LOGDIR}
 grep -i error ${LOGDIR}/*.log
+
+while [ "${ans3}" != "y" ] && [ "${ans3}" != "n" ]
+do
+    read -p "Next Step Run Database Conversion Process Part 2 Continue ? (y/n)" ans3
+done
+
+if [ "${ans3}" == "n" ]
+then
+    exit 1
+fi
+
+cd ../../../../../../../../../../../coeus-db-data-conv
+./runDataConvPart2.sh -u ${un} -p ${pw} -l ${LOGDIR} -n ${PORT} -s ${DBSvrNm}
+
+cd ${CURRENT_DIR}
+
+echo "Grepping for errors in the logs"
+grep -i error  ${LOGDIR}/*TimeAndMoney.log
