@@ -16,6 +16,8 @@ OPTIONS:
         -u db_userid
         -p db_password
         -l logdir
+        -s database sid
+        -n database port
 HERE
 }
 
