@@ -23,7 +23,8 @@ public class TimeAndMoneyDocumentStatusDaoImpl implements
 	private static final String PENDING_STATUS = "PENDING";
 	private static final String CANCELED_STATUS = "CANCELED";
 	private static final String ACTIVE_STATUS = "ACTIVE";
-	private static final String MAX_ACTIVE_DOCUMENT_QUERY = "select max(DOCUMENT_NUMBER) from TIME_AND_MONEY_DOCUMENT where TIME_AND_MONEY_DOC_STATUS = '" +
+	// KC-1243 TM doc - shell line (00001) does not reflect updated end date and total $ amount
+	private static final String MAX_ACTIVE_DOCUMENT_QUERY = "select to_char(max(to_number(document_number))) from TIME_AND_MONEY_DOCUMENT where TIME_AND_MONEY_DOC_STATUS = '" +
 			ARCHIVED_STATUS + "' group by AWARD_NUMBER";
 	private static final String UPDATE_ACTIVE_TIME_AND_MONEY_DOC_STATUS = "update TIME_AND_MONEY_DOCUMENT doc set TIME_AND_MONEY_DOC_STATUS = '"
 			+ ACTIVE_STATUS + "' where DOCUMENT_NUMBER = ?";
