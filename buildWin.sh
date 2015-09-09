@@ -7,13 +7,16 @@ Build
 OPTIONS:
         -h show this message
         -f faster - don't pre-compile jsp for tomcat
+        -n build node js (needed for first time, or after 'mvn clean" or if node.js is updated)
+        -r reject if modifed (check if non-commited code exists, to be used for automated build)
 HERE
 }
 
 
 PRE_COMPILE=-Pprecompile-jsp-tomcat-7
+PREVENT_NODE_JS_BUILD=-Dclean-jsfrontend-node.off=true
 REJECT_IF_MODIFIED=N
-while getopts "hfr" OPTION
+while getopts "hfrn" OPTION
 do
         case $OPTION in
                 h) usage
@@ -24,6 +27,9 @@ do
                    ;;
                 r)
                    REJECT_IF_MODIFIED=Y
+                   ;;
+                n)
+                   PREVENT_NODE_JS_BUILD=
                    ;;
                 ?)
                    usage
@@ -65,7 +71,7 @@ fi
 echo ${git_revision} > last_build.sha1
 
 
-cmd /C build.bat mvn -Denvironment=mygrant -Dbuild.version=${build_version} -Dmaven.test.skip=true ${PRE_COMPILE} clean install
+cmd /C build.bat mvn ${PREVENT_NODE_JS_BUILD} -Denvironment=mygrant -Dbuild.version=${build_version} -Dmaven.test.skip=true ${PRE_COMPILE} clean install
 
 
 if [ "${last_revision}" != "" ] 
