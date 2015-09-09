@@ -27,7 +27,8 @@ end;
 DECLARE max_id NUMBER;
 
 BEGIN
-SELECT max(question_id)+1 into max_id from question;
+-- UH modification we added questions in the 9xxxxx range so we need to set sequence to max below this range
+SELECT max(question_id)+1 into max_id from question where question_id < 900000;
 execute immediate 'CREATE SEQUENCE SEQ_QUESTION_ID INCREMENT BY 1 START WITH '||max_Id||' NOMAXVALUE NOCYCLE NOCACHE ORDER';
 end;
 /
