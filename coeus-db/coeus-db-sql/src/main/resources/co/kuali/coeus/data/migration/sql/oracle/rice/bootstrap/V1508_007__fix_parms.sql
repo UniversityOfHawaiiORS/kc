@@ -33,4 +33,5 @@ insert into krcr_cmpnt_t (NMSPC_CD, CMPNT_CD, NM, ACTV_IND, OBJ_ID, VER_NBR) VAL
 insert into krcr_cmpnt_t (NMSPC_CD, CMPNT_CD, NM, ACTV_IND, OBJ_ID, VER_NBR) VALUES ('KC-COMMITTEE', 'Document', 'Document', 'Y', SYS_GUID(), 1);
 insert into krcr_cmpnt_t (NMSPC_CD, CMPNT_CD, NM, ACTV_IND, OBJ_ID, VER_NBR) VALUES ('KC-UNT', 'Document', 'Document', 'Y', SYS_GUID(), 1);
 insert into krcr_cmpnt_t (NMSPC_CD, CMPNT_CD, NM, ACTV_IND, OBJ_ID, VER_NBR) VALUES ('KC-QUESTIONNAIRE', 'Document', 'Document', 'Y', SYS_GUID(), 1);
-insert into krcr_cmpnt_t (NMSPC_CD, CMPNT_CD, NM, ACTV_IND, OBJ_ID, VER_NBR) VALUES ('KR-IDM', 'PersonDocumentName', 'PersonDocumentName', 'Y', SYS_GUID(), 1);
+-- UH Fix this indert fails with a diplicate Error
+--insert into krcr_cmpnt_t (NMSPC_CD, CMPNT_CD, NM, ACTV_IND, OBJ_ID, VER_NBR) VALUES ('KR-IDM', 'PersonDocumentName', 'PersonDocumentName', 'Y', SYS_GUID(), 1);
