@@ -146,6 +146,7 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1508_oracle_kc_upgrade.sql
 
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < COSKeywords.sql
 
     echo "Done Grepping for errors in the logs"
     mv *.log ${LOGDIR}
