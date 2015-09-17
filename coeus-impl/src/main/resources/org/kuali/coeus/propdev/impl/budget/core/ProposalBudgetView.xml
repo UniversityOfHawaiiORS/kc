@@ -84,9 +84,11 @@
 		parent="Uif-MenuNavigationGroup" p:defaultItemIconClass="">
 		<property name="items">
 			<list>
+				<!-- KC-1235 Make return to proposal from budget more intuitive
 				<bean id="PropBudget-Menu-ReturnToProposal" parent="Uif-SecondaryActionButton-Mini"
                       p:performClientSideValidation="true"
                       p:methodToCall="openProposal" p:actionLabel="« Return to proposal"/>
+                      -->
 				<bean parent="PropBudget-NavigationMenu-PeriodsAndTotals" p:order="10" />
 				<bean parent="PropBudget-NavigationMenu-Rates" p:order="20" p:render="@{!budget.developmentProposal.isParent()}"/>
 				<bean parent="PropBudget-NavigationMenu-PersonnelCosts" p:order="30" />
@@ -126,13 +128,13 @@
 	<bean id="PropBudget-NavigationMenu-NonPersonnelCosts-parentBean" abstract="true"
 		parent="Kc-MenuAction" p:navigateToPageId="PropBudget-NonPersonnelCostsPage"
 		p:actionLabel="Non-Personnel Costs" p:iconClass="icon-file" />
-		
+
 	<bean id="PropBudget-NavigationMenu-SinglePointEntry" parent="PropBudget-NavigationMenu-SinglePointEntry-parentBean" />
 	<bean id="PropBudget-NavigationMenu-SinglePointEntry-parentBean" abstract="true"
 		parent="Kc-MenuAction" p:navigateToPageId="PropBudget-SinglePointEntryPage"
 		p:actionLabel="Single Point Entry" p:iconClass="icon-bell2" />
-		
-		
+
+
 	<bean id="PropBudget-NavigationMenu-Subawards" parent="PropBudget-NavigationMenu-Subawards-parentBean" />
 	<bean id="PropBudget-NavigationMenu-Subawards-parentBean" abstract="true"
 		parent="Kc-MenuAction" p:navigateToPageId="PropBudget-SubawardsPage"
@@ -148,7 +150,7 @@
 					p:actionLabel="Unrecovered F &amp; A" p:order="20" />
 			</list>
 		</property>
-	</bean>      
+	</bean>
 	<bean id="PropBudget-NavigationMenu-ProjectIncome" parent="PropBudget-NavigationMenu-ProjectIncome-parentBean" />
 	<bean id="PropBudget-NavigationMenu-ProjectIncome-parentBean"
 		abstract="true" parent="Kc-MenuAction" p:navigateToPageId="PropBudget-ProjectIncomePage"
@@ -209,9 +211,9 @@
                         </bean>
 						<bean parent="Uif-ActionLink" p:actionScript="showDialog('PropBudget-BudgetSettings-Dialog');"
 							p:actionLabel="Budget Settings" p:iconClass="icon-cog" p:order="20" />
-						<bean parent="Uif-ActionLink" p:actionLabel="Hierarchy @{budget.developmentProposal.isChild() ? '(C)' : budget.developmentProposal.isParent() ? '(P)' : ''}" 
+						<bean parent="Uif-ActionLink" p:actionLabel="Hierarchy @{budget.developmentProposal.isChild() ? '(C)' : budget.developmentProposal.isParent() ? '(P)' : ''}"
 							p:render="@{(#parent.readOnly and budget.developmentProposal.inHierarchy) or not #parent.readOnly}"
-							p:iconClass="icon-list-ol" p:order="30"  p:actionScript="showDialog('PropBudget-HierachySection');" />							
+							p:iconClass="icon-list-ol" p:order="30"  p:actionScript="showDialog('PropBudget-HierachySection');" />
 						<bean parent="Uif-ActionLink" p:actionLabel="Summary" p:methodToCall="populateBudgetSummary" p:additionalSubmitData="budgetId:@{budget.budgetId}"
 							p:iconClass="icon-eye" p:order="40" />
 						<bean parent="Uif-ActionLink" p:actionLabel="Budget Versions" p:actionScript="showDialog('PropBudget-BudgetVersions-Dialog');"
@@ -262,7 +264,7 @@
 			</bean>
 		</property>
 	</bean>
-	
+
 	<bean id="PropBudget-UnderDevelopmentPage" parent="PropBudget-UnderDevelopmentPage-parentBean" />
 	<bean id="PropBudget-UnderDevelopmentPage-parentBean" abstract="true"
 		parent="Uif-DocumentPage">
@@ -278,7 +280,7 @@
 			<null />
 		</property>
 	</bean>
-	
+
 	<bean id="PropBudget-BudgetVersions-Dialog" parent="PropBudget-BudgetVersions-Dialog-parentBean"/>
 	<bean id="PropBudget-BudgetVersions-Dialog-parentBean" abstract="true" parent="Uif-DialogGroup"
 		p:dialogCssClass="modal-lg" p:headerText="Budgets">
@@ -293,7 +295,7 @@
 			</list>
 		</property>
 	</bean>
-	
+
 	<bean id="PropBudget-BudgetVersions-Collection" parent="PropBudget-BudgetVersions-Collection-parentBean"/>
 	<bean id="PropBudget-BudgetVersions-Collection-parentBean" abstract="true" parent="PropDev-BudgetVersions-GenericCollection"
 		p:propertyName="budget.budgetParent.budgets" p:headerText="" p:readOnly="@{#parent.readOnly}">
@@ -303,7 +305,7 @@
            </map>
 		</property>
 	</bean>
-	
+
 	<bean id="PropBudget-ActivityTypeChanged-Dialog" parent="PropBudget-ActivityTypeChanged-Dialog-parentBean"/>
 	<bean id="PropBudget-ActivityTypeChanged-Dialog-parentBean" abstract="true" parent="PropBudget-PromptToSyncRates-Dialog"
 		p:promptText="The Activity Type has been changed. Do you want to sync budget rates?"/>
@@ -313,7 +315,7 @@
 	<bean id="PropBudget-PromptToSyncRates-Dialog" abstract="true" parent="PropBudget-PromptToSyncRates-Dialog-parentBean"/>
 	<bean id="PropBudget-PromptToSyncRates-Dialog-parentBean" abstract="true" parent="Uif-DialogGroup"
 		p:headerText="Sync Budget Rates?"
-		p:dialogCssClass="modal-sm">	
+		p:dialogCssClass="modal-sm">
 		<property name="footer.items">
       		<list>
 				<bean parent="Uif-DialogDismissButton" p:actionLabel="No" p:order="10"/>

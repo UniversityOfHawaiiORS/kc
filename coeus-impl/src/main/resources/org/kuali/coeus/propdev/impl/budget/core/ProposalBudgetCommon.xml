@@ -51,7 +51,11 @@
 					p:actionLabel="Complete Budget" p:render="@{#view.editModes.containsKey(T(org.kuali.coeus.propdev.impl.budget.core.ProposalBudgetConstants.AuthConstants).CHANGE_COMPLETE_STATUS) and !budget.isBudgetComplete() and !#parent.readOnly}"
 					p:order="40" />
                 <bean parent="Uif-SecondaryActionButton" p:performClientSideValidation="true"
+                      p:methodToCall="openProposal" p:actionLabel="Return to Proposal" p:order="50" />
+                <!-- KC-1235 Make return to proposal from budget more intuitive
+                <bean parent="Uif-SecondaryActionButton" p:performClientSideValidation="true"
                       p:methodToCall="closeBudget" p:actionLabel="Close" p:order="50" />
+                      -->
 			</list>
 		</property>
 	</bean>
