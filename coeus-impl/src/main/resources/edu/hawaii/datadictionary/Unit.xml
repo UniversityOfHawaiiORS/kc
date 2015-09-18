@@ -67,7 +67,11 @@
         <property name="headerText" value="Unit Lookup"/>
         <property name="criteriaFields">
             <list>
-                <bean p:propertyName="unitSearchInput" parent="Uif-LookupCriteriaInputField"/>
+                <bean p:propertyName="unitSearchInput" parent="Uif-LookupCriteriaInputField">
+                    <!-- KC-1127 If a blank SOLR search is executed, the system returns a STE -->
+                    <property name="required" value="true" />
+                    <!-- KC-1127 END -->
+                </bean>
             </list>
         </property>
         <!-- KC-1212 Improve Unit search results in 6.0 -->

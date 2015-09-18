@@ -52,7 +52,11 @@
         <property name="headerText" value="Organization Lookup"/>
         <property name="criteriaFields">
             <list>
-                <bean p:propertyName="organizationSearchInput" parent="Uif-LookupCriteriaInputField"/>
+                <bean p:propertyName="organizationSearchInput" parent="Uif-LookupCriteriaInputField">
+                    <!-- KC-1127 If a blank SOLR search is executed, the system returns a STE -->
+                    <property name="required" value="true" />
+                    <!-- KC-1127 END -->
+                </bean>
             </list>
         </property>
     </bean>
