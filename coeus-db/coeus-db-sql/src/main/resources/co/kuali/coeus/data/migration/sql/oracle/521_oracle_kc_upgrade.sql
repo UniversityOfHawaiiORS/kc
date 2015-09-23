@@ -55,7 +55,11 @@ spool 521_oracle_kc_upgrade.sql.log
 @./kc/bootstrap/V521_051__KC_DML_01_KRACOEUS-7040_B000.sql
 @./kc/bootstrap/V521_052__KC_DML_01_KRACOEUS-7042_B000.sql
 @./kc/bootstrap/V521_053__KC_DML_01_KRACOEUS-7072_B000.sql
-@./kc/bootstrap/V521_054__KC_DML_01_KRACOEUS-7158_B000.sql
+-- KC-1249 Unable to copy a PD record
+-- This script deletes s2s question to replace with new question and sub question
+-- this creates issues becuase we have proposals with old question
+-- this question should be modified using GUI so the questionnaire will version
+--  @./kc/bootstrap/V521_054__KC_DML_01_KRACOEUS-7158_B000.sql
 @./kc/bootstrap/V521_055__KC_DML_01_KRACOEUS-7172_B000.sql
 @./kc/bootstrap/V521_056__KC_DML_01_KRACOEUS-7206_B000.sql
 @./kc/bootstrap/V521_057__KC_DML_01_KRACOEUS-7223_B000.sql
