@@ -104,12 +104,16 @@ public class ProposalDevelopmentKeyPersonsRule extends KcTransactionalDocumentRu
         personIndex=0;
         for (ProposalPerson person : document.getDevelopmentProposal().getProposalPersons()) {
 
-            if(person.isCoInvestigator() && (person.getUnits() != null) && (person.getUnits().size()==0)){
+            // KC-956 Key Person Certification Questions show up for non-employees
+            //        Note: Here we are fixing the "Unit" required for non-employees mentioned in same JIRA as Cert Required
+            if(person.isCoInvestigator() && person.isEmployee() && (person.getUnits() != null) && (person.getUnits().size()==0)){
                 reportError("newProposalPersonUnit[" + personIndex + "].unitNumber",
                             ERROR_ONE_UNIT, person.getFullName());            
                 retval = false;
             }
-            if(person.isKeyPerson() && person.getOptInUnitStatus() && (person.getUnits()!= null) && (person.getUnits().size() ==0)){
+            // KC-956 Key Person Certification Questions show up for non-employees
+            //        Note: Here we are fixing the "Unit" required for non-employees mentioned in same JIRA as Cert Required
+            if(person.isKeyPerson() && person.isEmployee() && person.getOptInUnitStatus() && (person.getUnits()!= null) && (person.getUnits().size() ==0)){
                 reportError("newProposalPersonUnit[" + personIndex + "].unitNumber",
                             ERROR_ONE_UNIT, person.getFullName());  
                 retval = false;

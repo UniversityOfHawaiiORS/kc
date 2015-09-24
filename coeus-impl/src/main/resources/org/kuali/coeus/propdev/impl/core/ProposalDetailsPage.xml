@@ -87,10 +87,12 @@
 				</property>
 			</bean>
 		</property>
+		<!-- KC-1259 Keyword dropdown isn't sorted -->
 		<property name="optionsFinder">
 			<bean
-				class="org.kuali.rice.krad.keyvalues.PersistableBusinessObjectValuesFinder" 
+				class="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
 				p:businessObjectClass="org.kuali.coeus.common.framework.keyword.ScienceKeyword"
+				p:includeSelectRow="false"
 				p:keyAttributeName="code"
 				p:labelAttributeName="description"/>
 		</property>

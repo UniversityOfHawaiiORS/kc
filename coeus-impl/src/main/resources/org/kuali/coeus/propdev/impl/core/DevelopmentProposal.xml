@@ -1218,6 +1218,7 @@
 						p:inquiryParameters="principalInvestigatorName:principalName"/>
 			  </property>
 		</bean>
+		  <!-- KC-1106 Remove fields from Development Proposal Lookup
 		  <bean p:propertyName="aggregator" parent="Uif-LookupCriteriaInputField" p:fieldLabel.labelText="Aggregator">
 			  <property name="quickfinder">
 				  <bean parent="Uif-QuickFinderByScript"
@@ -1240,6 +1241,7 @@
 						p:inquiryParameters="participant:principalName"/>
 			  </property>
 		  </bean>
+		  -->
 		  <bean p:propertyName="initiator" parent="Uif-LookupCriteriaInputField"
 				p:fieldLabel.labelText="Initiator Username">
 			  <property name="quickfinder">

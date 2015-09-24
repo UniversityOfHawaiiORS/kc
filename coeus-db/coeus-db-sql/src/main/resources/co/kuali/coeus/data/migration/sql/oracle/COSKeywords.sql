@@ -3,8 +3,6 @@ set escape on
 set sqlblanklines on
 spool COSKeywords.log
 
-drop sequence uh_science_keyword_code_s;
-
 create sequence uh_science_keyword_code_s minvalue 10000;
 
 delete from science_keyword;

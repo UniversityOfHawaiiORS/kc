@@ -111,7 +111,8 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
         boolean retval = true;
         int count = 0;
         for (ProposalPerson person : document.getDevelopmentProposal().getProposalPersons()) {
-            if (hasCertification(person) && !validKeyPersonCertification(person)) {
+            // KC-956 Key Person Certification Questions show up for non-employees
+            if (person.isEmployee() && hasCertification(person) && !validKeyPersonCertification(person)) {
                 generateAuditError(count,person.getFullName());
                 retval = false;
             }
