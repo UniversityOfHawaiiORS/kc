@@ -23,4 +23,18 @@ Kc.Wizard = Kc.Wizard || {};
     namespace.returnToFirstResultsPage = function() {
         $('.modal-body').find('a.first').click();
     };
+
+    namespace.onShownDialogFixFocusAndKeyPress = function(inputSelector, buttonSelector) {
+        // KC-1218 Use SOLR for person lookup
+        $(inputSelector).closest('.modal').on('shown.bs.modal', function(e) {
+            $(inputSelector).focus();
+            $(inputSelector).keydown(function(event) {
+                if (event.which == 13) {
+                    //  event.preventDefault(); -- You suspect other stuff is happening. Let it happen.
+                    $(buttonSelector).click();
+                }
+            });
+        });
+    };
+
 })(Kc.Wizard, jQuery);

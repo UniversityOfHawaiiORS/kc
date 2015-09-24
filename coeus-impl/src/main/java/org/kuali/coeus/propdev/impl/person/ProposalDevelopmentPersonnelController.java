@@ -18,7 +18,9 @@
  */
 package org.kuali.coeus.propdev.impl.person;
 
+import edu.hawaii.kra.lookup.UhSolrExternalSearch;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.kuali.coeus.common.notification.impl.NotificationHelper;
 import org.kuali.coeus.common.notification.impl.bo.KcNotification;
 import org.kuali.coeus.common.notification.impl.bo.NotificationTypeRecipient;
@@ -146,15 +148,31 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
    public ModelAndView performPersonnelSearch(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
            HttpServletRequest request, HttpServletResponse response) throws Exception {
        form.getAddKeyPersonHelper().getResults().clear();
-       List<Object> results = new ArrayList<Object>();
+       List<Object> results = null;
 
-       for (Object object : getWizardControllerService().performWizardSearch(form.getAddKeyPersonHelper().getLookupFieldValues(),form.getAddKeyPersonHelper().getLineType())) {
-           WizardResultsDto wizardResult = (WizardResultsDto) object;
-           String personId = wizardResult.getKcPerson() != null ? wizardResult.getKcPerson().getPersonId() : wizardResult.getRolodex().getRolodexId().toString();
-           if (!personAlreadyExists(personId,form.getDevelopmentProposal().getProposalPersons())) {
-               results.add(object);
-           }
+       // KC-1218 Use SOLR for person lookup
+       if (form.getAddKeyPersonHelper().getLookupFieldValues().get("q") == null) {
+           return getRefreshControllerService().refresh(form);
        }
+
+       String q = form.getAddKeyPersonHelper().getLookupFieldValues().get("q").toString();
+       UhSolrExternalSearch search = new UhSolrExternalSearch();
+       Map<String, String> conf = new HashMap<String, String>();
+
+       String searchType = form.getAddKeyPersonHelper().getLineType();
+
+       if (searchType.equals(PersonTypeConstants.EMPLOYEE.getCode())) {
+           conf.put("kind", "PERSON");
+           conf.put("pk", "personId");
+           results = search.searchForKcPerson(conf, q);
+       } else if (searchType.equals(PersonTypeConstants.NONEMPLOYEE.getCode())) {
+           conf.put("kind", "NONEMPLOYEE");
+           conf.put("pk", "rolodexId");
+           results = search.searchForNonEmployee(conf, q);
+       } else {
+           Logger.getLogger(ProposalDevelopmentPersonnelController.class).error("Person Search for unknown type: " + searchType);
+       }
+       // KC-1218 END
 
        form.getAddKeyPersonHelper().setResults(results);
        return getRefreshControllerService().refresh(form);

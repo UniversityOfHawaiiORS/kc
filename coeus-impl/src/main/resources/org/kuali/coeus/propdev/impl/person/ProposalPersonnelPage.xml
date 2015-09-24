@@ -68,7 +68,58 @@
           p:methodToCall="prepareAddPersonDialog"
           p:actionParameters="PropDev-PersonnelPage-Wizard.step:0" p:iconClass="icon-user"/>
 
+    <!--        KC-1218 Use SOLR for person lookup -->
     <bean id="PropDev-PersonnelPage-Wizard" parent="Kc-Wizard"
+          p:fieldBindingObjectPath="addKeyPersonHelper">
+        <property name="items">
+            <list>
+                <bean parent="PropDev-PersonnelPage-WizardPage1-UH" p:order="10" />
+                <bean parent="PropDev-PersonnelPage-WizardPage2" p:order="20" />
+                <bean parent="PropDev-PersonnelPage-WizardPage3" p:order="30" />
+            </list>
+        </property>
+        <property name="onShowDialogScript" value="Kc.Wizard.onShownDialogFixFocusAndKeyPress('#q_control','#perform-search-button');"/>
+    </bean>
+
+
+    <bean id="PropDev-PersonnelPage-WizardPage1-UH" parent="PropDev-PersonnelPage-WizardPage1-UH-parentBean" />
+    <bean id="PropDev-PersonnelPage-WizardPage1-UH-parentBean" abstract="true"
+          parent="Uif-VerticalBoxSubSection">
+        <property name="items">
+            <list>
+                <bean id="PropDev-PersonnelPage-Search-Fields" parent="Uif-CssGridSection-1FieldLabelColumn">
+                    <property name="items">
+                        <list>
+                            <bean parent="Uif-InputField" p:label="Name" p:propertyName="lookupFieldValues['q']" p:order="10">
+                                <property name="id" value="q"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean parent="PropDev-PersonnelPage-TypeSelection" p:order="20" />
+            </list>
+        </property>
+        <property name="footer">
+            <bean parent="Uif-DialogFooter">
+                <property name="items">
+                    <list>
+                        <bean parent="PropDev-PersonnelPage-WizardButton"
+                              p:actionLabel="Search"
+                              p:methodToCall="performPersonnelSearch" p:actionParameters="PropDev-PersonnelPage-Wizard.step:1"
+                              p:order="10" p:successCallback="Kc.Wizard.returnToFirstResultsPage();"
+                              p:id="perform-search-button"/>
+                        <bean parent="Uif-SecondaryActionButton" p:actionLabel="Cancel" p:libraryCssClasses="btn,btn-link"
+                              p:dialogDismissOption="IMMEDIATE" p:dialogResponse="false" p:order="20"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- KC-1218 END -->
+
+
+    <bean id="PropDev-PersonnelPage-Wizard-ORIGINAL" parent="Kc-Wizard"
           p:fieldBindingObjectPath="addKeyPersonHelper">
         <property name="items">
             <list>

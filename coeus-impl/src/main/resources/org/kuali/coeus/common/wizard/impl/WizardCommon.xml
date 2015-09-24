@@ -167,7 +167,7 @@
                 <entry key="sDom" value="tip" />
                 <entry key="bRetrieve" value="true" />
                 <entry key="sPaginationType" value="full_numbers" />
-                <entry key="aaSorting" value="[[1,'asc']]" />
+<!--                <entry key="aaSorting" value="[[1,'asc']]" /> -->
                 <entry key="aoColumnDefs"
                        value="[{'sWidth' : '20px', 'bSortable':false, 'aTargets' : [0]}]" />
             </map>
