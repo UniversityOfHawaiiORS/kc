@@ -611,8 +611,9 @@
           p:render="@{!#parent.readOnly}"/>
 
     <bean id="PropDev-AttachmentPage-DetailsButton" parent="PropDev-AttachmentPage-DetailsButton-parentBean"/>
+    <!-- KC-1254 Rename "Details" button in attachments to Details/Replace -->
     <bean id="PropDev-AttachmentPage-DetailsButton-parentBean" abstract="true" parent="Uif-SecondaryActionButton-Mini"
-          p:actionLabel="Details"/>
+          p:actionLabel="Details/Replace"/>
 
     <bean id="PropDev-AttachmentPage-ProposalRightsButton" parent="PropDev-AttachmentPage-ProposalRightsButton-parentBean"/>
     <bean id="PropDev-AttachmentPage-ProposalRightsButton-parentBean" abstract="true" parent="Uif-SecondaryActionButton-Mini"
