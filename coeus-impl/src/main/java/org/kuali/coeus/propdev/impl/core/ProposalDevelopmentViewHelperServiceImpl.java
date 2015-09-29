@@ -38,6 +38,7 @@ import org.kuali.coeus.common.framework.sponsor.SponsorSearchResult;
 import org.kuali.coeus.common.framework.sponsor.SponsorSearchService;
 import org.kuali.coeus.common.questionnaire.framework.answer.Answer;
 import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
+import org.kuali.coeus.common.questionnaire.framework.core.QuestionnaireQuestion;
 import org.kuali.coeus.common.questionnaire.framework.question.Question;
 import org.kuali.coeus.common.questionnaire.framework.question.QuestionExplanation;
 import org.apache.log4j.Logger;
@@ -46,6 +47,7 @@ import org.kuali.coeus.propdev.impl.auth.perm.ProposalDevelopmentPermissionsServ
 import org.kuali.coeus.propdev.impl.custom.ProposalDevelopmentCustomDataGroupDto;
 import org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants;
 import org.kuali.coeus.propdev.impl.hierarchy.ProposalHierarchyService;
+import org.kuali.coeus.propdev.impl.krms.PropDevJavaFunctionKrmsTermServiceImpl;
 import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationContext;
 import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationRenderer;
 import org.kuali.coeus.propdev.impl.person.*;
@@ -79,6 +81,7 @@ import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.krad.file.FileMeta;
+import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.util.*;
 import org.kuali.rice.krad.bo.Note;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -120,6 +123,16 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     @Autowired
     @Qualifier("noteService")
     private NoteService noteService;
+
+    // KC-855 Add feature to Questionnaire for smart answers
+    @Autowired
+    @Qualifier("propDevJavaFunctionKrmsTermService")
+    private PropDevJavaFunctionKrmsTermServiceImpl propDevJavaFunctionKrmsTermService;
+
+    @Autowired
+    @Qualifier("businessObjectService")
+    private BusinessObjectService businessObjectService;
+    // END KC-855
 
     @Autowired
 	@Qualifier("parameterService")
@@ -419,7 +432,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         List collection = ObjectPropertyUtils.getPropertyValue(model, collectionPath);
         if (collection != null && !collection.isEmpty() && collection.size() > lineIndex &&
                 collection.get(lineIndex) instanceof ProposalSite) {
-            Integer typeCode = ((ProposalSite)(collection.get(lineIndex))).getLocationTypeCode();
+            Integer typeCode = ((ProposalSite) (collection.get(lineIndex))).getLocationTypeCode();
             if (typeCode.equals(ProposalSite.PROPOSAL_SITE_OTHER_ORGANIZATION)
                     || typeCode.equals(ProposalSite.PROPOSAL_SITE_PERFORMANCE_SITE)) {
                 collection.remove(lineIndex);
@@ -752,7 +765,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
                 return helper.getNarrative().getNarrativeAttachment().getName();
             } else if (StringUtils.equals(attachmentType,Constants.PERSONNEL_ATTACHMENT_TYPE_NAME)) {
                 return helper.getBiography().getPersonnelAttachment().getName();
-            } else if (StringUtils.equals(attachmentType,Constants.INSTITUTIONAL_ATTACHMENT_TYPE_NAME)) {
+            } else if (StringUtils.equals(attachmentType, Constants.INSTITUTIONAL_ATTACHMENT_TYPE_NAME)) {
                 return helper.getInstituteAttachment().getNarrativeAttachment().getName();
             }
         }
@@ -1003,12 +1016,12 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
       	        	}      	        	
       	        }else{
       	        	document.setCerttifyViewOnly(false);
-      	        	return false;
+                    return false;
       	        }
       	    }
 
-    public boolean isViewOnly(ProposalDevelopmentDocument document){
-    	return document.getCerttifyViewOnly();
+    public boolean isViewOnly(ProposalDevelopmentDocument document) {
+        return document.getCerttifyViewOnly();
     }
 
     public String getProposalPersonCoiStatus(ProposalPerson person) {
@@ -1124,4 +1137,88 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     public void setProposalPersonCoiIntegrationService(ProposalPersonCoiIntegrationService proposalPersonCoiIntegrationService) {
         this.proposalPersonCoiIntegrationService = proposalPersonCoiIntegrationService;
     }
+
+    // KC-855 Add feature to Questionnaire for smart answers
+    public PropDevJavaFunctionKrmsTermServiceImpl getPropDevJavaFunctionKrmsTermService() {
+        return propDevJavaFunctionKrmsTermService;
+    }
+
+    public void setPropDevJavaFunctionKrmsTermService(PropDevJavaFunctionKrmsTermServiceImpl propDevJavaFunctionKrmsTermService) {
+        this.propDevJavaFunctionKrmsTermService = propDevJavaFunctionKrmsTermService;
+    }
+
+    public BusinessObjectService getBusinessObjectService() {
+        return businessObjectService;
+    }
+
+    public void setBusinessObjectService(BusinessObjectService businessObjectService) {
+        this.businessObjectService = businessObjectService;
+    }
+
+    public void uhPopulateSmartAnswers(ProposalDevelopmentDocumentForm form) {
+        ProposalDevelopmentDocument doc = form.getProposalDevelopmentDocument();
+        List<AnswerHeader> answerHeaders = form.getQuestionnaireHelper().getAnswerHeaders();
+        if (answerHeaders != null) {
+            for (AnswerHeader answerHeader:answerHeaders) {
+                if (answerHeader.isHasVisibleQuestion()) {
+                    List<QuestionnaireQuestion> questions = answerHeader.getQuestionnaire().getQuestionnaireQuestions();
+                    if (questions != null) {
+                        for (QuestionnaireQuestion question:questions) {
+                            String questionToAnswer = question.getQuestion().getQuestionSeqId().toString();
+                            // Check if a default answer parameter was configured for this question
+                            String defaultAnswerParam = getParameterService().getParameterValueAsString("KC-GEN","All", "uh_default_answer_" + questionToAnswer);
+                            if (defaultAnswerParam != null) {
+                                // Split param into parts answer:rule:argument(s)
+                                String[] values=defaultAnswerParam.split(":");
+                                if (values.length == 3) {
+                                    String defaultAnswer = values[0];
+                                    String rule = values[1];
+                                    String arguments = values[2];
+                                    Boolean ruleMeet = false;
+                                    Sponsor sponsor = doc.getDevelopmentProposal().getSponsor();
+                                    Sponsor primeSponsor =  doc.getDevelopmentProposal().getPrimeSponsor();
+                                    if (rule.equals("SponsorCode")) {
+                                        ruleMeet = (sponsor != null && sponsor.getSponsorCode().equals(arguments));
+                                    } else if (rule.equals("PrimeSponsorCode")) {
+                                        ruleMeet = (primeSponsor != null && primeSponsor.getSponsorCode().equals(arguments));
+                                    } else if (rule.equals("SponsorOrPrimeSponsorCode")) {
+                                        ruleMeet = (sponsor != null && sponsor.getSponsorCode().equals(arguments))
+                                                || (primeSponsor != null && primeSponsor.getSponsorCode().equals(arguments));
+                                    } else if (rule.equals("SponsorTypeCode")) {
+                                        ruleMeet = (sponsor != null && sponsor.getSponsorTypeCode().equals(arguments));
+                                    } else if (rule.equals("PrimeSponsorTypeCode")) {
+                                        ruleMeet = (primeSponsor != null && primeSponsor.getSponsorTypeCode().equals(arguments));
+                                    } else if (rule.equals("SponsorOrPrimeSponsorTypeCode")) {
+                                        ruleMeet = (sponsor != null && sponsor.getSponsorTypeCode().equals(arguments))
+                                                || (primeSponsor != null && primeSponsor.getSponsorTypeCode().equals(arguments));
+                                    } else if (rule.equals("SponsorGroup")) {
+                                        ruleMeet = propDevJavaFunctionKrmsTermService.sponsorGroupRule(doc.getDevelopmentProposal(),arguments).equals("true");
+                                    } else if (rule.equals("All")) {
+                                        // All means always default answer
+                                        ruleMeet = true;
+                                    } else {
+                                        LOG.warn("Error processing question answer rule param for questionID " + questionToAnswer + " Unknown Rule:" + rule);
+                                    }
+                                    if (ruleMeet) {
+                                        List <Answer> answers = answerHeader.getAnswers();
+                                        if (answers != null) {
+                                            for (Answer answer:answers) {
+                                                if (answer.getQuestion().getQuestionSeqId().toString().equals(questionToAnswer) && answer.getAnswer() == null) {
+                                                    answer.setAnswer(defaultAnswer);
+                                                    this.businessObjectService.save(answerHeaders);
+                                                }
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    LOG.warn("Error processing question answer rule param for questionID " + questionToAnswer + "parse error [" + defaultAnswerParam + "]");
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // KC-855 END
 }
