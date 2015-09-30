@@ -126,7 +126,7 @@
   <bean id="ProposalPerson-proposalPersonRoleId" parent="ProposalPerson-proposalPersonRoleId-parentBean"/>
   <bean id="ProposalPerson-proposalPersonRoleId-parentBean" abstract="true" parent="AttributeReferenceDummy-genericSystemId">
     <property name="name" value="proposalPersonRoleId" />
-    <property name="label" value="Proposal Person Role Id" />
+    <property name="label" value="PProposal Person Role Id" />
     <property name="shortLabel" value="Prop Per Role Id" />
     <property name="control" >
       <bean parent="SelectControlDefinition" p:valuesFinderClass="org.kuali.coeus.propdev.impl.person.ProposalPersonRoleValuesFinder" p:includeKeyInLabel="false"/>
