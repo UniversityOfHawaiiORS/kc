@@ -65,6 +65,8 @@ public class ProposalDevelopmentQuestionnaireController extends ProposalDevelopm
     @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=navigate", "actionParameters[navigateToPageId]=PropDev-QuestionnairePage"})
     public ModelAndView navigateToQuestionnaire(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ((ProposalDevelopmentViewHelperServiceImpl) form.getViewHelperService()).populateQuestionnaires(form);
+        // KC-855 Add feature to Questionnaire for smart answers
+        ((ProposalDevelopmentViewHelperServiceImpl) form.getViewHelperService()).uhPopulateSmartAnswers(form);
         return super.navigate(form,result,request,response);
     }
 

@@ -99,5 +99,9 @@ update KRCR_PARM_T
 set val = 'AA000' where PARM_NM = 'budgetPersonDefaultJobCode';
 -- KC-988 End
 
+-- KC-1048 Certification Questionnaire Rule behavior only works on save
+-- While fixing this JIRA I discovered that this question was not displaying correctly because this flag was set wrong
+update QUESTIONNAIRE_QUESTIONS set condition_flag = 'Y' where questionnaire_questions_id = '300002';
+-- KC-1048 END
 
 commit;

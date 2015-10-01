@@ -360,9 +360,13 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         
         destDevelopmentProposal.getApplicantOrganization().setLocationName(srcDevelopmentProposal.getApplicantOrganization().getLocationName());
         destDevelopmentProposal.getApplicantOrganization().setSiteNumber(srcDevelopmentProposal.getApplicantOrganization().getSiteNumber());
-        destDevelopmentProposal.getPerformingOrganization().setLocationName(srcDevelopmentProposal.getPerformingOrganization().getLocationName());
-        destDevelopmentProposal.getPerformingOrganization().setSiteNumber(srcDevelopmentProposal.getPerformingOrganization().getSiteNumber());
-        
+        // KC-1258 Unable to copy PD if no primary performance site selected
+        //         We removed the default performing organization so we need to check it it was set before copying now
+        if (srcDevelopmentProposal.getPerformingOrganization() != null) {
+            destDevelopmentProposal.getPerformingOrganization().setLocationName(srcDevelopmentProposal.getPerformingOrganization().getLocationName());
+            destDevelopmentProposal.getPerformingOrganization().setSiteNumber(srcDevelopmentProposal.getPerformingOrganization().getSiteNumber());
+        }
+
         //UH KC-466 BEGIN - sponsor deadline date and sponsor deadline type were made required fields on save so they need to be copied too
         destDevelopmentProposal.setDeadlineDate(srcDevelopmentProposal.getDeadlineDate());
         destDevelopmentProposal.setDeadlineType(srcDevelopmentProposal.getDeadlineType());
