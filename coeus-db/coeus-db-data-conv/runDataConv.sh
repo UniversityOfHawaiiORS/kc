@@ -1,6 +1,6 @@
 #TODO
 # add options for DB_PORT and TNS_NAME
-JARFILE=coeus-db-data-conv-1508.47.jar
+JARFILE=coeus-db-data-conv-1509.57.jar
 logdir="LOGDIR"
 
 usage()
