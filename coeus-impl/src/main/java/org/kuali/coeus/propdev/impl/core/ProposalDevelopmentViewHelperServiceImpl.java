@@ -894,6 +894,12 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     }
     
     public boolean renderQuestionnaire(ProposalPerson proposalPerson){
+
+        // KC-956 Key Person Certification Questions show up for non-employees
+        if (!proposalPerson.isEmployee()) {
+            return false;
+        }
+
         if (proposalPerson.getRole().getCertificationRequired()){
             return true;
         }
