@@ -37,4 +37,15 @@ Kc.Wizard = Kc.Wizard || {};
         });
     };
 
+    namespace.fixSearchLabel = function(e) {
+        // This happens when anything in the entire containing div is clicked
+        if (e.target.type == "radio") {
+            if (e.target.value == "E") {
+                jQuery("#q_label").html("Name or Username");
+            } else if (e.target.value == "N") {
+                jQuery("#q_label").html("Name");
+            }
+        }
+    };
+
 })(Kc.Wizard, jQuery);

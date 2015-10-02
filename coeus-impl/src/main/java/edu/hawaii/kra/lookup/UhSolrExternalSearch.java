@@ -60,7 +60,7 @@ public class UhSolrExternalSearch {
 			int i = 0;
 
 			while(docs.hasNext()) {
-				if (i++ > 100) {
+				if (i++ > 20) {
 					break;
 				}
 				SolrDocument d = docs.next();

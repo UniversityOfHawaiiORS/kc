@@ -159,6 +159,9 @@
         <property name="items">
             <list>
                 <bean parent="PropDev-Personnel-TypeSelection-InputField">
+                    <!-- KC-1218 Use SOLR for person lookup -->
+                    <property name="onClickScript" value="Kc.Wizard.fixSearchLabel(e);"></property>
+                    <!-- KC-1218 end -->
                     <property name="control">
                         <bean parent="Uif-VerticalRadioControl">
                             <property name="options">
