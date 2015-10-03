@@ -257,10 +257,12 @@
                       p:label="Unit Number" p:order="50" />
                 <bean parent="Uif-MessageField" p:messageText="@{#line.kcPerson != null and #line.kcPerson.unit != null ? #line.kcPerson.unit.unitName:''}"
                       p:label="Unit Name" p:order="60"/>
+<!-- KC-1270 Add Key Person results too crowded
                 <bean parent="Uif-DataField" p:propertyName="kcPerson.contactOrganizationName"
                       p:label="Organization" p:order="70" p:enableAutoInquiry="false"/>
                 <bean parent="Uif-DataField" p:propertyName="kcPerson.city"
                       p:label="City" p:order="80" p:enableAutoInquiry="false"/>
+-->
             </list>
         </property>
     </bean>
