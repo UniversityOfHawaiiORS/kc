@@ -106,7 +106,6 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     private static final long serialVersionUID = -5122498699317873886L;
     private static final Logger LOG = Logger.getLogger(ProposalDevelopmentViewHelperServiceImpl.class);
     private static final String PARENT_PROPOSAL_TYPE_CODE = "PRDV";
-    public static final String PROP_PERSON_COI_STATUS_FLAG = "PROP_PERSON_COI_STATUS_FLAG";
 
     @Autowired
     @Qualifier("dateTimeService")
@@ -432,7 +431,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         List collection = ObjectPropertyUtils.getPropertyValue(model, collectionPath);
         if (collection != null && !collection.isEmpty() && collection.size() > lineIndex &&
                 collection.get(lineIndex) instanceof ProposalSite) {
-            Integer typeCode = ((ProposalSite) (collection.get(lineIndex))).getLocationTypeCode();
+            Integer typeCode = ((ProposalSite)(collection.get(lineIndex))).getLocationTypeCode();
             if (typeCode.equals(ProposalSite.PROPOSAL_SITE_OTHER_ORGANIZATION)
                     || typeCode.equals(ProposalSite.PROPOSAL_SITE_PERFORMANCE_SITE)) {
                 collection.remove(lineIndex);
@@ -765,7 +764,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
                 return helper.getNarrative().getNarrativeAttachment().getName();
             } else if (StringUtils.equals(attachmentType,Constants.PERSONNEL_ATTACHMENT_TYPE_NAME)) {
                 return helper.getBiography().getPersonnelAttachment().getName();
-            } else if (StringUtils.equals(attachmentType, Constants.INSTITUTIONAL_ATTACHMENT_TYPE_NAME)) {
+            } else if (StringUtils.equals(attachmentType,Constants.INSTITUTIONAL_ATTACHMENT_TYPE_NAME)) {
                 return helper.getInstituteAttachment().getNarrativeAttachment().getName();
             }
         }
@@ -895,10 +894,21 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     }
     
     public boolean renderQuestionnaire(ProposalPerson proposalPerson){
+
+        // KC-956 Key Person Certification Questions show up for non-employees
+        if (!proposalPerson.isEmployee()) {
+            return false;
+        }
+
         if (proposalPerson.getRole().getCertificationRequired()){
             return true;
         }
-       else if (proposalPerson.getRoleCode().equals(Constants.KEY_PERSON_ROLE)){
+
+       if (displayCoiDisclosureStatus()) {
+           return proposalPerson.getRoleCode().equals(Constants.KEY_PERSON_ROLE);
+       }
+
+       if (proposalPerson.getOptInCertificationStatus()) {
             return true;
         }
 
@@ -991,8 +1001,9 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     	Person person = getPersonService().getPersonByPrincipalName(currentUser);
     	return getProposalDevelopmentPermissionsService().hasCertificationPermissions(document, person, proposalPerson);
     }
+
     public boolean displayCoiDisclosureStatus(){
-       return getParameterService().getParameterValueAsBoolean(Constants.KC_GENERIC_PARAMETER_NAMESPACE,Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, PROP_PERSON_COI_STATUS_FLAG);
+       return getParameterService().getParameterValueAsBoolean(Constants.KC_GENERIC_PARAMETER_NAMESPACE,Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, Constants.PROP_PERSON_COI_STATUS_FLAG);
     }
  
     public boolean isCertQuestViewOnly(ProposalDevelopmentDocument document ,ProposalPerson proposalPerson){
@@ -1000,28 +1011,30 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
       	   return false;
          }
     	 String currentUser=getGlobalVariableService().getUserSession().getPrincipalId();
-    	 boolean canViewCretification = kraAuthorizationService.hasPermission(currentUser, document, PermissionConstants.VIEW_CERTIFICATION);
+    	 boolean canViewCertification = kraAuthorizationService.hasPermission(currentUser, document, PermissionConstants.VIEW_CERTIFICATION);
     	 boolean canCertify = kraAuthorizationService.hasPermission(currentUser, document, PermissionConstants.CERTIFY); 
+         boolean renderQuestionnaire = renderQuestionnaire(proposalPerson);
+
 		    	if(canCertify){
-		    		document.setCerttifyViewOnly(false);
-		    		return false;	
+            document.setCertifyViewOnly(false);
+            return !renderQuestionnaire;
 		    	}
-      	        if(canViewCretification){
+        if (canViewCertification) {
       	        	if(proposalPerson.getPersonId().equals(currentUser)){
-      	        		document.setCerttifyViewOnly(false);
-      	        		return false;	
+                document.setCertifyViewOnly(false);
+                return !renderQuestionnaire;
       	        	}else{
-      	        		document.setCerttifyViewOnly(true);
+                document.setCertifyViewOnly(true);
       	        		return true;
       	        	}      	        	
       	        }else{
-      	        	document.setCerttifyViewOnly(false);
-                    return false;
+            document.setCertifyViewOnly(false);
+            return !renderQuestionnaire;
       	        }
       	    }
 
-    public boolean isViewOnly(ProposalDevelopmentDocument document) {
-        return document.getCerttifyViewOnly();
+    public boolean isViewOnly(ProposalDevelopmentDocument document){
+    	return document.getCertifyViewOnly();
     }
 
     public String getProposalPersonCoiStatus(ProposalPerson person) {

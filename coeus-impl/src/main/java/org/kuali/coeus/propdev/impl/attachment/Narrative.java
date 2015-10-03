@@ -666,7 +666,6 @@ public class Narrative extends KcPersistableBusinessObjectBase implements Hierar
 
     @PostRemove
     public void removeData() {
-        // KC-1034 Cannot copy PD document - receive incident report
         if (getNarrativeAttachment() != null && getNarrativeAttachment().getFileDataId() != null) {
             getKcAttachmentDao().removeData(getNarrativeAttachment().getFileDataId());
         }
