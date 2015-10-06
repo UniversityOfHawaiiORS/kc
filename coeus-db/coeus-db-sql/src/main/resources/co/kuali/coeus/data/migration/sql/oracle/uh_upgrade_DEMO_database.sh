@@ -5,8 +5,8 @@
 #VX_oracle_kc_rice_server_upgrade.sql
 #VX_oracle_kc_upgrade.sql
 
-CHECK_JAVA=`which java`
-if [ "${CHECK_JAVA}" != "/cygdrive/c/Program Files/Java/jdk1.8.0_51/bin/java" ]
+CHECK_JAVA=`java -version 2>&1 | grep "java version" | cut -d\" -f2 | cut -d\. -f2`
+if [ "${CHECK_JAVA}" != "8" ]
 then
     echo "Java 8 not detected....exiting"
     exit
