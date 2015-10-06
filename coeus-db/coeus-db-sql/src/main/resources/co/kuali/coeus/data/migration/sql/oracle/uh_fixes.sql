@@ -104,4 +104,10 @@ set val = 'AA000' where PARM_NM = 'budgetPersonDefaultJobCode';
 update QUESTIONNAIRE_QUESTIONS set condition_flag = 'Y' where questionnaire_questions_id = '300002';
 -- KC-1048 END
 
+-- KC-1269 Change wording of questions to fit with new section names
+update QUESTION set question = replace(question,'Special Review','Compliance') where question like '%Special Review%';
+update QUESTION set question = replace(question,'Abstracts and Attachments','Attachments') where question like '%Abstracts and Attachments%';
+-- KC-1269 END
+
+
 commit;
