@@ -83,7 +83,8 @@
                 </bean>
                 <bean parent="Uif-DataField" p:propertyName="numberOfMonths" p:label="Months"
                       p:order="30"/>
-                <bean parent="Kc-InlineEdit-InputField" p:propertyName="totalCost"
+                <!-- KC-964 Lock Total Sponsor cost field for editing-->
+                <bean parent="Uif-DataField" p:propertyName="totalCost"
                       p:order="40"
                       p:readOnly="@{!#emptyList(budget.budgetLineItems) or !#emptyList(budget.budgetPersonnelDetails) or #parent.readOnly}"/>
                 <bean parent="Kc-InlineEdit-InputField" p:propertyName="totalDirectCost"
