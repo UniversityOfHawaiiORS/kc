@@ -357,7 +357,8 @@
           parent="PropDev-AttachmentPage-Collection" p:collectionObjectClass="org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract"
           p:propertyName="proposalAbstracts" p:cssClasses="proposalAbstractCollection">
         <property name="addWithDialogAction">
-            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Abstract" p:cssClasses="pull-right" p:iconClass="icon-plus"
+            <!-- KC-1272 Change all +Add buttons to be on the left side -->
+            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Abstract" p:cssClasses="pull-left" p:iconClass="icon-plus"
                   p:render="@{!#parent.readOnly}"/>
         </property>
         <property name="addLineItems">
@@ -570,7 +571,8 @@
     <bean id="PropDev-AttachmentsPage-NotesCollection-parentBean" abstract="true" parent="PropDev-AttachmentPage-Collection"
           p:collectionObjectClass="org.kuali.rice.krad.bo.Note" p:propertyName="notes" p:cssClasses="proposalNoteCollection">
         <property name="addWithDialogAction">
-            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Note" p:cssClasses="pull-right" p:iconClass="icon-plus"
+            <!-- KC-1272 Change all +Add buttons to be on the left side -->
+            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Note" p:cssClasses="pull-left" p:iconClass="icon-plus"
                   p:render="@{!#parent.readOnly}"/>
         </property>
         <property name="lineActions">

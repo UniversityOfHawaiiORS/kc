@@ -43,13 +43,16 @@
                 <bean parent="Uif-HorizontalBoxGroup" p:order="10">
                     <property name="items">
                         <list>
+
                             <bean parent="PropDev-PersonnelPage-AddButton" p:order="10" p:render="@{!document.developmentProposal.isParent() and !#parent.readOnly}"/>
+                            <!-- KC-1268 STE on Key Personnel page after using notify all button
                             <bean parent="Uif-PrimaryActionButton" p:order="20" p:actionLabel="Notify All" p:actionScript="showDialog('PropDev-Personal-NotifyPersonsDialog')"  p:cssClasses="pull-right"
                                   p:render="@{#actionFlags[#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.PropDevDocumentActions).NOTIFY_PROPOSAL_PERSONS}]
                                   and document.developmentProposal.proposalPersons.size() > 0
                                   and !#ViewHelper.areAllCertificationsComplete(document.developmentProposal.proposalPersons)
                                   and !document.developmentProposal.isChild()
                                   and !#parent.readOnly}"/>
+                                  -->
                             <bean parent="Uif-PrimaryActionButton" p:actionLabel="COI Disclosure Status"
                                                p:order="35"  p:actionScript="showDialog('PropDev-PersonnelPage-COIStatus-Dialog');"
                                                 p:render="@{#ViewHelper.displayCoiDisclosureStatus() and
