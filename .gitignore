@@ -1,5 +1,6 @@
 git.log
 last_build.sha1
+build.out
 **/.project
 **/.classpath
 **/.settings
