@@ -87,7 +87,6 @@ public class ProposalDevelopmentProposalRequiredFieldsAuditRule implements Docum
         // KC-1281 Add data validation warning for keywords field
         if (proposal.getPropScienceKeywords().isEmpty()) {
             AuditError keyWordWarning = new AuditError(KEYWORD_KEY, UhKeyConstants.KEYWORDS_NOT_ENTERED_WARNING, KEYWORD_ENTRY_PAGE_ID);
-            keyWordWarning.setParams(new String[] { "ignoreSections" });
             getAuditErrorsForWarning(KEYWORD_PAGE_NAME, AUDIT_WARNINGS).add(keyWordWarning);
         }
 
