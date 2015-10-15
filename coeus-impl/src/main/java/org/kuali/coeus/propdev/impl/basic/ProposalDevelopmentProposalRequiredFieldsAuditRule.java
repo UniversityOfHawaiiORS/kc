@@ -18,6 +18,7 @@
  */
 package org.kuali.coeus.propdev.impl.basic;
 
+import edu.hawaii.infrastructure.UhKeyConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.framework.type.ProposalType;
 import org.kuali.coeus.propdev.api.core.SubmissionInfoService;
@@ -83,6 +84,13 @@ public class ProposalDevelopmentProposalRequiredFieldsAuditRule implements Docum
         }
         */
 
+        // KC-1281 Add data validation warning for keywords field
+        if (proposal.getPropScienceKeywords().isEmpty()) {
+            AuditError keyWordWarning = new AuditError(KEYWORD_KEY, UhKeyConstants.KEYWORDS_NOT_ENTERED_WARNING, KEYWORD_ENTRY_PAGE_ID);
+            keyWordWarning.setParams(new String[] { "ignoreSections" });
+            getAuditErrorsForWarning(KEYWORD_PAGE_NAME, AUDIT_WARNINGS).add(keyWordWarning);
+        }
+
         return valid;
     }
     
@@ -109,6 +117,22 @@ public class ProposalDevelopmentProposalRequiredFieldsAuditRule implements Docum
 
         return auditErrors;
     }
+
+    // KC-1281 Add data validation warning for keywords field
+    private List<AuditError> getAuditErrorsForWarning(String areaName, String severity) {
+        List<AuditError> auditErrors = new ArrayList<AuditError>();
+        String clusterKey = areaName + "." + NO_SECTION_ID;
+        if (!GlobalVariables.getAuditErrorMap().containsKey(clusterKey+severity)) {
+            GlobalVariables.getAuditErrorMap().put(clusterKey+severity, new AuditCluster(clusterKey, auditErrors,severity));
+        }
+        else {
+            auditErrors = GlobalVariables.getAuditErrorMap().get(clusterKey+severity).getAuditErrorList();
+        }
+
+        return auditErrors;
+    }
+    // KC-1281 End
+
     /**
      * Looks up and returns the ParameterService.
      * @return the parameter service. 

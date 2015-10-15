@@ -27,6 +27,8 @@ public final class UhKeyConstants {
     // KC-735 Add warning for Sponsor Deadline Time not entered
     public static final String SPONSOR_DEADLINE_TIME_WARNING = "warning.empty.sponsor.deadlinetime";
 
+    // KC-1281 Add data validation warning for keywords field
+    public static final String KEYWORDS_NOT_ENTERED_WARNING = "warning.empty.keywords";
     
     /**
      * private utility class ctor.
