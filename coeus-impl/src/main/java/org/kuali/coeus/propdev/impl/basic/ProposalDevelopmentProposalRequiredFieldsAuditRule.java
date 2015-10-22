@@ -27,6 +27,7 @@ import org.kuali.coeus.propdev.impl.core.ProposalTypeService;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.util.AuditCluster;
 import org.kuali.rice.krad.util.AuditError;
@@ -85,10 +86,25 @@ public class ProposalDevelopmentProposalRequiredFieldsAuditRule implements Docum
         */
 
         // KC-1281 Add data validation warning for keywords field
-        if (proposal.getPropScienceKeywords().isEmpty()) {
-            AuditError keyWordWarning = new AuditError(KEYWORD_KEY, UhKeyConstants.KEYWORDS_NOT_ENTERED_WARNING, KEYWORD_ENTRY_PAGE_ID);
-            getAuditErrorsForWarning(KEYWORD_PAGE_NAME, AUDIT_WARNINGS).add(keyWordWarning);
+        String keyWordAuditEnabledSetting = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN", "All", "uh_enable_keyword_audit");
+        if (keyWordAuditEnabledSetting == null || keyWordAuditEnabledSetting.isEmpty()) {
+            keyWordAuditEnabledSetting = "N";
         }
+        if (!keyWordAuditEnabledSetting.toUpperCase().equals("N") && proposal.getPropScienceKeywords().isEmpty()) {
+            String keyWordAuditMessage = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN","All", "uh_keyword_audit_message");
+            if (keyWordAuditMessage == null || keyWordAuditMessage.isEmpty()) {
+                keyWordAuditMessage = "Keywords are empty.";
+            }
+            String[] messageParams = { keyWordAuditMessage } ;
+            AuditError keyWordAudit = new AuditError(KEYWORD_KEY, UhKeyConstants.KEYWORDS_NOT_ENTERED_WARNING, KEYWORD_ENTRY_PAGE_ID, messageParams);
+            if (keyWordAuditEnabledSetting.toUpperCase().equals("E") ) {
+                getAuditErrorsBySeverity(KEYWORD_PAGE_NAME, AUDIT_ERRORS).add(keyWordAudit);
+                valid=false;
+            } else {
+                getAuditErrorsBySeverity(KEYWORD_PAGE_NAME, AUDIT_WARNINGS).add(keyWordAudit);
+            }
+        }
+        // KC-1281 END
 
         return valid;
     }
@@ -118,7 +134,7 @@ public class ProposalDevelopmentProposalRequiredFieldsAuditRule implements Docum
     }
 
     // KC-1281 Add data validation warning for keywords field
-    private List<AuditError> getAuditErrorsForWarning(String areaName, String severity) {
+    private List<AuditError> getAuditErrorsBySeverity(String areaName, String severity) {
         List<AuditError> auditErrors = new ArrayList<AuditError>();
         String clusterKey = areaName + "." + NO_SECTION_ID;
         if (!GlobalVariables.getAuditErrorMap().containsKey(clusterKey+severity)) {

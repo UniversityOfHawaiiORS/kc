@@ -109,5 +109,11 @@ update QUESTION set question = replace(question,'Special Review','Compliance') w
 update QUESTION set question = replace(question,'Abstracts and Attachments','Attachments') where question like '%Abstracts and Attachments%';
 -- KC-1269 END
 
+-- KC-1281 Add data validation warning for keywords field
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh_enable_keyword_audit',sys_guid(),1,'CONFG' ,'W','enable Keyword audit rule. N=No, W=Warn, E=Error','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh_keyword_audit_message',sys_guid(),1,'CONFG' ,'You have not included any Keywords for this proposal, keywords help UH identify possible field experts for future funding opportunities.','Keyword Audit message if enabled.','A','KC');
 
 commit;
