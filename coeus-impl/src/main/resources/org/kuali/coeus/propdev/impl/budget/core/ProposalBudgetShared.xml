@@ -94,7 +94,8 @@
 		</property>
 		<property name="header.lowerGroup">
 			<!-- KC-1272 Change all +Add buttons to be on the left side -->
-			<bean parent="Uif-VerticalBoxGroup">
+			<bean parent="Uif-VerticalBoxGroup" p:additionalCssClasses="clearfix">
+				<property name="id" value="button-container-thing"></property>
 				<property name="items">
 					<list>
 						<bean parent="Uif-Message"
