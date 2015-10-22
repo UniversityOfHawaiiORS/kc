@@ -115,5 +115,11 @@ values ('KC-GEN','All','uh_enable_keyword_audit',sys_guid(),1,'CONFG' ,'W','enab
 
 insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
 values ('KC-GEN','All','uh_keyword_audit_message',sys_guid(),1,'CONFG' ,'You have not included any Keywords for this proposal, keywords help UH identify possible field experts for future funding opportunities.','Keyword Audit message if enabled.','A','KC');
+-- KC-1281 END
+
+-- KC-1088 Remove unnecessary PD permissions
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh_pd_access_roles',sys_guid(),1,'CONFG' ,':KC12106:KC12103:KC12104:KC12105:','Roll Ids of roles to be offered by PD Access Page for granting to individuals while document is in saved mode.','A','KC');
+-- KC-1088 END
 
 commit;
