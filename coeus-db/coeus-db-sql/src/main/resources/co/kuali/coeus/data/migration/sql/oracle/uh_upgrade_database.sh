@@ -152,6 +152,7 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < UH_KRIM_DELTA_PKG.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < COSKeywords.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < PopulatePrimaryUnitFromProposalCreatorRole.sql
 
     echo "Done Grepping for errors in the logs"
     mv *.log ${LOGDIR}
