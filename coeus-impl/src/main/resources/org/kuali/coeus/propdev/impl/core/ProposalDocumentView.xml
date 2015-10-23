@@ -317,44 +317,46 @@
                 <value>kc-help-menu</value>
             </list>
         </property>
+		<!-- KC-1294 Make PD Help dropdown configurable -->
         <property name="menuItems">
             <list>
                 <bean parent="Uif-MenuHeader" p:messageText="Basics"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Proposal Details"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/proposaldetails.htm" />
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.proposal.details.url')}" />
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="S2S Opportunity Search"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/s2sopportunitysearch.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.s2s.opportunity.search.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Delivery Information"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/deliveryinfo.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.delivery.information.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Sponsor &amp; Program Information"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/sponsorprograminformation.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.sponsor.and.program.information.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Organization &amp; Location"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/organizationslocations.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.organization.and.location.url')}"/>
                 <bean parent="Uif-MenuDivider"/>
                 <bean parent="Uif-MenuHeader" p:messageText="Key Personnel"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Personnel"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/keypersonnel.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.personnel.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Credit Allocation"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/creditallocation.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.credit.allocation.url')}"/>
                 <bean parent="Uif-MenuDivider"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Compliance"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/compliance1.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.compliance.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Attachments"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/proposalattachmentstab.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.attachments.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Questionnaire"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/questionnaire.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.questionnaire.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Budget"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/budgetversionsscreen.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.budget.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Access"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/access1.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.access.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Supplemental Information"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/supplementalinformation.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.supplemental.information.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Summary/Submit"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/summarysubmit.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.summary.submit.url')}"/>
                 <bean parent="Uif-Link" p:target="_blank" p:linkText="Glossary of Terms"
-                      p:href="@{#ConfigProperties['application.url']}/static/help/default.htm?turl=Documents/glossaryofterms.htm"/>
+                      p:href="@{#getParam('KC-GEN','All','uh.pd.help.glossary.of.terms.url')}"/>
             </list>
         </property>
+		<!-- KC-1294 END -->
     </bean>
 
 </beans>
