@@ -35,3 +35,8 @@ tr.finalBudget div.submissionMessage {
 .replaceAttachment .subAwardDetailsFileUpload-replace {
 	display: block;
 }
+
+/* KC-980 Budget action drop down runs off screen */
+.uh_fix_budget_action .dropdown-menu {
+	left: -127px;
+}

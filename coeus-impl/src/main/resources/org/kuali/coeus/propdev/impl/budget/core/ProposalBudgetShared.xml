@@ -120,7 +120,9 @@
 	</bean>
 	
 	<bean id="PropDev-BudgetVersions-GenericActions" parent="PropDev-BudgetVersions-GenericActions-parentBean"/>
-	<bean id="PropDev-BudgetVersions-GenericActions-parentBean" abstract="true" parent="Kc-Dropdown-Button">
+	<!-- KC-980 Budget action drop down runs off screen
+	            NOTE: this overrides the additionalCssClasses of parent Kc-Dropdown-Button so I had to add btn-group from that bean -->
+	<bean id="PropDev-BudgetVersions-GenericActions-parentBean" abstract="true" parent="Kc-Dropdown-Button" p:additionalCssClasses="btn-group,uh_fix_budget_action">
 		<property name="listPrototype.items">
 			<list>
 				<bean parent="Uif-ActionLink" p:actionLabel="View Summary" p:methodToCall="populateBudgetSummary" p:additionalSubmitData="budgetId:@{#line.budgetId}" p:iconClass="icon-eye-open" p:order="10"/>
