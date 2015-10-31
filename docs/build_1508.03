@@ -1,0 +1,121 @@
+
+* Download ojdbc7 12.1.0.2
+cp to ~/.m2/repository/com/oracle/ojdbc7/12.1.0.2/ojdbc7-12.1.0.2.jar
+http://www.oracle.com/technetwork/database/features/jdbc/default-2280470.html
+
+
+* use maven > 3.1.0 installed
+
+
+* use java 8
+
+
+* non windows check coeus-webapp/pom.xml and remove the --msvs_version part
+<arguments>install --msvs_version=2013e</arguments>
+
+
+
+schemaspy
+    checkout schemaspy-1507.2-branch
+    run build.sh
+
+rice
+    checkout uh-rice-2.5.3
+    run build.sh
+
+kc-api
+    checkout kuali-coeus-api-1507.3
+    run build.sh
+
+kc-s2sgen
+    checkout uh-modifications
+    run build.sh
+
+
+kc
+    checkout uh-modifications
+    run build.sh
+
+Command line build now fails in cygwin because of new requirement.  We need c, python and npm installed.  (Actually the build installs npm each time.)
+
+To fix this I did the following in windows
+************** Windows notes start
+From Chris Smith’s Instructions  With bullet notes from me.
+1.       Uninstalled all existing versions of Visual C++ and Visual Studio (may not be required, but I wanted to start from scratch) 
+I didn’t do this because I never installed Visual C++)
+2.       Installed Visual Studio Community 2013 from this page that’s linked from the node-gyp steps. (The default download on that page is now VS 2015, but that version did *not* work for me)
+I couldn’t get Community 2013 to install on my Windows 7 Pro 64bit machine.  It kept saying I needed newer version of windows.  So I had to research a bit and find that I needed to install “Express 2013 for Desktop” …
+Also note the “this page” link above takes you to 2015 version which will not work.  You need to expand “Visual Studio 2013 and select Express 2013 for Desktop”  Image attached.
+3.       Installed the MS Windows SDK for Windows 7 and .NET Framework 4 linked from the node-gyp steps.
+4.       Updated the coeus-webapp pom.xml to add the –msvs_version=2013e argument to the npm execution on line 279; it should look like this:
+        <arguments>install –msvs_version=2013e</arguments>
+This is a bit of a problem for a mixed dev environment.  MacOS/Unix users need to remove this.
+5.       Set the following environment variable:
+        set VCTargetsPath=C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120
+6.       Ran the standard ‘mvn clean install’ command
+Failed for me because of missing python.
+ Adding python to Cygwin failed
+Research says npm doesn’t work in Cygwin
+Installed Python for windows (2.7.10) https://www.python.org/downloads/
+Created build.bat
+set PYTHON=C:\Python27\python.exe
+ set VCTargetsPath=C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120
+mvn clean install
+Now for the CYGWIN HACK
+Created buildWin.sh for my Cygwin build  This will run the cmd shell in the cyg window and run the build command then return to bash prompt when done.
+cmd /C build.bat
+
+************** Windows notes END
+
+************** Unix note
+I had to modify coeus-webapp/pom.xml for windows
+for unix this will need to be modified back
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <configuration>
+                            <nodeVersion>${frontend-maven-plugin.node.version}</nodeVersion>
+                            <npmVersion>${frontend-maven-plugin.npm.version}</npmVersion>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>npm install</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>install --msvs_version=2013e</arguments>
+                        </configuration>
+                    </execution>
+************** Unix note End
+
+
+
+
+    NOTE: -Pprecompile-jsp-tomcat-7
+        \coeus-webapp\target\jsp-source\jsp\uh_005fhelpline_005finfo_jsp.java
+    NOTE: tests work on out of box but fail for ours we should fix
+
+You need to reimport maven in IntelliJ to have it detect new Java Melody Classpath or you will get error 
+Configuration problem: Failed to import bean definitions from URL location [classpath:net/bull/javamelody/monitoring-spring.xml]
+Right mouse project then ->maven->reimport
+
+After re-import build->Make (which might take a while)
+Then you should be able to run with no errors.
+
+    
+
+
+
+
+
+
+
+
+
+~                                                                  

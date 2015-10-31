@@ -56,6 +56,7 @@ public interface Constants {
     public static final String MAPPING_CUSTOM_DATA = "customData";
     public static final String MAPPING_PROPOSAL_ACTIONS = "actions";
     public static final String MAPPING_PROTOCOL_ACTIONS = "protocolActions";
+    public static final String MAPPING_PROTOCOL_HISTORY = "protocolHistory";
     public static final String MAPPING_PROTOCOL_ONLINE_REVIEW = "onlineReview";
     public static final String MAPPING_PROPOSAL_MEDUSA_PAGE = "proposalMedusa";
     public static final String MAPPING_PROPOSAL_APPROVER_PAGE = "approverView";
@@ -141,10 +142,9 @@ public interface Constants {
     public static final String KNS_AUDIT_ERRORS = AUDIT_ERRORS;
     
     public static final String CURRENT_PENDING_REPORT_GROUP_NAME = "CURRENT_PENDING_REPORT_GROUP_NAME";
-    //public static final String PROPOSAL_ACTIONS_PAGE = "proposalActions";
-    //public static final String ABSTRACTS_AND_ATTACHMENTS_PAGE = "abstractsAttachments";
     public static final String PROPOSAL_PAGE = "proposal";
     public static final String CUSTOM_ATTRIBUTES_PAGE = "customData";
+    public static final String CERTIFICATION_PAGE = "PropDev-CertificationView-Page";
     public static final String QUESTIONS_PAGE = "PropDev-QuestionnairePage";
     public static final String PROP_DEV_PERMISSIONS_PAGE = "PropDev-PermissionsPage";
     public static final String PERMISSIONS_PAGE = "permissions";
@@ -449,8 +449,12 @@ public interface Constants {
     public static final String AWARD_SYNC_HAS_SYNC_NODE_NAME = "hasSync";
     public static final String AWARD_SYNC_VALIDATION_NODE_NAME = "SyncValidationApproval";
     public static final String AWARD_SYNC_NOT_APPLICABLE = "Not applicable";
-    
-  //Institutional Proposal
+
+    // Award financial rest api constants
+    public static final String FINANCIAL_REST_API_ENABLED = "ENABLE_FINANCIAL_REST_API";
+    public static final String DISPLAY_ACCOUNT_BALANCES = "DISPLAY_ACCOUNT_BALANCES";
+
+    //Institutional Proposal
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_HOME_PAGE = "home";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_CONTACTS_PAGE = "contacts";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_SPECIAL_REVIEW_PAGE = "specialReview";
@@ -458,6 +462,7 @@ public interface Constants {
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_INTELLECTUAL_PROPERTY_REVIEW_PAGE = "intellectualPropertyReview";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_DISTRIBUTION_PAGE = "distribution";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_ACTIONS_PAGE = "institutionalProposalActions";
+    public static final String MAPPING_INSTITUTIONAL_PROPOSAL_ATTACHMENTS_PAGE = "attachments";
     public static final String MAPPING_INSTITUTIONAL_PROPOSAL_MEDUSA_PAGE = "medusa";
 
     public static final String INSTITUTIONAL_PROPOSAL_IP_PANEL_ANCHOR = "institutionalProposal";
@@ -562,6 +567,7 @@ public interface Constants {
 
     public static final String PROTOCOL_CREATE_CONTINUATION_SUMMARY_KEY = "actionHelper.continuationSummary";
     public static final String PROTOCOL_CREATE_CONTINUATION_WITH_AMENDMENT_KEY = "actionHelper.protocolCreateContinuationWithAmendment";
+    String PROTOCOL_ATTACHMENT_PREFIX = "Protocol: ";
     
     // Protocol edit modes
     public static final String CAN_VIEW_REVIEW_COMMENTS = "viewReviewComments";
@@ -717,6 +723,7 @@ public interface Constants {
     
     //
     public static final String KC_GENERIC_PARAMETER_NAMESPACE = "KC-GEN";
+    public static final String KC_S2S_PARAMETER_NAMESPACE = "KC-S2S";
     public static final String KC_ALL_PARAMETER_DETAIL_TYPE_CODE = "All";
     public static final String MODULE_NAMESPACE_AWARD_BUDGET = "KC-AB";
     
@@ -817,7 +824,8 @@ public interface Constants {
     // Iacuc - exceptionDescription length
     public static final Integer IACUC_PROTOCOL_EXCEPTION_DESC_LENGTH = 40;
     public static final String MAPPING_IACUC_PROTOCOL_ACTIONS = "iacucProtocolActions";
-    
+    public static final String MAPPING_IACUC_PROTOCOL_HISTORY = "iacucProtocolHistory";
+ 
     public static final String IACUC_PROCEDURE_PERSON_RESPONSIBLE_DELIMITER = "|";
 
     public static final int IACUC_PROCEDURE_CUSTOM_DATA_SMALL_STRING_MAX_LENGTH = 1000;
@@ -899,9 +907,21 @@ public interface Constants {
     
     public static final String PD_INITIATED_ROUTE_NODE_NAME = "Initiated";
 
-    //Prop Dev Parameter
+    //Prop Dev Parameters
     public static final String SPONSOR_HIERACHY_REQ_DIV_PROG_CODES = "SPONSOR_HIERACHY_REQ_DIV_PROG_CODES";
+    public static final String PROP_PERSON_COI_STATUS_FLAG = "PROP_PERSON_COI_STATUS_FLAG";
+
 
     public static final String MM_DD_YYYY_HH_MM_A_DATE_FORMAT = "MM/dd/yyyy hh:mm a";
+    public static final String CAN_MAINTAIN_IP_ATTACHMENTS = "CAN_MAINTAIN_IP_ATTACHMENTS";
+    public static final String CAN_VIEW_IP_ATTACHMENTS = "CAN_VIEW_IP_ATTACHMENTS";
+
+    // award actions
+    public static final String AWARD_BUDGET_PARAMETERS_ACTION = "awardBudgetParameters.do?";
+    public static final String AWARD_BUDGET_VERSIONS_ACTION = "awardBudgetVersions.do?";
+    
+    public static final int PROTOCOL_DEFAULT_SUBMISSION_NUMBER = -1;
+
+    public static final String MAKE_AWD_CUM_ANTICIPATED_OBL_EDITABLE = "MAKE_AWD_CUM_ANTICIPATED_OBL_EDITABLE";
 }
 

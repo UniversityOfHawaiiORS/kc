@@ -25,14 +25,7 @@
 <c:set var="protocolAttachmentFilterAttributes" value="${DataDictionary.IacucProtocolAttachmentFilter.attributes}" />
 <c:set var="protocolNotesAttributes" value="${DataDictionary.IacucProtocolNotepad.attributes}" />
 
-<script type="text/javascript" src="scripts/jquery/jquery.js"></script> 
-
-<!--
-"ATTP", "Attachment Type"
-"DESC", "Description"
-"LAUP", "Last Updated"
-"UPBY", "Last Updated By" 
- -->
+<script type="text/javascript" src="scripts/jquery/jquery.js"></script>
  
 <script type="text/javascript">
     var $j = jQuery.noConflict();
@@ -344,7 +337,10 @@
   	headerDispatch="${KualiForm.headerDispatch}"
   	headerTabActive="noteAndAttachment">
   	
-<div align="right"><kul:help documentTypeName="IacucProtocolDocument" pageName="Notes%20%26%20Attachments" /></div>
+<div align="right">
+    <kra:shortUrl shortUrl="${KualiForm.shortUrl}"/>
+    <kul:help documentTypeName="IacucProtocolDocument" pageName="Notes%20%26%20Attachments" />
+</div>
 <div id="workarea">
 <kra-protocol:protocolAttachmentProtocol 
     protocolAttachmentProtocolAttributes="${protocolAttachmentProtocolAttributes}"

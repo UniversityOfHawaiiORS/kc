@@ -368,4 +368,9 @@ public class NegotiationForm extends KcTransactionalDocumentFormBase implements 
         return extraButtons;
     }
     // KC-821 END
+
+    public String getShortUrl() {
+        return getBaseShortUrl() + "/kc-common/negotiations/" + getNegotiationDocument().getNegotiation().getNegotiationId();
+    }
+
 }

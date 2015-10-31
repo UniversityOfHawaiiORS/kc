@@ -1183,9 +1183,10 @@
   <bean id="DevelopmentProposal-LookupView-parentBean" abstract="true" parent="Uif-LookupView" p:viewHelperService="#{#getService('propDevLookupableHelperService')}">
     <property name="dataObjectClassName" value="org.kuali.coeus.propdev.impl.core.DevelopmentProposal"/>
     <property name="headerText" value="Development Proposal Lookup"/>
+	<property name="defaultSortAscending" value="false"/>
     <property name="defaultSortAttributeNames">
       <list>
-        <value>proposalNumber</value>
+        <value>proposalNumberPadded</value>
       </list>
     </property>
     <property name="criteriaFields">
@@ -1194,18 +1195,65 @@
         <bean p:propertyName="proposalTypeCode" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
         <bean p:propertyName="proposalStateTypeCode" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
         <bean p:propertyName="title" parent="Uif-LookupCriteriaInputField"/>
-        <bean p:propertyName="proposalPerson" parent="Uif-LookupCriteriaInputField" p:fieldLabel.labelText="Proposal Person"/>
-        <bean p:propertyName="principalInvestigatorName" parent="Uif-LookupCriteriaInputField"/>
-        <bean p:propertyName="initiator" parent="Uif-LookupCriteriaInputField" p:fieldLabel.labelText="Initiator">
-            <property name="quickfinder">
-                <bean parent="Uif-QuickFinderByScript" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
-                      p:fieldConversions="principalName:initiator"/>
-            </property>
-            <property name="inquiry">
-                <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
-                      p:inquiryParameters="initiator:principalName"/>
-            </property>
-        </bean>
+		  <bean p:propertyName="proposalPerson" parent="Uif-LookupCriteriaInputField"
+				p:fieldLabel.labelText="Proposal Person">
+			  <property name="quickfinder">
+				  <bean parent="Uif-QuickFinderByScript"
+						p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:fieldConversions="principalName:proposalPerson"/>
+			  </property>
+			  <property name="inquiry">
+				  <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:inquiryParameters="proposalPerson:principalName"/>
+			  </property>
+		  </bean>
+		  <bean p:propertyName="principalInvestigatorName" parent="Uif-LookupCriteriaInputField">
+			  <property name="quickfinder">
+				  <bean parent="Uif-QuickFinderByScript"
+						p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:fieldConversions="principalName:principalInvestigatorName"/>
+			  </property>
+			  <property name="inquiry">
+				  <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:inquiryParameters="principalInvestigatorName:principalName"/>
+			  </property>
+		</bean>
+		  <!-- KC-1106 Remove fields from Development Proposal Lookup
+		  <bean p:propertyName="aggregator" parent="Uif-LookupCriteriaInputField" p:fieldLabel.labelText="Aggregator">
+			  <property name="quickfinder">
+				  <bean parent="Uif-QuickFinderByScript"
+						p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:fieldConversions="principalName:aggregator"/>
+			  </property>
+			  <property name="inquiry">
+				  <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:inquiryParameters="aggregator:principalName"/>
+			  </property>
+		  </bean>
+		  <bean p:propertyName="participant" parent="Uif-LookupCriteriaInputField" p:fieldLabel.labelText="Participant">
+			  <property name="quickfinder">
+				  <bean parent="Uif-QuickFinderByScript"
+						p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:fieldConversions="principalName:participant"/>
+			  </property>
+			  <property name="inquiry">
+				  <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:inquiryParameters="participant:principalName"/>
+			  </property>
+		  </bean>
+		  -->
+		  <bean p:propertyName="initiator" parent="Uif-LookupCriteriaInputField"
+				p:fieldLabel.labelText="Initiator Username">
+			  <property name="quickfinder">
+				  <bean parent="Uif-QuickFinderByScript"
+						p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:fieldConversions="principalName:initiator"/>
+			  </property>
+			  <property name="inquiry">
+				  <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
+						p:inquiryParameters="initiator:principalName"/>
+			  </property>
+		  </bean>
         <bean p:propertyName="deadlineDate" parent="Uif-LookupCriteriaInputField"  p:ranged="true"/>
         <bean p:propertyName="sponsorCode" parent="Uif-LookupCriteriaInputField">
           <property name="inquiry">
@@ -1243,8 +1291,10 @@
     </property>
     <property name="resultFields">
       <list>
-        <bean p:propertyName="proposalNumber" parent="Uif-DataField"/>
-        <bean p:propertyName="proposalDocument.documentNumber" parent="Uif-DataField"/> 
+	    <!-- KC-1179 Sort All my proposals with most recent first -->
+		<bean p:propertyName="proposalNumberPadded" p:label="Proposal Number" parent="Uif-DataField"/>
+		<!-- KC-1179 END -->
+        <bean p:propertyName="proposalDocument.documentNumber" parent="Uif-DataField"/>
         <bean p:propertyName="proposalType.description" parent="Uif-DataField">
           <property name="inquiry">
                        <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.type.ProposalType"
@@ -1287,6 +1337,7 @@
         <bean p:propertyName="hierarchyStatusName" parent="Uif-DataField"/>
       </list>
     </property>
+	  <property name="resultsGroup.useServerPaging" value="true"/>
       <property name="resultsGroup.lineActions">
           <list>
               <bean parent="Development-Proposal-Lookup-result-ViewLink" p:order="10"/>
@@ -1323,54 +1374,9 @@
       </property>
   </bean>
   
-<bean id="AllDevelopmentProposals-LookupViewId" parent="AllDevelopmentProposals-lookupView-parentBean" />
+  <bean id="AllDevelopmentProposals-LookupViewId" parent="AllDevelopmentProposals-lookupView-parentBean" />
    <bean id="AllDevelopmentProposals-lookupView-parentBean" abstract="true" parent="DevelopmentProposal-LookupView" p:viewName="AllLookupableDevelopmentProposals-LookupViewName" 
 	p:headerText="All Proposal Development Document Lookup" >
-	<property name="criteriaFields">
-      <list >
-        <bean p:propertyName="proposalNumber" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
-        <bean p:propertyName="proposalTypeCode" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
-        <bean p:propertyName="proposalStateTypeCode" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
-        <bean p:propertyName="title" parent="Uif-LookupCriteriaInputField"/>
-        <bean p:propertyName="proposalPerson" parent="Uif-LookupCriteriaInputField" p:fieldLabel.labelText="Proposal Person"/>
-        <bean p:propertyName="principalInvestigatorName" parent="Uif-LookupCriteriaInputField"/>
-       <bean p:propertyName="initiator" parent="Uif-LookupCriteriaInputField" p:fieldLabel.labelText="Initiator"  p:enableAutoDirectInquiry="false" p:defaultValue="@{#userSession == null ? '' : #userSession.getLoggedInUserPrincipalName()}">
-            <property name="inquiry" >
-                <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.rice.kim.impl.identity.PersonImpl"
-                      p:inquiryParameters="initiator:principalName" />
-            </property>
-        </bean>
-        <bean p:propertyName="deadlineDate" parent="Uif-LookupCriteriaInputField"  p:ranged="true"/>
-        <bean p:propertyName="sponsorCode" parent="Uif-LookupCriteriaInputField">
-          <property name="inquiry">
-              <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.sponsor.Sponsor"
-                    p:inquiryParameters="sponsorCode:sponsorCode"/>
-          </property>
-        </bean>
-		<!-- KC-1106 Remove fields from Development Proposal Lookup
-        <bean p:propertyName="sponsor.sponsorName" parent="Uif-LookupCriteriaInputField">
-            <property name="inquiry">
-                <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.sponsor.Sponsor"
-                      p:inquiryParameters="sponsorCode:sponsorCode"/>
-            </property>
-        </bean>
-        -->
-        <bean parent="DevelopmentProposal-Lookup-UnitField"/>
-		  <!-- KC-1106 Remove fields from Development Proposal Lookup
-        <bean p:propertyName="ownedByUnit.unitName" parent="Uif-LookupCriteriaInputField">
-            <property name="inquiry">
-                <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.common.framework.unit.Unit"
-                      p:inquiryParameters="ownedByUnit.unitName:unitName"/>
-            </property>
-        </bean>
-        <bean p:propertyName="currentAwardNumber" parent="Uif-LookupCriteriaInputField"/>
-        -->
-        <bean p:propertyName="opportunityIdForGG" parent="Uif-LookupCriteriaInputField"/>
-		<!-- KC-1106 Remove fields from Development Proposal Lookup
-        <bean p:propertyName="hierarchyStatus" parent="Uif-LookupCriteriaInputField"/>
-        -->
-      </list>
-    </property>
   </bean>
 
 

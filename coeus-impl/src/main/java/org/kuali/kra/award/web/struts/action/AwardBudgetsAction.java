@@ -51,6 +51,7 @@ import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -63,11 +64,16 @@ import java.util.List;
  */
 public class AwardBudgetsAction extends AwardAction implements AuditModeAction {
 
-    private static final Log LOG = LogFactory.getLog(AwardBudgetsAction.class);
+	private static final Log LOG = LogFactory.getLog(AwardBudgetsAction.class);
 
     private static final String CONFIRM_SYNCH_BUDGET_RATE = "confirmSynchBudgetRate";
     private static final String NO_SYNCH_BUDGET_RATE = "noSynchBudgetRate";
     public static final String DEFAULT_BUDGET_ACTIVITY_TYPE_CODE = "x";
+    private static final String SHOW_ALL_BUDGET_VERSIONS_URL_PARAM = "showAllBudgetVersions=";
+	private static final String AUDIT_ACTIVATED_URL_PARAM = "auditActivated=";
+	private static final String AMPERSTAND = "&";
+    public static final String SYNC_QUESTION_ASKED = "syncQuestionAsked";
+
 
     /**
      * Main execute method that is run. Populates A map of rate types in the {@link HttpServletRequest} instance to be used
@@ -178,7 +184,6 @@ public class AwardBudgetsAction extends AwardAction implements AuditModeAction {
         Collection<BudgetRate> allBudgetRates = budgetService.getSavedProposalRates(budgetToOpen);
         Award newestAward = getAwardBudgetService().getActiveOrNewestAward(awardDocument.getAward().getAwardNumber());
         newestAward.refreshReferenceObject("awardFandaRate");
-        List<AwardFandaRate> fandaRates = newestAward.getAwardFandaRate();
         List ebRates =new ArrayList();
         if(newestAward.getSpecialEbRateOffCampus()!=null)
         	ebRates.add(newestAward.getSpecialEbRateOffCampus());
@@ -187,11 +192,12 @@ public class AwardBudgetsAction extends AwardAction implements AuditModeAction {
         if(newestAward.getRequestedStartDateInitial()==null || newestAward.getRequestedEndDateInitial()==null){
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
-        
-        if(awardBudgetService.checkRateChange(allBudgetRates, newestAward)){
+
+        if (awardBudgetService.checkRateChange(allBudgetRates, newestAward)) {
         	return confirm(syncBudgetRateConfirmationQuestion(mapping, form, request, response,
                     KeyConstants.QUESTION_SYNCH_AWARD_RATE), CONFIRM_SYNCH_BUDGET_RATE, NO_SYNCH_BUDGET_RATE);
-        	 }
+        }
+
         if (budgetRatesService.checkActivityTypeChange(allBudgetRates, newestAward.getActivityTypeCode())) {
             return confirm(syncBudgetRateConfirmationQuestion(mapping, form, request, response,
                     KeyConstants.QUESTION_SYNCH_BUDGET_RATE), CONFIRM_SYNCH_BUDGET_RATE, NO_SYNCH_BUDGET_RATE);
@@ -209,17 +215,13 @@ public class AwardBudgetsAction extends AwardAction implements AuditModeAction {
             }
             String backUrl = URLEncoder.encode(buildActionUrl(awardDocument.getDocumentNumber(), Constants.MAPPING_AWARD_BUDGET_VERSIONS_PAGE, "AwardDocument"), StandardCharsets.UTF_8.name());
             String forward = buildForwardUrl(routeHeaderId) + "&backLocation=" + backUrl;
+            forward = StringUtils.replace(forward, Constants.AWARD_BUDGET_VERSIONS_ACTION, Constants.AWARD_BUDGET_PARAMETERS_ACTION);
             if (!budget.getActivityTypeCode().equals(newestAward.getActivityTypeCode()) || budget.isRateClassTypesReloaded()) {
                 budget.setActivityTypeCode(newestAward.getActivityTypeCode());
-                forward = forward.replace("awardBudgetParameters.do?", "awardBudgetParameters.do?syncBudgetRate=Y&");
+                forward = forward.replace(Constants.AWARD_BUDGET_PARAMETERS_ACTION, Constants.AWARD_BUDGET_PARAMETERS_ACTION + "syncBudgetRate=Y" + AMPERSTAND);
             }
-            if (awardForm.isAuditActivated()) {
-                forward = StringUtils.replace(forward, "awardBudgetParameters.do?", "awardBudgetParameters.do?auditActivated=true&");
-            } else {
-            	forward = StringUtils.replace(forward, "awardBudgetParameters.do?", "awardBudgetParameters.do?auditActivated=false&");
-            }
-            //add in the showAllBudgetVersions flag so it will be persisted until they leave the documents.
-            forward = StringUtils.replace(forward, "Parameters.do?", "Parameters.do?showAllBudgetVersions=" + awardForm.isShowAllBudgetVersions() + "&");
+            forward = StringUtils.replace(forward, Constants.AWARD_BUDGET_PARAMETERS_ACTION, Constants.AWARD_BUDGET_PARAMETERS_ACTION + AUDIT_ACTIVATED_URL_PARAM + awardForm.isAuditActivated() + AMPERSTAND);
+            forward = StringUtils.replace(forward, Constants.AWARD_BUDGET_PARAMETERS_ACTION, Constants.AWARD_BUDGET_PARAMETERS_ACTION + SHOW_ALL_BUDGET_VERSIONS_URL_PARAM + awardForm.isShowAllBudgetVersions() + AMPERSTAND);
             return new ActionForward(forward, true);
         }
     }
@@ -245,11 +247,9 @@ public class AwardBudgetsAction extends AwardAction implements AuditModeAction {
             Budget budget = awardBudgetDocument.getBudget();
           
           budget.setRateClassTypesReloaded(false);
-          forward = forward.replace("awardBudgetParameters.do?", "awardBudgetParameters.do?syncBudgetRate=Y&");
+          forward = forward.replace(Constants.AWARD_BUDGET_VERSIONS_ACTION, Constants.AWARD_BUDGET_PARAMETERS_ACTION + "syncBudgetRate=Y" + AMPERSTAND);
         }
-        if (awardForm.isAuditActivated()) {
-            forward = StringUtils.replace(forward, "budgetParameters.do?", "budgetParameters.do?auditActivated=true&");
-        }
+        forward = StringUtils.replace(forward, Constants.AWARD_BUDGET_VERSIONS_ACTION, Constants.AWARD_BUDGET_VERSIONS_ACTION + AUDIT_ACTIVATED_URL_PARAM + awardForm.isAuditActivated() + AMPERSTAND + SYNC_QUESTION_ASKED + "=Y" + AMPERSTAND);
         return new ActionForward(forward, true);
     }
 
@@ -315,7 +315,15 @@ public class AwardBudgetsAction extends AwardAction implements AuditModeAction {
         AwardForm awardForm = (AwardForm) form;
         AwardDocument awardDoc = awardForm.getAwardDocument();
         Budget budgetToCopy = getSelectedVersion(awardForm, request);
-        copyBudget(awardDoc.getBudgetParent(), budgetToCopy, copyPeriodOneOnly);
+        DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
+		AwardBudgetDocument budgetDocToCopy = (AwardBudgetDocument) documentService.getByDocumentHeaderId(budgetToCopy.getDocumentNumber());
+		
+		AwardBudgetDocument newBudget = getAwardBudgetService().copyBudgetVersion(budgetDocToCopy, copyPeriodOneOnly);
+		awardDoc.getAward().getBudgets().add(newBudget.getAwardBudget());
+		awardDoc.getAward().getCurrentVersionBudgets().add(newBudget.getAwardBudget());
+        newBudget.getBudget().setNameUpdatable(true);
+        newBudget.getBudget().setName(budgetToCopy.getName() + " " 
+                                                + budgetToCopy.getBudgetVersionNumber() + " copy");
     }
     
     private StrutsConfirmation syncBudgetRateConfirmationQuestion(ActionMapping mapping, ActionForm form,

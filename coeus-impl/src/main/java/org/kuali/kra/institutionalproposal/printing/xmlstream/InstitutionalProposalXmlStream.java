@@ -67,13 +67,13 @@ import java.util.*;
  */
 public class InstitutionalProposalXmlStream implements XmlStream {
     
-	
+
 	private static final String PROPOSAL_SUMMARY_COMMENT_CODE;
 	private static final String PROTOCOL_NUMBER = "protocolNumber";
 	private static final String SPECIAL_REVIEW_APPROVAL_CODE = "5";
 	private static final String SPONSOR_CODE = "sponsorCode";
 	private static final String NSF_CODE = "nsfCode";
-	private static final String NOTICE_OF_OPPORTUNITY_CODE = "noticeOfOpportunityCode";
+	private static final String NOTICE_OF_OPPORTUNITY_CODE = "code";
 	private static final String PROPOSAL_TYPE_CODE = "code";
 	private static final String PROPOSAL_STATUS_CODE = "proposalStatusCode";
 	private static final String SCHOOL_NAME = "SCHOOL_NAME";
@@ -194,7 +194,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
                     
                     otherGroup.setGroupName(customAttributeDocuments.get(custData.getCustomAttributeId().toString()).getCustomAttribute().getGroupName());
                     otherGroupDetails.setColumnValue(custData.getValue());                  
-                    otherGroupDetails.setColumnName(customAttributeDocuments.get(custData.getCustomAttributeId().toString()).getCustomAttribute().getLabel());                                       
+                    otherGroupDetails.setColumnName(customAttributeDocuments.get(custData.getCustomAttributeId().toString()).getCustomAttribute().getLabel());
                     otherGroupDetailsTypesList.add(otherGroupDetails);
                     break;
                 }
@@ -216,7 +216,6 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 		List<KeyPersonType> keyPersonTypes = new ArrayList<KeyPersonType>();
 		IPKeyPersonType keyPersonType = null;
 		for (InstitutionalProposalPerson proposalPerson : institutionalProposal.getProjectPersons()) {
-			if (proposalPerson.isPrincipalInvestigator() || proposalPerson.isCoInvestigator() || proposalPerson.isKeyPerson()) {
 				keyPersonType = IPKeyPersonType.Factory.newInstance();
 				if (institutionalProposal.getProposalNumber() != null) {
 					keyPersonType.setProposalNumber(institutionalProposal
@@ -229,12 +228,12 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 				//BEGIN UH KC-450 rbl added code to fix null pointer error - print notice generation failure for non-employees
 				if (person != null) {
 				    if (person.getFullName() != null) {
-					    keyPersonType.setPersonName(person.getFullName());
+					keyPersonType.setPersonName(person.getFullName());
 				    } else if (proposalPerson.getRolodex() != null) {
 					    if (proposalPerson.getRolodex().getFullName() != null) {
 						    keyPersonType.setPersonName(proposalPerson.getRolodex().getFullName());
 					    }
-				    }
+				}
 				}
 				//END UH KC-450 
 				ContactRole role = proposalPerson.getContactRole();
@@ -242,13 +241,13 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 					keyPersonType.setRoleName(role.getRoleDescription());
 				}
 				if (proposalPerson.getPerson() != null) {
-				if (proposalPerson.getPerson().getAddressLine1() != null) {
+	                if (proposalPerson.getPerson().getAddressLine1() != null) {
 					    keyPersonType.setPersonAddress(proposalPerson.getPerson().getAddressLine1());
 	                }
 				} else if (proposalPerson.getRolodex() != null) {
                     if (proposalPerson.getRolodex().getAddressLine1() != null) {
                         keyPersonType.setPersonAddress(proposalPerson.getRolodex().getAddressLine1());
-					}
+                    }
 				}
 				if (proposalPerson.getTotalEffort() != null) {
 					keyPersonType.setPercentEffort(proposalPerson
@@ -259,7 +258,6 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 					keyPersonType.setNonEmployee(true);
 				}
 			}
-		}
 		return keyPersonTypes.toArray(new IPKeyPersonType[0]);
 	}
 
@@ -275,38 +273,37 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 		List<InvestigatorType2> investigatorTypesList = new ArrayList<InvestigatorType2>();
 		InvestigatorType2 investigatorType = null;
 		for (InstitutionalProposalPerson proposalPerson : institutionalProposal.getProjectPersons()) {
-			if (proposalPerson.isPrincipalInvestigator() || proposalPerson.isCoInvestigator() || proposalPerson.isKeyPerson()) {
 				investigatorType = InvestigatorType2.Factory.newInstance();
 				PersonType personType = PersonType.Factory.newInstance();
                 KcPerson person = proposalPerson.getPerson();
                 if (person != null) {
                     if (person.getAddressLine1() != null) {
                         personType.setAddress(person.getAddressLine1());
-				}
+                    }
                     if (person.getCity() != null) {
                         personType.setCity(person.getCity());
-				}
+                    }
                     if (person.getFirstName() != null) {
                         personType.setFirstName(person.getFirstName());
-				}
-				if (proposalPerson.getFullName() != null) {
-					personType.setFullName(proposalPerson.getFullName());
-				}
+                    }
+                    if (proposalPerson.getFullName() != null) {
+                        personType.setFullName(proposalPerson.getFullName());
+                    }
                     if (person.getLastName() != null) {
                         personType.setLastName(person.getLastName());
-				}
+                    }
                     if (person.getMiddleName() != null) {
                         personType.setMiddleName(person.getMiddleName());
-				}
-				if (proposalPerson.getPhoneNumber() != null) {
-					personType.setPhone(proposalPerson.getPhoneNumber());
-				}
+                    }
+                    if (proposalPerson.getPhoneNumber() != null) {
+                        personType.setPhone(proposalPerson.getPhoneNumber());
+                    }
                     if (person.getState() != null) {
                         personType.setState(person.getState());
-				}
+                    }
                     if (person.getPostalCode() != null) {
                         personType.setZip(person.getPostalCode());
-				}
+                    }
                 } else {
                     NonOrganizationalRolodex rolodex = proposalPerson.getRolodex();
                     if (rolodex != null) {
@@ -350,7 +347,6 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 						.toArray(new UnitType[0]));
 				investigatorTypesList.add(investigatorType);
 			}
-		}
 		return investigatorTypesList.toArray(new InvestigatorType2[0]);
 	}
 

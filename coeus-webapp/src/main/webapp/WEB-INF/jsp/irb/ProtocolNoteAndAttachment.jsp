@@ -19,23 +19,7 @@
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
 <c:set var="readOnly" value="${!KualiForm.notesAttachmentsHelper.modifyAttachments}" scope="request" />
-<kul:documentPage
-	showDocumentInfo="true"
-	htmlFormAction="protocolNoteAndAttachment"
-	documentTypeName="ProtocolDocument"
-	renderMultipart="true"
-	showTabButtons="true"
-	auditCount="0"
-  	headerDispatch="${KualiForm.headerDispatch}"
-  	headerTabActive="noteAndAttachment">
 
-<!--
-"ATTP", "Attachment Type"
-"DESC", "Description"
-"LAUP", "Last Updated"
-"UPBY", "Last Updated By" 
- -->
- 
 <script type="text/javascript">
     var $j = jQuery.noConflict();
     
@@ -336,10 +320,23 @@
     });
 </script>
 
+<kul:documentPage
+        showDocumentInfo="true"
+        htmlFormAction="protocolNoteAndAttachment"
+        documentTypeName="ProtocolDocument"
+        renderMultipart="true"
+        showTabButtons="true"
+        auditCount="0"
+        headerDispatch="${KualiForm.headerDispatch}"
+        headerTabActive="noteAndAttachment">
 
-  	
-<div align="right"><kul:help documentTypeName="ProtocolDocument" pageName="Notes%20%26%20Attachments" /></div>
 <div id="workarea">
+
+<div align="right">
+    <kra:shortUrl shortUrl="${KualiForm.shortUrl}"/>
+    <kul:help documentTypeName="ProtocolDocument" pageName="Notes%20%26%20Attachments" />
+</div>
+
 <kra-irb:protocolAttachmentProtocol /> 
 <kra-irb:protocolNotes />
 <kul:panelFooter />

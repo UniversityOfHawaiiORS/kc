@@ -47,6 +47,8 @@
     <bean id="Kc-LandingPage-UhGrid-parentBean" abstract="true" parent="Uif-CssGridGroup">
         <property name="items">
             <list>
+                <!-- KC-1225 Need to add message of the day feature back into 6.0 -->
+                <bean parent="Uif-MessageField" p:messageText="@{#getParam('KC-GEN','All','uh_message_of_the_day')}" p:colSpan="12" p:additionalCssClasses="uh_motd_text"/>
                 <bean parent="Uif-MessageField" p:messageText="Get started" p:colSpan="12" p:additionalCssClasses="uh_help_section_header"/>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
                     p:actionLabel="Create Proposal"

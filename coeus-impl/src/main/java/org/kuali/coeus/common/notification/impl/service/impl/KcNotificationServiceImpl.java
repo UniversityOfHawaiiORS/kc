@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -103,8 +105,9 @@ public class KcNotificationServiceImpl implements KcNotificationService {
     private RolodexService rolodexService;
     private ParameterService parameterService;
     private IdentityService identityService;
-    private KcEmailService kcEmailService;    
-    
+    private KcEmailService kcEmailService;
+    private ExecutorService executorService = Executors.newCachedThreadPool();
+
     @Override
     public NotificationType getNotificationType(NotificationContext context) {
         return getNotificationType(context.getModuleCode(), context.getActionTypeCode());
@@ -179,7 +182,7 @@ public class KcNotificationServiceImpl implements KcNotificationService {
     @Override
     public void sendNotification(NotificationContext context) {
         KcNotification notification = createNotificationObject(context);
-        
+
         if (notification.getNotificationType() != null && notification.getNotificationType().isActive()) {
             String contextName = context.getContextName();
             String subject = notification.getSubject();
@@ -218,13 +221,13 @@ public class KcNotificationServiceImpl implements KcNotificationService {
     }
     
     @Override
-    public void sendNotification(NotificationContext context, KcNotification notification, List<NotificationTypeRecipient> notificationTypeRecipients) {        
+    public void sendNotification(NotificationContext context, KcNotification notification, List<NotificationTypeRecipient> notificationTypeRecipients) {
         String contextName = context.getContextName();
         String subject = notification.getSubject();
         String message = notification.getMessage();
         Set<NotificationRecipient.Builder> notificationRecipients = getNotificationRecipients(notificationTypeRecipients, context);
         Set<String> emailRecipients = getEmailRecipients(notificationTypeRecipients);
-        
+
         sendNotification(contextName, subject, message, notificationRecipients);
         sendEmailNotification(subject, message, notificationRecipients, context.getEmailAttachments());
         sendEmailNotification(getKcEmailService().getDefaultFromAddress(), emailRecipients, subject, message, context.getEmailAttachments());
@@ -233,7 +236,7 @@ public class KcNotificationServiceImpl implements KcNotificationService {
     @Override
     public void sendNotification(String contextName, String subject, String message, List<String> principalNames) {
         Collection<NotificationRecipient.Builder> notificationRecipients = getNotificationRecipients(principalNames);
-        
+
         sendNotification(contextName, subject, message, notificationRecipients);
         sendEmailNotification(subject, message, notificationRecipients, Collections.<EmailAttachment>emptyList());
     }
@@ -242,17 +245,17 @@ public class KcNotificationServiceImpl implements KcNotificationService {
     public void sendEmailNotification(NotificationContext context) {
         if (isEmailEnabled()) {
             KcNotification notification = createNotificationObject(context);
-            
+
             if (notification.getNotificationType() != null && notification.getNotificationType().isActive()) {
                 String subject = notification.getSubject();
                 String message = notification.getMessage();
                 Collection<NotificationRecipient.Builder> notificationRecipients = getNotificationRecipients(context);
                 Set<String> toAddresses = getRecipientEmailAddresses(notificationRecipients);
-                
+
                 String fromAddress = getKcEmailService().getDefaultFromAddress();
-                
+
                 sendEmailNotification(fromAddress, toAddresses, subject, message, context.getEmailAttachments());
-            }        
+            }
         }
     }
     
@@ -276,8 +279,7 @@ public class KcNotificationServiceImpl implements KcNotificationService {
         
         notification.setRecipients(new ArrayList<NotificationRecipient.Builder>(notificationRecipients));
         notification.setDocTypeName(docTypeName);
-        
-        sendNotificationService.sendNotification(notification.build());
+        executorService.execute(() -> sendNotificationService.sendNotification(notification.build()));
     }
     
     private String getKCNotificationDocTypeName() {

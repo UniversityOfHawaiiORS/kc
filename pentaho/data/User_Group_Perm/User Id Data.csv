@@ -1,0 +1,54 @@
+Name,UH Number,Principal Name,Email Address,Affiliation Type,Campus Code,Emplyee Id,Primary,Employee Status,Employee Type ,Base Salary Amount,Primary Department Code,Work Phone,Fax,First Name,Last Name,PRIMARY_TITLE
+Yaa Yin,17249689,yaayin,yaayin@hawaii.edu,FCLTY,MA,pcall,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Yaa-Yin,Fong-pcall,ORS Director
+Jean U,10674932,jeanu,yaayin@hawaii.edu,STAFF,MA,ddall,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Yaa-Yin,Fong-ddall,
+Dawn C,11374137,dhirao,teffta@hawaii.edu,STAFF,MA,ddall2,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Andrew,Tefft-ddall2,
+Charles Luk,10226662,cluk,gouldner@hawaii.edu,STAFF,MA,ddall3,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Ronald,Gouldner-ddall3,
+Kevin H,10344456,hanaokak,oshirok@hawaii.edu,STAFF,MA,ddcanceti,Y,Active,Professional,0,MA1424,808-956-5198,808-956-9081,Kathy,Oshiro-ddce,
+Lane,20376233,lanef,hanaokak@hawaii.edu,STAFF,MU,ddmicrobio,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Kevin,Hanaoka-ddmb,
+Donna K,17582561,dkekina,morita@hawaii.edu,STAFF,HI,ddpharmsci,Y,Active,Professional,0,HI1668,808-956-5198,808-956-9081,Janis,Morita-ddps,
+Dawn K,10341593,dawnkim,oshirok@hawaii.edu,STAFF,HI,ddpharmsci2,Y,Active,Professional,0,HI1668,808-956-5198,808-956-9081,Kathy,Oshiro-ddps2,
+Lisa Ku,10338527,kunitomo,hanaokak@hawaii.edu,STAFF,MA,ddvolcgeo,Y,Active,Professional,0,MA1604,808-956-5198,808-956-9081,Kevin,Hanaoka-ddvg,
+Mark Y,12667229,myabui,morita@hawaii.edu,STAFF,MA,foall,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Janis,Morita-foall,Contracts Specialist
+Janis,10344255,morita,reeser@hawaii.edu,STAFF,MA,foall2,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Cheryl,Reeser-foall2,
+Karen M,19597745,klmatsu,teffta@hawaii.edu,STAFF,MA,foall3,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Andrew,Tefft-foall3,
+Wilbert C,10368422,wchoy,gouldner@hawaii.edu,STAFF,MA,foall4,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Ronald,Gouldner-foall4,
+Laura M,19636781,lmikawa,mitake@hawaii.edu,STAFF,MA,focanceti,Y,Active,Professional,0,MA1424,808-956-5198,808-956-9081,Naomi,Mitake-foce,
+Maricel R,11397420,mrodil,hanaokak@hawaii.edu,STAFF,MA,focanceti2,Y,Active,Professional,0,MA1424,808-956-5198,808-956-9081,Kevin,Hanaoka-foce2,
+Guilan X,17128842,guilan,daniel@ors.hawaii.edu,STAFF,MU,fomicrobio,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Daniel,Shelverton-fomb,
+Tammy F,12308996,tfuruta,oshirok@hawaii.edu,STAFF,MU,fomicrobio2,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Kathy,Oshiro-fomb2,
+Menaka G,10337640,menaha,jhalaszy@hawaii.edu,STAFF,HI,fopharmsci,Y,Active ,Professional,0,HI1668,808-956-5198,808-956-9081,Jennifer,Halaszyn-fops,
+Harrison I,10340470,hiwata,hanaokak@hawaii.edu,STAFF,HI,fopharmsci2,Y,Active ,Professional,0,HI1668,808-956-5198,808-956-9081,Kevin,Hanaoka-fops2,
+Joy M,10367210,magarifu,oshirok@hawaii.edu,STAFF,MA,fovolcgeo,Y,Active ,Professional,0,MA1604,808-956-5198,808-956-9081,Kathy,Oshiro-fovg,
+Leonard G,14705603,lgouveia,,FCLTY,MU,keypers1,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Key,Personnel1,
+Ying Guo,16256210,yingguo,,FCLTY,MU,keypers2,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Key,Personnel2,
+Jodi Ito,10329971,jodi,,STAFF,MA,keypers3,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Key,Personnel3,
+Lisa Ottiger,10108046,lottiger,,STAFF,MA,keypers4,Y,Active,Professional,0,MA1424,808-956-5198,808-956-9081,Key,Personnel4,
+Ming X,19402592,mingxu,,FCLTY,MA,keypers5,Y,Active,Professional,0,MA1424,808-956-5198,808-956-9081,Key,Personnel5,
+Mike,10953327,mcmorimo,jhalaszy@hawaii.edu,STAFF,MA,orsb,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Jennifer,Halaszyn-orsb,
+Royce,15340606,royceh,mitake@hawaii.edu,STAFF,MA,orsc,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Naomi,Mitake-orsc,
+Linda Murakami,10337083,lindamur,lindamur@hawaii.edu,STAFF,MA,orsd,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Daniel,Shelverton-orsd,
+Andrew,20210107,teffta,reeser@hawaii.edu,STAFF,MA,orse,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Cheryl,Reeser-orse,
+Gang,11150731,ygang,teffta@hawaii.edu,STAFF,MA,orsf,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Andrew,Tefft-orsf,
+Kristy D,14924392,kdoo,royceh@hawaii.edu,STAFF,MA,orsg,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Royce,Hanada-orsg,
+Sylvia F,19827446,ssflores,mcmorimo@hawaii.edu,STAFF,MA,orsh,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Michael,Morimoto-orsg,
+Paula G,10925851,gealon,morita@hawaii.edu,STAFF,MA,orsi,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9082,Janis,Morita-orsi,
+Ron ,20781608,gouldner,gouldner@hawaii.edu,STAFF,MA,orsmaint,Y,Active,Professional,0,SW1683,808-956-5198,808-956-9081,Ronald,Gouldner-orsmaint,
+Darcie Y,14715435,dsy,morita@hawaii.edu,FCLTY,MA,pcall2,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Janis,Morita-pcall2,
+Linda F,14376163,llfong,daniel@ors.hawaii.edu,FCLTY,MA,pcall3,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Daniel,Shelverton-pcall3,
+Daniel S,11778843,dshelver,teffta@hawaii.edu,FCLTY,MA,pcall4,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Andrew,Tefft-pcall4,Grants and Contracts Specialist
+Marlen M,20890326,mmmoe,royceh@hawaii.edu,FCLTY,MA,pcall5,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Royce,Hanada-pcall5,
+Georgette,10363057,gsakumot,gouldner@hawaii.edu,FCLTY,MA,pcall6,Y,Active,Professional,0,000001,808-956-5198,808-956-9081,Ronald,Gouldner-pcall6,Pre-Award Specialist
+Steven O,19344245,sosa6,jhalaszy@hawaii.edu,FCLTY,MA,pccanceti,Y,Active,Professional,0,MA1424,808-956-5198,808-956-9081,Jennifer,Halaszyn-pcce,
+Curtis T,10670279,ctanabe,oshirok@hawaii.edu,FCLTY,MA,pccanceti2,Y,Active,Professional,0,MA1424,808-956-5198,808-956-9081,Kathy,Oshiro-pcce2,
+Kellie G,11198653,kellieg,mitake@hawaii.edu,FCLTY,MU,pcmicrobio,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Naomi,Mitake-pcmb,
+Man Sze,11273379,mshing,hanaokak@hawaii.edu,FCLTY,MU,pcmicrobio2,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Kevin,Hanaoka-pcmb2,
+Jennifer H,17602720,jhalaszy,mcmorimo@hawaii.edu,FCLTY,MU,pcmicrobio3,Y,Active,Professional,0,MU1315,808-956-5198,808-956-9081,Michael,Morimoto-pcb3,
+Nina,21318108,tzuying,lanef@hawaii.edu,FCLTY,HI,pcpharmsci,Y,Active ,Professional,0,HI1668,808-956-5198,808-956-9081,Lane,Fukuda-pcps,
+Naomi,13628007,mitake,hanaokak@hawaii.edu,FCLTY,HI,pcpharmsci2,Y,Active ,Professional,0,HI1668,808-956-5198,808-956-9081,Kevin,Hanaoka-pcps2,Pre-Award Specialist
+Claire M,17371367,muzzatti,reeser@hawaii.edu,FCLTY,MA,pcvolcgeo,Y,Active ,Professional,0,MA1604,808-956-5198,808-956-9081,Cheryl,Reeser-pcvg,
+Julie,10365576,baileyju,oshirok@hawaii.edu,FCLTY,MA,pcvolcgeo2,Y,Active ,Professional,0,MA1604,808-956-5198,808-956-9081,Kathy,Oshiro-pcvg2,
+,10340949,kyoshina,,,,,,,,,,,,,,Pre-Award Specialist
+,10325855,pkakugaw,Only UH Number and title,,,,,,,,,,,,,Pre-Award Specialist
+,10461831,reeser,are used in the person_ext_t load.,,,,,,,,,,,,,Contracts Specialist
+,19920186,taui7,Need to add more if using the older load.,,,,,,,,,,,,,Coordinator
+,uhkchua,Hilo's Hybrid Unit Administrator,,,,,,,,,,,,,,Director

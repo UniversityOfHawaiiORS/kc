@@ -6,6 +6,8 @@ package edu.hawaii.infrastructure;
 public final class UhKeyConstants {
     
     public static final String ERROR_DOCUMENT_ABSTRACT_PROJECT_SUMMARY_MISSING = "error.document.abstract.projectSummary.missing";
+    // KC-966 Add FCOI Validation rule
+    public static final String WARNING_NON_EMPLOYEE_FCOI_REQUIRED = "warning.nonemployee.fcoi_attachment";
     //KC-306 - Primary performance site is not set as a default so it must be a required field now.
     // KC-952 Project Performance Site Improvements
     public static final String ERROR_PROPOSAL_SITES_PRIMARY_REQUIRED = "error.required.primaryPerformanceSite";
@@ -25,6 +27,8 @@ public final class UhKeyConstants {
     // KC-735 Add warning for Sponsor Deadline Time not entered
     public static final String SPONSOR_DEADLINE_TIME_WARNING = "warning.empty.sponsor.deadlinetime";
 
+    // KC-1281 Add data validation warning for keywords field
+    public static final String KEYWORDS_NOT_ENTERED_WARNING = "warning.empty.keywords";
     
     /**
      * private utility class ctor.

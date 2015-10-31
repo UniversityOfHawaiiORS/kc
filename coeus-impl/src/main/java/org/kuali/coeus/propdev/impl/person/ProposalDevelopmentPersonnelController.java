@@ -18,7 +18,10 @@
  */
 package org.kuali.coeus.propdev.impl.person;
 
+import edu.hawaii.kra.lookup.UhSolrExternalSearch;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.kuali.coeus.common.notification.impl.NotificationHelper;
 import org.kuali.coeus.common.notification.impl.bo.KcNotification;
 import org.kuali.coeus.common.notification.impl.bo.NotificationTypeRecipient;
 import org.kuali.coeus.common.view.wizard.framework.WizardControllerService;
@@ -33,6 +36,7 @@ import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiography;
 import org.kuali.coeus.common.framework.person.PersonTypeConstants;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.uif.UifConstants;
 import org.kuali.rice.krad.uif.UifParameters;
 import org.kuali.rice.krad.uif.util.ObjectPropertyUtils;
@@ -58,6 +62,10 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
 
     public static final String PROPOSAL_PERSONS_PATH = "document.developmentProposal.proposalPersons";
     public static final String CERTIFICATION_UPDATE_FEATURE_FLAG = "CERTIFICATION_UPDATE_FEATURE_FLAG";
+    public static final String CERTIFICATION_ACTION_TYPE_CODE = "104";
+    public static final String CERTIFY_NOTIFICATION = "Certify Notification";
+    public static final String KEY_PERSON_PROJECT_ROLE = "keyPersonProjectRole";
+    public static final String PERSON_ROLE = "personRole";
     @Autowired
     @Qualifier("wizardControllerService")
     private WizardControllerService wizardControllerService;
@@ -65,6 +73,10 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
     @Autowired
     @Qualifier("keyPersonnelService")
 	private KeyPersonnelService keyPersonnelService;
+
+    @Autowired
+    @Qualifier("kualiRuleService")
+    private KualiRuleService kualiRuleService;
 
 	@Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=navigate", "actionParameters[navigateToPageId]=PropDev-PersonnelPage"})
     public ModelAndView navigateToPersonnel(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result, HttpServletRequest request, HttpServletResponse response) throws Exception {
@@ -115,7 +127,7 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
     @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=prepareAddPersonDialog"})
     public ModelAndView prepareAddPersonDialog(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) {
         form.getAddKeyPersonHelper().setLineType(PersonTypeConstants.EMPLOYEE.getCode());
-        return getModelAndViewService().showDialog("PropDev-PersonnelPage-Wizard",true,form);
+        return getModelAndViewService().showDialog(ProposalDevelopmentConstants.KradConstants.PROP_DEV_PERSONNEL_PAGE_WIZARD, true, form);
     }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=navigateToPersonError"})
@@ -136,15 +148,31 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
    public ModelAndView performPersonnelSearch(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
            HttpServletRequest request, HttpServletResponse response) throws Exception {
        form.getAddKeyPersonHelper().getResults().clear();
-       List<Object> results = new ArrayList<Object>();
+       List<Object> results = null;
 
-       for (Object object : getWizardControllerService().performWizardSearch(form.getAddKeyPersonHelper().getLookupFieldValues(),form.getAddKeyPersonHelper().getLineType())) {
-           WizardResultsDto wizardResult = (WizardResultsDto) object;
-           String personId = wizardResult.getKcPerson() != null ? wizardResult.getKcPerson().getPersonId() : wizardResult.getRolodex().getRolodexId().toString();
-           if (!personAlreadyExists(personId,form.getDevelopmentProposal().getProposalPersons())) {
-               results.add(object);
-           }
+       // KC-1218 Use SOLR for person lookup
+       if (form.getAddKeyPersonHelper().getLookupFieldValues().get("q") == null) {
+           return getRefreshControllerService().refresh(form);
        }
+
+       String q = form.getAddKeyPersonHelper().getLookupFieldValues().get("q").toString();
+       UhSolrExternalSearch search = new UhSolrExternalSearch();
+       Map<String, String> conf = new HashMap<String, String>();
+
+       String searchType = form.getAddKeyPersonHelper().getLineType();
+
+       if (searchType.equals(PersonTypeConstants.EMPLOYEE.getCode())) {
+           conf.put("kind", "PERSON");
+           conf.put("pk", "personId");
+           results = search.searchForKcPerson(conf, q);
+       } else if (searchType.equals(PersonTypeConstants.NONEMPLOYEE.getCode())) {
+           conf.put("kind", "NONEMPLOYEE");
+           conf.put("pk", "rolodexId");
+           results = search.searchForNonEmployee(conf, q);
+       } else {
+           Logger.getLogger(ProposalDevelopmentPersonnelController.class).error("Person Search for unknown type: " + searchType);
+       }
+       // KC-1218 END
 
        form.getAddKeyPersonHelper().setResults(results);
        return getRefreshControllerService().refresh(form);
@@ -170,16 +198,27 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
            }
        }
 
-       newProposalPerson.setProposalPersonRoleId((String)form.getAddKeyPersonHelper().getParameter("personRole"));
-       if (form.getAddKeyPersonHelper().getParameterMap().containsKey("keyPersonProjectRole")) {
-        newProposalPerson.setProjectRole((String)form.getAddKeyPersonHelper().getParameter("keyPersonProjectRole"));
+       newProposalPerson.setProposalPersonRoleId((String) form.getAddKeyPersonHelper().getParameter(PERSON_ROLE));
+       if (form.getAddKeyPersonHelper().getParameterMap().containsKey(KEY_PERSON_PROJECT_ROLE)) {
+        newProposalPerson.setProjectRole((String) form.getAddKeyPersonHelper().getParameter(KEY_PERSON_PROJECT_ROLE));
+       }
+
+       if (!getKualiRuleService().applyRules(new AddKeyPersonEvent(form.getProposalDevelopmentDocument(),newProposalPerson))) {
+           return reportKeyPersonError(form);
        }
        getKeyPersonnelService().addProposalPerson(newProposalPerson, form.getProposalDevelopmentDocument());
        Collections.sort(form.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalPersons(), new ProposalPersonRoleComparator());
        form.getAddKeyPersonHelper().reset();
        form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATEPAGE.getKey());
-       return super.save(form);
+       super.save(form);
+       return getKcCommonControllerService().closeDialog(ProposalDevelopmentConstants.KradConstants.PROP_DEV_PERSONNEL_PAGE_WIZARD, form);
    }
+
+    protected ModelAndView reportKeyPersonError(ProposalDevelopmentDocumentForm form) {
+        form.setAjaxReturnType(UifConstants.AjaxReturnTypes.UPDATECOMPONENT.getKey());
+        form.setUpdateComponentId(ProposalDevelopmentConstants.KradConstants.PROP_DEV_PERSONNEL_PAGE_WIZARD);
+        return getModelAndViewService().getModelAndView(form);
+    }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=navigate", "actionParameters[navigateToPageId]=PropDev-CreditAllocationPage"})
     public ModelAndView navigateToCreditAllocation(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, BindingResult result,
@@ -267,51 +306,82 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
     return getModelAndViewService().showDialog("PropDev-SubmitPage-CertificationDetail",true,form);
     }
 
-    @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=sendCertificationNotification")
-    public ModelAndView sendCertificationNotification(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form,
-                                       @RequestParam("actionParameters[" + UifParameters.SELECTED_LINE_INDEX + "]") String selectedLine) throws Exception {
-
-        sendPersonNotification(form, String.valueOf(selectedLine));
-        return super.save(form);
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=prepareVerifyCertificationDialog")
+    public ModelAndView prepareVerifyCertificationDialog(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form,
+                                                      @RequestParam("actionParameters[" + UifParameters.SELECTED_LINE_INDEX + "]") String selectedLine) throws Exception {
+        ProposalPerson person = form.getDevelopmentProposal().getProposalPerson(Integer.parseInt(selectedLine));
+        prepareNoticationHelper(form, person);
+       if (form.getNotificationHelper().getPromptUserForNotificationEditor(form.getNotificationHelper().getNotificationContext())) {
+           return getModelAndViewService().showDialog(ProposalDevelopmentConstants.KradConstants.PROP_DEV_PERSONNEL_PAGE_VERIFY_NOTIFICATION_DIALOG, true, form);
+       } else {
+           return sendCertificationNotification(form);
+       }
     }
 
+    protected void prepareNoticationHelper(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form, ProposalPerson person) {
+        NotificationHelper<ProposalDevelopmentNotificationContext> notificationHelper = form.getNotificationHelper();
+        notificationHelper.setNotification(getKcNotificationService().createNotificationObject(createNotificationContext(form.getDevelopmentProposal(), person)));
+        notificationHelper.setNotificationContext(createNotificationContext(form.getDevelopmentProposal(), person));
+        notificationHelper.setNotificationRecipients(Collections.singletonList(createRecipientFromPerson(person)));
+        notificationHelper.setNewPersonId(person.getPersonId());
+    }
 
-    public void sendPersonNotification(ProposalDevelopmentDocumentForm form, String selectedLine) throws Exception {
-        ProposalPerson person = form.getDevelopmentProposal().getProposalPerson(Integer.parseInt(selectedLine));
-
+    protected ProposalDevelopmentNotificationContext createNotificationContext(DevelopmentProposal developmentProposal, ProposalPerson person) {
         ProposalDevelopmentNotificationContext context =
-                new ProposalDevelopmentNotificationContext(form.getDevelopmentProposal(), "104", "Certify Notification");
-        ((ProposalDevelopmentNotificationRenderer) context.getRenderer()).setDevelopmentProposal(form.getDevelopmentProposal());
-        ((ProposalDevelopmentNotificationRenderer) context.getRenderer()).setProposalPerson(person);
-        KcNotification notification = getKcNotificationService().createNotificationObject(context);
+                new ProposalDevelopmentNotificationContext(developmentProposal, CERTIFICATION_ACTION_TYPE_CODE, CERTIFY_NOTIFICATION);
+        ProposalDevelopmentNotificationRenderer renderer = (ProposalDevelopmentNotificationRenderer) context.getRenderer();
+        renderer.setDevelopmentProposal(developmentProposal);
+        renderer.setProposalPerson(person);
+        return context;
+    }
+
+    protected NotificationTypeRecipient createRecipientFromPerson(ProposalPerson person) {
         NotificationTypeRecipient recipient = new NotificationTypeRecipient();
         recipient.setPersonId(person.getPersonId());
-        getKcNotificationService().sendNotification(context, notification, Collections.singletonList(recipient));
-        getGlobalVariableService().getMessageMap().putInfoForSectionId("PropDev-PersonnelPage-Collection", KeyConstants.INFO_NOTIFICATIONS_SENT, person.getFullName() + " " + notification.getCreateTimestamp());
+        recipient.setFullName(person.getFullName());
+        return recipient;
+    }
+
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=sendCertificationNotification")
+    public ModelAndView sendCertificationNotification(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
+        NotificationHelper<ProposalDevelopmentNotificationContext> notificationHelper = form.getNotificationHelper();
+        ProposalPerson person =((ProposalDevelopmentNotificationRenderer) notificationHelper.getNotificationContext().getRenderer()).getProposalPerson();
+        getKcNotificationService().sendNotification(notificationHelper.getNotificationContext(), notificationHelper.getNotification(),
+                notificationHelper.getNotificationRecipients());
+        getGlobalVariableService().getMessageMap().putInfoForSectionId(ProposalDevelopmentConstants.KradConstants.PROP_DEV_PERSONNEL_PAGE_COLLECTION, KeyConstants.INFO_NOTIFICATIONS_SENT,
+                person.getFullName() + " " + notificationHelper.getNotification().getCreateTimestamp());
         person.setLastNotification(getDateTimeService().getCurrentTimestamp());
-        getDataObjectService().save(person);
+        return super.save(form);
     }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=sendAllCertificationNotifications")
     public ModelAndView sendAllCertificationNotifications(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
         int index = 0;
         for (ProposalPerson proposalPerson : form.getDevelopmentProposal().getProposalPersons()) {
-            if (proposalPerson.isSelectedPerson()) {
-                boolean certificationComplete = true;
-                for (AnswerHeader answerHeader : proposalPerson.getQuestionnaireHelper().getAnswerHeaders()) {
-                    certificationComplete &= answerHeader.isCompleted();
-                }
-                if (!certificationComplete) {
+            if (proposalPerson.isSelectedPerson() && !isCertificationComplete(proposalPerson) ) {
                     sendPersonNotification(form, String.valueOf(index));
-                }
-
-                index++;
             }
+            index++;
         }
         return super.save(form);
     }
 
+    protected boolean isCertificationComplete(ProposalPerson proposalPerson) {
+        boolean certificationComplete = true;
+        for (AnswerHeader answerHeader : proposalPerson.getQuestionnaireHelper().getAnswerHeaders()) {
+            certificationComplete &= answerHeader.isCompleted();
+        }
+        return certificationComplete;
+    }
 
+    public void sendPersonNotification(ProposalDevelopmentDocumentForm form, String selectedLine) throws Exception {
+        ProposalPerson person = form.getDevelopmentProposal().getProposalPerson(Integer.parseInt(selectedLine));
+        ProposalDevelopmentNotificationContext context = createNotificationContext(form.getDevelopmentProposal(), person);
+        KcNotification notification = getKcNotificationService().createNotificationObject(context);
+        getKcNotificationService().sendNotification(context, notification, Collections.singletonList(createRecipientFromPerson(person)));
+        getGlobalVariableService().getMessageMap().putInfoForSectionId(ProposalDevelopmentConstants.KradConstants.PROP_DEV_PERSONNEL_PAGE_COLLECTION, KeyConstants.INFO_NOTIFICATIONS_SENT, person.getFullName() + " " + notification.getCreateTimestamp());
+        person.setLastNotification(getDateTimeService().getCurrentTimestamp());
+    }
 
     @Transactional @RequestMapping(value = "/proposalDevelopment", params={"methodToCall=movePersonUp"})
     public ModelAndView movePersonUp(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form,
@@ -437,4 +507,12 @@ public class ProposalDevelopmentPersonnelController extends ProposalDevelopmentC
 			return retval;
 		}
 	}
+
+    public KualiRuleService getKualiRuleService() {
+        return kualiRuleService;
+    }
+
+    public void setKualiRuleService(KualiRuleService kualiRuleService) {
+        this.kualiRuleService = kualiRuleService;
+    }
 }

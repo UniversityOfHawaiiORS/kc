@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.kuali.coeus</groupId>
         <artifactId>coeus</artifactId>
-        <version>1506.69</version>
+        <version>1509.57</version>
     </parent>
     <artifactId>coeus-impl</artifactId>
     <packaging>jar</packaging>
@@ -206,6 +206,7 @@
                         <artifactId>xercesImpl</artifactId>
                         <version>${xercesImpl.version}</version>
                     </dependency>
+
                 </dependencies>
             </plugin>
 
@@ -299,6 +300,26 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-broker</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-jdbc-store</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-kahadb-store</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-spring</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
         </dependency>
@@ -316,6 +337,12 @@
         <dependency>
             <groupId>displaytag</groupId>
             <artifactId>displaytag</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${hibernate.validator.version}</version>
         </dependency>
 
         <dependency>
@@ -361,11 +388,6 @@
         <dependency>
             <groupId>log4j</groupId>
             <artifactId>log4j</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>logkit</groupId>
-            <artifactId>logkit</artifactId>
         </dependency>
 
         <dependency>
@@ -668,6 +690,11 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jms</artifactId>
         </dependency>
 
         <dependency>

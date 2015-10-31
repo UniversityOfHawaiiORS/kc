@@ -207,22 +207,6 @@ public class RoleDaoImpl implements RoleDao {
         }
     }
 
-    /*
-    private void deleteAttributeData(Collection<String> attrsToDelete) {
-    	LOG.info("Entered deleteAttributeData");
-        for (String attr: attrsToDelete) {
-            Connection connection = connectionDaoService.getRiceConnection();
-            try (PreparedStatement stmt = setString(1, attr, connection.prepareStatement("DELETE FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ATTR_DATA_ID = ?"))) {
-            	LOG.info("SQLALTER:DELETE FROM KRIM_ROLE_MBR_ATTR_DATA_T WHERE ATTR_DATA_ID = ?");
-            	LOG.info("SQLALTER:--ATTR_DATA_ID="+ attr);
-                stmt.executeUpdate();
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-    */
-
     private void saveDocumentAccess(Collection<DocumentAccess> accesses) {
     	LOG.info("Entered saveDocumentAccess");
         for (DocumentAccess access : accesses) {

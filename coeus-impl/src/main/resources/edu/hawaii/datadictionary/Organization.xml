@@ -50,9 +50,19 @@
     <bean id="Organization-LookupView" parent="Organization-LookupView-parentBean">
         <property name="viewHelperService" value="#{#getService('uhOrganizationLookupableKRAD')}"/>
         <property name="headerText" value="Organization Lookup"/>
+        <!-- KC-1283 For Primary Performance Site, searches can only be done using physical address. -->
+        <property name="defaultSortAttributeNames">
+            <list>
+                <value></value>
+            </list>
+        </property><!-- KC-1283 END -->
         <property name="criteriaFields">
             <list>
-                <bean p:propertyName="organizationSearchInput" parent="Uif-LookupCriteriaInputField"/>
+                <bean p:propertyName="organizationSearchInput" parent="Uif-LookupCriteriaInputField">
+                    <!-- KC-1127 If a blank SOLR search is executed, the system returns a STE -->
+                    <property name="required" value="true" />
+                    <!-- KC-1127 END -->
+                </bean>
             </list>
         </property>
     </bean>

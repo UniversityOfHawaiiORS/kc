@@ -59,10 +59,13 @@
 <script type="text/javascript">
    var $j = jQuery.noConflict();
 </script>
- 
 
+<c:set var="readOnly" value="${not KualiForm.editingMode['fullEntry']}"/>
   	
-<div align="right"><kul:help documentTypeName="IacucProtocolDocument" pageName="Protocol" /></div>
+<div align="right">
+    <kra:shortUrl shortUrl="${KualiForm.shortUrl}"/>
+    <kul:help documentTypeName="IacucProtocolDocument" pageName="Protocol" />
+</div>
 <kul:documentOverview editingMode="${KualiForm.editingMode}" />
 
 <kra-protocol:protocolRequiredFields
@@ -110,6 +113,11 @@
     
 
 <kul:panelFooter />
+    <c:if test="${readOnly && KualiForm.editingMode['canModify']}">
+        <c:set var="extraButtonSource" value="${ConfigProperties.kra.externalizable.images.url}buttonsmall_edit_temp.gif"/>
+        <c:set var="extraButtonProperty" value="methodToCall.edit"/>
+        <c:set var="extraButtonAlt" value="Edit"/>
+    </c:if>
 	<kul:documentControls 
 		transactionalDocument="false"
 		suppressRoutingControls="true"
@@ -126,5 +134,4 @@ var kualiElements = kualiForm.elements;
 </SCRIPT>
 
 <script language="javascript" src="dwr/interface/IacucProtocolFundingSourceService.js"></script>
-<!-- <script language="javascript" src="dwr/interface/UnitService.js"></script> -->
 </kul:documentPage>

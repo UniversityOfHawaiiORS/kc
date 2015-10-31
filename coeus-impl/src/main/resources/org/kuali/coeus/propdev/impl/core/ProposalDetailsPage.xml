@@ -87,10 +87,12 @@
 				</property>
 			</bean>
 		</property>
+		<!-- KC-1259 Keyword dropdown isn't sorted -->
 		<property name="optionsFinder">
 			<bean
-				class="org.kuali.rice.krad.keyvalues.PersistableBusinessObjectValuesFinder" 
+				class="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
 				p:businessObjectClass="org.kuali.coeus.common.framework.keyword.ScienceKeyword"
+				p:includeSelectRow="false"
 				p:keyAttributeName="code"
 				p:labelAttributeName="description"/>
 		</property>
@@ -233,14 +235,21 @@
 
 	<bean id="PropDev-DetailsPage-OwnedByUnitNumberField" parent="PropDev-DetailsPage-OwnedByUnitNumberField-parentBean" />
 	<bean id="PropDev-DetailsPage-OwnedByUnitNumberField-parentBean"
-		abstract="true" parent="Uif-InputField" p:propertyName="ownedByUnitNumber" >
+		  abstract="true" parent="Uif-InputField" p:propertyName="ownedByUnitNumber"
+		  p:readOnlyDisplayReplacement="@{#fp.ownedByUnitNumber} - @{#fp.ownedByUnitName}@{#fp.ownedByUnit != null and #fp.ownedByUnit.active ? '' : ' (inactive)'}">
 		<property name="control">
-			<bean parent="Uif-DropdownControl"/>
+			<bean parent="Uif-AdvancedMultiSelectControl" p:multiple="false">
+				<property name="templateOptions">
+					<map merge="true">
+						<entry key="&quot;position&quot;" value="{&quot;my&quot;:&quot;left bottom&quot;, &quot;at&quot;:&quot;left top&quot;}"/>
+					</map>
+				</property>
+			</bean>
 		</property>
 		<property name="optionsFinder">
 			<bean class="org.kuali.coeus.propdev.impl.basic.LeadUnitValuesFinder" p:addBlankOption="false"/>
 		</property>
-        </bean>
+    </bean>
 
 	<bean id="PropDev-DetailsPage-ContinuedFromField" parent="PropDev-DetailsPage-ContinuedFromField-parentBean" />
 	<bean id="PropDev-DetailsPage-ContinuedFromField-parentBean"

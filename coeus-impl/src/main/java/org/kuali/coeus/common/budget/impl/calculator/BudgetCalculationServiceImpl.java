@@ -23,6 +23,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.budget.api.rate.RateClassType;
 import org.kuali.coeus.common.budget.framework.calculator.*;
 import org.kuali.coeus.common.budget.framework.query.QueryList;
+import org.kuali.coeus.common.budget.framework.rate.BudgetRatesService;
+import org.kuali.coeus.common.budget.framework.rate.ValidCeRateType;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.common.budget.framework.query.operator.And;
@@ -64,10 +66,11 @@ import java.util.*;
  */
 @Component("budgetCalculationService")
 public class BudgetCalculationServiceImpl implements BudgetCalculationService {
-    
+
     @Autowired
     @Qualifier("businessObjectService")
     private BusinessObjectService businessObjectService;
+
     @Autowired
     @Qualifier("budgetDistributionService")
     private BudgetDistributionService budgetDistributionService;
@@ -79,16 +82,22 @@ public class BudgetCalculationServiceImpl implements BudgetCalculationService {
     @Autowired
     @Qualifier("dataObjectService")
     private DataObjectService dataObjectService;
-    
+
     @Autowired
     @Qualifier("globalVariableService")
     private GlobalVariableService globalVariableService;
 
+    @Autowired
+    @Qualifier("budgetRatesService")
+    private BudgetRatesService budgetRatesService;
+
     private static final String BUDGET_SUMMARY_PERIOD_HEADER_LABEL = "P";
+
     private static final String BUDGET_SUMMARY_PERSONNEL_GROUP_LABEL = "Personnel";
     private static final String BUDGET_SUMMARY_NONPERSONNEL_GROUP_LABEL = "Non-personnel";
     private static final String BUDGET_SUMMARY_TOTALS_GROUP_LABEL = "Totals";
-    
+    private static final String CALCULATED_COST = "calculatedCost";
+
     private enum BudgetSummaryConstants {
         CalculatedDirectCost ("calculatedDirectCosts", "Calculated Direct Costs"),
         TotalDirectCost ("totalDirectCost", "Total Direct Cost"),
@@ -141,19 +150,26 @@ public class BudgetCalculationServiceImpl implements BudgetCalculationService {
         final boolean isLineItemsEmpty = budgetPeriod.getBudgetLineItems().isEmpty();
         
         if(isLineItemsEmpty && !budgetLineItemDeleted){
-            final Map<String, Object> fieldValues = new HashMap<>();
-
-            fieldValues.put("budgetId", budgetPeriod.getBudgetId());
-            fieldValues.put("budgetPeriod", budgetPeriod.getBudgetPeriod());
-            
-
-            final Collection<BudgetLineItem> deletedLineItems
-                = this.dataObjectService.findMatching(BudgetLineItem.class, QueryByCriteria.Builder.andAttributes(fieldValues).build()).getResults();
+            final Collection<? extends BudgetLineItem> deletedLineItems = getLineItemsFromDatabase(budgetPeriod);
             return !deletedLineItems.isEmpty();
         }
             
         return true;
     }
+	
+    protected Collection<? extends BudgetLineItem> getLineItemsFromDatabase(
+			final BudgetPeriod budgetPeriod) {
+		final Map<String, Object> fieldValues = new HashMap<>();
+
+		fieldValues.put("budgetId", budgetPeriod.getBudgetId());
+		fieldValues.put("budgetPeriod", budgetPeriod.getBudgetPeriod());
+		
+
+		final Collection<? extends BudgetLineItem> deletedLineItems
+		    = this.dataObjectService.findMatching(BudgetLineItem.class, QueryByCriteria.Builder.andAttributes(fieldValues).build()).getResults();
+		return deletedLineItems;
+	}
+	
     protected void copyLineItemToPersonnelDetails(BudgetLineItem budgetLineItem, BudgetPersonnelDetails budgetPersonnelDetails) {
     	budgetPersonnelDetails.setBudget(budgetLineItem.getBudget());
         budgetPersonnelDetails.setBudgetId(budgetLineItem.getBudgetId());
@@ -738,7 +754,7 @@ public class BudgetCalculationServiceImpl implements BudgetCalculationService {
                             Equals equalsRC = new Equals("rateClassCode", budgetLineItemCalculatedAmount.getRateClassCode());
                             Equals equalsRT = new Equals("rateTypeCode", budgetLineItemCalculatedAmount.getRateTypeCode());
                             And RCandRT = new And(equalsRC, equalsRT);
-                            ScaleTwoDecimal rateTypeTotalInThisPeriod = lineItemCalcAmtQueryList.sumObjects("calculatedCost", RCandRT);
+                            ScaleTwoDecimal rateTypeTotalInThisPeriod = lineItemCalcAmtQueryList.sumObjects(CALCULATED_COST, RCandRT);
                             if (!calculatedExpenseTotals.containsKey(rateType)) {
                                 List <ScaleTwoDecimal> rateTypePeriodTotals = new ArrayList<>();
                                 for (int i = 0; i < budget.getBudgetPeriods().size(); i++) {
@@ -817,7 +833,7 @@ public class BudgetCalculationServiceImpl implements BudgetCalculationService {
                         Equals equalsRC = new Equals("rateClassCode", budgetLineItemCalculatedAmount.getRateClassCode());
                         Equals equalsRT = new Equals("rateTypeCode", budgetLineItemCalculatedAmount.getRateTypeCode());
                         And RCandRT = new And(equalsRC, equalsRT);
-                        ScaleTwoDecimal rateTypeTotalInThisPeriod = lineItemCalcAmtQueryList.sumObjects("calculatedCost", RCandRT);
+                        ScaleTwoDecimal rateTypeTotalInThisPeriod = lineItemCalcAmtQueryList.sumObjects(CALCULATED_COST, RCandRT);
                         if (!calculatedExpenseTotals.containsKey(rateType)) {
                             List <ScaleTwoDecimal> rateTypePeriodTotals = new ArrayList<>();
                             for (int i = 0; i < budget.getBudgetPeriods().size(); i++) {
@@ -847,8 +863,16 @@ public class BudgetCalculationServiceImpl implements BudgetCalculationService {
     }
     @Override
     public void applyToLaterPeriods(Budget budget, BudgetPeriod budgetPeriod, BudgetLineItem budgetLineItem) {
+
+        for (ValidCeRateType validCeRateType : budgetLineItem.getCostElementBO().getValidCeRateTypes()) {
+            validCeRateType.getRateType().getDescription();
+            validCeRateType.getRateClass().getCode();
+            validCeRateType.getCostElementBo().getDescription();
+        }
+
         BudgetPeriodCalculator periodCalculator = new BudgetPeriodCalculator();
         periodCalculator.applyToLaterPeriods(budget, budgetPeriod, budgetLineItem);
+
         List<String> errors = periodCalculator.getErrorMessages();
         if(!errors.isEmpty()){
             MessageMap errorMap = globalVariableService.getMessageMap();
@@ -1166,16 +1190,23 @@ public class BudgetCalculationServiceImpl implements BudgetCalculationService {
         	RateType rateType = uniqueLineItem.getKey();
         	QueryList<BudgetLineItemCalculatedAmount> lineItemCalAmounts = uniqueLineItem.getValue();
             RateClass rateClass = rateType.getRateClass();
-            if (((personnelFlag && rateClass != null && !StringUtils.equals(rateClass.getRateClassTypeCode(), RateClassType.EMPLOYEE_BENEFITS.getRateClassType())) || !personnelFlag)) {
-                if(!StringUtils.equals(rateClass.getRateClassTypeCode(), RateClassType.OVERHEAD.getRateClassType())) {
-                    ScaleTwoDecimal rateTypeTotalInThisPeriod = lineItemCalAmounts.sumObjects("calculatedCost");
-                    calculatedExpenseTotal = calculatedExpenseTotal.add(rateTypeTotalInThisPeriod); 
-                }
+            if (isCalculatedDirectCostRate(personnelFlag, rateType, rateClass)) {
+                ScaleTwoDecimal rateTypeTotalInThisPeriod = lineItemCalAmounts.sumObjects(
+                        CALCULATED_COST);
+                calculatedExpenseTotal = calculatedExpenseTotal.add(rateTypeTotalInThisPeriod);
             }
         }
         return calculatedExpenseTotal;
     }
-    
+
+    private boolean isCalculatedDirectCostRate(boolean personnelFlag, RateType rateType, RateClass rateClass) {
+        return ((!getBudgetRatesService().isEmployeeBenefit(rateClass.getRateClassTypeCode())
+                || getBudgetRatesService().isVacationOnLabAllocation(rateClass.getCode(), rateType.getRateTypeCode())
+                || getBudgetRatesService().isEmployeeBenefitOnLabAllocation(rateClass.getCode(), rateType.getRateTypeCode()))
+                || !personnelFlag)
+                && !StringUtils.equals(rateClass.getRateClassTypeCode(), RateClassType.OVERHEAD.getRateClassType());
+    }
+
     /**
      * This method is to categorize line item calculated amounts based on rate type
      */
@@ -1269,5 +1300,12 @@ public class BudgetCalculationServiceImpl implements BudgetCalculationService {
 	public void setDataObjectService(DataObjectService dataObjectService) {
 		this.dataObjectService = dataObjectService;
 	}
-    
+
+    public BudgetRatesService getBudgetRatesService() {
+        return budgetRatesService;
+    }
+
+    public void setBudgetRatesService(BudgetRatesService budgetRatesService) {
+        this.budgetRatesService = budgetRatesService;
+    }
 }

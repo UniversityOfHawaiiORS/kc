@@ -23,6 +23,7 @@ import org.kuali.coeus.common.framework.person.KcPersonService;
 import org.kuali.coeus.common.framework.unit.Unit;
 import org.kuali.coeus.common.framework.auth.UnitAuthorizationService;
 import org.kuali.coeus.sys.framework.lookup.KcKualiLookupableHelperServiceImpl;
+import org.kuali.coeus.sys.framework.util.CollectionUtils;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.coeus.common.framework.multicampus.MultiCampusConstants;
@@ -46,6 +47,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Unit lookup that accounts for the extra parameter {@code campusCode} and filters the search results if it is defined.

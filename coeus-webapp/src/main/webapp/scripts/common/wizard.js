@@ -23,4 +23,29 @@ Kc.Wizard = Kc.Wizard || {};
     namespace.returnToFirstResultsPage = function() {
         $('.modal-body').find('a.first').click();
     };
+
+    namespace.onShownDialogFixFocusAndKeyPress = function(inputSelector, buttonSelector) {
+        // KC-1218 Use SOLR for person lookup
+        $(inputSelector).closest('.modal').on('shown.bs.modal', function(e) {
+            $(inputSelector).focus();
+            $(inputSelector).keydown(function(event) {
+                if (event.which == 13) {
+                    //  event.preventDefault(); -- You suspect other stuff is happening. Let it happen.
+                    $(buttonSelector).click();
+                }
+            });
+        });
+    };
+
+    namespace.fixSearchLabel = function(e) {
+        // This happens when anything in the entire containing div is clicked
+        if (e.target.type == "radio") {
+            if (e.target.value == "E") {
+                jQuery("#q_label").html("Name or Username");
+            } else if (e.target.value == "N") {
+                jQuery("#q_label").html("Name");
+            }
+        }
+    };
+
 })(Kc.Wizard, jQuery);

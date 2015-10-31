@@ -708,7 +708,10 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         newNarrative.setModuleNumber(legacyNarrativeService.getNextModuleNumber(hierarchyProposal.getProposalDocument()));
         newNarrative.setDevelopmentProposal(hierarchyProposal);
         newNarrative.setNarrativeUserRights(null);
-        newNarrative.getNarrativeAttachment().setData(narrative.getData());
+        newNarrative.setNarrativeAttachment((NarrativeAttachment) deepCopy(narrative.getNarrativeAttachment()));
+        //need to null out the file data id so the setData method does not remove the attachment data from the attachment db
+        newNarrative.getNarrativeAttachment().setFileDataId(null);
+        newNarrative.getNarrativeAttachment().setData(narrative.getNarrativeAttachment().getData());
         hierarchyAttachments.add(newNarrative);
     }
 
@@ -1164,6 +1167,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         ProposalDevelopmentDocument pDoc = (ProposalDevelopmentDocument) documentService.getByDocumentHeaderId(pbo.getProposalDocument().getDocumentNumber());
         if (!pbo.isInHierarchy()) {
             rejectProposal(pDoc, renderMessage(PROPOSAL_ROUTING_REJECTED_ANNOTATION, reason), principalName, renderMessage(HIERARCHY_REJECTED_APPSTATUS));
+            // KC-937 When you return a proposal for changes, you receive an error and a message that may be misleading
+            getPessimisticLockService().releaseWorkflowPessimisticLocking(pDoc);
         } else if (pbo.isParent()) {
             rejectProposalHierarchy(pDoc, reason, principalName);
         } else {

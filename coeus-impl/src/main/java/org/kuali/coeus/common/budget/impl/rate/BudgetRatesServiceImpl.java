@@ -19,10 +19,13 @@
 package org.kuali.coeus.common.budget.impl.rate;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.kuali.coeus.common.budget.framework.calculator.ValidCalcType;
 import org.kuali.coeus.common.budget.framework.query.operator.*;
 import org.kuali.coeus.common.budget.framework.rate.*;
+import org.kuali.coeus.common.budget.framework.rate.RateClassType;
 import org.kuali.coeus.common.framework.fiscalyear.FiscalYearMonthService;
 import org.kuali.coeus.common.framework.type.ActivityType;
 import org.kuali.coeus.common.framework.unit.Unit;
@@ -57,6 +60,9 @@ public abstract class BudgetRatesServiceImpl implements BudgetRatesService {
 
     private static final String PERIOD_SEARCH_SEPARATOR = "|";
     private static final String PERIOD_DISPLAY_SEPARATOR = ",";
+    private static final String RATE_CLASS_TYPE = "rateClassType";
+    private static final String DEPENDENT_RATE_CLASS_TYPE = "dependentRateClassType";
+
     private static final Log LOG = LogFactory.getLog(BudgetRatesServiceImpl.class);
 
     @Autowired
@@ -312,6 +318,7 @@ public abstract class BudgetRatesServiceImpl implements BudgetRatesService {
             return new ArrayList<>();
         }
         Collection abstractRates = getActiveInstituteRates(InstituteRate.class, firstUnit, budget.getBudgetParent().getActivityTypeCode());
+
         return (Collection<InstituteRate>)abstractRates;
     }
     
@@ -418,7 +425,7 @@ public abstract class BudgetRatesServiceImpl implements BudgetRatesService {
     /* get applicable rates before project start date  
      * get the latest 
      * */
-    protected void filterInstituteRates(Budget budget, Collection<AbstractInstituteRate> allRates, Collection<AbstractInstituteRate> filteredRates, Date personSalaryEffectiveDate) {
+    protected void filterInstituteRatesBasedOnSalaryEffectiveDate(Budget budget, Collection<AbstractInstituteRate> allRates, Collection<AbstractInstituteRate> filteredRates, Date personSalaryEffectiveDate) {
         List<String> addedList = new ArrayList<>();
         QueryList<AbstractInstituteRate> instituteRates = new QueryList<>(allRates);
         for (AbstractInstituteRate instituteRate : allRates) {
@@ -463,7 +470,7 @@ public abstract class BudgetRatesServiceImpl implements BudgetRatesService {
     protected void filterRates(Budget budget, Collection allAbstractInstituteRates, Collection filteredAbstractInstituteRates) {
         filteredAbstractInstituteRates.clear();
         Date personSalaryEffectiveDate = getBudgetPersonSalaryEffectiveDate(budget);
-        filterInstituteRates(budget, allAbstractInstituteRates, filteredAbstractInstituteRates, personSalaryEffectiveDate);
+        filterInstituteRatesBasedOnSalaryEffectiveDate(budget, allAbstractInstituteRates, filteredAbstractInstituteRates, personSalaryEffectiveDate);
     }
     
     protected boolean isOutOfSync(Budget budget) {
@@ -587,7 +594,8 @@ public abstract class BudgetRatesServiceImpl implements BudgetRatesService {
      * and unit number 
      * */
     protected void getBudgetRates(List<RateClassType> rateClassTypes, Budget budget, Collection<InstituteRate> allInstituteRates) {
-        List<InstituteRate> instituteRates = budget.getInstituteRates();        
+        List<InstituteRate> instituteRates = budget.getInstituteRates();
+        // this filters institute rates var
         filterRates(budget, allInstituteRates, instituteRates);        
         List<BudgetRate> budgetRates = budget.getBudgetRates();
         
@@ -880,6 +888,44 @@ public abstract class BudgetRatesServiceImpl implements BudgetRatesService {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isVacation(String rateClassTypeCode) {
+        return StringUtils.equals(rateClassTypeCode, org.kuali.coeus.common.budget.api.rate.RateClassType.VACATION.getRateClassType());
+    }
+
+    @Override
+    public boolean isEmployeeBenefit(String rateClassTypeCode) {
+        return StringUtils.equals(rateClassTypeCode, org.kuali.coeus.common.budget.api.rate.RateClassType.EMPLOYEE_BENEFITS.getRateClassType());
+    }
+
+    @Override
+    public boolean isLabAllocationSalary(String rateClassTypeCode) {
+        return StringUtils.equals(rateClassTypeCode, org.kuali.coeus.common.budget.api.rate.RateClassType.LA_SALARIES.getRateClassType());
+
+    }
+
+    @Override
+    public boolean isVacationOnLabAllocation(String rateClassCode, String rateTypeCode) {
+        ValidCalcType vacationOnLaValidCalcType = getDependentValidRateClassTypeForLA(org.kuali.coeus.common.budget.api.rate.RateClassType.VACATION.getRateClassType());
+        return StringUtils.equals(rateClassCode , vacationOnLaValidCalcType.getRateClassCode()) &&
+                StringUtils.equals(rateTypeCode,vacationOnLaValidCalcType.getRateTypeCode());
+    }
+
+    @Override
+    public boolean isEmployeeBenefitOnLabAllocation(String rateClassCode, String rateTypeCode) {
+        ValidCalcType ebOnLaValidCalcType = getDependentValidRateClassTypeForLA(org.kuali.coeus.common.budget.api.rate.RateClassType.EMPLOYEE_BENEFITS.getRateClassType());
+        return StringUtils.equals(rateClassCode, ebOnLaValidCalcType.getRateClassCode())
+                && StringUtils.equals(rateTypeCode, ebOnLaValidCalcType.getRateTypeCode());
+    }
+
+    protected ValidCalcType getDependentValidRateClassTypeForLA(String rateClassType) {
+        Map<String,String> param = new HashMap<>();
+        param.put(RATE_CLASS_TYPE, rateClassType);
+        param.put(DEPENDENT_RATE_CLASS_TYPE, org.kuali.coeus.common.budget.api.rate.RateClassType.LA_SALARIES.getRateClassType());
+        List<ValidCalcType> result = (List<ValidCalcType>) getBusinessObjectService().findMatching(ValidCalcType.class, param);
+        return result.isEmpty()?null:result.get(0);
     }
 
     public BusinessObjectService getBusinessObjectService() {

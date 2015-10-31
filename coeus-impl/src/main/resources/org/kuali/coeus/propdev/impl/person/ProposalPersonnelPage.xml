@@ -43,13 +43,16 @@
                 <bean parent="Uif-HorizontalBoxGroup" p:order="10">
                     <property name="items">
                         <list>
+
                             <bean parent="PropDev-PersonnelPage-AddButton" p:order="10" p:render="@{!document.developmentProposal.isParent() and !#parent.readOnly}"/>
+                            <!-- KC-1268 STE on Key Personnel page after using notify all button
                             <bean parent="Uif-PrimaryActionButton" p:order="20" p:actionLabel="Notify All" p:actionScript="showDialog('PropDev-Personal-NotifyPersonsDialog')"  p:cssClasses="pull-right"
                                   p:render="@{#actionFlags[#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.PropDevDocumentActions).NOTIFY_PROPOSAL_PERSONS}]
                                   and document.developmentProposal.proposalPersons.size() > 0
                                   and !#ViewHelper.areAllCertificationsComplete(document.developmentProposal.proposalPersons)
                                   and !document.developmentProposal.isChild()
                                   and !#parent.readOnly}"/>
+                                  -->
                             <bean parent="Uif-PrimaryActionButton" p:actionLabel="COI Disclosure Status"
                                                p:order="35"  p:actionScript="showDialog('PropDev-PersonnelPage-COIStatus-Dialog');"
                                                 p:render="@{#ViewHelper.displayCoiDisclosureStatus() and
@@ -68,7 +71,58 @@
           p:methodToCall="prepareAddPersonDialog"
           p:actionParameters="PropDev-PersonnelPage-Wizard.step:0" p:iconClass="icon-user"/>
 
+    <!--        KC-1218 Use SOLR for person lookup -->
     <bean id="PropDev-PersonnelPage-Wizard" parent="Kc-Wizard"
+          p:fieldBindingObjectPath="addKeyPersonHelper">
+        <property name="items">
+            <list>
+                <bean parent="PropDev-PersonnelPage-WizardPage1-UH" p:order="10" />
+                <bean parent="PropDev-PersonnelPage-WizardPage2" p:order="20" />
+                <bean parent="PropDev-PersonnelPage-WizardPage3" p:order="30" />
+            </list>
+        </property>
+        <property name="onShowDialogScript" value="Kc.Wizard.onShownDialogFixFocusAndKeyPress('#q_control','#perform-search-button');"/>
+    </bean>
+
+
+    <bean id="PropDev-PersonnelPage-WizardPage1-UH" parent="PropDev-PersonnelPage-WizardPage1-UH-parentBean" />
+    <bean id="PropDev-PersonnelPage-WizardPage1-UH-parentBean" abstract="true"
+          parent="Uif-VerticalBoxSubSection">
+        <property name="items">
+            <list>
+                <bean id="PropDev-PersonnelPage-Search-Fields" parent="Uif-CssGridSection-1FieldLabelColumn">
+                    <property name="items">
+                        <list>
+                            <bean parent="Uif-InputField" p:label="Name" p:propertyName="lookupFieldValues['q']" p:order="10">
+                                <property name="id" value="q"/>
+                            </bean>
+                        </list>
+                    </property>
+                </bean>
+                <bean parent="PropDev-PersonnelPage-TypeSelection" p:order="20" />
+            </list>
+        </property>
+        <property name="footer">
+            <bean parent="Uif-DialogFooter">
+                <property name="items">
+                    <list>
+                        <bean parent="PropDev-PersonnelPage-WizardButton"
+                              p:actionLabel="Search"
+                              p:methodToCall="performPersonnelSearch" p:actionParameters="PropDev-PersonnelPage-Wizard.step:1"
+                              p:order="10" p:successCallback="Kc.Wizard.returnToFirstResultsPage();"
+                              p:id="perform-search-button"/>
+                        <bean parent="Uif-SecondaryActionButton" p:actionLabel="Cancel" p:libraryCssClasses="btn,btn-link"
+                              p:dialogDismissOption="IMMEDIATE" p:dialogResponse="false" p:order="20"/>
+                    </list>
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- KC-1218 END -->
+
+
+    <bean id="PropDev-PersonnelPage-Wizard-ORIGINAL" parent="Kc-Wizard"
           p:fieldBindingObjectPath="addKeyPersonHelper">
         <property name="items">
             <list>
@@ -108,6 +162,9 @@
         <property name="items">
             <list>
                 <bean parent="PropDev-Personnel-TypeSelection-InputField">
+                    <!-- KC-1218 Use SOLR for person lookup -->
+                    <property name="onClickScript" value="Kc.Wizard.fixSearchLabel(e);"></property>
+                    <!-- KC-1218 end -->
                     <property name="control">
                         <bean parent="Uif-VerticalRadioControl">
                             <property name="options">
@@ -203,10 +260,12 @@
                       p:label="Unit Number" p:order="50" />
                 <bean parent="Uif-MessageField" p:messageText="@{#line.kcPerson != null and #line.kcPerson.unit != null ? #line.kcPerson.unit.unitName:''}"
                       p:label="Unit Name" p:order="60"/>
+<!-- KC-1270 Add Key Person results too crowded
                 <bean parent="Uif-DataField" p:propertyName="kcPerson.contactOrganizationName"
                       p:label="Organization" p:order="70" p:enableAutoInquiry="false"/>
                 <bean parent="Uif-DataField" p:propertyName="kcPerson.city"
                       p:label="City" p:order="80" p:enableAutoInquiry="false"/>
+-->
             </list>
         </property>
     </bean>
@@ -264,7 +323,7 @@
                         <bean parent="PropDev-PersonnelPage-WizardButton-Continue"
                               p:actionParameters="PropDev-PersonnelPage-Wizard.step:2"
                               p:actionLabel="Add Person"
-                              p:methodToCall="addPerson" p:dialogDismissOption="REQUEST"
+                              p:methodToCall="addPerson"
                               p:order="10" />
                         <bean parent="PropDev-PersonnelPage-WizardButton-Back"
                               p:actionParameters="PropDev-PersonnelPage-Wizard.step:1" p:order="20" />
@@ -320,7 +379,7 @@
                             <bean parent="Uif-HorizontalBoxGroup">
                                 <property name="items">
                                     <list>
-                                        <bean parent="Uif-PrimaryActionButton-Mini" p:actionLabel="Notify @{#lp.fullName}" p:methodToCall="sendCertificationNotification"
+                                        <bean parent="Uif-PrimaryActionButton-Mini" p:actionLabel="Notify @{#lp.fullName}" p:methodToCall="prepareVerifyCertificationDialog"
                                               p:render="@{#actionFlags[#{T(org.kuali.coeus.propdev.impl.core.ProposalDevelopmentConstants.PropDevDocumentActions).NOTIFY_PROPOSAL_PERSONS}] 
                                               and !#empty(#lp.versionNumber) 
                                               and #ViewHelper.canViewCertificationTab(document,#line) 
@@ -632,23 +691,27 @@
             </list>
         </property>
     </bean>
-
+    <!-- KC-956 Key Person Certification Questions show up for non-employees
+                added #ViewHelper.renderQuestionnaire(#line) and to re-->
     <bean id="PropDev-PersonnelPage-Questionnaire" parent="PropDev-PersonnelPage-Questionnaire-parentBean" />
     <bean id="PropDev-PersonnelPage-Questionnaire-parentBean"
           abstract="true" parent="Uif-CssGridSection" p:id="personnelQuestionnaire"
-          p:render="@{#line.questionnaireHelper.answerHeaders != null and #line.questionnaireHelper.answerHeaders.size() > 0}"
+          p:render="@{#ViewHelper.renderQuestionnaire(#line) and #line.questionnaireHelper.answerHeaders != null and #line.questionnaireHelper.answerHeaders.size() > 0}"
           p:refreshWhenChangedPropertyNames="document.developmentProposal.proposalPersons[@{#index}].proposalPersonRoleId"
           p:progressiveRenderAndRefresh="true"
           p:headerText="@{(#line.questionnaireHelper.answerHeaders != null and #line.questionnaireHelper.answerHeaders.size() > 0 and #line.questionnaireHelper.answerHeaders[0].label != null) ? #line.questionnaireHelper.answerHeaders[0].label : 'None'}">
         <property name="items">
             <list>
+                <bean parent="PropDev-PersonnelPage-KeyPersonCertificationToggle"
+                      p:render="@{!#line.getRole().getCertificationRequired()}"
+                      p:order="10"/>
                 <bean parent="Uif-Message" p:messageText="[color=red]Proposal is a Child in Proposal Hierarchy. Certifications must take place in the Parent proposal.[/color]"
                       p:render="@{document.developmentProposal.isChild()}"
-                      p:order="10" />
+                      p:order="20" />
                 <bean parent="Uif-PrimaryActionButton-Small" p:methodToCall="clearAnswers" p:actionLabel="Clear All Answers"
                       p:actionParameters="personNumber:@{(#line.proposalPersonNumber)}"
                       p:render="@{!#ViewHelper.isCertQuestViewOnly(document,#line)  and !document.developmentProposal.isChild()}"
-                      p:order="20">
+                      p:order="30">
                     <property name="confirmationDialog">
                         <bean parent="Uif-DialogGroup-OkCancel" p:promptText="Are you sure you want to clear all the answers?"/>
                     </property>
@@ -660,12 +723,25 @@
             </list>
         </property>
     </bean>
+
+    <bean id="PropDev-PersonnelPage-KeyPersonCertificationToggle" parent="Uif-VerticalBoxGroup">
+            <property name="items">
+                <list>
+                    <bean parent="Uif-Message" p:messageText="You have the option to @{#line.getOptInCertificationStatus()?'remove':'add'} Certification Questions for a @{#line.getRole().getDescription()}." p:order="10" />
+                    <bean parent="Uif-PrimaryActionButton-Small" p:methodToCall="certificationToggle" p:actionLabel="@{#line.getOptInCertificationStatus()?'Remove':'Include'} Certification Questions"
+                          p:actionParameters="personNumber:@{(#line.proposalPersonNumber)}"
+                          p:order="20"
+                          p:render="@{!#parent.readOnly}"/>
+                </list>
+            </property>
+    </bean>
+
     <bean id="proposalPersonQuestionnaire-SubCollection-parentBean" parent="Questionnaire-SubCollection-parentBean">
 		<property name="items">
 			<list>
                 <bean parent="Uif-MessageField" p:messageText="@{#ViewHelper.getQuestionMoreInfo(#lp.questionnaireQuestion.question)}"
                         p:hidden="true"/>
-				<bean id="proposalPersonQuestionnaire-InputField" parent="Questionnaire-InputField-parentBean" p:readOnly="@{document.developmentProposal.isChild() or document.getCerttifyViewOnly()}" p:order="10" />
+				<bean id="proposalPersonQuestionnaire-InputField" parent="Questionnaire-InputField-parentBean" p:readOnly="@{document.developmentProposal.isChild() or document.getCertifyViewOnly()}" p:order="10" />
                 <bean parent="Uif-InputField" p:propertyName="question.lookupReturn" p:fieldLabel.render="false">
                     <property name="control">
                         <bean parent="Uif-HiddenControl" />
@@ -705,7 +781,7 @@
 				<ref bean="PropDev-Personal-NotifyPersonsPage" />
 			</list>
 		</property>
-		</bean>    
+		</bean>
     <bean id="PropDev-Personal-NotifyPersonsPage" parent="PropDev-Personal-NotifyPersonsPage-parentBean"/>
     <bean id="PropDev-Personal-NotifyPersonsPage-parentBean" abstract="true" parent="Uif-TableCollectionSection"
       p:propertyName="document.developmentProposal.proposalPersons"   
@@ -735,7 +811,7 @@
 							p:methodToCall="sendAllCertificationNotifications"
 							p:successCallback="dismissDialog('PropDev-Personal-NotifyPersonsDialog');"
 							p:refreshId="PropDev-Personal-NotifyPersonsDialog" p:actionLabel="Notify"
-							p:render="@{canEditView}"
+							p:render="@{canEdit}"
 							p:order="10" />
 					</list>
 				</property>
@@ -838,6 +914,41 @@
                 <bean id="Uif-DialogConfirmButton" parent="Uif-PrimaryActionButton" p:actionLabel="Ok" p:order="10"
                       p:dialogDismissOption="REQUEST" p:performClientSideValidation="true" p:methodToCall="updateCertification"/>
             </list>
+        </property>
+    </bean>
+
+
+    <bean id="PropDev-PersonnelPage-VerifyNotification-Dialog" parent="PropDev-PersonnelPage-VerifyNotification-Dialog-parentBean"/>
+    <bean id="PropDev-PersonnelPage-VerifyNotification-Dialog-parentBean" abstract="true" parent="Uif-DialogGroup"
+          p:fieldBindingObjectPath="notificationHelper">
+        <property name="items">
+            <list>
+                <bean parent="Uif-FieldGroupBase" p:order="20">
+                    <property name="group">
+                        <bean parent="Uif-VerticalBoxGroup">
+                            <property name="items">
+                                <list>
+                                    <bean parent="Kc-SendNotification-Recipients" p:readOnly="true"/>
+                                </list>
+                            </property>
+                        </bean>
+                    </property>
+                </bean>
+                <bean parent="Uif-InputField" p:propertyName="notification.subject" p:order="30"/>
+                <bean parent="Uif-InputField" p:propertyName="notification.message" p:order="40"/>
+            </list>
+        </property>
+        <property name="footer">
+            <bean parent="Uif-DialogFooter">
+                <property name="items">
+                    <list merge="true">
+                        <bean parent="Uif-PrimaryActionButton" p:actionLabel="Send Notifications" p:methodToCall="sendCertificationNotification"
+                              p:order="10" p:dialogDismissOption="REQUEST"/>
+                        <bean parent="Uif-SecondaryActionButton" p:actionLabel="Cancel" p:libraryCssClasses="btn,btn-link" p:methodToCall="cancelNotifications"
+                              p:dialogDismissOption="REQUEST" p:dialogResponse="false" p:order="30" p:successCallback="dismissDialog('Kc-SendNotification-Wizard');"/>
+                    </list>
+                </property>
+            </bean>
         </property>
     </bean>
 

@@ -54,7 +54,7 @@
 	<param name="kew.externalizable.images.url">/${app.context.name}/kew/images/</param>
 	<param name="kra.externalizable.images.url">/${app.context.name}/static/images/</param>
 
-    <param name="kns.javascript.files">plugins/jquery/jquery-1.8.3.js,plugins/cookie/jquery.cookie.js,kr/scripts/core.js,kr/scripts/dhtml.js,kr/scripts/my_common.js,kr/scripts/jscalendar-1.0/calendar.js,kr/scripts/jscalendar-1.0/lang/calendar-en.js,kr/scripts/jscalendar-1.0/calendar-setup.js,dwr/engine.js,dwr/util.js,dwr/interface/PersonService.js,kr/scripts/objectInfo.js,dwr/interface/CustomAttributeService.js,dwr/interface/ProposalDevelopmentService.js,dwr/interface/BudgetService.js,dwr/interface/AwardTemplateReportTermService.js,scripts/fancybox2.1.5/jquery.fancybox.pack.js,plugins/blockUI/jquery.blockUI.js,scripts/kuali_application.js,scripts/bootstrap/bootstrap.js</param>
+    <param name="kns.javascript.files">plugins/jquery/jquery-1.8.3.js,plugins/cookie/jquery.cookie.js,kr/scripts/core.js,kr/scripts/dhtml.js,kr/scripts/my_common.js,kr/scripts/jscalendar-1.0/calendar.js,kr/scripts/jscalendar-1.0/lang/calendar-en.js,kr/scripts/jscalendar-1.0/calendar-setup.js,dwr/engine.js,dwr/util.js,dwr/interface/PersonService.js,kr/scripts/objectInfo.js,dwr/interface/CustomAttributeService.js,dwr/interface/BudgetService.js,dwr/interface/AwardTemplateReportTermService.js,scripts/fancybox2.1.5/jquery.fancybox.pack.js,plugins/blockUI/jquery.blockUI.js,scripts/kuali_application.js,scripts/bootstrap/bootstrap.js</param>
     <param name="kns.css.files">kr/css/kuali.css,kr/scripts/jscalendar-1.0/calendar-win2k-1.css,scripts/fancybox2.1.5/jquery.fancybox.css,css/kuali_application.css,css/bootstrap/css/bootstrap-skinned.css</param>
 
     <param name="portal.css.files">plugins/fancybox/jquery.fancybox.css,plugins/textpopout/popoutTextarea.css,plugins/jgrowl/jquery.jgrowl.css,css/kuali_overrides.css,css/bootstrap/css/bootstrap-skinned.css</param>
@@ -158,9 +158,10 @@
 	<param name="s2s.keystore.password">keystore password</param>
 	<param name="s2s.truststore.location">path to truststore</param>
 	<param name="s2s.truststore.password">truststore password</param>
+	<param name="s2s.cert.algorithm">TLSv1.2</param>
 	
-	<param name="grants.gov.s2s.host.production">https://ws07.grants.gov:446/grantsws-applicant/services/v2/</param>
-	<param name="grants.gov.s2s.host.development">https://at07ws.grants.gov:446/grantsws-applicant/services/v2/</param>
+	<param name="grants.gov.s2s.host.production">https://ws07.grants.gov:443/grantsws-applicant/services/v2/</param>
+	<param name="grants.gov.s2s.host.development">https://at07ws.grants.gov:443/grantsws-applicant/services/v2/</param>
 	<param name="grants.gov.s2s.host">${grants.gov.s2s.host.development}</param>
 	<param name="grants.gov.s2s.port">ApplicantWebServicesSoapPort</param>
 
@@ -202,9 +203,8 @@
 	<param name="kew.ehcache.config.location" override="false">classpath:org/kuali/rice/kew/impl/config/kew.ehcache.xml</param>
 	<param name="core.ehcache.config.location" override="false">classpath:org/kuali/rice/core/config/core.ehcache.xml</param>
 	<param name="location.ehcache.config.location" override="false">classpath:org/kuali/rice/location/config/location.ehcache.xml</param>
-	
-	 <!-- XAPool is still the default in common-config-defaults. But that might change -->
-	<param name="connection.pool.impl">XAPool</param>
+
+	<param name="connection.pool.impl">Bitronix</param>
 	 
 	<param name="rice.portal.allowed.regex" override="false">^(${application.url}|${rice.server.url})(/.*|)</param>
 	<param name="kc.config.verifier.hard.error">true</param>
@@ -237,4 +237,17 @@
 
     <param name="kc.rest.admin.username" override="false"></param>
     <param name="kc.rest.admin.password" override="false"></param>
+
+	<param name="coi.projects.url">http://127.0.0.1:3002/api/coi/projects</param>
+	<param name="coi.projects.enabled">false</param>
+
+	<param name="mq.redelivery.default.maximumRedeliveries">10</param>
+	<param name="mq.redelivery.default.initialRedeliveryDelay">3000</param>
+	<param name="mq.redelivery.default.redeliveryDelay">3000</param>
+	<param name="mq.redelivery.default.useExponentialBackOff">true</param>
+	<param name="mq.redelivery.default.backOffMultiplier">2</param>
+
+	<param name="mq.datasource.minPoolSize">1</param>
+	<param name="mq.datasource.maxPoolSize">20</param>
+	<param name="mq.broker.dataDirectory">activemq-data</param>
 </config>

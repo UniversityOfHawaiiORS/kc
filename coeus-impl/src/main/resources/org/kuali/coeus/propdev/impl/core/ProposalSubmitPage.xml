@@ -158,9 +158,11 @@
           p:readOnly="false">
         <property name="items">
             <list>
-                <bean parent="Uif-MessageField" p:messageText="Are you sure you want to reject this document?" p:order="10"/>
+                <!-- KC-950 Rename "Reject" button within the Proposal Actions tab -->
+                <bean parent="Uif-MessageField" p:messageText="Are you sure you want to return this document for changes ?" p:order="10"/>
+                <!-- KC-950 Rename "Reject" button within the Proposal Actions tab -->
                 <bean parent="Uif-InputField" p:propertyName="rejectReason" p:order="20"
-                        p:fieldLabel.labelText="Rejection Reason"/>
+                        p:fieldLabel.labelText="Reason returning for changes"/>
                 <bean parent="Uif-InputField" p:propertyName="rejectFile" p:order="30"
                       p:fieldLabel.labelText="Attachment">
                     <property name="control">

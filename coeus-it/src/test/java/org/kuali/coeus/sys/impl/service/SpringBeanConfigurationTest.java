@@ -20,7 +20,6 @@ package org.kuali.coeus.sys.impl.service;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.KeyValue;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.keyvalue.DefaultKeyValue;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -35,6 +34,7 @@ import org.kuali.rice.core.api.resourceloader.GlobalResourceLoader;
 import org.kuali.rice.core.api.resourceloader.ResourceLoader;
 import org.kuali.rice.core.framework.resourceloader.SpringResourceLoader;
 import org.springframework.beans.factory.BeanCreationException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.ConfigurableWebApplicationContext;
@@ -43,27 +43,17 @@ import javax.xml.namespace.QName;
 
 import java.lang.reflect.Proxy;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
 
     private static final Log LOG = LogFactory.getLog(SpringBeanConfigurationTest.class);
 
-    private static final Collection<String> IGNORE_PATTERN = new ArrayList<String>() {{
-        add("^org.springframework.aop.*");
-
-        //rice failures ignores these for now
-        add("^kualiMaintainable$");
-        add("^messageService$");
-        add("^lookupableHelperService$");
-
-        //bittronix beans mess up our ci environment
-        add("riceDataSourceBitronixXa");
-        add("dataSourceBitronixXa");
-        add("btmConfig");
-        add("transactionManagerBitronix");
-
-    }};
+    private static final Collection<String> IGNORE_PATTERN = Stream.of(
+            "^org.springframework.aop.*"
+    ).collect(Collectors.toList());
 
     private Collection<SpringResourceLoader> springResourceLoaders;
 
@@ -78,9 +68,7 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
             return;
         }
         if (parent.getResourceLoaders() != null) {
-            for (ResourceLoader child : parent.getResourceLoaders()) {
-                processResourceLoader(child);
-            }
+            parent.getResourceLoaders().forEach(this::processResourceLoader);
         }
         if (parent instanceof SpringResourceLoader) {
             springResourceLoaders.add((SpringResourceLoader) parent);
@@ -95,12 +83,7 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
      */
     @Test
     public void test_all_spring_bean_retrieval() {
-        toEachSpringBean(new VoidFunction() {
-            @Override
-            public void r(ApplicationContext context, String name) {
-                context.getBean(name);
-            }
-        }, false);
+        toEachSpringBean(BeanFactory::getBean, false);
     }
 
     /**
@@ -114,42 +97,37 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
 
         for (SpringResourceLoader r : springResourceLoaders) {
             ApplicationContext context = r.getContext();
-                for (String name : context.getBeanDefinitionNames()) {
+            for (String name : context.getBeanDefinitionNames()) {
                 if (process(name)) {
-                        try {
-                            function.r(context, name);
-                        } catch (BeanIsAbstractException e) {
-                            //ignore since the bean can't be created
-                        } catch (BeanCreationException e) {
-                            //if there is no way to ignore creation errors all tests will fail even if one bean is bad regardless of the type
-                            //we do want this type of failure to be tested by at least one test method but not all tests
-                            if (!ignoreCreationException) {
-                                LOG.error("unable to create bean " + name + (context instanceof ConfigurableWebApplicationContext ? " for locations " + Arrays.asList(((ConfigurableWebApplicationContext) context).getConfigLocations()) : ""), e);
-                                throw e;
-                            }
-                        } catch (RuntimeException e) {
-                            LOG.error("failed to execute function for bean " + name + (context instanceof ConfigurableWebApplicationContext ? " for locations " + Arrays.asList(((ConfigurableWebApplicationContext) context).getConfigLocations()) : ""), e);
-                            List<KeyValue<String, Exception>> rlFailures = failedBeans.get(r.getName());
-                            if (rlFailures == null) {
-                                rlFailures = new ArrayList<>();
-                            }
-                            rlFailures.add(new DefaultKeyValue<String, Exception>(name, e));
-                            failedBeans.put(r.getName(), rlFailures);
-                    }
+                    try {
+                        function.r(context, name);
+                    } catch (BeanIsAbstractException e) {
+                        //ignore since the bean can't be created
+                    } catch (BeanCreationException e) {
+                        //if there is no way to ignore creation errors all tests will fail even if one bean is bad regardless of the type
+                        //we do want this type of failure to be tested by at least one test method but not all tests
+                        if (!ignoreCreationException) {
+                            LOG.error("unable to create bean " + name + (context instanceof ConfigurableWebApplicationContext ? " for locations " + Arrays.asList(((ConfigurableWebApplicationContext) context).getConfigLocations()) : ""), e);
+                            throw e;
                         }
+                    } catch (RuntimeException e) {
+                        LOG.error("failed to execute function for bean " + name + (context instanceof ConfigurableWebApplicationContext ? " for locations " + Arrays.asList(((ConfigurableWebApplicationContext) context).getConfigLocations()) : ""), e);
+                        List<KeyValue<String, Exception>> rlFailures = failedBeans.get(r.getName());
+                        if (rlFailures == null) {
+                            rlFailures = new ArrayList<>();
+                        }
+                        rlFailures.add(new DefaultKeyValue<>(name, e));
+                        failedBeans.put(r.getName(), rlFailures);
+                    }
                 }
+            }
         }
 
         Assert.assertTrue("the following beans failed to retrieve " + failedBeans, failedBeans.isEmpty());
     }
 
     private boolean process(String name) {
-        for (String pattern : IGNORE_PATTERN) {
-            if (name.matches(pattern)) {
-                return false;
-            }
-        }
-        return true;
+        return IGNORE_PATTERN.stream().noneMatch(name::matches);
     }
 
     private static class PrototypeVerification implements VoidFunction {
@@ -166,6 +144,10 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
             //not for type based checks I could use: ApplicationContext.getBeanNamesForType() but this method has too
             //many limitations where it wont consider certain beans like nested
             if (clazz.isInstance(o)) {
+                if (!context.isPrototype(name)) {
+                    Assert.fail("A prototype bean should always be configured as prototype, bean: " + name + " of type: " + clazz.getName());
+                }
+
                 Object o2 = context.getBean(name);
                 Assert.assertNotSame("A prototype bean should always return a unique instance, bean: " + name + " of type: " + clazz.getName(), o, o2);
             }
@@ -180,16 +162,19 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
     //the kns maintainable extends the krad maintainable for now.  Placing this here for completeness
     //and in case this relationship ever changes
     @Test
+    @SuppressWarnings("deprecation")
     public void test_kns_maintainable_are_prototype_scope() {
         toEachSpringBean(new PrototypeVerification(org.kuali.rice.kns.maintenance.Maintainable.class), true);
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void test_kns_lookupables_are_prototype_scope() {
         toEachSpringBean(new PrototypeVerification(org.kuali.rice.kns.lookup.Lookupable.class), true);
     }
 
     @Test
+    @SuppressWarnings("deprecation")
     public void test_kns_lookup_helper_service_are_prototype_scope() {
         toEachSpringBean(new PrototypeVerification(org.kuali.rice.kns.lookup.LookupableHelperService.class), true);
     }
@@ -219,20 +204,17 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
     public void test_beans_across_other_contexts_correct_scope() {
         final Set<String> prototypes = new HashSet<>();
         final Set<String> nonPrototypes = new HashSet<>();
-        toEachSpringBean(new VoidFunction() {
-            @Override
-            public void r(ApplicationContext context, String name) {
-                final Object o = context.getBean(name);
-                final Object o2 = context.getBean(name);
+        toEachSpringBean((context, name) -> {
+            final Object o = context.getBean(name);
+            final Object o2 = context.getBean(name);
 
-                if (o != o2) {
-                    //skip checking if a proxy
-                    if (!Proxy.isProxyClass(o.getClass())) {
-                        prototypes.add(name);
-                    }
-                } else {
-                    nonPrototypes.add(name);
+            if (o != o2) {
+                //skip checking if a proxy
+                if (!Proxy.isProxyClass(o.getClass())) {
+                    prototypes.add(name);
                 }
+            } else {
+                nonPrototypes.add(name);
             }
         }, true);
         final Collection<String> misConfigured = CollectionUtils.retainAll(nonPrototypes, prototypes);
@@ -246,9 +228,7 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
     @Test
     public void test_beans_across_other_contexts_name_conflict() {
         final HashMap<String, Set<Class<?>>> beans = new HashMap<>();
-        toEachSpringBean(new VoidFunction() {
-            @Override
-            public void r(ApplicationContext context, String name) {
+        toEachSpringBean((context, name) -> {
                 Object o = context.getBean(name);
                 if (o != null) {
                     Set<Class<?>> beanClasses = beans.get(name);
@@ -273,22 +253,17 @@ public class SpringBeanConfigurationTest extends KcIntegrationTestBase {
                     LOG.warn("bean " + name + " is null");
                 }
 
-            }
-        }, true);
+            }, true);
 
         final Set<Map.Entry<String, Set<Class<?>>>> entrySet = new HashSet<>(beans.entrySet());
-        CollectionUtils.filter(entrySet, new Predicate<Map.Entry<String, Set<Class<?>>>>() {
-            @Override
-            public boolean evaluate(Map.Entry<String, Set<Class<?>>> object) {
-                return object.getValue().size() > 1;
-            }
-        });
+        CollectionUtils.filter(entrySet, object -> object.getValue().size() > 1);
 
         Assert.assertTrue("The following bean names are duplicated in different contexts with different class names " + entrySet,
                 entrySet.isEmpty());
     }
 
-    private static interface VoidFunction {
+    @FunctionalInterface
+    private interface VoidFunction {
         void r(ApplicationContext context, String name);
     }
 }

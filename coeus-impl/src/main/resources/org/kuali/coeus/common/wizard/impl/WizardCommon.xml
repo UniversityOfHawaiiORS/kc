@@ -84,10 +84,8 @@
             <bean parent="Uif-HorizontalBoxGroup">
                 <property name="items">
                     <list>
-                        <!-- KC-986 Hide "Add New Address Book" button on Address Book Lookup
                         <bean parent="Rolodex-AddNewAddressButton"  p:order="10"
                               p:render="@{#editModes['addAddressBook']}"/>
-                              -->
                     </list>
                 </property>
             </bean>
@@ -169,7 +167,7 @@
                 <entry key="sDom" value="tip" />
                 <entry key="bRetrieve" value="true" />
                 <entry key="sPaginationType" value="full_numbers" />
-                <entry key="aaSorting" value="[[1,'asc']]" />
+<!--                <entry key="aaSorting" value="[[1,'asc']]" /> -->
                 <entry key="aoColumnDefs"
                        value="[{'sWidth' : '20px', 'bSortable':false, 'aTargets' : [0]}]" />
             </map>

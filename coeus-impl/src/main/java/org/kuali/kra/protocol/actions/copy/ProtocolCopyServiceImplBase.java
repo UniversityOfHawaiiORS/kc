@@ -39,9 +39,9 @@ import org.kuali.kra.protocol.protocol.reference.ProtocolReferenceBase;
 import org.kuali.kra.protocol.protocol.research.ProtocolResearchAreaBase;
 import org.kuali.kra.protocol.specialreview.ProtocolSpecialReviewBase;
 import org.kuali.rice.kim.api.role.Role;
+import org.kuali.rice.kim.api.role.RoleService;
 import org.kuali.rice.krad.bo.DocumentHeader;
 import org.kuali.rice.krad.service.DocumentService;
-import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
 import org.kuali.rice.krad.service.SequenceAccessorService;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.ObjectUtils;
@@ -81,36 +81,14 @@ import java.util.Map.Entry;
 public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extends ProtocolDocumentBase> implements ProtocolCopyService<GenericProtocolDocument> {
     
     private static final String PROTOCOL_CREATED = "ProtocolBase created";
-    
+    private static final String CUSTOM_ATTRIBUTE = "customAttribute";
+
     private DocumentService documentService;
     private SystemAuthorizationService systemAuthorizationService;
     private KcAuthorizationService kraAuthorizationService;
     private KcPersonService kcPersonService;
     private SequenceAccessorService sequenceAccessorService;
-
-    /**
-     * Set the Document Service.
-     * @param documentService
-     */
-    public void setDocumentService(DocumentService documentService) {
-        this.documentService = documentService;
-    }
-    
-    /**
-     * Set the System Authorization Service.
-     * @param systemAuthorizationService
-     */
-    public void setSystemAuthorizationService(SystemAuthorizationService systemAuthorizationService) {
-        this.systemAuthorizationService = systemAuthorizationService;
-    }
-    
-    /**
-     * Set the Kra Authorization Service.
-     * @param kralAuthorizationService
-     */
-    public void setKraAuthorizationService(KcAuthorizationService kraAuthorizationService) {
-        this.kraAuthorizationService = kraAuthorizationService;
-    }
+    private RoleService roleService;
     
     @Override
     public GenericProtocolDocument copyProtocol(GenericProtocolDocument srcDoc) throws Exception {
@@ -119,13 +97,7 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
     
     @Override
     public GenericProtocolDocument copyProtocol(GenericProtocolDocument srcDoc, String protocolNumber, boolean isAmendmentRenewal) throws Exception {
-        GenericProtocolDocument newDoc = createNewProtocol(srcDoc, protocolNumber, isAmendmentRenewal);
-        
-        documentService.saveDocument(newDoc);
-            
-        // Can't initialize authorization until a protocol is saved
-        // and we have a new protocol number.
-            
+        GenericProtocolDocument newDoc = createNewProtocol(srcDoc, protocolNumber, isAmendmentRenewal);        
         initializeAuthorization(srcDoc, newDoc);
 
         return newDoc;
@@ -138,14 +110,11 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
      * protocol.
      * "Copy" may be a pure copy or copy for amendment &amp; renewal creation.
      * if for amendment/renewal, then notes &amp; attachments will be copied.
-     * @param srcDoc
-     * @return
-     * @throws Exception
      */
-    @SuppressWarnings("unchecked")
     protected GenericProtocolDocument createNewProtocol(GenericProtocolDocument srcDoc, String protocolNumber, boolean isAmendmentRenewal) throws Exception {
-        DocumentService docService = KRADServiceLocatorWeb.getDocumentService();
-        GenericProtocolDocument newDoc = (GenericProtocolDocument) docService.getNewDocument(srcDoc.getClass());
+
+        @SuppressWarnings("unchecked")
+        GenericProtocolDocument newDoc = (GenericProtocolDocument) getDocumentService().getNewDocument(srcDoc.getClass());
             
         newDoc.getProtocol().setProtocolNumber(protocolNumber);
         newDoc.getProtocol().setSequenceNumber(0);
@@ -158,11 +127,10 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
         copyRequiredProperties(srcDoc, newDoc);
         copyAdditionalProperties(srcDoc, newDoc);
         copyProtocolLists(srcDoc, newDoc);
-        if (isAmendmentRenewal && !srcDoc.getProtocol().isAmendment() && !srcDoc.getProtocol().isAmendment()) {
+        if (isAmendmentRenewal && !srcDoc.getProtocol().isAmendment()) {
             removeDeletedAttachment(newDoc.getProtocol());
             
         }
-        newDoc.getProtocol().setProtocolNumber(protocolNumber);
         copyCustomDataAttributeValues(srcDoc, newDoc);
         
         org.kuali.kra.protocol.actions.ProtocolActionBase protocolAction = getProtocolActionNewInstanceHook(newDoc.getProtocol(), null, getProtocolActionProtocolCreatedCodeHook());
@@ -171,27 +139,23 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
         newDoc.getProtocol().getProtocolActions().add(protocolAction);
 
         if (!isAmendmentRenewal) {
-            newDoc.getProtocol().setAttachmentProtocols(new ArrayList<ProtocolAttachmentProtocolBase>());
-            newDoc.getProtocol().setNotepads(new ArrayList<ProtocolNotepadBase>());
+            newDoc.getProtocol().setAttachmentProtocols(new ArrayList<>());
+            newDoc.getProtocol().setNotepads(new ArrayList<>());
             if (newDoc.getProtocol().getProtocolPersons() != null) {
                 for (ProtocolPersonBase person : newDoc.getProtocol().getProtocolPersons()) {
-                    person.setAttachmentPersonnels(new ArrayList<ProtocolAttachmentPersonnelBase>());
+                    person.setAttachmentPersonnels(new ArrayList<>());
                 }
             }
         } else {
             initPersonAttachments(newDoc.getProtocol());
-        }
-        documentService.saveDocument(newDoc); 
-        if (isAmendmentRenewal) {
-            refreshAttachmentsPersonnels(newDoc.getProtocol());
         }
         
         return newDoc;
     }
 
     private void removeDeletedAttachment(ProtocolBase protocol) {
-        List<Integer> documentIds = new ArrayList<Integer>();
-        List<ProtocolAttachmentProtocolBase> attachments = new ArrayList<ProtocolAttachmentProtocolBase>();
+        List<Integer> documentIds = new ArrayList<>();
+        List<ProtocolAttachmentProtocolBase> attachments = new ArrayList<>();
         for (ProtocolAttachmentProtocolBase attachment : protocol.getAttachmentProtocols()) {
             attachment.setProtocol(protocol);
             if ("3".equals(attachment.getDocumentStatusCode())) {
@@ -213,7 +177,6 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
 
     /**
      * This method initializes the personId of the person
-     * @param protocol
      */
     private void initPersonId(ProtocolBase protocol) {
         for (ProtocolPersonBase person : protocol.getProtocolPersons()) {
@@ -224,7 +187,6 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
 
     /**
      * This method initializes person attachments for the newly created protocol.
-     * @param protocol
      */
     private void initPersonAttachments(ProtocolBase protocol) {
         for (ProtocolPersonBase person : protocol.getProtocolPersons()) {
@@ -232,15 +194,6 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
                 attachment.setPersonId(person.getProtocolPersonId());
             }
         }
-    }
-    
-    protected void refreshAttachmentsPersonnels(ProtocolBase protocol) {
-        if (protocol.getProtocolPersons() != null) {
-            for (ProtocolPersonBase person : protocol.getProtocolPersons()) {
-                person.refreshReferenceObject("attachmentPersonnels");
-            }
-        }
-
     }
                 
     /**
@@ -262,8 +215,6 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
     /**
      * Copy over the required properties so we can do an initial save of the document
      * in order to obtain a ProtocolId and ProtocolNumber.
-     * @param srcDoc
-     * @param destDoc
      */
     protected void copyRequiredProperties(GenericProtocolDocument srcDoc, GenericProtocolDocument destDoc) {
         destDoc.getDocumentHeader().setDocumentDescription(srcDoc.getDocumentHeader().getDocumentDescription());
@@ -275,8 +226,6 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
     
     /**
      * Copy over the additional properties.
-     * @param srcDoc
-     * @param destDoc
      */
     protected void copyAdditionalProperties(GenericProtocolDocument srcDoc, GenericProtocolDocument destDoc) {
         destDoc.getProtocol().setFdaApplicationNumber(srcDoc.getProtocol().getFdaApplicationNumber());
@@ -298,7 +247,6 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
      * roles.  But if we encounter the initiator again, we ignore him/her.  For example,
      * the initiator may be a Viewer for the protocol being copied.  He/she should not
      * be a Viewer again for the new protocol since they are now have the Aggregator roe.
-     * @param doc the protocol document
      */
     protected void initializeAuthorization(GenericProtocolDocument srcDoc, GenericProtocolDocument destDoc) {
         String userId = GlobalVariables.getUserSession().getPrincipalId();
@@ -307,10 +255,12 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
    
         List<Role> roles = systemAuthorizationService.getRoles(getProtocolRoleTypeHook());
         for (Role role : roles) {
-
+            if (getRoleService().isDerivedRole(role.getId())) {
+                continue;
+            }
             List<String> users = kraAuthorizationService.getPrincipalsInRole(role.getName(), srcDoc.getProtocol());
 
-            final List<KcPerson> persons = new ArrayList<KcPerson>();
+            final List<KcPerson> persons = new ArrayList<>();
             for(String uid : users) {
                 KcPerson person = kcPersonService.getKcPersonByPersonId(uid);
                 if (person != null && person.getActive()) {
@@ -330,38 +280,33 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
      * Copy the BO lists from the original protocol to the new protocol.
      * The init() method for each BO entry will be invoked to reset its
      * primary key (id), ProtocolId, and ProtocolNumber.
-     * @param srcDoc
-     * @param destDoc
      */
-    @SuppressWarnings("unchecked")
     protected void copyProtocolLists(GenericProtocolDocument srcDoc, GenericProtocolDocument destDoc) {
         ProtocolBase srcProtocol = srcDoc.getProtocol();
         ProtocolBase destProtocol = destDoc.getProtocol();
         
-        destProtocol.setProtocolResearchAreas((List<ProtocolResearchAreaBase>) deepCopy(srcProtocol.getProtocolResearchAreas()));
-        destProtocol.setProtocolReferences((List<ProtocolReferenceBase>) deepCopy(srcProtocol.getProtocolReferences()));
-        destProtocol.setProtocolLocations((List<ProtocolLocationBase>) deepCopy(srcProtocol.getProtocolLocations()));
-        destProtocol.setProtocolFundingSources((List<ProtocolFundingSourceBase>) deepCopy(srcProtocol.getProtocolFundingSources()));
-        destProtocol.setProtocolPersons((List<ProtocolPersonBase>) deepCopy(srcProtocol.getProtocolPersons()));
-        destProtocol.setSpecialReviews((List<ProtocolSpecialReviewBase>) deepCopy(srcProtocol.getSpecialReviews()));
+        destProtocol.setProtocolResearchAreas(deepCopy(srcProtocol.getProtocolResearchAreas()));
+        destProtocol.setProtocolReferences(deepCopy(srcProtocol.getProtocolReferences()));
+        destProtocol.setProtocolLocations(deepCopy(srcProtocol.getProtocolLocations()));
+        destProtocol.setProtocolFundingSources(deepCopy(srcProtocol.getProtocolFundingSources()));
+        destProtocol.setProtocolPersons(deepCopy(srcProtocol.getProtocolPersons()));
+        destProtocol.setSpecialReviews(deepCopy(srcProtocol.getSpecialReviews()));
         // must make following call to copy exemption codes (transient objects don't get copied)
         destProtocol.cleanupSpecialReviews(srcProtocol);
-        destProtocol.setAttachmentProtocols((List<ProtocolAttachmentProtocolBase>) deepCopy(srcProtocol.getAttachmentProtocols()));
-        destProtocol.setNotepads((List<ProtocolNotepadBase>) deepCopy(srcProtocol.getNotepads()));
+        destProtocol.setAttachmentProtocols(deepCopy(srcProtocol.getAttachmentProtocols()));
+        destProtocol.setNotepads(deepCopy(srcProtocol.getNotepads()));
         initPersonId(destProtocol);
     }
    
-    protected Object deepCopy(Object obj) {
+    protected <T> T deepCopy(T obj) {
         if (obj instanceof Serializable) {
-            return ObjectUtils.deepCopy((Serializable) obj);
+            return (T) ObjectUtils.deepCopy((Serializable)obj);
         }
         return obj;
     }
     
     /**
      * Copy the custom attribute values to the new protocol document.
-     * @param srcProtocolDocument
-     * @param destProtocolDocument
      */
     protected void copyCustomDataAttributeValues(GenericProtocolDocument srcProtocolDocument, GenericProtocolDocument destProtocolDocument) {
         destProtocolDocument.initialize();
@@ -369,7 +314,7 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
             CustomAttributeDocument cad = srcProtocolDocument.getCustomAttributeDocuments().get(entry.getKey());
             if(ObjectUtils.isNotNull(cad)) {
                 if(ObjectUtils.isNull(cad.getCustomAttribute())) {
-                    cad.refreshReferenceObject("customAttribute");
+                    cad.refreshReferenceObject(CUSTOM_ATTRIBUTE);
                 }
                 entry.getValue().getCustomAttribute().setValue(cad.getCustomAttribute().getValue());
             }
@@ -395,5 +340,43 @@ public abstract class ProtocolCopyServiceImplBase<GenericProtocolDocument extend
 
     public void setKcPersonService(KcPersonService kcPersonService) {
         this.kcPersonService = kcPersonService;
+    }
+
+    public RoleService getRoleService() {
+        return roleService;
+    }
+
+    public void setRoleService(RoleService roleService) {
+        this.roleService = roleService;
+    }
+
+    public DocumentService getDocumentService() {
+        return documentService;
+    }
+
+    public void setDocumentService(DocumentService documentService) {
+        this.documentService = documentService;
+    }
+
+
+    public void setSystemAuthorizationService(SystemAuthorizationService systemAuthorizationService) {
+        this.systemAuthorizationService = systemAuthorizationService;
+    }
+
+
+    public void setKraAuthorizationService(KcAuthorizationService kraAuthorizationService) {
+        this.kraAuthorizationService = kraAuthorizationService;
+    }
+
+    public SystemAuthorizationService getSystemAuthorizationService() {
+        return systemAuthorizationService;
+    }
+
+    public KcAuthorizationService getKraAuthorizationService() {
+        return kraAuthorizationService;
+    }
+
+    public SequenceAccessorService getSequenceAccessorService() {
+        return sequenceAccessorService;
     }
 }

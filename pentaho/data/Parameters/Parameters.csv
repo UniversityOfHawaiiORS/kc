@@ -1,0 +1,9 @@
+NMSPC_CD,APPL_NMSPC_CD,PARM_DTL_TYP_CD,PARM_NM,Description,Parameter Value
+KC-B,KC,Document,budgetUnrecoveredFandAEnforcementFlag,Flag indicating if Unrecovered F and A allocation should be enforced,Y
+KC-B,KC,Document,budgetUnrecoveredFandAApplicabilityFlag,Flag indicating if Unrecovered F&A is applicable for the budget,Y
+KR-WKFLW,KUALI,Mailer,FROM_ADDRESS,Default from email address for notifications.,kc-noreply@ors.hawaii.edu
+KC-PROTOCOL,KC,Document,irb.protocol.development.proposal.linking.enabled,Linking from Development Proposal to PROTOCOL Funding source is configurable at impl time,N
+KC-PROTOCOL,KC,Document,irb.protocol.award.linking.enabled,Linking from Award to Protocol Funding source is configurable at impl time,N
+KC-PROTOCOL,KC,Document,irb.protocol.institute.proposal.linking.enabled,Linking from Institute Proposal to PROTOCOL Funding source is configurable at impl time,N
+KC-PD,KC,Document,MULTI_CAMPUS_ENABLED,Flag for enabling/disabling Multicampus ,1
+KC-GEN,KC,All,MULTI_CAMPUS_ENABLED,Enables or disables Multi-Campus mode ,Y

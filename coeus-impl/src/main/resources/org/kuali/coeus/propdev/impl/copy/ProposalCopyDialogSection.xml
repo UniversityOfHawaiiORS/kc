@@ -66,7 +66,7 @@ http://www.springframework.org/schema/util/spring-util-3.0.xsd">
                       p:order="20"/>
 
                 <bean parent="PropDev-CopyDialog-OwnedByUnitNumberField" p:propertyName="leadUnitNumber"
-                      p:enableAutoQuickfinder="false"
+                      p:enableAutoQuickfinder="false" p:readOnlyDisplayReplacement=""
                       p:order="30" p:readOnly="false"/>
 
                 <bean parent="Uif-InputField" p:propertyName="includeBudget" p:order="40" p:fieldLabel.renderColon="false" p:readOnly="false"
@@ -96,14 +96,12 @@ http://www.springframework.org/schema/util/spring-util-3.0.xsd">
     </bean>
 
     <bean id="PropDev-CopyDialog-OwnedByUnitNumberField" parent="PropDev-CopyDialog-OwnedByUnitNumberField-parentBean" />
-    <bean id="PropDev-CopyDialog-OwnedByUnitNumberField-parentBean"
-          abstract="true" parent="Uif-InputField" p:fieldLabel.renderColon="false" >
+    <bean id="PropDev-CopyDialog-OwnedByUnitNumberField-parentBean" abstract="true"
+          parent="Uif-InputField" p:propertyName="ownedByUnitNumber">
         <property name="control">
-            <bean parent="Uif-DropdownControl"/>
+            <bean parent="Uif-DropdownControl" />
         </property>
-        <property name="optionsFinder">
-            <bean class="org.kuali.coeus.propdev.impl.basic.LeadUnitValuesFinder" p:addBlankOption="false"/>
-        </property>
+        <property name="optionsFinder" value="#{#getService('leadUnitValuesFinder')}"/>
     </bean>
 
     <bean id="PropDev-CopyDialog-BudgetSelection-parentBean"

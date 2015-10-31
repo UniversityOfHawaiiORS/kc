@@ -32,7 +32,6 @@
   	
 <c:set var="readOnly" value="${not KualiForm.editingMode['fullEntry']}" scope="request" />
 
-<!-- <script language="JavaScript" type="text/javascript" src="dwr/engine.js"></script> -->
 
 <script language="JavaScript" type="text/javascript" src="dwr/util.js"></script>
 	
@@ -50,7 +49,6 @@
 <kul:documentOverview editingMode="${KualiForm.editingMode}" />
 
 <kra-timeandmoney:awardHierarchyTimeAndMoney />
-<%--<c:if test="${KualiForm.inMultipleNodeHierarchy}" >--%>
 	<c:choose>
 		<c:when test="${KualiForm.directIndirectViewEnabled == '1'}">	
 			<kra-timeandmoney:directIndirectTransactions />
@@ -58,12 +56,9 @@
 		<c:otherwise>
 			<kra-timeandmoney:transactions />
 		</c:otherwise>
-	</c:choose>  	
-<%--</c:if>--%>
+	</c:choose>
 <kra-a:awardDirectFnAFundsDistribution />
 <kra-timeandmoney:summary />
-<kra-timeandmoney:actionSummary />
-<kra-timeandmoney:timeAndMoneyHistory />
 
 <kul:adHocRecipients />
 <kul:routeLog />
@@ -75,7 +70,6 @@ var kualiElements = kualiForm.elements;
 </SCRIPT>
 <script language="javascript" src="scripts/kuali_application.js"></script>
 
-<%--<c:if test="${readOnly && KualiForm.document.canModify && KualiForm.displayEditButton}">--%>
 <c:if test="${readOnly && KualiForm.displayEditButton}">
 	<c:set var="extraButtonSource" value="${ConfigProperties.kra.externalizable.images.url}buttonsmall_edit_temp.gif"/>
 	<c:set var="extraButtonProperty" value="methodToCall.editOrVersion"/>

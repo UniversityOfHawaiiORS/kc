@@ -83,7 +83,8 @@
                 </bean>
                 <bean parent="Uif-DataField" p:propertyName="numberOfMonths" p:label="Months"
                       p:order="30"/>
-                <bean parent="Kc-InlineEdit-InputField" p:propertyName="totalCost"
+                <!-- KC-964 Lock Total Sponsor cost field for editing-->
+                <bean parent="Uif-DataField" p:propertyName="totalCost"
                       p:order="40"
                       p:readOnly="@{!#emptyList(budget.budgetLineItems) or !#emptyList(budget.budgetPersonnelDetails) or #parent.readOnly}"/>
                 <bean parent="Kc-InlineEdit-InputField" p:propertyName="totalDirectCost"
@@ -108,7 +109,11 @@
             <list>
                 <bean parent="Uif-DeleteLineAction-IconOnly" p:order="40"
                       p:render="@{!#ViewHelper.isBudgetLineItemEditable(#collectionGroup.bindingInfo.bindingPath,#index,editableBudgetLineItems)}" 
-                      p:iconClass="icon-trash"/>
+                      p:iconClass="icon-trash">
+                        <property name="confirmationDialog">
+                            <bean parent="Uif-DialogGroup-OkCancel" p:promptText="Are you sure you want to delete period?"/>
+                        </property>
+                </bean>
             </list>
         </property>
         <property name="layoutManager.columnCalculations">

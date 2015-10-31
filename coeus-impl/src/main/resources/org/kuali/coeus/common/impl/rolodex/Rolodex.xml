@@ -823,6 +823,7 @@
 
     <bean id="Rolodex-LookupView-AddButton" parent="Rolodex-LookupView-parentBean"
           p:viewName="Rolodex-LookupView-AddButton">
+    <!-- KC-986 Hide "Add New Address Book" button on Address Book Lookup
         <property name="page.header.rightGroup">
             <bean parent="Uif-HorizontalBoxGroup">
                 <property name="items">
@@ -835,6 +836,7 @@
                 </property>
             </bean>
         </property>
+        -->
     </bean>
 
     <bean id="Rolodex-AddNewAddressButton" parent="Rolodex-AddNewAddressButton-parentBean"/>

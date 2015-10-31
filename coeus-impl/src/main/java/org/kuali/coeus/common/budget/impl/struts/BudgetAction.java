@@ -34,6 +34,7 @@ import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.coeus.sys.framework.workflow.KcDocumentRejectionService;
 import org.kuali.kra.award.budget.AwardBudgetExt;
 import org.kuali.kra.award.budget.AwardBudgetPeriodExt;
+import org.kuali.kra.award.budget.calculator.AwardBudgetCalculationService;
 import org.kuali.kra.award.budget.document.AwardBudgetDocument;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
@@ -85,6 +86,7 @@ import org.kuali.rice.krad.util.ObjectUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -108,6 +110,8 @@ public class BudgetAction extends BudgetActionBase {
     public static final String PROPOSAL_HIERARCHY_SUB_PROJECT_INDIRECT_COST_ELEMENT = "proposalHierarchySubProjectIndirectCostElement";
     public static final String SUMMARY_TOTALS = "summaryTotals";
     public static final String ROUTE = "route";
+    public static final String SYNC_QUESTION_ASKED = "syncQuestionAsked";
+
 
     private ProposalHierarcyActionHelper hierarchyHelper;
     @Override
@@ -150,20 +154,27 @@ public class BudgetAction extends BudgetActionBase {
         return buildParameterizedConfirmationQuestion(mapping, form, request, response, CONFIRM_SYNCH_AWARD_RATES,
                 message, "");
     }
+
     public ActionForward confirmSynchAwardRates(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return synchAwardBudgetRate(mapping, form, request, response, true);
+        return synchAwardBudgetRate(form, true);
     }
+
     public ActionForward noSynchAwardRates(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-        return synchAwardBudgetRate(mapping, form, request, response, false);
+        return synchAwardBudgetRate(form, false);
     }
-    private ActionForward synchAwardBudgetRate(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response, boolean confirm) throws Exception {
+
+    private ActionForward synchAwardBudgetRate(ActionForm form, boolean confirm) throws Exception {
         BudgetForm budgetForm = (BudgetForm) form;
         AwardBudgetDocument budgetDoc = budgetForm.getBudgetDocument();
         String routeHeaderId = budgetDoc.getDocumentHeader().getWorkflowDocument().getDocumentId();
         String forward = buildForwardUrl(routeHeaderId);
+
         if (confirm) {
-            forward = forward.replace("awardBudgetParameters.do?", "awardBudgetParameters.do?syncBudgetRate=Y&");
-         }
+            forward = forward.replace(Constants.AWARD_BUDGET_VERSIONS_ACTION, Constants.AWARD_BUDGET_PARAMETERS_ACTION + "syncBudgetRate=Y&");
+         } else {
+            forward = forward.replace(Constants.AWARD_BUDGET_VERSIONS_ACTION, Constants.AWARD_BUDGET_VERSIONS_ACTION + SYNC_QUESTION_ASKED + "=Y&");
+        }
+
         return new ActionForward(forward, true);
     }
     
@@ -242,7 +253,7 @@ public class BudgetAction extends BudgetActionBase {
     }
 
     private BudgetCalculationService getBudgetCalculationService() {
-		return KcServiceLocator.getService(BudgetCalculationService.class);
+		return KcServiceLocator.getService(AwardBudgetCalculationService.class);
 	}
 
 	protected BudgetSummaryService getBudgetSummaryService() {
@@ -390,7 +401,7 @@ public class BudgetAction extends BudgetActionBase {
     public ActionForward modularBudget(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {
         BudgetForm budgetForm = (BudgetForm) form;
         BudgetModularService budgetModularService = KcServiceLocator.getService(BudgetModularService.class);
-        budgetForm.setBudgetModularSummary(budgetModularService.generateModularSummary(budgetForm.getBudgetDocument().getBudget()));
+        budgetForm.setBudgetModularSummary(budgetModularService.processModularSummary(budgetForm.getBudgetDocument().getBudget(),false));
         return mapping.findForward(Constants.BUDGET_MODULAR_PAGE);
     }
 

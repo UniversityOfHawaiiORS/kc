@@ -5,7 +5,7 @@ Kuali Coeus (KC) for Research Administration is a comprehensive system to manage
 ----------
 ##**Installation**
 **Prerequisites**
-[Maven 3.2.x][1]
+[Maven 3.3.x][1]
 [Java 1.8.x][2]
 [Tomcat 7.x][3]
 [MySQL 5.6.x][4]
@@ -61,6 +61,14 @@ When a project specific profile is available, it will be documented in the build
 > 
 *mvn clean install -Perror-prone*
 
+> **Dev Profile:**When developing with KC there are some features that are useful only for development purposes. In order to enable these features you should enable the dev profile. Currently the dev profile only provides the p6spy dependency. See the section below on Configuration for how to use this feature.
+>
+*mvn clean install -Pdev*
+
+> **Node Clean:**When building our api documentation, our build process will download node.js and various node dependencies.  By default, these artifacts are deleted on every mvn clean execution.  You can avoid this clean step by sending the following system parameter clean-jsfrontend-node.off on the command line.  This is useful to speed up project builds by avoiding the installation node.js on subsequent clean install iterations. 
+>
+*mvn clean install -Dclean-jsfrontend-node.off*
+
 All Kuali Coeus projects use standard maven conventions to build and install artifacts.  The following documents how to install source, javadoc, and primary artifacts for each maven projects.
 
 > **Source and Javadoc jars:** When building Kuali Coeus Projects it may be helpful to also build source and javadoc jars.  These jars can be consumed by tools such as debuggers.  Note: due to changes in the javadoc tool in Java 8, you may need to execute the compile phase before attempting to create a javadoc jar. 
@@ -108,6 +116,13 @@ Wait until coeus-s2sgen has installed successfully before moving to the next ste
 
 **Step 7: Build Kuali Coeus**
 Installing Kuali Coeus
+
+Install without Oracle support
+```
+cd ../kc
+mvn clean compile source:jar javadoc:jar install -Dgrm.off=true
+```
+
 > **Oracle Profile:** If using an Oracle database make sure oracle profile is used to insure Oracle specific jars are added to the classpath.  Application will fail to start up if the Oracle jar is not added.
 ```
 mvn clean install -Dgrm.off=true -Poracle
@@ -123,12 +138,8 @@ mvn clean install -Dgrm.off=true -Pitests
 mvn clean install -Dgrm.off=true -Pprecompile-jsp-tomcat-7
 ```
 
-
-Install without Oracle support
-```
-cd ../kc
-mvn clean compile source:jar javadoc:jar install -Dgrm.off=true
-```
+> **System Dependent Requirements:** Kuali Coeus is now using some node and npm dependencies as part of its build process. These dependencies have all been designed to be downloaded, installed and run without any additional system level requirements, but there are some system specific requirements that cannot be managed by our build process. This seems to primarily affect Windows, but additional systems may be affected depending on local configuration. If you are seeing errors attempting to build Kuali Coeus that relate to node or npm, please see the failing node project's documentation for what might be expected to be installed on your system.
+For example, we currently have a dependency on a node project called drafter that builds our api documentation. From their [Windows specific documentation][10], drafter appears to require Visual Studio Express 2012 and Python 2.7. These types of dependencies are beyond our control, but we strive to make the build process as simple as possible.
 
 **Step 8: Install Spring Instrumentation**
 
@@ -177,6 +188,12 @@ This section contains some useful information about configuring the Kuali Coeus 
 <param name="kc.monitoring.enabled">false</param>
 ```
 
+> **P6Spy** P6Spy can be a useful tool during development that will allow you to view sql statements that are generated and executed against the database in real time. In order to use it in KC you will need to enable the dev profile mentioned above as well as reconfigure your database connection string and driver similar to the below sample. All other kc-config.xml options should remain the same. Additionally you will need to configure the spy.properties file found in *coeus-webapp/src/main/resources/* to specify the correct original driver and potentially the appender method if StdOut is not sufficient.
+```
+<param name="datasource.url">jdbc:p6spy:mysql://localhost:3306/kcdev</param>
+<param name="datasource.driver.name">com.p6spy.engine.spy.P6SpyDriver</param>
+```
+
   [1]: http://maven.apache.org/download.cgi
   [2]: http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html
   [3]: https://tomcat.apache.org/download-70.cgi
@@ -186,3 +203,4 @@ This section contains some useful information about configuring the Kuali Coeus 
   [7]: http://mvnrepository.com/artifact/org.springframework/spring-instrument/3.2.13.RELEASE
   [8]: http://www.graphviz.org/Download..php
   [9]: https://github.com/google/error-prone
+  [10]: https://github.com/apiaryio/drafter/wiki/Building-on-Windows

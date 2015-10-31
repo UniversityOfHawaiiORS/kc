@@ -35,7 +35,10 @@
   	
   	<c:set var="readOnly" value="${not KualiForm.editingMode['fullEntry']}" scope="request" />
   	
-  	<div align="right"><kul:help documentTypeName="${KualiForm.documentTypeName}" pageName="Custom Data" /></div>
+  	<div align="right">
+       <kra:shortUrl shortUrl="${KualiForm.shortUrl}"/>
+       <kul:help documentTypeName="${KualiForm.documentTypeName}" pageName="Custom Data" />
+    </div>
   	<%-- KC-908 Make Award Custom Data tabs default to opened --%>
  	<c:set var="uhOpenTab" value="true" scope="request" />
 	<kra-customdata:customDataTab />

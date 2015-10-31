@@ -177,6 +177,8 @@ public class ProposalDevelopmentDocumentRule extends KcTransactionalDocumentRule
             valid &= processCustomDataRule(proposalDevelopmentDocument);
             valid &= processAttachmentRules(proposalDevelopmentDocument);
             valid &= processSaveSpecialReviewRule(proposalDevelopmentDocument);
+            // KC-1219 If you add someone that does not have a unit, then turn on data validation, you can no longer navigate around the proposal
+            valid &= processSaveKeyPersonBusinessRules(proposalDevelopmentDocument);
             GlobalVariables.getMessageMap().removeFromErrorPath("document.developmentProposal");
         }
 
@@ -504,6 +506,10 @@ public class ProposalDevelopmentDocumentRule extends KcTransactionalDocumentRule
         } else if (proposal.getFinalBudget() != null &&
         		!StringUtils.equals(budgetStatusCompleteCode, proposal.getFinalBudget().getBudgetStatus())) {
             auditErrors.add(new AuditError("document.developmentProposal.budgets", KeyConstants.AUDIT_ERROR_NO_BUDGETVERSION_COMPLETE_AND_FINAL, ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID));
+            retval = false;
+        } else if (proposal.getFinalBudget() != null && (!proposal.getFinalBudget().getStartDate().equals(proposal.getRequestedStartDateInitial()) ||
+        		!proposal.getFinalBudget().getEndDate().equals(proposal.getRequestedEndDateInitial()))) {
+        	auditErrors.add(new AuditError("document.developmentProposal.budgets", KeyConstants.ERROR_BUDGET_DATES_NOT_MATCH_PROPOSAL_DATES, ProposalDevelopmentDataValidationConstants.BUDGET_PAGE_ID));
             retval = false;
         }
         if (auditErrors.size() > 0) {

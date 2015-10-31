@@ -357,7 +357,8 @@
           parent="PropDev-AttachmentPage-Collection" p:collectionObjectClass="org.kuali.coeus.propdev.impl.abstrct.ProposalAbstract"
           p:propertyName="proposalAbstracts" p:cssClasses="proposalAbstractCollection">
         <property name="addWithDialogAction">
-            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Abstract" p:cssClasses="pull-right" p:iconClass="icon-plus"
+            <!-- KC-1272 Change all +Add buttons to be on the left side -->
+            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Abstract" p:cssClasses="pull-left" p:iconClass="icon-plus"
                   p:render="@{!#parent.readOnly}"/>
         </property>
         <property name="addLineItems">
@@ -428,6 +429,7 @@
     <bean id="PropDev-AttachmentsPage-InternalSection-parentBean"
           abstract="true" parent="Uif-VerticalBoxSection" p:header.headerText="Internal (&lt;span class='internalAttachmentCount'&gt;@{document.developmentProposal.instituteAttachments.size()}&lt;/span&gt;)"
           p:fieldBindingObjectPath="document.developmentProposal">
+        <property name="id" value="PropDev-AttachmentsPage-InternalSection"></property>
         <property name="items">
             <list>
                <bean parent="PropDev-AttachmentPage-InternalAttachmentButtons" p:order="10"/>
@@ -569,7 +571,8 @@
     <bean id="PropDev-AttachmentsPage-NotesCollection-parentBean" abstract="true" parent="PropDev-AttachmentPage-Collection"
           p:collectionObjectClass="org.kuali.rice.krad.bo.Note" p:propertyName="notes" p:cssClasses="proposalNoteCollection">
         <property name="addWithDialogAction">
-            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Note" p:cssClasses="pull-right" p:iconClass="icon-plus"
+            <!-- KC-1272 Change all +Add buttons to be on the left side -->
+            <bean parent="Uif-AddWithDialogAction" p:actionLabel="Add Note" p:cssClasses="pull-left" p:iconClass="icon-plus"
                   p:render="@{!#parent.readOnly}"/>
         </property>
         <property name="lineActions">
@@ -610,8 +613,9 @@
           p:render="@{!#parent.readOnly}"/>
 
     <bean id="PropDev-AttachmentPage-DetailsButton" parent="PropDev-AttachmentPage-DetailsButton-parentBean"/>
+    <!-- KC-1254 Rename "Details" button in attachments to Details/Replace -->
     <bean id="PropDev-AttachmentPage-DetailsButton-parentBean" abstract="true" parent="Uif-SecondaryActionButton-Mini"
-          p:actionLabel="Details"/>
+          p:actionLabel="Details/Replace"/>
 
     <bean id="PropDev-AttachmentPage-ProposalRightsButton" parent="PropDev-AttachmentPage-ProposalRightsButton-parentBean"/>
     <bean id="PropDev-AttachmentPage-ProposalRightsButton-parentBean" abstract="true" parent="Uif-SecondaryActionButton-Mini"

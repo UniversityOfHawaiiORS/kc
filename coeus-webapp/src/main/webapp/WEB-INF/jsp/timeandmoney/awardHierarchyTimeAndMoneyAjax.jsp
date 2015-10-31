@@ -34,19 +34,14 @@ body {
 }
 </style>
 
-<!-- <script language="JavaScript" type="text/javascript" src="dwr/engine.js"></script> -->
+
 <script language="JavaScript" type="text/javascript" src="dwr/util.js"></script>
 <script language="JavaScript" type="text/javascript" src="scripts/kuali_application.js"></script>
 
 
 </head>
 <body>
-<html:form styleId="kualiForm" method="post"
-    action="/awardHierarchyAwardActionsAjax.do" enctype=""
-    onsubmit="return hasFormAlreadyBeenSubmitted();"> 
-<!--  initial data here -->
-<%-- <input type="text" id = "researchAreas" name="researchAreas"   value="${ResearchAreasForm.researchAreas}"/> --%>
-
+<html:form styleId="kualiForm" method="post" action="/awardHierarchyAwardActionsAjax.do" enctype="" onsubmit="return hasFormAlreadyBeenSubmitted();">
 <div id="json">
 ${KualiForm.awardHierarchy}
 </div>

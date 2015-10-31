@@ -43,7 +43,6 @@
 </style>
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
-<c:set var="awardPrintAttributes" value="${DataDictionary.AwardPrint.attributes}" />
 <c:set var="awardPrintNoticeAttributes" value="${DataDictionary.AwardPrintNotice.attributes}" />
 <c:set var="awardTransactionSelectorAttributes" value="${DataDictionary.AwardTransactionSelectorBean.attributes}" />
 <c:set var="award" value="${KualiForm.document.award}" />
@@ -150,9 +149,15 @@
       			  </div>  
       			 </div>
 				</td>
-				<td class="infoline" style="text-align:center;"><html:image property="methodToCall.printNotice"
-						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif' 
-						alt="Print Award Notice" styleClass="tinybutton" onclick="excludeSubmitRestriction=true"/></td>
+				<td class="infoline" style="text-align:center;">
+					<div><html:image property="methodToCall.printNotice"
+									 src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif'
+									 alt="Print Award Summary" styleClass="tinybutton" onclick="excludeSubmitRestriction=true"/></div>
+					<div style="padding-top: 10px;">
+						<html:image property="methodToCall.sendNotice"
+									src='${ConfigProperties.kr.externalizable.images.url}tinybutton-send.gif'
+									alt="Send Award Summary" styleClass="tinybutton" onclick="excludeSubmitRestriction=true"/></div>
+				</td>
 			</tr><tr> 
 				<th scope="row" style="width:150px; text-align: left;">Award Modification</th>
 				 <td style="padding: 5px;">
@@ -191,14 +196,6 @@
 						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif' 
 						alt="Print Award Hierarchy" styleClass="tinybutton" onclick="excludeSubmitRestriction=true"/></td>			 
 			</tr>
-			<!--<tr>
-			 <th colspan="2" style="text-align: left;">
-			  Budget
-			 </th>
-			 <td class="infoline" style="text-align:center;"><html:image property="methodToCall.printBudget"
-						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif' 
-						alt="Print Budget" styleClass="tinybutton" onclick="excludeSubmitRestriction=true"/></td>			 
-			</tr>-->
 			<tr>
 			 <th colspan="2" style="text-align: left;">
 			  Time &amp; Money History

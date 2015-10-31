@@ -18,6 +18,8 @@
  */
 package org.kuali.coeus.common.impl.attachment;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.struts.upload.FormFile;
 import org.kuali.coeus.common.framework.attachment.KcAttachmentService;
 import org.kuali.coeus.sys.framework.validation.ErrorReporter;
 import org.kuali.kra.infrastructure.Constants;
@@ -131,11 +133,17 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
 
     @Override
     public boolean validPDFFile(FileMeta fileInQuestion, ErrorReporter errorReporter, String errorPrefix) {
+        /* KC-967 Attachment warning shows that a file is not a PDF when it is
+        FF for windows shows vague mime type application/binary for PDFs
         if (!Constants.PDF_REPORT_CONTENT_TYPE.equals(fileInQuestion.getContentType())) {
            errorReporter.reportWarning(errorPrefix, KeyConstants.INVALID_FILE_TYPE,
                     fileInQuestion.getName(), Constants.PDF_REPORT_CONTENT_TYPE);
-        }
+        }*/
         return true;
     }
 
+    @Override
+    public boolean doesNewFileExist(FormFile file){
+        return file != null && StringUtils.isNotBlank(file.getFileName());
+    }
 }

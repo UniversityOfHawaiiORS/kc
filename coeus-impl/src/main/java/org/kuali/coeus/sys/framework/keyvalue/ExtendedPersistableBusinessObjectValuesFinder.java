@@ -18,6 +18,7 @@
  */
 package org.kuali.coeus.sys.framework.keyvalue;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
 import org.kuali.rice.krad.keyvalues.PersistableBusinessObjectValuesFinder;
@@ -36,7 +37,11 @@ import java.util.List;
  * </p>
  */
 public class ExtendedPersistableBusinessObjectValuesFinder extends PersistableBusinessObjectValuesFinder {
-
+    // KC-1259 Keyword dropdown isn't sorted
+    //         We want to use this class since it sorts the results but it also adds "select"
+    //         so I made this a property with the default being to add the Select
+    //         this allows me to turn off the "add select entry"
+    protected boolean includeSelectRow = true;
     
     class PBOComparator implements Comparator
     {    
@@ -63,6 +68,15 @@ public class ExtendedPersistableBusinessObjectValuesFinder extends PersistableBu
         }
         
     }
+
+    // KC-1259 Keyword dropdown isn't sorted
+    //         We want to use this class since it sorts the results but it also adds "select"
+    //         so I made this a property with the default being to add the Select
+    //         this allows me to turn off the "add select entry"
+    public void setIncludeSelectRow(boolean includeSelectRow) {
+        this.includeSelectRow = includeSelectRow;
+    }
+
     /**
      * Build the list of KeyValues using the key (keyAttributeName) and
      * label (labelAttributeName) of the list of all business objects found
@@ -76,8 +90,14 @@ public class ExtendedPersistableBusinessObjectValuesFinder extends PersistableBu
         
         labels = super.getKeyValues();
         Collections.sort(labels, new PBOComparator());
-        
-        labels.add(0, new ConcreteKeyValue(PrefixValuesFinder.getPrefixKey(), PrefixValuesFinder.getDefaultPrefixValue()));
+
+        // KC-1259 Keyword dropdown isn't sorted
+        //         We want to use this class since it sorts the results but it also adds "select"
+        //         so I made this a property with the default being to add the Select
+        //         this allows me to turn off the "add select entry"
+        if (includeSelectRow) {
+            labels.add(0, new ConcreteKeyValue(PrefixValuesFinder.getPrefixKey(), PrefixValuesFinder.getDefaultPrefixValue()));
+        }
         return labels;
     }
 }

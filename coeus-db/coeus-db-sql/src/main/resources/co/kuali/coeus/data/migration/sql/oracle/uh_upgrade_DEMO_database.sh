@@ -5,8 +5,8 @@
 #VX_oracle_kc_rice_server_upgrade.sql
 #VX_oracle_kc_upgrade.sql
 
-CHECK_JAVA=`which java`
-if [ "${CHECK_JAVA}" != "/cygdrive/c/Program Files/Java/jdk1.8.0_45/bin/java" ]
+CHECK_JAVA=`java -version 2>&1 | grep "java version" | cut -d\" -f2 | cut -d\. -f2`
+if [ "${CHECK_JAVA}" != "8" ]
 then
     echo "Java 8 not detected....exiting"
     exit
@@ -27,7 +27,7 @@ getAnswer() {
         echo 1>&2
         }
 
-if [ -f ../../../../../../../../../../../coeus-db-data-conv/ojdbc6-11.2.0.3.jar ]
+if [ -f ../../../../../../../../../../../coeus-db-data-conv/ojdbc7-12.1.0.2.jar ]
 then
     echo "found ojdbc file proceeding"
 else
@@ -80,6 +80,7 @@ LOGDIR=${CURRENT_DIR}/LOGS.${un}.${timestamp}
 mkdir -p ${LOGDIR}
 
 # DEMO IS ALREADY created at 6.0 level so skip
+echo "Skipping upgrades from 520-600 since demo database should be 6.0 already"
 # Update to 5.2.0
 #sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_rice_server_upgrade.sql
 #sqlplus "${un}"/"${pw}@${DBSvrNm}" < 520_oracle_rice_client_upgrade.sql
@@ -146,10 +147,17 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1506_oracle_kc_demo.sql
 
-#Update to 1507 (Note this was released with 1506 release.....may change in 1507 version
+#Update to 1507
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1507_oracle_kc_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1507_oracle_kc_upgrade.sql
 
+#Update to 1508
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1508_oracle_kc_rice_server_upgrade.sql 
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1508_oracle_kc_upgrade.sql
 
+#Update to 1509
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1509_oracle_kc_rice_server_upgrade.sql 
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1509_oracle_kc_upgrade.sql
 
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
 

@@ -80,11 +80,7 @@ import org.kuali.kra.irb.actions.print.ProtocolPrintingService;
 import org.kuali.kra.irb.actions.request.ProtocolRequestBean;
 import org.kuali.kra.irb.actions.reviewcomments.*;
 import org.kuali.kra.irb.actions.risklevel.*;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmission;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmissionStatus;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmitAction;
-import org.kuali.kra.irb.actions.submit.ProtocolSubmitActionEvent;
-import org.kuali.kra.irb.actions.submit.ValidProtocolActionAction;
+import org.kuali.kra.irb.actions.submit.*;
 import org.kuali.kra.irb.actions.undo.UndoLastActionBean;
 import org.kuali.kra.irb.actions.undo.UndoLastActionService;
 import org.kuali.kra.irb.auth.ProtocolTask;
@@ -204,12 +200,12 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
 
         ApplicationTask task = new ApplicationTask(TaskName.CREATE_PROTOCOL);
         if (isAuthorized(task)) {
-            String newDocId = getProtocolCopyService().copyProtocol(protocolForm.getProtocolDocument()).getDocumentNumber();
+            final ProtocolDocument copy = (ProtocolDocument) getDocumentService().saveDocument(getProtocolCopyService().copyProtocol(protocolForm.getProtocolDocument()));
 
             // Switch over to the new protocol document and
             // go to the Protocol tab web page.
 
-            protocolForm.setDocId(newDocId);
+            protocolForm.setDocId(copy.getDocumentNumber());
             protocolForm.setViewOnly(false);
             loadDocument(protocolForm);
             protocolForm.getProtocolDocument().setViewOnly(protocolForm.isViewOnly());
@@ -307,10 +303,10 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         return isMax;
     }
 
-    private int activeSubmissonCount(List<ProtocolSubmission> submissions) {
+    private int activeSubmissonCount(List<ProtocolSubmissionLite> submissions) {
         int count = 0;
-        for (ProtocolSubmission submission : submissions) {
-            if (submission.getProtocol().isActive()) {
+        for (ProtocolSubmissionLite submission : submissions) {
+            if (submission.isProtocolActive()) {
                 count++;
             }
         }
@@ -997,7 +993,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         AttachmentSummary attachmentSummary = protocolSummary.getAttachments().get(selectedIndex);
         
         
-        if (attachmentSummary.getAttachmentType().startsWith("Protocol: ")) {
+        if (attachmentSummary.getAttachmentType().startsWith(Constants.PROTOCOL_ATTACHMENT_PREFIX)) {
             ProtocolAttachmentProtocol attachment = getProtocolAttachmentService().getAttachment(ProtocolAttachmentProtocol.class, attachmentSummary.getAttachmentId());
             return printAttachmentProtocol(mapping, response, attachment, protocolForm);
         } 
@@ -1071,7 +1067,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         actionHelper.setAmendmentDetails();
         actionHelper.initAmendmentBeans(true);
         protocolForm.getActionHelper().initSubmissionDetails();
-        return mapping.findForward(Constants.MAPPING_BASIC);
+        return mapping.findForward(Constants.MAPPING_PROTOCOL_HISTORY);
     }
     
     /**
@@ -1093,7 +1089,7 @@ public class ProtocolProtocolActionsAction extends ProtocolAction implements Aud
         actionHelper.setAmendmentDetails();
         actionHelper.initAmendmentBeans(true);
         protocolForm.getActionHelper().initSubmissionDetails();
-        return mapping.findForward(Constants.MAPPING_BASIC);
+        return mapping.findForward(Constants.MAPPING_PROTOCOL_HISTORY);
     }
 
     /**

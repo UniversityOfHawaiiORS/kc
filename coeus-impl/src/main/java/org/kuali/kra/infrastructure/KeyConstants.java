@@ -172,6 +172,7 @@ public final class KeyConstants {
     public static final String QUESTION_TOTALCOSTLIMIT_CHANGED = "document.question.totalCostLimit.changed";
     public static final String ERROR_BUDGET_REJECT_NO_REASON = "error.budget.reject.noReason";
     public static final String ERROR_COMPLETE_BUDGET_LOCK = "error.completeBudget.locked";
+    public static final String ERROR_BUDGET_DATES_NOT_MATCH_PROPOSAL_DATES = "error.budget.dates.not.match.proposal.dates";
     //Budget Version warnings
     public static final String WARNING_BUDGET_VERSION_MODULAR_INVALID_TDC = "warning.budgetVersion.Modular.InvalidTotalDirectCost";
 
@@ -257,6 +258,7 @@ public final class KeyConstants {
     public static final String WARNING_TOTAL_COST_LIMIT_EXCEEDED= "warning.budgetCostLimit.exceeded";
     public static final String WARNING_PERIOD_COST_LIMIT_EXCEEDED= "warning.periodCostLimit.exceeded";
     public static final String WARNING_UNRECOVERED_FA_NEGATIVE= "warning.unrecoveredFA.negative";
+    
     public static final String WARNING_TOTAL_DIRECT_COST_LIMIT_EXCEEDED= "warning.budgetDirectCostLimit.exceeded";
     public static final String WARNING_PERIOD_DIRECT_COST_LIMIT_EXCEEDED= "warning.periodDirectCostLimit.exceeded";
 
@@ -449,11 +451,17 @@ public final class KeyConstants {
     public static final String QUESTION_SYNC_PANEL = "document.question.syncPanel.text";
     public static final String QUESTION_SYNC_FULL = "document.question.syncAll.text";
     public static final String QUESTION_SYNC_PANEL_TO_EMPTY = "document.question.syncPanelToEmpty.text";
-      
+     
+    public static final String QUESTION_VOID_ATTACHMENT = "document.question.voidAttachment.text";
     //Award Attachments
     public static final String QUESTION_DELETE_ATTACHMENT = "document.question.deleteAttachment.text";
     public static final String AWARD_ATTACHMENT_TYPE_CODE_REQUIRED = "error.awardNotesAndAttachments.attachment.typeRequired";
     public static final String AWARD_ATTACHMENT_FILE_REQUIRED = "error.awardNotesAndAttachments.attachment.fileRequired";
+    
+//InstitutionalProposal Attachments
+    
+    public static final String INSTITUTIONAL_PROPOSAL_ATTACHMENT_TYPE_CODE_REQUIRED = "error.institutionalProposalAttachments.attachment.typeRequired";
+    public static final String INSTITUTIONAL_PROPOSAL_ATTACHMENT_FILE_REQUIRED = "error.institutionalProposalAttachments.attachment.fileRequired";
     
     //Award Budget
     public static final String ERROR_AWARD_OR_MONEY_DOC_NOT_FINAL = "error.budget.award.not.final";
@@ -1030,7 +1038,6 @@ public final class KeyConstants {
     public static final String NEGOTIATION_ERROR_NEGOTIATOR = "negotiation.error.negotiator";
     public static final String NEGOTIATION_WARNING_ASSOCIATEDID_NOT_SET = "negotiation.warning.associatedid.not.set";
     public static final String NEGOTIATION_ACTIVITY_START_BEFORE_NEGOTIATION = "negotiation.error.activity.start.before.negotiation.start";
-    public static final String NEGOTIATION_ACTIVITY_FOLLOWUP_BEFORE_TODAY = "negotiation.error.followup.date.before.today";
     public static final String NEGOTIATION_ACTIVITY_END_AFTER_NEGOTIATION = "negotiation.error.activity.end.after.negotiation.end";
     public static final String NEGOTIATION_ACTIVITY_START_BEFORE_END = "negotiation.error.activity.start.before.end";
     public static final String NEGOTIATION_CLOSE_PENDING_ACTIVITIES = "negotiation.message.closePendingActivities";

@@ -47,6 +47,8 @@
 				<ref bean="SubAwardAttachments-subAwardId"/>
 				<ref bean="SubAwardAttachments-updateUser"/>
 				<ref bean="SubAwardAttachments-updateTimestamp"/>
+				<ref bean="SubAwardAttachments-lastUpdateUser"/>
+				<ref bean="SubAwardAttachments-lastUpdateTimestamp"/>
 			</list>
 		</property>
 	</bean>
@@ -133,10 +135,14 @@
 	    <property name="label" value="File Name" />
 	    <property name="shortLabel" value="File Name" />
 	    <property name="maxLength" value="150" />
-	    <property name="validationPattern" >
-	      <bean parent="AnyCharacterValidationPattern"
-	            	p:allowWhitespace="true" />
-	    </property>
+		<property name="validationPattern" >
+			<bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true"/>
+		</property>
+		<property name="validCharactersConstraint">
+			<bean parent="AnyCharacterPatternConstraint">
+				<property name="allowWhitespace" value="true"/>
+			</bean>
+		</property>
 	    <property name="required" value="false" />
 	    <property name="control" >
 	      <bean parent="TextControlDefinition"
@@ -200,6 +206,16 @@
 		<property name="name" value="updateTimestamp" />
 		<property name="label" value="Last Update" />
 		<property name="shortLabel" value="Posted Timestamp" />
+	</bean>
+
+	<bean id="SubAwardAttachments-lastUpdateUser" parent="SubAwardAttachments-lastUpdateUser-parentBean" />
+	<bean id="SubAwardAttachments-lastUpdateUser-parentBean" abstract="true" parent="SubAwardAttachments-updateUser" >
+		<property name="name" value="lastUpdateUser" />
+	</bean>
+
+	<bean id="SubAwardAttachments-lastUpdateTimestamp" parent="SubAwardAttachments-lastUpdateTimestamp-parentBean" />
+	<bean id="SubAwardAttachments-lastUpdateTimestamp-parentBean" abstract="true" parent="SubAwardAttachments-updateTimestamp" >
+		<property name="name" value="lastUpdateTimestamp" />
 	</bean>
 	
 	<bean id="SubAwardAttachments-documentId" parent="SubAwardAttachments-documentId-parentBean" />
