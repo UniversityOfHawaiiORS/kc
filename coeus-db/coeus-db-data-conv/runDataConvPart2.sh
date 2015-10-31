@@ -88,7 +88,7 @@ if test -f ./ojdbc7-12.1.0.2.jar
 then
     echo Running tmdocstatus conversion
     mkdir -p $logdir
-    java -Djava.util.logging.config.file="${ROOT_PATH}/coeus-db/coeus-db-data-conv/src/main/resources/org/kuali/coeus/dc/jul-debug.properties"   -cp "target/${JARFILE}:./ojdbc7-12.1.0.2.jar" org.kuali.coeus.dc.Main ${dryrun} -dbplatform Oracle -dbricecon jdbc:oracle:thin:@localhost:${database_port}:${database_sid} -dbcoeuscon jdbc:oracle:thin:@localhost:1530:KCDEV -dbriceuser ${userid} -dbricepwd ${password}  -dbcoeususer ${userid} -dbcoeuspwd ${password} tmdocstatus 2>&1 | tee "${logdir}/${userid}${dryrun}${TIME_STAMP}.TimeAndMoney.log"
+    java -Djava.util.logging.config.file="${ROOT_PATH}/coeus-db/coeus-db-data-conv/src/main/resources/org/kuali/coeus/dc/jul-debug.properties"   -cp "target/${JARFILE}:./ojdbc7-12.1.0.2.jar" org.kuali.coeus.dc.Main ${dryrun} -dbplatform Oracle -dbricecon jdbc:oracle:thin:@localhost:${database_port}:${database_sid} -dbcoeuscon jdbc:oracle:thin:@localhost:${database_port}:${database_sid} -dbriceuser ${userid} -dbricepwd ${password}  -dbcoeususer ${userid} -dbcoeuspwd ${password} tmdocstatus 2>&1 | tee "${logdir}/${userid}${dryrun}${TIME_STAMP}.TimeAndMoney.log"
     echo "Done logs placed in ${logdir}"
 else
     echo "Didn't find oracle jar.  Please copy ojdbc7-12.1.0.2.jar into current directory"
