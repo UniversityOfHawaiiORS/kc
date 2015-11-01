@@ -39,6 +39,7 @@ public class UhKcUserLoginFilter extends UserLoginFilter
 	private static Boolean uhimsRunning=false;
 
 	private static String appUrl;
+	private static String contextName;
 		
 	// KC-901 Add ability for help desk to run the uhims process on demand
 	public static synchronized String executeShellCommand() {
@@ -149,10 +150,11 @@ public class UhKcUserLoginFilter extends UserLoginFilter
         }
 		// If user with no System Admin permission tries to access system admin pages
 		// redirect to KRAD app url
-		if (request.getRequestURL() != null && request.getRequestURL().toString().contains(getAppUrl() + "/portal")) {
+		if (request.getRequestURL() != null && request.getRequestURL().toString().contains(getContextName() + "/portal")) {
 			Principal principal = KimApiServiceLocator.getIdentityService().getPrincipalByPrincipalName(principalName);
-			if (KimApiServiceLocator.getPermissionService().hasPermission(principal.getPrincipalId(), "KC_GEN", "uh-view-sys-admin-portal")) {
+			if (!KimApiServiceLocator.getPermissionService().hasPermission(principal.getPrincipalId(), "KC-GEN", "uh-view-sys-admin-portal")) {
 				response.sendRedirect(getAppUrl());
+				return;
 			}
 		}
         super.doFilter(request, response, chain);
@@ -164,5 +166,13 @@ public class UhKcUserLoginFilter extends UserLoginFilter
 			appUrl = configService.getPropertyValueAsString("application.url");
 		}
 		return appUrl;
+	}
+
+	public static String getContextName() {
+		if (contextName == null) {
+			ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
+			contextName = configService.getPropertyValueAsString("app.context.name");
+		}
+		return contextName;
 	}
 }
