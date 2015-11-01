@@ -166,7 +166,7 @@ public class KcUHStyleableEmailContentServiceImpl extends
 			newEmailBody = origEmailBody.replaceFirst("\\s*To respond to this eDoc:", newEmailLines);
 			//UH KC-496 END
 			//UH KC-422 BEGIN rbl added ORS Helpline contact information to all email notifications
-			String newHelpLine = "Instructions for myGRANT approvers can be found here:\nhttp://www.hawaii.edu/ors/training/myGrant/Job_aids/approver.pdf\n\nIf you have any questions or concerns, please contact the ORS Helpline at <mailto:helpline@ors.hawaii.edu> or (808) 956-5198.";
+			String newHelpLine = "Instructions for myGRANT approvers can be found here:\nhttp://www.ors.hawaii.edu/mygrant_help/approver.php\n\nIf you have any questions or concerns, please contact the ORS Helpline at <mailto:helpline@ors.hawaii.edu> or (808) 956-5198.";
 			newEmailBody = newEmailBody.replaceFirst("For additional help.*", newHelpLine);
 			//UH KC-645 replace the generated docTitle which contains extraneous info in KC 5.1.x with just the proposal's actual project title
 			newEmailBody = newEmailBody.replaceFirst("Title:.*\n", newProjectTitleLine);
