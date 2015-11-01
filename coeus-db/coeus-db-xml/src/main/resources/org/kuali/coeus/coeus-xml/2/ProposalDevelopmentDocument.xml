@@ -146,7 +146,7 @@
 		<ruleName>FinalUnitApprovalRoutingRule</ruleName>
 	</requests>
     <role name="UH_Central_Final_Approval">
-		<qualifierResolver>UH_Final_Approval-XPathQualifierResolver</qualifierResolver>
+		<qualifierResolver>UnitNumberRouting-XPathQualifierResolver</qualifierResolver>
         <activationType>P</activationType>
 		<finalApproval>false</finalApproval>
 	</role>
@@ -413,10 +413,10 @@
 			</resolverConfig>
 		</ruleAttribute>
 		<ruleAttribute>
-			<name>UH_Final_Approval-XPathQualifierResolver</name>
+			<name>UnitNumberRouting-XPathQualifierResolver</name>
 			<className>org.kuali.rice.kew.role.XPathQualifierResolver</className>
-			<label>UH_Final_Approval-XPathQualifierResolver</label>
-			<description>UH_Final_Approval-XPathQualifierResolver</description>
+			<label>UnitNumberRouting-XPathQualifierResolver</label>
+			<description>UnitNumberRouting-XPathQualifierResolver</description>
 			<type>QualifierResolver</type>
 			<serviceNamespace>KC</serviceNamespace>
 			<resolverConfig>
