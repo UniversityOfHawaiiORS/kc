@@ -37,6 +37,9 @@ public class UhKcUserLoginFilter extends UserLoginFilter
 	private static String kcUserGroupId;
 	// KC-901 Add ability for help desk to run the uhims process on demand
 	private static Boolean uhimsRunning=false;
+
+	private static String appUrl;
+	private static String contextName;
 		
 	// KC-901 Add ability for help desk to run the uhims process on demand
 	public static synchronized String executeShellCommand() {
@@ -109,7 +112,6 @@ public class UhKcUserLoginFilter extends UserLoginFilter
         	    // more often this is caused in dev where dev CAS allows you to type anything resulting in no principle data
         	    // This will also block inactive users similar to code in 3.1.1 for KC-487 put in by RBL
             	ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
-
             	String logoutUrlBase = configService.getPropertyValueAsString("filter.casLogoutUrl");
             	String profilerNotFoundRedirectUrl = configService.getPropertyValueAsString("filter.profilerNotFoundRedirectUrl");
             	
@@ -139,15 +141,38 @@ public class UhKcUserLoginFilter extends UserLoginFilter
         	        String channelTitle=(String)request.getParameter("channelTitle");
         	        // KC-1204 Only allow users in the "UH KC Users" group to access myGRANT
                     if (request.getRequestURL() != null && !request.getRequestURL().toString().contains("PermissionDenied")) {
-        		        ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
-        		        String appUrl= configService.getPropertyValueAsString("application.url");
-        		        response.sendRedirect(appUrl + "/PermissionDenied.do");
+        		        response.sendRedirect(getAppUrl() + "/PermissionDenied.do");
         		        return;
         	        }
                 }
 			}
 			// KC-531 End
-        }    
+        }
+		// If user with no System Admin permission tries to access system admin pages
+		// redirect to KRAD app url
+		if (request.getRequestURL() != null && request.getRequestURL().toString().contains(getContextName() + "/portal")) {
+			Principal principal = KimApiServiceLocator.getIdentityService().getPrincipalByPrincipalName(principalName);
+			if (!KimApiServiceLocator.getPermissionService().hasPermission(principal.getPrincipalId(), "KC-GEN", "uh-view-sys-admin-portal")) {
+				response.sendRedirect(getAppUrl());
+				return;
+			}
+		}
         super.doFilter(request, response, chain);
     }
+
+	public static String getAppUrl() {
+		if (appUrl == null) {
+			ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
+			appUrl = configService.getPropertyValueAsString("application.url");
+		}
+		return appUrl;
+	}
+
+	public static String getContextName() {
+		if (contextName == null) {
+			ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
+			contextName = configService.getPropertyValueAsString("app.context.name");
+		}
+		return contextName;
+	}
 }
