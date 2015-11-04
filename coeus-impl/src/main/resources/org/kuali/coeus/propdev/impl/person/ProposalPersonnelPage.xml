@@ -93,7 +93,7 @@
                 <bean id="PropDev-PersonnelPage-Search-Fields" parent="Uif-CssGridSection-1FieldLabelColumn">
                     <property name="items">
                         <list>
-                            <bean parent="Uif-InputField" p:label="Name" p:propertyName="lookupFieldValues['q']" p:order="10">
+                            <bean parent="Uif-InputField" p:label="Name or Username" p:propertyName="lookupFieldValues['q']" p:order="10">
                                 <property name="id" value="q"/>
                             </bean>
                         </list>
