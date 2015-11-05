@@ -93,6 +93,7 @@
                 <bean id="PropDev-PersonnelPage-Search-Fields" parent="Uif-CssGridSection-1FieldLabelColumn">
                     <property name="items">
                         <list>
+                            <!-- KC-1218 Use SOLR for person lookup -->
                             <bean parent="Uif-InputField" p:label="Name or Username" p:propertyName="lookupFieldValues['q']" p:order="10">
                                 <property name="id" value="q"/>
                             </bean>
