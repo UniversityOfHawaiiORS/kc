@@ -709,9 +709,10 @@
                 <bean parent="Uif-Message" p:messageText="[color=red]Proposal is a Child in Proposal Hierarchy. Certifications must take place in the Parent proposal.[/color]"
                       p:render="@{document.developmentProposal.isChild()}"
                       p:order="20" />
+                <!-- KC-1302 Certification question are not locked while enroute (Note: need to remove "Clear All Answers" button also -->
                 <bean parent="Uif-PrimaryActionButton-Small" p:methodToCall="clearAnswers" p:actionLabel="Clear All Answers"
                       p:actionParameters="personNumber:@{(#line.proposalPersonNumber)}"
-                      p:render="@{!#ViewHelper.isCertQuestViewOnly(document,#line)  and !document.developmentProposal.isChild()}"
+                      p:render="@{!#ViewHelper.isCertQuestViewOnly(document,#line)  and !document.developmentProposal.isChild() and !#parent.readOnly}"
                       p:order="30">
                     <property name="confirmationDialog">
                         <bean parent="Uif-DialogGroup-OkCancel" p:promptText="Are you sure you want to clear all the answers?"/>

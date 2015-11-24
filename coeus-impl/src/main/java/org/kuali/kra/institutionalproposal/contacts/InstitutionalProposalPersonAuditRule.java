@@ -96,8 +96,9 @@ public class InstitutionalProposalPersonAuditRule implements DocumentAuditRule {
         boolean valid = true;
         for ( InstitutionalProposalPerson person : institutionalProposalPersons) {
             if ( (person.isPrincipalInvestigator() || person.isCoInvestigator()) && 
-                    person.getUnits() != null && person.getUnits().size() == 0 ) {
+                    person.getUnits() != null && person.getUnits().size() == 0 && person.isEmployee()) {
                 valid = false;
+                // KC-1318 Remove requirement for Non-employee Co-Investigator to have a unit
                 auditErrors.add(new AuditError(PROPOSAL_PROJECT_PERSON_LIST_ERROR_KEY, ERROR_PROPOSAL_PROJECT_PERSON_UNIT_DETAILS_REQUIRED,
                         Constants.MAPPING_INSTITUTIONAL_PROPOSAL_CONTACTS_PAGE + "." + Constants.CONTACTS_PANEL_ANCHOR, new String[]{person.getFullName()}));
             }

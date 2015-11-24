@@ -80,7 +80,8 @@ public class InstitutionalProposalPersonSaveRuleImpl implements InstitutionalPro
     boolean checkForRequiredUnitDetails(List<InstitutionalProposalPerson> projectPersons) {
         boolean valid = true;
         for(InstitutionalProposalPerson p: projectPersons) {
-            if(p.isPrincipalInvestigator() || p.isCoInvestigator()) {
+            // KC-1318 Remove requirement for Non-employee Co-Investigator to have a unit
+            if(p.isPrincipalInvestigator() || p.isCoInvestigator() && p.isEmployee()) {
                 if(p.getUnits().size() == 0) {
                     valid = false;
                     GlobalVariables.getMessageMap().putError(PROPOSAL_PROJECT_PERSON_LIST_ERROR_KEY,

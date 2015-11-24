@@ -407,6 +407,17 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
     }
     
     protected boolean canSaveCertification(ProposalDevelopmentDocument document, Person user) {
+
+        // KC-1302 Certification question are not locked while enroute
+        // This will break the ability to edit Certifcation enroute if we ever want to use that.
+        // So perhaps I should put a parameter around this to disable or use the parameter for enroute
+        // certification.  But should all users be allowed to edit during the entire flow ?  Or just the user
+        // for the current workflow stop.  Also when at final ORS route step the certifications should perhaps
+        // be locked.  Just blocking if enroute for now.
+        if (getKcWorkflowService().isEnRoute(document)) {
+            return false;
+        }
+
         for(ProposalPerson person : document.getDevelopmentProposal().getProposalPersons()) {
             if (getProposalDevelopmentPermissionsService().hasCertificationPermissions(document, user, person)) {
                 return true;
