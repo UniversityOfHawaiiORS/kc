@@ -122,7 +122,8 @@ public class AwardProjectPersonsAuditRule implements DocumentAuditRule {
     protected boolean checkUnits(List<AwardPerson> awardPersons) {
         boolean valid = true;
         for ( AwardPerson person : awardPersons) {
-            if ( (person.isPrincipalInvestigator() || person.isCoInvestigator()) && 
+            // KC-1318 Remove requirement for Non-employee Co-Investigator to have a unit
+            if ( person.isEmployee() && (person.isPrincipalInvestigator() || person.isCoInvestigator()) &&
                     person.getUnits() != null && person.getUnits().size() == 0 ) {
                 valid = false;
                 auditErrors.add(new AuditError(AWARD_PROJECT_PERSON_LIST_ERROR_KEY, ERROR_AWARD_PROJECT_PERSON_UNIT_DETAILS_REQUIRED,
