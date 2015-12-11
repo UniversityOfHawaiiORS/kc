@@ -43,6 +43,8 @@ public abstract class AbstractProjectPersonDerivedRoleTypeServiceImpl extends De
         List<AbstractProjectPerson> newPersons = new ArrayList<AbstractProjectPerson>();
         if (StringUtils.equals(roleName, Constants.PRINCIPAL_INVESTIGATOR_ROLE)
                 || StringUtils.equals(roleName, Constants.CO_INVESTIGATOR_ROLE)
+                // KC-1326 Multiple PI approval request missing from route log
+                || StringUtils.equals(roleName, Constants.MULTI_PI_ROLE)
                 || StringUtils.equals(roleName, Constants.KEY_PERSON_ROLE)) {
             for(AbstractProjectPerson person : persons) {
                 if (StringUtils.equals(person.getRoleCode(), roleName)) {
