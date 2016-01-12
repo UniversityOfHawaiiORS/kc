@@ -20,7 +20,6 @@ package org.kuali.coeus.propdev.impl.core;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.kuali.coeus.common.budget.framework.core.Budget;
 import org.kuali.coeus.common.framework.medusa.MedusaNode;
 import org.kuali.coeus.common.framework.medusa.MedusaService;
 import org.kuali.coeus.common.framework.module.CoeusModule;
@@ -32,6 +31,7 @@ import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
 import org.kuali.coeus.propdev.impl.action.ProposalDevelopmentRejectionBean;
 import org.kuali.coeus.propdev.impl.attachment.NarrativeUserRights;
 import org.kuali.coeus.propdev.impl.attachment.ProposalDevelopmentAttachmentHelper;
+import org.kuali.coeus.propdev.impl.auth.perm.ProposalDevelopmentPermissionsService;
 import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
 import org.kuali.coeus.propdev.impl.budget.core.AddBudgetDto;
 import org.kuali.coeus.propdev.impl.budget.core.SelectableBudget;
@@ -40,9 +40,12 @@ import org.kuali.coeus.propdev.impl.custom.ProposalDevelopmentCustomDataHelper;
 import org.kuali.coeus.propdev.impl.docperm.ProposalUserRoles;
 import org.kuali.coeus.propdev.impl.editable.ProposalChangedData;
 import org.kuali.coeus.propdev.impl.notification.ProposalDevelopmentNotificationContext;
+import org.kuali.coeus.propdev.impl.person.ProposalPerson;
+import org.kuali.coeus.propdev.impl.person.ProposalPersonCoiIntegrationService;
 import org.kuali.coeus.propdev.impl.person.creditsplit.ProposalCreditSplitListDto;
 import org.kuali.coeus.propdev.impl.person.question.ProposalPersonQuestionnaireHelper;
 import org.kuali.coeus.propdev.impl.questionnaire.ProposalDevelopmentQuestionnaireHelper;
+import org.kuali.coeus.propdev.impl.coi.CoiConstants;
 import org.kuali.coeus.propdev.impl.copy.ProposalCopyCriteria;
 import org.kuali.coeus.propdev.impl.s2s.S2sAppSubmission;
 import org.kuali.coeus.propdev.impl.s2s.S2sUserAttachedForm;
@@ -66,8 +69,8 @@ import org.kuali.rice.krad.util.MessageMap;
 import org.kuali.rice.krad.web.bind.ChangeTracking;
 import org.kuali.rice.krad.web.form.TransactionalDocumentFormBase;
 
-import javax.persistence.Transient;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @ChangeTracking
 @Link(path = "document.developmentProposal")
@@ -334,6 +337,30 @@ public class ProposalDevelopmentDocumentForm extends TransactionalDocumentFormBa
         this.dataValidationItems = dataValidationItems;
     }
 
+    public List<ProposalPerson> getPersonnelWhoRequireCertification() {
+        ProposalDevelopmentPermissionsService permissionsService = getProposalDevelopmentPermissionsService();
+        List<ProposalPerson> persons = getDevelopmentProposal().getProposalPersons().stream().
+                filter(person -> permissionsService.doesPersonRequireCertification(person)).collect(Collectors.toList());
+        return persons;
+    }
+
+    public List<ProposalPerson> getPersonnelWhoRequireDisclosure() {
+    	ProposalPersonCoiIntegrationService proposalPersonCoiIntegrationService = getProposalPersonCoiIntegrationService();
+    	List<ProposalPerson> persons = getPersonnelWhoRequireCertification().stream().filter(person -> {
+    		String coiStatus = proposalPersonCoiIntegrationService.getProposalPersonCoiStatus(person);
+    		return !coiStatus.equals(CoiConstants.CERTIFICATION_INCOMPLETE) && !coiStatus.equals(CoiConstants.DISCLOSURE_NOT_REQUIRED);
+    	}).collect(Collectors.toList());
+    	return persons;
+    }
+    
+    private ProposalPersonCoiIntegrationService getProposalPersonCoiIntegrationService() {
+        return KcServiceLocator.getService(ProposalPersonCoiIntegrationService.class);
+    }
+    
+    private ProposalDevelopmentPermissionsService getProposalDevelopmentPermissionsService() {
+        return KcServiceLocator.getService(ProposalDevelopmentPermissionsService.class);
+    }
+
     public OrganizationAddWizardHelper getAddOrganizationHelper() {
 		return addOrganizationHelper;
 	}
@@ -525,10 +552,7 @@ public class ProposalDevelopmentDocumentForm extends TransactionalDocumentFormBa
     }
 
     public S2sAppSubmission getDisplayedS2sAppSubmission() {
-        if (CollectionUtils.isNotEmpty(this.getDevelopmentProposal().getS2sAppSubmission())){
-            return this.getDevelopmentProposal().getS2sAppSubmission().get(this.getDevelopmentProposal().getS2sAppSubmission().size()-1);
-        }
-        return null;
+        return this.getDevelopmentProposal().getDisplayedS2sAppSubmission();
     }
 
     public AnswerHeader getUpdateAnswerHeader() {

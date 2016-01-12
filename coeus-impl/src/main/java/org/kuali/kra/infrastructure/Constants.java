@@ -121,6 +121,7 @@ public interface Constants {
     public static final String MODULE_NAMESPACE_INSITUTIONAL_PROPOSAL = "KC-IP";
     public static final String MODULE_NAMESPACE_TIME_AND_MONEY = "KC-T";
     public static final String MODULE_NAMESPACE_UNIT = "KC-UNT";
+    public static final String MODULE_NAMESPACE_MAINTENANCE = "KC-M";
 
     public static final String PESSIMISTIC_LOCKING_EXPIRATION_AGE = "pessimisticLocking.expirationAge";
     
@@ -184,7 +185,8 @@ public interface Constants {
     public static final String CREDIT_SPLIT_KEY = "document.developmentProposalList[0].creditSplit";
     public static final String PERSON_CERTIFICATE = "proposalPersonCertificate";
     public static final String PERSON_COMMENT = "personComment";
-
+    public static final int ERA_COMMONS_USERNAME_MIN_LENGTH = 6;
+    
     /*Proposal notification constants*/
     public static final String DATA_OVERRIDE_NOTIFICATION_ACTION = "102";
     public static final String DATA_OVERRIDE_CONTEXT = "Proposal Data Override";
@@ -678,6 +680,8 @@ public interface Constants {
     public static final String ENABLE_PROTOCOL_TO_PROPOSAL_LINK = "irb.protocol.institute.proposal.linking.enabled";
     
     public static final String PROTOCOL_TYPE_CODE_EXEMPT = "irb.protocol.protocoltype.exempt";
+    public static final String IRB_PROTOCOL_DUPLICATE_PERSON_ENABLED = "irb.protocol.duplicatePerson.enabled";
+    public static final String IACUC_PROTOCOL_DUPLICATE_PERSON_ENABLED = "iacuc.protocol.duplicatePerson.enabled";
     
     // Questionnaire
     public static final String QUESTION_EXPLANATION = "E";

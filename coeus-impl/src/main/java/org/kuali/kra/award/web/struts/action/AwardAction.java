@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.kuali.coeus.coi.framework.*;
 import org.kuali.coeus.common.framework.auth.SystemAuthorizationService;
 import org.kuali.coeus.common.framework.version.VersionStatus;
 import org.kuali.coeus.common.framework.version.history.VersionHistory;
@@ -41,7 +42,6 @@ import org.kuali.kra.award.*;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchy;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchyBean;
 import org.kuali.kra.award.awardhierarchy.AwardHierarchyService;
-import org.kuali.kra.award.awardhierarchy.AwardHierarchyTempObject;
 import org.kuali.kra.award.awardhierarchy.sync.AwardSyncPendingChangeBean;
 import org.kuali.kra.award.awardhierarchy.sync.AwardSyncType;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncCreationService;
@@ -152,11 +152,39 @@ public class AwardAction extends BudgetParentActionBase {
     public static final String DISABLE_ATTACHMENT_REMOVAL = "disableAttachmentRemoval";
     public static final String CURRENT_VERSION_BUDGETS = "currentVersionBudgets";
 
+    //question constants
+    private static final String QUESTION_VERIFY_SYNC="VerifySync";
+    private static final String QUESTION_VERIFY_EMPTY_SYNC="VerifyEmptySync";
+
+    private static final Log LOG = LogFactory.getLog( AwardAction.class );
+
     private enum SuperUserAction {
         SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
     }
-    
-    private ParameterService parameterService;
+
+    private static final AwardTemplateSyncScope[] DEFAULT_SCOPES_REQUIRE_VERIFY_FOR_EMPTY = new AwardTemplateSyncScope[] {
+            AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
+            AwardTemplateSyncScope.SPONSOR_CONTACTS_TAB,
+            AwardTemplateSyncScope.REPORTS_TAB
+    };
+
+
+    private static final AwardTemplateSyncScope[] DEFAULT_AWARD_TEMPLATE_SYNC_SCOPES = new AwardTemplateSyncScope[] {
+            AwardTemplateSyncScope.AWARD_PAGE,
+            AwardTemplateSyncScope.COST_SHARE,
+            AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
+            AwardTemplateSyncScope.SPONSOR_CONTACTS_TAB,
+            AwardTemplateSyncScope.TERMS_TAB,
+            AwardTemplateSyncScope.REPORTS_TAB,
+            AwardTemplateSyncScope.COMMENTS_TAB
+    };
+
+    private static final String DOCUMENT_ROUTE_QUESTION="DocRoute";
+
+    private static final String ADD_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";
+    private static final String DEL_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";
+
+    private transient ParameterService parameterService;
     private transient AwardBudgetService awardBudgetService;
     private transient AwardService awardService;
     private transient ReportTrackingService reportTrackingService;
@@ -164,36 +192,8 @@ public class AwardAction extends BudgetParentActionBase {
     private transient SubAwardService subAwardService;
     TimeAndMoneyAwardDateSaveRuleImpl timeAndMoneyAwardDateSaveRuleImpl;
     private transient TimeAndMoneyVersionService timeAndMoneyVersionService;
-    
-    private static final Log LOG = LogFactory.getLog( AwardAction.class );
-    
-    //question constants
-    private static final String QUESTION_VERIFY_SYNC="VerifySync";
-    private static final String QUESTION_VERIFY_EMPTY_SYNC="VerifyEmptySync";
-    
-   
-    
-    private static final AwardTemplateSyncScope[] DEFAULT_SCOPES_REQUIRE_VERIFY_FOR_EMPTY = new AwardTemplateSyncScope[] {
-            AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
-            AwardTemplateSyncScope.SPONSOR_CONTACTS_TAB,
-            AwardTemplateSyncScope.REPORTS_TAB
-    };
-    
-    
-    private static final AwardTemplateSyncScope[] DEFAULT_AWARD_TEMPLATE_SYNC_SCOPES = new AwardTemplateSyncScope[] { 
-        AwardTemplateSyncScope.AWARD_PAGE,
-        AwardTemplateSyncScope.COST_SHARE,
-        AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
-        AwardTemplateSyncScope.SPONSOR_CONTACTS_TAB,
-        AwardTemplateSyncScope.TERMS_TAB,
-        AwardTemplateSyncScope.REPORTS_TAB,
-        AwardTemplateSyncScope.COMMENTS_TAB
-        };
-
-    private static final String DOCUMENT_ROUTE_QUESTION="DocRoute";
-    
-    private static final String ADD_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";
-    private static final String DEL_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";    
+    private transient ProjectPublisher projectPublisher;
+    private transient ProjectRetrievalService projectRetrievalService;
 
     @Override
     public ActionForward docHandler(ActionMapping mapping, ActionForm form
@@ -397,7 +397,7 @@ public class AwardAction extends BudgetParentActionBase {
         ActionForward holdingPageForward = mapping.findForward(Constants.MAPPING_HOLDING_PAGE);
         return routeToHoldingPage(basicForward, forward, holdingPageForward, returnLocation);
     }
-    
+
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
@@ -447,6 +447,9 @@ public class AwardAction extends BudgetParentActionBase {
          * deal with the award report tracking generation business.
          */
         getReportTrackingService().generateReportTrackingAndSave(award, false);
+
+        getProjectPublisher().publishProject(getProjectRetrievalService()
+                .retrieveProject(awardForm.getAwardDocument().getAward().getAwardId().toString()));
 
         return forward;
     }
@@ -1342,6 +1345,7 @@ public class AwardAction extends BudgetParentActionBase {
         awardForm.setTemplateLookup(false);
         awardForm.setCurrentSyncScopes(null);
         awardForm.setCurrentSyncQuestionId(null);
+        awardForm.buildReportTrackingBeans();
         return mapping.findForward(Constants.MAPPING_AWARD_BASIC);
     }    
     
@@ -1659,4 +1663,30 @@ public class AwardAction extends BudgetParentActionBase {
 		}
 		return result;
 	}
+
+
+    public ProjectPublisher getProjectPublisher() {
+        if (projectPublisher == null) {
+            projectPublisher = KcServiceLocator.getService(ProjectPublisher.class);
+        }
+
+        return projectPublisher;
+    }
+
+    public void setProjectPublisher(ProjectPublisher projectPublisher) {
+        this.projectPublisher = projectPublisher;
+    }
+
+    public ProjectRetrievalService getProjectRetrievalService() {
+        if (projectRetrievalService == null) {
+            projectRetrievalService = KcServiceLocator.getService("awardProjectRetrievalService");
+        }
+
+        return projectRetrievalService;
+    }
+
+    public void setProjectRetrievalService(ProjectRetrievalService projectRetrievalService) {
+        this.projectRetrievalService = projectRetrievalService;
+    }
+
 }

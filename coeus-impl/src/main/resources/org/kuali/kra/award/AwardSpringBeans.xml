@@ -37,7 +37,7 @@
 
     <tx:annotation-driven transaction-manager="transactionManager" />
     <context:annotation-config />
-    <context:component-scan base-package="org.kuali.kra.award" />
+    <context:component-scan base-package="org.kuali.kra.award"/>
     <context:component-scan base-package="org.kuali.coeus.award"/>
     <mvc:annotation-driven/>
 
@@ -250,6 +250,8 @@
     <bean id="sponsorHierarchyService" class="org.kuali.rice.core.framework.resourceloader.GlobalResourceLoaderServiceFactoryBean">
         <property name="serviceName" value="sponsorHierarchyService" />
     </bean>
+    
+    <bean id="errorHandlingUtilService" parent="grlImporter" p:serviceName="errorHandlingUtilService" />
 
     <bean id="parentLookupableHelperService" abstract="true">
         <property name="persistenceStructureService" ref="persistenceStructureService" />
@@ -1345,6 +1347,8 @@
         <property name="parameterService" ref="parameterService" />
         <property name="sponsorDtoService" ref="sponsorDtoService" />
     </bean>
+
+    <bean id="jdbcOperations" parent="grlImporter" p:serviceName="jdbcOperations" />
 
     <import resource="classpath:org/kuali/kra/external/AwardOverrideSpringBeans.xml" />
 

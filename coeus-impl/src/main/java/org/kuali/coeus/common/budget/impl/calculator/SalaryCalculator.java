@@ -18,6 +18,7 @@
  */
 package org.kuali.coeus.common.budget.impl.calculator;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.budget.framework.query.QueryList;
 import org.kuali.coeus.common.budget.api.rate.RateClassType;
@@ -70,14 +71,12 @@ public class SalaryCalculator {
         this.endDate = personnelLineItem.getEndDate();
         errorList = new ArrayList<String>();
         warningList = new ArrayList<String>();
-        this.dateTimeService = KcServiceLocator.getService(DateTimeService.class);
     }
 
-    private QueryList<BudgetRate> filterInflationRates() {
-        if (personnelLineItem.getApplyInRateFlag()) {
-            final CostElement costElement = getCostElement(personnelLineItem);
-            final ValidCeRateType inflationRateType = costElement.getValidCeRateTypes().stream().filter(t -> t.getRateClassType().equals(RateClassType.INFLATION.getRateClassType())).findFirst().get();
+    public QueryList<BudgetRate> filterInflationRates(CostElement costElement, boolean applyInflationRate) {
+        final ValidCeRateType inflationRateType = costElement.getValidCeRateTypes().stream().filter(t -> t.getRateClassType().equals(RateClassType.INFLATION.getRateClassType())).findFirst().orElse(null);
 
+        if (applyInflationRate && inflationRateType != null) {
             final Predicate<BudgetRate> dateAndRateAndOnOffCampusFlag = budgetRate -> {
                 final boolean iInflationRCEquals = StringUtils.equals(inflationRateType.getRateClassCode(), budgetRate.getRateClassCode());
                 final boolean iInflationRTEquals = StringUtils.equals(inflationRateType.getRateTypeCode(), budgetRate.getRateTypeCode());
@@ -102,23 +101,29 @@ public class SalaryCalculator {
         return budget.getBudgetRates();
     }
 
-    private CostElement getCostElement(BudgetPersonnelDetails personnelLineItem) {
-        CostElement costElement = personnelLineItem.getCostElementBO();
-        if (costElement == null) {
+    protected CostElement getCostElement(CostElement costElementBO, String costElementCode) {
+        if (costElementBO == null) {
             BusinessObjectService businessObjectService = KcServiceLocator.getService(BusinessObjectService.class);
             Map<String, String> pkMap = new HashMap<String, String>();
-            pkMap.put("costElement", personnelLineItem.getCostElement());
-            costElement = businessObjectService.findByPrimaryKey(CostElement.class, pkMap);
+            pkMap.put("costElement", costElementCode);
+            costElementBO = businessObjectService.findByPrimaryKey(CostElement.class, pkMap);
         }
-        List<ValidCeRateType> costElementRates = costElement.getValidCeRateTypes();
+        List<ValidCeRateType> costElementRates = costElementBO.getValidCeRateTypes();
         if (costElementRates == null || costElementRates.isEmpty()) {
-            costElement.refreshReferenceObject("validCeRateTypes");
+            costElementBO.refreshReferenceObject("validCeRateTypes");
         }
-        return costElement;
+        return costElementBO;
     }
 
     private ValidCeRateType getInflationRateType(CostElement costElement) {
         return costElement.getValidCeRateTypes().stream().filter(t -> t.getRateClassType().equals(RateClassType.INFLATION.getRateClassType())).findFirst().get();
+    }
+
+    protected DateTimeService getDateTimeService() {
+        if (dateTimeService == null) {
+            dateTimeService = KcServiceLocator.getService(DateTimeService.class);
+        }
+        return dateTimeService;
     }
 
     private QueryList<BudgetPerson> filterBudgetPersons() {
@@ -162,12 +167,12 @@ public class SalaryCalculator {
             warningMsg.append(" with Job Code ");
             warningMsg.append(this.personnelLineItem.getJobCode());
             warningMsg.append(" for the period ");
-            warningMsg.append(dateTimeService.toDateString(startDate));
+            warningMsg.append(getDateTimeService().toDateString(startDate));
             warningMsg.append(" to ");
             if (!filteredPersons.isEmpty()) {
-                warningMsg.append(dateTimeService.toDateString(add(filteredPersons.get(0).getEffectiveDate(), -1)));
+                warningMsg.append(getDateTimeService().toDateString(add(filteredPersons.get(0).getEffectiveDate(), -1)));
             } else {
-                warningMsg.append(dateTimeService.toDateString(personnelLineItem.getEndDate()));
+                warningMsg.append(getDateTimeService().toDateString(personnelLineItem.getEndDate()));
             }
             warningMsg.append("\n");
             warningMsg.append("Salary for this period will be set to 0\n");
@@ -183,7 +188,7 @@ public class SalaryCalculator {
      * Subtract no of days from the given date
      */
     private Date add(Date date, int days) {
-        Calendar cal = dateTimeService.getCalendar(date);
+        Calendar cal = getDateTimeService().getCalendar(date);
         cal.add(Calendar.DATE, days);
         return cal.getTime();
     }
@@ -241,7 +246,8 @@ public class SalaryCalculator {
     private QueryList<SalaryDetails> createSalBreakupIntervals() {
         QueryList combinedList = new QueryList();
         combinedList.addAll(filterBudgetPersons());
-        combinedList.addAll(filterInflationRates());
+        final CostElement costElement = getCostElement(personnelLineItem.getCostElementBO(), personnelLineItem.getCostElement());
+        combinedList.addAll(filterInflationRates(costElement, personnelLineItem.getApplyInRateFlag()));
         combinedList.sort("sortableDate");
         if (isAnniversarySalaryDateEnabled()) {
             combinedList = processAnniversarySalaryDateInflationRates(combinedList);
@@ -277,7 +283,7 @@ public class SalaryCalculator {
             }
             int compareDateChange = rateChangeDate.compareTo(tempStartDate);
             if (compareDateChange > 0) {
-                Calendar rateChangeCal = dateTimeService.getCalendar(rateChangeDate);
+                Calendar rateChangeCal = getDateTimeService().getCalendar(rateChangeDate);
                 rateChangeCal.add(Calendar.DATE, -1);
                 tempEndDate = rateChangeCal.getTime();
                 Boundary boundary = new Boundary(tempStartDate, tempEndDate);
@@ -364,16 +370,16 @@ public class SalaryCalculator {
                 }
                 else {
                     filteredCombinedList.add(dateSortable);
-                    filteredCombinedList.addAll(createAnnualInflationRates(budgetPerson));
+                    filteredCombinedList.addAll(createAnnualInflationRates(budgetPerson, endDate));
                 }
             }
         }
         return filteredCombinedList;
     }
 
-    private List<BudgetRate> createAnnualInflationRates(BudgetPerson budgetPerson) {
+    private List<BudgetRate> createAnnualInflationRates(BudgetPerson budgetPerson, Date endDate) {
         List<BudgetRate> budgetRates = new ArrayList<BudgetRate>();
-        List<BudgetRate> inflationRatesList = filterInflationRates(budgetPerson.getEffectiveDate(), this.endDate);
+        List<BudgetRate> inflationRatesList = filterInflationRates(budgetPerson.getEffectiveDate(), endDate);
         if (inflationRatesList.isEmpty()) {
             return budgetRates;
         }
@@ -386,9 +392,10 @@ public class SalaryCalculator {
             }
             budgetRates.add(budgetRate);
         }
-        Calendar salaryDateCalendar = dateTimeService.getCalendar(budgetPerson.getSalaryAnniversaryDate());
+        Calendar salaryDateCalendar = getDateTimeService().getCalendar(budgetPerson.getSalaryAnniversaryDate());
+        Calendar endCalendar = getDateTimeService().getCalendar(endDate);
+
         int startYear = salaryDateCalendar.get(Calendar.YEAR);
-        Calendar endCalendar = dateTimeService.getCalendar(endDate);
         int endYear = endCalendar.get(Calendar.YEAR);
         if (startYear != endYear) {
             while (salaryDateCalendar.get(Calendar.YEAR) <= endYear) {
@@ -401,7 +408,7 @@ public class SalaryCalculator {
                 if (inflationRateToBeApplied != null) {
                     BudgetRate nextBudgetRate = (BudgetRate) ObjectUtils.deepCopy(inflationRateToBeApplied);
                     try {
-                        nextBudgetRate.setStartDate(dateTimeService.convertToSqlDate(dateTimeService
+                        nextBudgetRate.setStartDate(getDateTimeService().convertToSqlDate(getDateTimeService()
                                 .toDateString(nextInflationDate)));
                         budgetRates.add(nextBudgetRate);
                     }
@@ -476,17 +483,17 @@ public class SalaryCalculator {
         public ScaleTwoDecimal calculateSalary() {
             int paidMonths = (workingMonths == null) ? 12 : (workingMonths.intValue());
             double perMonthSalary = this.getActualBaseSalary().doubleValue() / paidMonths;
-            Calendar startDateCalendar = dateTimeService.getCalendar(startDate);
+            Calendar startDateCalendar = getDateTimeService().getCalendar(startDate);
             int startMonth = startDateCalendar.get(Calendar.MONTH);
-            Calendar endDateCalendar = dateTimeService.getCalendar(endDate);
+            Calendar endDateCalendar = getDateTimeService().getCalendar(endDate);
             double totalSalary = 0d;
             boolean salaryReset = false;
             while (startDateCalendar.compareTo(endDateCalendar) <= 0) {
                 int noOfDaysInMonth = startDateCalendar.getActualMaximum(Calendar.DAY_OF_MONTH);
                 int noOfActualDays = 0;
                 if (altBudgetPerson != null && !salaryReset) {
-                    Calendar effdtCalendar = dateTimeService.getCalendar(altBudgetPerson.getEffectiveDate());
-                    Calendar nextStartDateCalendar = dateTimeService.getCalendar(startDateCalendar.getTime());
+                    Calendar effdtCalendar = getDateTimeService().getCalendar(altBudgetPerson.getEffectiveDate());
+                    Calendar nextStartDateCalendar = getDateTimeService().getCalendar(startDateCalendar.getTime());
                     nextStartDateCalendar.add(Calendar.MONTH, 1);
                     nextStartDateCalendar.set(Calendar.DAY_OF_MONTH, 1);
                     if (effdtCalendar.compareTo(startDateCalendar) >= 0 && effdtCalendar.compareTo(nextStartDateCalendar) < 0) {
@@ -529,65 +536,30 @@ public class SalaryCalculator {
             setActualBaseSalary(actualBaseSal.percentage(applicableRate).add(actualBaseSal));
         }
 
-        /**
-         * Getter for property boundary.
-         * 
-         * @return Value of property boundary.
-         */
         public Boundary getBoundary() {
             return boundary;
         }
 
-        /**
-         * Setter for property boundary.
-         * 
-         * @param boundary New value of property boundary.
-         */
         public void setBoundary(Boundary boundary) {
             this.boundary = boundary;
         }
 
-        /**
-         * Getter for property actualBaseSalary.
-         * 
-         * @return Value of property actualBaseSalary.
-         */
         public ScaleTwoDecimal getActualBaseSalary() {
             return actualBaseSalary;
         }
 
-        /**
-         * Setter for property actualBaseSalary.
-         * 
-         * @param actualBaseSalary New value of property actualBaseSalary.
-         */
         public void setActualBaseSalary(ScaleTwoDecimal actualBaseSalary) {
             this.actualBaseSalary = actualBaseSalary;
         }
 
-        /**
-         * Getter for property calculatedSalary.
-         * 
-         * @return Value of property calculatedSalary.
-         */
         public ScaleTwoDecimal getCalculatedSalary() {
             return calculatedSalary;
         }
 
-        /**
-         * Setter for property calculatedSalary.
-         * 
-         * @param calculatedSalary New value of property calculatedSalary.
-         */
         public void setCalculatedSalary(ScaleTwoDecimal calculatedSalary) {
             this.calculatedSalary = calculatedSalary;
         }
 
-        /**
-         * Overridden method of toString. It will form a string representation of each element associated with this class.
-         * 
-         * @return Concatinated string representation of each element
-         */
         public String toString() {
             StringBuffer strBffr = new StringBuffer("");
             strBffr.append("Actual Base Salary=>" + actualBaseSalary);
@@ -601,20 +573,10 @@ public class SalaryCalculator {
             return strBffr.toString();
         }
 
-        /**
-         * Gets the workingMonths attribute.
-         * 
-         * @return Returns the workingMonths.
-         */
         public Integer getWorkingMonths() {
             return workingMonths;
         }
 
-        /**
-         * Sets the workingMonths attribute value.
-         * 
-         * @param workingMonths The workingMonths to set.
-         */
         public void setWorkingMonths(Integer workingMonths) {
             this.workingMonths = workingMonths;
         }
@@ -655,15 +617,48 @@ public class SalaryCalculator {
         if (budgetPerson.getEffectiveDate().before(p1StartDate)) {
             p1StartDate = budgetPerson.getEffectiveDate();
         }
-        QueryList<BudgetRate> qlist = filterInflationRates(p1StartDate, startDate);
+        QueryList<BudgetRate> qlist = new QueryList<>();
+
+        Date previousEndDate = getPreviousPeriodEndDate();
+
+        if (isAnniversarySalaryDateEnabled() && budgetPerson.getSalaryAnniversaryDate() != null) {
+            qlist.addAll(createAnnualInflationRates(budgetPerson, previousEndDate));
+        } else {
+            qlist.addAll(filterInflationRates(p1StartDate, previousEndDate));
+        }
         for (BudgetRate budgetProposalrate : qlist) {
             if (budgetProposalrate.getStartDate().after(budgetPerson.getEffectiveDate())
-                    && budgetProposalrate.getStartDate().before(startDate)) {
+                    && budgetProposalrate.getStartDate().before(previousEndDate)) {
                 calBase = calBase.add(calBase.multiply(budgetProposalrate.getApplicableRate().bigDecimalValue()).divide(new ScaleTwoDecimal(100.00).bigDecimalValue(), RoundingMode.HALF_UP));
             }
         }
         return new ScaleTwoDecimal(calBase);
 
+    }
+
+    private Date getPreviousPeriodEndDate() {
+        int previousPeriod = personnelLineItem.getBudgetPeriod() - 1;
+
+        List<BudgetPersonnelDetails> previousPeriodsPersonnelDetails = budget.getBudgetPeriods()
+                .stream()
+                .filter(budgetPeriod -> budgetPeriod.getBudgetPeriod().equals(previousPeriod))
+                .flatMap(l -> l.getBudgetLineItems().stream())
+                .flatMap(l -> l.getBudgetPersonnelDetailsList().stream())
+                .filter(budgetPersonnelDetail -> (
+                    budgetPersonnelDetail.getBudgetPerson() != null &&
+                    personnelLineItem.getBudgetPerson() != null &&
+                    StringUtils.equals(budgetPersonnelDetail.getBudgetPerson().getPersonRolodexTbnId(), personnelLineItem.getBudgetPerson().getPersonRolodexTbnId()) &&
+                    StringUtils.equals(budgetPersonnelDetail.getCostElement(), personnelLineItem.getCostElement())))
+                .sorted((detail1, detail2) -> detail1.getEndDate().compareTo(detail2.getEndDate()))
+                .collect(Collectors.toList());
+
+        Date previousEndDate = startDate;
+
+        if (!CollectionUtils.isEmpty(previousPeriodsPersonnelDetails)) {
+            previousEndDate =  previousPeriodsPersonnelDetails.get(previousPeriodsPersonnelDetails.size()-1).getEndDate();
+        }
+
+        return previousEndDate;
     }
 
     private BudgetPerson getBudgetPersonApplied(BudgetPerson budgetPerson, Boundary boundary) {
@@ -684,7 +679,7 @@ public class SalaryCalculator {
     }
 
     private QueryList<BudgetRate> filterInflationRates(Date sDate, Date eDate) {
-        final CostElement costElement = getCostElement(personnelLineItem);
+        final CostElement costElement = getCostElement(personnelLineItem.getCostElementBO(), personnelLineItem.getCostElement());
         final ValidCeRateType inflationRateType = getInflationRateType(costElement);
 
         Equals eInflationRC = null;
@@ -740,4 +735,5 @@ public class SalaryCalculator {
             return new QueryList<BudgetRate>();
         }
     }
+
 }
