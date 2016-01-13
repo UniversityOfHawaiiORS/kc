@@ -61,7 +61,6 @@ import org.kuali.coeus.propdev.impl.hierarchy.HierarchyStatusConstants;
 import org.kuali.coeus.propdev.impl.person.KeyPersonnelService;
 import org.kuali.coeus.common.questionnaire.framework.answer.QuestionnaireAnswerService;
 import org.kuali.rice.core.api.criteria.QueryByCriteria;
-import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.bo.*;
 import org.kuali.rice.krad.data.CopyOption;
@@ -121,6 +120,9 @@ import java.util.*;
 public class ProposalCopyServiceImpl implements ProposalCopyService {
     
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(ProposalCopyServiceImpl.class);
+    private static final String PROPOSAL_NUMBER = "proposalNumber";
+    private static final String ORGANIZATION = "organization";
+    private static final String ROLODEX = "rolodex";
 
     @Autowired
     @Qualifier("questionnaireAnswerService")
@@ -149,10 +151,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 	@Autowired
     @Qualifier("parameterService")
 	private ParameterService parameterService;
-	
-	@Autowired
-    @Qualifier("dateTimeService")
-	private DateTimeService dateTimeService;
 
     @Autowired
     @Qualifier("globalVariableService")
@@ -180,11 +178,9 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
      * the new doc.
      * @param doc the proposal development document to copy.
      * @param criteria the user-specified criteria that controls various copy operations.
-     * @return
-     * @throws Exception
      */
     public ProposalDevelopmentDocument copyProposal(ProposalDevelopmentDocument doc, ProposalCopyCriteria criteria) {
-        String newDocNbr = null;
+
         ProposalDevelopmentDocument newDoc = null;
         LOG.info("STARTING PROPOSAL COPY");
         // check any business rules
@@ -223,6 +219,8 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
                 newDoc = (ProposalDevelopmentDocument) getDocumentService().saveDocument(newDoc);
 
+                newDoc.getDevelopmentProposal().getBudgets().forEach(budget -> getProposalBudgetService().syncBudgetReferencesForCopy(budget));
+
                 // add abstracts now since proposal number has been generated now.
                 addAbstracts(abstracts, newDoc);
 
@@ -259,8 +257,9 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     }
 
     protected void copyNotes(ProposalDevelopmentDocument doc, ProposalDevelopmentDocument newDoc) {
-        List<Note> notes = doc.getNotes();
-        List<Note> newNotes = new ArrayList<Note>();
+        @SuppressWarnings("unchecked")
+        final List<Note> notes = doc.getNotes();
+        final List<Note> newNotes = new ArrayList<>();
         for (Note note : notes) {
             Note noteCopy = getDataObjectService().copyInstance(note, CopyOption.RESET_PK_FIELDS, CopyOption.RESET_VERSION_NUMBER, CopyOption.RESET_OBJECT_ID);
             // you should not need to do this since the version number should have been reset but for some reason it is not and an OLE is thrown if we do not explicitly set.
@@ -272,7 +271,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
     protected List<ProposalAbstract> copyAbstracts(ProposalDevelopmentDocument oldDoc, ProposalDevelopmentDocument newDoc) throws Exception {
         newDoc.getDevelopmentProposal().setProposalAbstracts(null);
-        List<ProposalAbstract> abstracts = new ArrayList<ProposalAbstract>();
+        List<ProposalAbstract> abstracts = new ArrayList<>();
         for (ProposalAbstract abs : oldDoc.getDevelopmentProposal().getProposalAbstracts()) {
             ProposalAbstract absCopy = (ProposalAbstract) deepCopy(abs);
             absCopy.setAbstractType(abs.getAbstractType());
@@ -284,11 +283,11 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
     protected void clearNarrativeUserRights(ProposalDevelopmentDocument newDoc) {
         for (Narrative narrative : newDoc.getDevelopmentProposal().getNarratives()) {
-            narrative.setNarrativeUserRights(new ArrayList<NarrativeUserRights>());
+            narrative.setNarrativeUserRights(new ArrayList<>());
         }
 
         for (Narrative narrative : newDoc.getDevelopmentProposal().getInstituteAttachments()) {
-            narrative.setNarrativeUserRights(new ArrayList<NarrativeUserRights>());
+            narrative.setNarrativeUserRights(new ArrayList<>());
         }
     }
 
@@ -316,10 +315,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
      * properties necessary for the initial creation of the proposal.  This will
      * give us the proposal number to use when copying over the remainder of the
      * proposal.
-     * @param srcDoc
-     * @param criteria
-     * @return
-     * @throws Exception
      */
     protected ProposalDevelopmentDocument createNewProposal(ProposalDevelopmentDocument srcDoc, ProposalCopyCriteria criteria) throws Exception {
         
@@ -343,8 +338,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     /**
      * Copy over the required properties so we can do an initial save of the document
      * in order to obtain a proposal number.
-     * @param oldDoc
-     * @param newDoc
      */
     protected void copyRequiredProperties(ProposalDevelopmentDocument oldDoc, ProposalDevelopmentDocument newDoc) {
         DevelopmentProposal srcDevelopmentProposal = oldDoc.getDevelopmentProposal();
@@ -386,18 +379,16 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 
     /**
      * This method copies all custom data from one document to another.
-     * @param src
-     * @param dest
      */
     protected void copyCustomDataFromDocument(ProposalDevelopmentDocument src, ProposalDevelopmentDocument dest) {
         for (Map.Entry<String, CustomAttributeDocument> entry: src.getCustomAttributeDocuments().entrySet()) {
             // Find the attribute value
             CustomAttributeDocument customAttributeDocument = entry.getValue();
             if(customAttributeDocument.isActive()) {
-                Map<String, Object> primaryKeys = new HashMap<String, Object>();
+                Map<String, Object> primaryKeys = new HashMap<>();
                 primaryKeys.put(KRADPropertyConstants.DOCUMENT_NUMBER, src.getDocumentNumber());
                 primaryKeys.put(Constants.CUSTOM_ATTRIBUTE_ID, customAttributeDocument.getId());
-                List<CustomAttributeDocValue> customAttributeDocValues = (List<CustomAttributeDocValue>) getDataObjectService().findMatching(CustomAttributeDocValue.class,
+                List<CustomAttributeDocValue> customAttributeDocValues = getDataObjectService().findMatching(CustomAttributeDocValue.class,
                         QueryByCriteria.Builder.andAttributes(primaryKeys).build()).getResults();
                 if (!CollectionUtils.isEmpty(customAttributeDocValues)) {
                     CustomAttributeDocValue customAttributeDocValue = customAttributeDocValues.get(0);
@@ -405,8 +396,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                     // Store a new CustomAttributeDocValue using the new document's document number
                     CustomAttributeDocValue newDocValue = new CustomAttributeDocValue();
                     newDocValue.setDocumentNumber(dest.getDocumentNumber());
-                    newDocValue.setId(customAttributeDocument.getId().longValue());
-                    newDocValue.setValue(customAttributeDocValue.getValue());
+                    newDocValue.setId(customAttributeDocument.getId());
                     dest.getCustomDataList().add(newDocValue);
                     newDocValue.setValue(customAttributeDocValue == null ? customAttributeDocument.getCustomAttribute().getDefaultValue() : customAttributeDocValue.getValue());
                 }
@@ -417,7 +407,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     protected void fixS2sUserAttachedForms(ProposalDevelopmentDocument newDoc) {
         DevelopmentProposal developmentProposal = newDoc.getDevelopmentProposal();
 
-        List<S2sUserAttachedForm> newList = new ArrayList<S2sUserAttachedForm>();
+        List<S2sUserAttachedForm> newList = new ArrayList<>();
         List<S2sUserAttachedForm> userAttachedForms = developmentProposal.getS2sUserAttachedForms();
         for (S2sUserAttachedForm s2sUserAttachedForm : userAttachedForms) {
             if (s2sUserAttachedForm != null) {
@@ -516,11 +506,9 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
      * The document next values must be the same in the new version as in
      * the old document.  Note that the next document values must be assigned
      * the document number of the new version.
-     * @param oldDoc
-     * @param newDoc
      */
     protected void fixNextValues(ProposalDevelopmentDocument oldDoc, ProposalDevelopmentDocument newDoc) {
-        List<DocumentNextvalue> newNextValues = new ArrayList<DocumentNextvalue>();
+        List<DocumentNextvalue> newNextValues = new ArrayList<>();
         List<DocumentNextvalue> oldNextValues = oldDoc.getDocumentNextvalues();
         for (DocumentNextvalue oldNextValue : oldNextValues) {
             DocumentNextvalue newNextValue = new DocumentNextvalue();
@@ -562,10 +550,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     /**
      * Once the proposal is copied, we need to make changes based on the lead unit
      * and change other properties to make the proposal usable.
-     * @param srcDoc
-     * @param newDoc
-     * @param criteria
-     * @throws Exception
      */
     protected void modifyNewProposal(ProposalDevelopmentDocument srcDoc, ProposalDevelopmentDocument newDoc, ProposalCopyCriteria criteria) throws Exception {
 
@@ -647,22 +631,20 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             setPersonNarrativePermission(globalVariableService.getUserSession().getPrincipalId(), narratives.get(narrativeNumber), oldNarratives.get(narrativeNumber), copiedProposal.getProposalNumber());
         }
 
-        List<Narrative> instituteAttachments = copiedProposal.getInstituteAttachments();
-        List<Narrative> oldInstituteAttachments = oldProposal.getInstituteAttachments();
         for (int narrativeNumber = 0; narrativeNumber < narratives.size(); narrativeNumber++) {
             setPersonNarrativePermission(globalVariableService.getUserSession().getPrincipalId(), narratives.get(narrativeNumber), oldNarratives.get(narrativeNumber), copiedProposal.getProposalNumber());
         }
 
-        }
+    }
 
 
     protected void modifyNarrativesStatus(DevelopmentProposal oldProposal, DevelopmentProposal copiedProposal) {
         List<Narrative> narratives = copiedProposal.getNarratives();
-        for (int narrativeNumber = 0; narrativeNumber < narratives.size(); narrativeNumber++) {
-            if (StringUtils.equals(narratives.get(narrativeNumber).getNarrativeType().getNarrativeTypeGroup(), Constants.PROPOSAL_NARRATIVE_TYPE_GROUP_CODE))
-                narratives.get(narrativeNumber).setModuleStatusCode(Constants.NARRATIVE_MODULE_STATUS_INCOMPLETE);
+        for (Narrative narrative : narratives) {
+            if (StringUtils.equals(narrative.getNarrativeType().getNarrativeTypeGroup(), Constants.PROPOSAL_NARRATIVE_TYPE_GROUP_CODE))
+                narrative.setModuleStatusCode(Constants.NARRATIVE_MODULE_STATUS_INCOMPLETE);
             else
-                narratives.get(narrativeNumber).setModuleStatusCode(Constants.NARRATIVE_MODULE_STATUS_COMPLETE);
+                narrative.setModuleStatusCode(Constants.NARRATIVE_MODULE_STATUS_COMPLETE);
         }
 
     }
@@ -674,7 +656,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         //remove the user performing the copy from the narrative permissions in case they had permissions other than modify.
         //they will default to modify during the copy as they are the aggregator of the new document.
         for (int rightsNumber = 0; rightsNumber < newRights.size(); rightsNumber++) {
-            if (oldRights.get(rightsNumber).getUserId() != personId) {
+            if (!oldRights.get(rightsNumber).getUserId().equals(personId)) {
                 newRights.get(rightsNumber).setModuleNumber(oldRights.get(rightsNumber).getModuleNumber());
                 newRights.get(rightsNumber).setPersonName(oldRights.get(rightsNumber).getPersonName());
                 newRights.get(rightsNumber).setUserId(oldRights.get(rightsNumber).getUserId());
@@ -736,12 +718,12 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     }
 
     protected void setPreviousGrantsGovTrackingId(String oldProposalNumber, ProposalDevelopmentDocument newDoc) {
-        Map<String, Object> keyMap = new HashMap<String, Object>();
-        keyMap.put("proposalNumber", oldProposalNumber);
-        List<S2sAppSubmission> s2sAppSubmissionProposalList = (List<S2sAppSubmission>) getDataObjectService().findMatching(S2sAppSubmission.class,
+        Map<String, Object> keyMap = new HashMap<>();
+        keyMap.put(PROPOSAL_NUMBER, oldProposalNumber);
+        List<S2sAppSubmission> s2sAppSubmissionProposalList =  getDataObjectService().findMatching(S2sAppSubmission.class,
                 QueryByCriteria.Builder.andAttributes(keyMap).build()).getResults();
 
-        newDoc.getDevelopmentProposal().setS2sAppSubmission(new ArrayList<S2sAppSubmission>());
+        newDoc.getDevelopmentProposal().setS2sAppSubmission(new ArrayList<>());
         for(S2sAppSubmission s2sAppSubmissionListValue:s2sAppSubmissionProposalList) {
             newDoc.getDevelopmentProposal().setPrevGrantsGovTrackingID(s2sAppSubmissionListValue.getGgTrackingId());
         }
@@ -770,10 +752,10 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
                 if (proposalSite.getLocationTypeCode().equals(ProposalSite.PROPOSAL_SITE_APPLICANT_ORGANIZATION) ||
                         proposalSite.getLocationTypeCode().equals(ProposalSite.PROPOSAL_SITE_PERFORMING_ORGANIZATION)) {
                     proposalSite.setOrganizationId(unitOrganizationId);
-                    proposalSite.refreshReferenceObject("organization");
+                    proposalSite.refreshReferenceObject(ORGANIZATION);
                     proposalSite.setLocationName(proposalSite.getOrganization().getOrganizationName());
                     proposalSite.setRolodexId(proposalSite.getOrganization().getContactAddressId());
-                    proposalSite.refreshReferenceObject("rolodex");
+                    proposalSite.refreshReferenceObject(ROLODEX);
                     initializeCongressionalDistrict(proposalSite.getOrganizationId(), proposalSite);
                 }
             }
@@ -781,7 +763,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     }
 
     protected void initializeCongressionalDistrict(String organizationId, ProposalSite proposalSite) {
-        Organization organization = (Organization)getDataObjectService().find(Organization.class, organizationId);
+        Organization organization = getDataObjectService().find(Organization.class, organizationId);
         if (organization != null) {
             String defaultDistrict = organization.getCongressionalDistrict();
             if (!StringUtils.isEmpty(defaultDistrict)) {
@@ -826,7 +808,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
             if (StringUtils.equals(roleId, Constants.PRINCIPAL_INVESTIGATOR_ROLE)) {
                 
                 List<ProposalPersonUnit> proposalPersonUnits = person.getUnits();
-                String homeUnitNumber = person.getHomeUnit();
 
                 boolean doesNewLeadUnitExist = false;
                 for (Iterator iterator = proposalPersonUnits.iterator(); iterator.hasNext();) {
@@ -871,7 +852,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
         
         ProposalPersonUnit oldProposalPersonUnit = findProposalPersonUnit(unitNumber, oldProposalPersonUnits);
         if (oldProposalPersonUnit != null) {
-            List<ProposalUnitCreditSplit> newUnitCreditSplits = new ArrayList<ProposalUnitCreditSplit>();
+            List<ProposalUnitCreditSplit> newUnitCreditSplits = new ArrayList<>();
             List<ProposalUnitCreditSplit> oldUnitCreditSplits = oldProposalPersonUnit.getCreditSplits();
             for (ProposalUnitCreditSplit oldUnitCreditSplit : oldUnitCreditSplits) {
                 ProposalUnitCreditSplit newUnitCreditSplit = getDataObjectService().copyInstance(oldUnitCreditSplit, CopyOption.RESET_OBJECT_ID, CopyOption.RESET_PK_FIELDS, CopyOption.RESET_VERSION_NUMBER);
@@ -909,24 +890,23 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
     /**
      * @param src the source proposal development document, i.e. the original.
      * @param dest the destination proposal development document, i.e. the new document.
-     * @param budgetVersions
      */
     protected void copyBudgets(ProposalDevelopmentDocument src, ProposalDevelopmentDocument dest, String budgetVersions) throws Exception {
     	dest.getDevelopmentProposal().getBudgets().clear();
-    	ProposalDevelopmentBudgetExt finalBudgetVersion = (ProposalDevelopmentBudgetExt) src.getDevelopmentProposal().getFinalBudget();
+    	ProposalDevelopmentBudgetExt finalBudgetVersion =  src.getDevelopmentProposal().getFinalBudget();
         if (budgetVersions.equals(ProposalCopyCriteria.BUDGET_FINAL_VERSION) && finalBudgetVersion != null) {
-        	ProposalDevelopmentBudgetExt budgetCopy = (ProposalDevelopmentBudgetExt) getProposalBudgetService().copyBudgetVersion(finalBudgetVersion, false, dest.getDevelopmentProposal());
+        	ProposalDevelopmentBudgetExt budgetCopy =  getProposalBudgetService().copyBudgetVersion(finalBudgetVersion, false, dest.getDevelopmentProposal());
         	dest.getDevelopmentProposal().getBudgets().add(budgetCopy);
         } else {
         	for (ProposalDevelopmentBudgetExt budget : src.getDevelopmentProposal().getBudgets()) {
-            	ProposalDevelopmentBudgetExt budgetCopy = (ProposalDevelopmentBudgetExt) getProposalBudgetService().copyBudgetVersion(budget, false, dest.getDevelopmentProposal());
+            	ProposalDevelopmentBudgetExt budgetCopy =  getProposalBudgetService().copyBudgetVersion(budget, false, dest.getDevelopmentProposal());
             	dest.getDevelopmentProposal().getBudgets().add(budgetCopy);   		
         	}
         }
     }
     
     private void clearProposalPersonNotificationDetails(ProposalDevelopmentDocument proposalDevelopmentDocument){
-    	List<ProposalPerson> proposalPersons = new ArrayList();
+    	List<ProposalPerson> proposalPersons = new ArrayList<>();
     	for(ProposalPerson proposalPerson : proposalDevelopmentDocument.getDevelopmentProposal().getProposalPersons()){
     		proposalPerson.setLastNotification(null);
     		proposalPerson.setCertifiedBy(null);
@@ -952,13 +932,7 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 	public void setDocumentService(DocumentService documentService) {
         this.documentService = documentService;
     }
-	
-	
-    /**
-     * Set the Key Personnel Service.  It is set via dependency injection.
-     * 
-     * @param keyPersonnelService the Key Personnel Service
-     */
+
     public void setKeyPersonnelService(KeyPersonnelService keyPersonnelService) {
         this.keyPersonnelService = keyPersonnelService;
     }
@@ -975,11 +949,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
 		this.kcAuthorizationService = kcAuthorizationService;
 	}
 
-    /**
-     * Get the Kuali Rule Service.
-     * 
-     * @return the Kuali Rule Service
-     */
     protected KualiRuleService getKualiRuleService() {
         return kualiRuleService;
     }
@@ -996,18 +965,10 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
   		this.unitService = unitService;
   	}
 
-    /**
-     * Gets the questionnaireAnswerService attribute. 
-     * @return Returns the questionnaireAnswerService.
-     */
     protected QuestionnaireAnswerService getQuestionnaireAnswerService() {
         return questionnaireAnswerService;
     }
 
-    /**
-     * Sets the questionnaireAnswerService attribute value.
-     * @param questionnaireAnswerService The questionnaireAnswerService to set.
-     */
     public void setQuestionnaireAnswerService(QuestionnaireAnswerService questionnaireAnswerService) {
         this.questionnaireAnswerService = questionnaireAnswerService;
     }
@@ -1021,10 +982,6 @@ public class ProposalCopyServiceImpl implements ProposalCopyService {
        return getProposalTypeService().isProposalTypeRenewalRevisionContinuation(proposalTypeCode);
     }
 
-    /**
-     * Sets the ParameterService.
-     * @param parameterService the parameter service. 
-     */
     public void setParameterService(ParameterService parameterService) {
         this.parameterService = parameterService;
     }

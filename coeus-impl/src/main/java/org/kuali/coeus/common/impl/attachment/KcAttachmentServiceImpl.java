@@ -45,11 +45,10 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
 
 	@Resource(name="KcFileMimeTypeIcons")
     private Map<String, String> KcFileMimeTypeIcons;
-   
+
     private static final String REPLACEMENT_CHARACTER = "_";
     //Exclude everything but numbers, alphabets, dots, hyphens and underscores
-    // KC-364 remove spaces from "invalid char" check for attachments
-    private static final String REGEX_TITLE_FILENAME_PATTERN = "([^0-9 a-zA-Z\\.\\-_])";
+    private static final String REGEX_TITLE_FILENAME_PATTERN = "([^0-9a-zA-Z\\.\\-_])";
     private static final String REGEX_TITLE_SPECIAL_CHARACTER_PATTERN = "([^\\x00-\\x7F])";
     
     /**
@@ -106,8 +105,8 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
             }
         }        
         return false;    
-    }   
-    
+    }
+
     @Override
     public String checkAndReplaceSpecialCharacters(String text) {     
         String cleanText = text;
@@ -133,11 +132,11 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
 
     @Override
     public boolean validPDFFile(FileMeta fileInQuestion, ErrorReporter errorReporter, String errorPrefix) {
-        /* KC-967 Attachment warning shows that a file is not a PDF when it is
-        FF for windows shows vague mime type application/binary for PDFs
-        if (!Constants.PDF_REPORT_CONTENT_TYPE.equals(fileInQuestion.getContentType())) {
-           errorReporter.reportWarning(errorPrefix, KeyConstants.INVALID_FILE_TYPE,
-                    fileInQuestion.getName(), Constants.PDF_REPORT_CONTENT_TYPE);
+        if (fileInQuestion.getName() == null) {
+        	errorReporter.reportError(errorPrefix, KeyConstants.ERROR_ATTACHMENT_FILE_REQURIED);
+        } /* KC-967 Attachment warning shows that a file is not a PDF when it is
+           * FF for windows shows vague mime type application/binary for PDFs
+          else if (!Constants.PDF_REPORT_CONTENT_TYPE.equals(fileInQuestion.getContentType())) {
         }*/
         return true;
     }

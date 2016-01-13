@@ -84,6 +84,9 @@
         <filter-name>UserLoginFilter</filter-name>
 		<!-- UH Changes: KC-203: Use a custom UserLoginFilter. -->
 		<filter-class>edu.hawaii.rice.kew.web.UhKcUserLoginFilter</filter-class>
+        <!-- Override with UH Login Filter NOTE: in KC 6.0 1512.93 the changed from UserLoginFilter to AuthServiceUserLoginFilter so we may need to do some work here for 1512
+        <filter-class>org.kuali.coeus.sys.framework.auth.AuthServiceUserLoginFilter</filter-class>
+        -->
     </filter>
 
     <filter>
@@ -177,9 +180,20 @@
     <!-- Rice content End -->
 
     <filter-mapping>
+        <filter-name>BootstrapFilter</filter-name>
+        <url-pattern>/schemaspy/*</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
         <filter-name>UserLoginFilter</filter-name>
         <url-pattern>/schemaspy/*</url-pattern>
     </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>BootstrapFilter</filter-name>
+        <url-pattern>/monitoring/*</url-pattern>
+    </filter-mapping>
+    
 
     <filter-mapping>
         <filter-name>UserLoginFilter</filter-name>
@@ -327,6 +341,10 @@
         <init-param>
             <param-name>config-kew</param-name>
             <param-value>/WEB-INF/dwr-kew.xml</param-value>
+        </init-param>
+        <init-param>
+            <param-name>config-krlc</param-name>
+            <param-value>/WEB-INF/dwr-krlc.xml</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
@@ -522,7 +540,7 @@
         </taglib>
     </jsp-config>
 
-<!-- Rice content End -->
+    <!-- Rice content End -->
 <!-- IE Compatability Filter KC-415 -->
     <!--  KC-1006 Site broken in IE  (KC 6.0 KRAD doesn't work with compatibility mode turned on so removing this fix)
         <filter>

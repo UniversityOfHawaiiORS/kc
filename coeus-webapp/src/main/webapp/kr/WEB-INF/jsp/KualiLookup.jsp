@@ -27,7 +27,7 @@
 <!-- KCIU Customization Starts 
 Suppresses the Create New button on the top right corner-->
 <c:if test="${KualiForm.suppressActions!=true and KualiForm.supplementalActionsEnabled!=true}">
-    <c:if test="${not fn:contains(boClassName,'org.kuali.kra.bo.Rolodex')}">
+    <c:if test="${not fn:contains(boClassName,'org.kuali.coeus.common.framework.rolodex.Rolodex')}">
     <c:set var="headerMenu" value="${KualiForm.lookupable.createNewUrl}   ${KualiForm.lookupable.htmlMenuBar}" />
     </c:if>
 </c:if>
@@ -61,7 +61,7 @@ Suppresses the Create New button on the top right corner-->
       var kualiElements = kualiForm.elements;
     </SCRIPT>
     <script type="text/javascript" src="${pageContext.request.contextPath}/dwr/interface/DocumentTypeService.js"></script>
-
+	
 	<c:if test="${KualiForm.headerBarEnabled}">
 	<div class="headerarea-small" id="headerarea-small">
 		<h1><c:out value="${KualiForm.lookupable.title}" /> <c:choose>
@@ -220,7 +220,7 @@ Suppresses the Create New button on the top right corner-->
 			-->
 			<c:if test="${!empty reqSearchResultsActualSize}" >			
     			<c:choose>
-						<c:when test="${fn:contains(boClassName,'org.kuali.kra.bo.NonOrganizationalRolodex')}">
+						<c:when test="${fn:contains(boClassName,'org.kuali.coeus.common.framework.rolodex.NonOrganizationalRolodex')}">
     			    			<!--  Cannot create this by parsing the createNewUrl because NonOrganizationalRolodex is not a maint doc and does not have one-->
     				  			Can't find who you are looking for? Contact the <a href=http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/10 target="_blank">ORS Helpline</a> to add someone.<br>
 						</c:when>
@@ -229,7 +229,7 @@ Suppresses the Create New button on the top right corner-->
 						</c:when>
 				</c:choose>
 			</c:if>
-
+				
 			<!-- KCIU Customization Ends -->
 			<!-- KC-755 END -->
 			

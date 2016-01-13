@@ -1905,62 +1905,70 @@ function setDefaultReviewerTypeCode(methodToCall, committeeId, scheduleId, proto
 
 var REVIEWERS_ARRAY_ELEMENTS_PER_RECORD = 4;
 
+var IRB_REVIEWERS_ARRAY_ELEMENTS_PER_RECORD = 3;
+
 function setModifySubmissionDefaultReviewerTypeCode(methodToCall, committeeId, scheduleId, protocolId, beanName, protocolReviewTypeCode) {	
 	var reviewerBean = "actionHelper." + beanName + ".reviewer[";
 	var cmtId = dwr.util.getValue(committeeId); 
 	var schedId = $j(jq_escape(scheduleId)).attr("value");
 	var reviewTypeCode = $j(jq_escape(protocolReviewTypeCode)).attr("value");
-	var queryString = "&committeeId="+cmtId+"&scheduleId=" + schedId+"&protocolId="+protocolId+"&protocolReviewTypeCode="+reviewTypeCode;
-	callAjaxByPath('jqueryAjax.do', methodToCall, queryString,
-			function(jQueyrData) {
-				reviewersReturned = $j(jQueyrData).find('#ret_value').html();
-				getProtocolReviewerTypes(reviewersReturned, beanName);
-				
-				var reviewersArr = reviewersReturned.split(";");
-				
-				var defaultReviewTyper;
-   			var numberOfRevierwers = reviewersArr.length/REVIEWERS_ARRAY_ELEMENTS_PER_RECORD;
-   			var dwrReply = {
-   					callback:function(data) {
-   						if ( data != null ) {	
-   							defaultReviewTyper = data;
-   						} else {
-   							defaultReviewTyper = '';
-   						}
-   						
-   						for (i=0; i<numberOfRevierwers; i++) {
-					  		var selectField = document.getElementsByName(reviewerBean + i + '].reviewerTypeCode')[0];
-					  		if (selectField != null) {
-						  		var rt = reviewersArr[(i * REVIEWERS_ARRAY_ELEMENTS_PER_RECORD) + 3];
-								for (j=0; j<selectField.length; j++) {
-						  			if (rt) {
-										if (selectField.options[j].value == rt.trim()) {
+
+	if ( (committeeId == "select" || cmtId == "" ) ||
+			(reviewTypeCode == "3" && (schedId == "" || scheduleId == "select")) ) {
+		document.getElementById("reviewers").style.display = 'none';
+	} else {
+		var queryString = "&committeeId="+cmtId+"&scheduleId=" + schedId+"&protocolId="+protocolId+"&protocolReviewTypeCode="+reviewTypeCode;
+		callAjaxByPath('jqueryAjax.do', methodToCall, queryString,
+				function(jQueyrData) {
+					reviewersReturned = $j(jQueyrData).find('#ret_value').html();
+					getProtocolReviewerTypes(reviewersReturned, beanName);
+
+					var reviewersArr = reviewersReturned.split(";");
+
+					var defaultReviewTyper;
+					var numberOfRevierwers = reviewersArr.length/REVIEWERS_ARRAY_ELEMENTS_PER_RECORD;
+					var dwrReply = {
+						callback:function(data) {
+							if ( data != null ) {
+								defaultReviewTyper = data;
+							} else {
+								defaultReviewTyper = '';
+							}
+
+							for (i=0; i<numberOfRevierwers; i++) {
+								var selectField = document.getElementsByName(reviewerBean + i + '].reviewerTypeCode')[0];
+								if (selectField != null) {
+									var rt = reviewersArr[(i * REVIEWERS_ARRAY_ELEMENTS_PER_RECORD) + 3];
+									for (j=0; j<selectField.length; j++) {
+										if (rt) {
+											if (selectField.options[j].value == rt.trim()) {
+												selectField.options[j].setAttribute("selected", "selected");
+												selectField.selectedIndex = j;
+											}
+										} else if (selectField.options[j].value == defaultReviewTyper) {
 											selectField.options[j].setAttribute("selected", "selected");
 											selectField.selectedIndex = j;
 										}
-									} else if (selectField.options[j].value == defaultReviewTyper) {
-						  				selectField.options[j].setAttribute("selected", "selected");
-						  				selectField.selectedIndex = j;
-						  			}
-						  		}
-					  		}
-					  		
-					  	}
-   					},
-   					errorHandler:function( errorMessage ) {	
-   						window.status = errorMessage;
-   						window.alert('C data: unknown, there is an error: ' + errorMessage);
-   						defaultReviewTyper = '';
-   					}
-   			};
-   			IacucProtocolActionAjaxService.getDefaultCommitteeReviewTypeCode(dwrReply);
-   			return defaultReviewTyper;
-				
-			},
-			function(error) {
-				alert("error is" + error);
-			}
-	);
+									}
+								}
+
+							}
+						},
+						errorHandler:function( errorMessage ) {
+							window.status = errorMessage;
+							window.alert('C data: unknown, there is an error: ' + errorMessage);
+							defaultReviewTyper = '';
+						}
+					};
+					IacucProtocolActionAjaxService.getDefaultCommitteeReviewTypeCode(dwrReply);
+					return defaultReviewTyper;
+
+				},
+				function(error) {
+					alert("error is" + error);
+				}
+		);
+	}
 }
 
 function protocolDisplayReviewers(methodToCall, committeeId, scheduleId, protocolId, beanName) {
@@ -1999,7 +2007,7 @@ function protocolModifySubmissionReviewers(methodToCall, committeeId, scheduleId
     			function(data) {
     				reviewersReturned = $j(data).find('#ret_value').html();
 					getProtocolReviewerTypes(reviewersReturned, beanName);
-    				
+					document.getElementById("reviewers").style.display = 'table-row';
     			},
     			function(error) {
     				alert("error is" + error);
@@ -2047,12 +2055,12 @@ function updateReviewerHtml(reviewerData, reviewerTypesData) {
 	document.getElementById("reviewers").style.display = '';
 	var reviewersArr = reviewerData.split(";");
 	var arrLength = reviewersArr.length;
-	var numReviewers = Math.floor(reviewersArr.length / REVIEWERS_ARRAY_ELEMENTS_PER_RECORD);
+	var numReviewers = Math.floor(reviewersArr.length / IRB_REVIEWERS_ARRAY_ELEMENTS_PER_RECORD);
 	var numRows = Math.floor((numReviewers+1) / 2);
 	var reviewersTableLeft = document.getElementById("reviewersTableLeft");
 	var reviewersTableRight = document.getElementById("reviewersTableRight");
-	setReviewers(reviewersArr, 0, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, reviewerTypes, reviewersTableLeft);
-	setReviewers(reviewersArr, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numReviewers, reviewerTypes, reviewersTableRight);
+	setReviewers(reviewersArr, 0, IRB_REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, reviewerTypes, reviewersTableLeft);
+	setReviewers(reviewersArr, IRB_REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numRows, IRB_REVIEWERS_ARRAY_ELEMENTS_PER_RECORD*numReviewers, reviewerTypes, reviewersTableRight);
 	//finally set the number of reviewers for proper trucation
 	document.getElementById("numberOfReviewers").value = numReviewers;
 }
@@ -2132,8 +2140,8 @@ function setReviewers(reviewers, beginIndex, endIndex, reviewerTypes, htmlElemen
 	removeAllChildren(htmlElement);
 				
     var tbody = document.createElement('tbody');
-	for (var i = beginIndex; i < endIndex; i += REVIEWERS_ARRAY_ELEMENTS_PER_RECORD) {
-		reviewerIndex = i/REVIEWERS_ARRAY_ELEMENTS_PER_RECORD;
+	for (var i = beginIndex; i < endIndex; i += IRB_REVIEWERS_ARRAY_ELEMENTS_PER_RECORD) {
+		reviewerIndex = i/IRB_REVIEWERS_ARRAY_ELEMENTS_PER_RECORD;
 		
 		var row = document.createElement('tr');
 		var data = document.createElement('td');
@@ -2637,8 +2645,7 @@ function updateStateFromCountry() {
 		callback:function(data) {
 			if ( data != null ) {
 				dwr.util.removeAllOptions( 'document.newMaintainableObject.state' );
-				$('document.newMaintainableObject.state').options[0] = new Option('', '');
-				dwr.util.addOptions( 'document.newMaintainableObject.state', data, 'postalStateCode', 'postalStateName' );
+				dwr.util.addOptions( 'document.newMaintainableObject.state', data, 'code', 'name' );
 			} 
 		},
 		errorHandler:function( errorMessage ) {
@@ -2646,7 +2653,7 @@ function updateStateFromCountry() {
 		}
 	};
 
-	StateService.findAllStatesByAltCountryCode(countryCode, dwrReply);
+	StateService.findAllStatesInCountryByAltCode(countryCode, dwrReply);
 }
 
 

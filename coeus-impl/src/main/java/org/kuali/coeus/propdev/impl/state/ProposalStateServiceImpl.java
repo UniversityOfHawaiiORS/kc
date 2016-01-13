@@ -40,14 +40,12 @@ public class ProposalStateServiceImpl implements ProposalStateService {
     
     @Override
     public String getProposalStateTypeCode(ProposalDevelopmentDocument proposalDevelopmentDocument, boolean isRejectAction) {
-        WorkflowDocument wd = proposalDevelopmentDocument.getDocumentHeader().getWorkflowDocument();
+        final WorkflowDocument wd = proposalDevelopmentDocument.getDocumentHeader().getWorkflowDocument();
         
         if (wd.isInitiated()) {
             return ProposalState.IN_PROGRESS;
         } else if (wd.isSaved()) {
-            return computeProposalStateForSaved(proposalDevelopmentDocument);
-        } else if( isRejectAction && wd.isEnroute()  ) {
-            return ProposalState.REVISIONS_REQUESTED;
+            return computeProposalStateForSaved(proposalDevelopmentDocument, isRejectAction);
         } else if (wd.isEnroute()) {
             return computeProposalStateForEnRoute(proposalDevelopmentDocument);
         } else if (wd.isApproved()) {
@@ -61,9 +59,11 @@ public class ProposalStateServiceImpl implements ProposalStateService {
         }
     }
 
-    protected String computeProposalStateForSaved(ProposalDevelopmentDocument proposalDevelopmentDocument) {
+    protected String computeProposalStateForSaved(ProposalDevelopmentDocument proposalDevelopmentDocument, boolean isRejectAction) {
         if (isSubmitted(proposalDevelopmentDocument)) {
             return ProposalState.APPROVAL_NOT_INITIATED_SUBMITTED;
+        } else if (isRejectAction) {
+            return ProposalState.REVISIONS_REQUESTED;
         } else {
             return ProposalState.IN_PROGRESS;
         }
@@ -80,10 +80,8 @@ public class ProposalStateServiceImpl implements ProposalStateService {
     }
 
     protected boolean isFinalApproval(WorkflowDocument workflowDocument) {
-        if (StringUtils.isNotEmpty(workflowDocument.getDocumentId())) {
-            return getKcWorkflowService().isFinalApproval(workflowDocument);
-        }
-        return false;
+        return StringUtils.isNotEmpty(workflowDocument.getDocumentId())
+                && getKcWorkflowService().isFinalApproval(workflowDocument);
     }
 
     protected String computeProposalStateForApproved(ProposalDevelopmentDocument proposalDevelopmentDocument) {

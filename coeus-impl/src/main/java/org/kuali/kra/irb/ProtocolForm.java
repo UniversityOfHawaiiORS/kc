@@ -280,7 +280,8 @@ public class ProtocolForm extends ProtocolFormBase {
         if (propertyName.startsWith("actionHelper.protocolSubmitAction.reviewer") ||
                 propertyName.startsWith("methodToCall.printSubmissionQuestionnaireAnswer.line")
                 || propertyName.startsWith("methodToCall.saveCorrespondence")
-                || propertyName.startsWith("methodToCall.closeCorrespondence")) {
+                || propertyName.startsWith("methodToCall.closeCorrespondence")
+                || propertyName.startsWith("methodToCall.viewCorrespondence")) {
             return true;
         } else {
             return super.isPropertyEditable(propertyName);
@@ -326,8 +327,12 @@ public class ProtocolForm extends ProtocolFormBase {
 
 
     @Override
-    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm) throws Exception {
-        return new ActionHelper((ProtocolForm) protocolForm);
+    protected ActionHelperBase createNewActionHelperInstanceHook(ProtocolFormBase protocolForm, boolean initializeActions) throws Exception {
+    	ActionHelper actionHelper = new ActionHelper((ProtocolForm) protocolForm);
+    	if(initializeActions) {
+    		actionHelper.initializeProtocolActions();
+    	}
+    	return actionHelper;
     }
 
 

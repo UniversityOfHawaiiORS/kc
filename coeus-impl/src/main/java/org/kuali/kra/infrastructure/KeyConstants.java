@@ -169,6 +169,7 @@ public final class KeyConstants {
     public static final String ERROR_BUDGET_OBLIGATED_AMOUNT_INVALID = "error.award.invalidObligatedAmount";
     public static final String ERROR_AWARD_BUDGET_START_DATE_MISSING = "error.award.budgetVersion.startDate.required";
     public static final String ERROR_AWARD_BUDGET_END_DATE_MISSING = "error.award.budgetVersion.endDate.required";
+    public static final String WARNING_AWARD_BUDGET_LINE_ITEM_DATES_UPDATED = "warn.award.budget.line.item.dates.updated";
     public static final String QUESTION_TOTALCOSTLIMIT_CHANGED = "document.question.totalCostLimit.changed";
     public static final String ERROR_BUDGET_REJECT_NO_REASON = "error.budget.reject.noReason";
     public static final String ERROR_COMPLETE_BUDGET_LOCK = "error.completeBudget.locked";
@@ -269,6 +270,7 @@ public final class KeyConstants {
 
     public static final String AUDIT_ERROR_BUDGET_DISTRIBUTION_SOURCE_MISSING = "error.budget.distribution.sourceMissing";
     public static final String AUDIT_ERROR_BUDGET_DISTRIBUTION_FISCALYEAR_MISSING = "error.budget.distribution.fiscalYearMissing";
+    public static final String AUDIT_ERROR_BUDGET_DISTRIBUTION_ONCAMPUS_FLAG_MISSING = "error.budget.distribution.onCampusFlagMissing";
     public static final String AUDIT_ERROR_BUDGET_DISTRIBUTION_UNALLOCATED_NOT_ZERO = "error.budget.distribution.unallocatedMustBeZero";
     public static final String AUDIT_WARNING_BUDGET_DISTRIBUTION_FISCALYEAR_INCONSISTENT = "warning.budget.distribution.fiscalYearInconsistent";
     public static final String AUDIT_ERROR_BUDGET_DISTRIBUTION_DUPLICATE_UNRECOVERED_FA = "error.budget.distribution.duplicate.unrecoveredFA";
@@ -1129,6 +1131,7 @@ public final class KeyConstants {
     public static final String ERROR_DELETION_BLOCKED = "error.deletion.blocked";
 
     public static final String AUDIT_WARNING_PROPOSAL_WITHNO_BUDGET = "warning.proposal.withno.budget";
+    public static final String ERROR_ATTACHMENT_FILE_REQURIED = "error.attachment.file.required";
     
     /**
      * private utility class ctor.

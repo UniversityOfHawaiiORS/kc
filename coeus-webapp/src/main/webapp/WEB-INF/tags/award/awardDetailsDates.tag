@@ -28,8 +28,8 @@
 
 <%-- KC-821 Only allow one Negotiation per child award. --%>
 <kul:tab tabTitle="Details & Dates" defaultOpen="true" 
-	tabErrorKey="document.awardList[0].awardTransactionTypeCode,document.award.version, document.awardList[0].statusCode,document.awardList[0].activityTypeCode,document.awardList[0].awardTypeCode,document.awardList[0].financialChartOfAccountsCode,document.awardList[0].title,document.awardList[0].beginDate,document.awardList[0].awardExecutionDate,document.awardList[0].extension.signedDate,document.awardList[0].extension.officialReportedDate,document.awardList[0].extension.assignedDate,document.awardList[0].extension.completedDate,document.awardList[0].sponsorCode,document.awardList[0].unitNumber, detailsAndDatesFormHelper*,document.awardList[0].awardAmountInfos[${KualiForm.document.award.indexOfLastAwardAmountInfo}].*, document.awardList[0].modificationNumber,document.awardList[0].cfdaNumber,document.awardList[0].primeSponsorCode,document.awardList[0].extension.assignedToPersonId"
-	tabAuditKey="document.awardList[0].awardEffectiveDate,document.awardList[0].sponsorCode,document.awardList[0].primeSponsorCode"
+	tabErrorKey="document.awardList[0].awardTransactionTypeCode,document.award.version, document.awardList[0].statusCode,document.awardList[0].activityTypeCode,document.awardList[0].awardTypeCode,document.awardList[0].financialChartOfAccountsCode,document.awardList[0].title,document.awardList[0].beginDate,document.awardList[0].awardExecutionDate,document.awardList[0].extension.signedDate,document.awardList[0].extension.officialReportedDate,document.awardList[0].extension.assignedDate,document.awardList[0].extension.completedDate,document.awardList[0].sponsorCode,document.awardList[0].unitNumber, detailsAndDatesFormHelper*,document.awardList[0].awardAmountInfos[${KualiForm.document.award.indexOfLastAwardAmountInfo}].*, document.awardList[0].modificationNumber,document.awardList[0].cfdaNumber,document.awardList[0].primeSponsorCode,document.awardList[0].extension.assignedToPersonId,document.awardList[0].fainId,document.awardList[0].fedAwardYear,document.awardList[0].fedAwardDate"
+	tabAuditKey="document.awardList[0].awardEffectiveDate,document.awardList[0].sponsorCode,document.awardList[0].primeSponsorCode,document.awardList[0].fainId,document.awardList[0].fedAwardYear,document.awardList[0].fedAwardDate"
 	auditCluster="homePageAuditWarnings,homePageAuditErrors" useRiceAuditMode="true">
 <c:set var="awardObligatedAndAnticipatedAmountsEditable" value="${KualiForm.awardObligatedAndAnticipatedAmountsEditable}" />
 <!-- Institution -->
@@ -275,6 +275,19 @@
         	<kul:htmlControlAttribute property="document.awardList[0].nsfCode" attributeEntry="${awardAttributes.nsfCode}" styleClass="fixed-size-200-select" />
         </td>
     </tr>
+	<tr>
+		<th align="right">
+			<div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.fainId}" /></div>
+		</th>
+		<td align="left" valign="middle">
+			<kul:htmlControlAttribute property="document.awardList[0].fainId" attributeEntry="${awardAttributes.fainId}" />
+		</td>
+		<th align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.fedAwardYear}" />
+		</th>
+		<td align="left" valign="middle">
+			<kul:htmlControlAttribute property="document.awardList[0].fedAwardYear" attributeEntry="${awardAttributes.fedAwardYear}" />
+		</td>
+	</tr>
 </table>
 </kul:innerTab>	
 
@@ -393,7 +406,7 @@
 					<th>
 						<div align="right">
 							<kul:htmlAttributeLabel
-								attributeEntry="${awardAmountInfoAttributes.finalExpirationDate}" />
+								attributeEntry="${awardAmountInfoAttributes.finalExpirationDate}"/>
 						</div>
 					</th>
 
@@ -413,7 +426,7 @@
 							<td align="left" valign="middle">
                                 <kul:htmlControlAttribute
 									property="document.awardList[0].awardAmountInfos[${KualiForm.document.award.indexOfAwardAmountInfoForDisplay}].finalExpirationDate"
-									attributeEntry="${awardAmountInfoAttributes.finalExpirationDate}" />
+									attributeEntry="${awardAmountInfoAttributes.finalExpirationDate}"/>
 							</td>
 						</c:otherwise>
 					</c:choose>
@@ -444,6 +457,14 @@
 							</td>
 						</c:otherwise>
 					</c:choose>
+				</tr>
+				<tr>
+ 			        <th>
+						<div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.fedAwardDate}" /></div>
+					</th>
+					<td align="left" valign="middle">
+						<kul:htmlControlAttribute property="document.awardList[0].fedAwardDate" attributeEntry="${awardAttributes.fedAwardDate}"/>
+					</td>
 				</tr>
 				<tr>
  			        <th>
@@ -581,7 +602,7 @@
 								<c:otherwise>
 									<tr>
 										<th>
-					            			<div align="right">Anticipated Amount:</div>
+                                            <div align="right">Anticipated Amount:</div>
 					        			</th>
 										<td align="left" valign="middle">
 					            			<kul:htmlControlAttribute property="document.awardList[0].awardAmountInfos[${KualiForm.indexOfAwardAmountInfoForDisplay}].anticipatedTotalAmount" attributeEntry="${awardAttributes.anticipatedTotal}" readOnly="${!awardObligatedAndAnticipatedAmountsEditable}"/>

@@ -75,13 +75,11 @@
 				attributeEntry="${reportTrackingBeanAttributes.preparerName}"/>
 				
 						<c:if test="${!reportTrackingReadOnly}">
- 						<%-- KC-985 STE if you click on the Assigned To lookup in award --%>
 	                	<kul:lookup boClassName="org.kuali.coeus.common.framework.person.KcPerson" 
 	                                fieldConversions="personId:reportTrackingBeans[${index}].preparerId,userName:reportTrackingBeans[${index}].preparerName" />
                     </c:if>				
 				<kul:htmlControlAttribute property="reportTrackingBeans[${index}].preparerId" readOnly="${reportTrackingReadOnly }"
 						attributeEntry="${reportTrackingBeanAttributes.preparerId}"   />
-				<%-- KC-985 STE if you click on the Assigned To lookup in award --%>
                 <kul:directInquiry boClassName="org.kuali.coeus.common.framework.person.KcPerson" inquiryParameters="reportTrackingBeans[${index}].preparerId:personId" />
 					<br/>
                 	<span id="reportTrackingBeans.fullName"> <c:out value="${reportTrackingBeans[$index].preparerFullname}"/>&nbsp;</span>  
