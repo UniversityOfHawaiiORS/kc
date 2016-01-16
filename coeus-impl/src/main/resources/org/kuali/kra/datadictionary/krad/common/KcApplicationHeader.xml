@@ -569,7 +569,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
 
     <bean id="Kc-Header-Researcher-COIStandaloneGroup" parent="Kc-Header-Researcher-COIStandaloneGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-COIStandaloneGroup-parentBean" abstract="true"
-          parent="Uif-MenuList" p:headerText="Conflict of Interest" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}>
+          parent="Uif-MenuList" p:headerText="Conflict of Interest" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                 <bean parent="Uif-Link" p:href="@{#ConfigProperties['coi.standalone.base.url']}/coi" p:linkText="COI Dashboard" p:order="10"/>
@@ -579,7 +579,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
 
     <bean id="Kc-Header-Researcher-COIMonolithGroup" parent="Kc-Header-Researcher-COIMonolithGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-COIMonolithGroup-parentBean" abstract="true"
-          parent="Uif-MenuList" p:headerText="Conflict of Interest" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}>
+          parent="Uif-MenuList" p:headerText="Conflict of Interest" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
         <property name="items">
             <list>
                 <bean parent="Uif-SimpleHeaderFour" p:headerText="  My Financial Entities" p:order="10" />

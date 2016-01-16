@@ -80,7 +80,6 @@
       <start name="Initiated" nextNode="isHierarchyChild" />
       <split name="isHierarchyChild">
       <branch name="False">
-<<<<<<< HEAD
 	        <!-- UH Routing -->
 			<requests name="ProposalPersons" nextNode="PreApprover" />
 			<requests name="PreApprover" nextNode="Initial_FA" />
@@ -89,11 +88,7 @@
 			<requests name="Dean_VC" nextNode="Final_Unit_Approval" />
 			<requests name="Final_Unit_Approval" nextNode="PeopleFlows" />
 			<requests name="PeopleFlows" nextNode="UH_Central_Final_Approval" />
-			<requests name="UH_Central_Final_Approval" nextNode="Join" />		
-=======
-        <requests name="PeopleFlows" nextNode="OSPOfficeRouting" />
-        <role name="OSPOfficeRouting" nextNode="Join" />
->>>>>>> coeus-1512.93-uh-build
+			<requests name="UH_Central_Final_Approval" nextNode="Join" />
       </branch>
       <branch name="True">
         <requests name="WaitForHierarchyDisposition" nextNode="Join" />
@@ -111,19 +106,15 @@
     <split name="isHierarchyChild">
       <type>org.kuali.coeus.sys.framework.workflow.SimpleBooleanSplitNode</type>
     </split>
-<<<<<<< HEAD
     <role name="ProposalPersons">
       <qualifierResolver>ProposalPersons-XPathQualifierResolver</qualifierResolver>
       <activationType>P</activationType>
       <finalApproval>false</finalApproval>
     </role>
-=======
->>>>>>> coeus-1512.93-uh-build
     <requests name="PeopleFlows">
       <activationType>R</activationType>
       <rulesEngine executorClass="org.kuali.coeus.propdev.impl.core.ProposalDevelopmentRulesEngineExecutorImpl" />
     </requests>
-<<<<<<< HEAD
  	<requests name="PreApprover">
 		<activationType>P</activationType>
 		<finalApproval>false</finalApproval>
@@ -163,13 +154,6 @@
         <activationType>P</activationType>
 		<finalApproval>false</finalApproval>
 	</role>
-=======
-    <role name="OSPOfficeRouting">
-      <qualifierResolverClass>org.kuali.rice.kew.role.NullQualifierResolver</qualifierResolverClass>
-      <activationType>S</activationType>
-      <finalApproval>false</finalApproval>
-    </role>
->>>>>>> coeus-1512.93-uh-build
     <join name="Join" />
     <requests name="WaitForHierarchyDisposition">
       <activationType>S</activationType>
@@ -187,7 +171,6 @@
 		<description>Approval rule from the hierarchy parent to hierarchy children.</description>
 	</ruleTemplate>
   </ruleTemplates>
-<<<<<<< HEAD
   <rules xmlns="ns:workflow/Rule" xsi:schemaLocation="ns:workflow/Rule resource:Rule">
         <rule>
   			<name>PreApproverRoutingRule</name>
@@ -261,9 +244,6 @@
 			</responsibilities>
 		</rule>
   </rules>
-  
-=======
->>>>>>> coeus-1512.93-uh-build
 	<ruleAttributes xmlns="ns:workflow/RuleAttribute" xsi:schemaLocation="ns:workflow/RuleAttribute resource:RuleAttribute">
 		<ruleAttribute>
 			<name>CopyCustomActionListAttribute</name>
@@ -275,7 +255,6 @@
 			<type>ActionListAttribute</type>
 			<serviceNamespace>KC</serviceNamespace>
 		</ruleAttribute>
-
 		<ruleAttribute>
 			<name>AggregatorSearchAttribute</name>
 			<className>org.kuali.rice.kew.docsearch.xml.StandardGenericXMLSearchableAttribute</className>

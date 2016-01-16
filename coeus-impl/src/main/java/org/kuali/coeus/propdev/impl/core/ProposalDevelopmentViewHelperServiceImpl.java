@@ -24,6 +24,7 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.apache.log4j.Logger;
 import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
 import org.kuali.coeus.common.budget.framework.calculator.BudgetCalculationService;
 import org.kuali.coeus.common.framework.auth.perm.KcAuthorizationService;
@@ -106,6 +107,7 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
     private static final long serialVersionUID = -5122498699317873886L;
     private static final String PARENT_PROPOSAL_TYPE_CODE = "PRDV";
     private static final String ATTACHMENT_FILE = "multipartFile";
+    private static final Logger LOG = Logger.getLogger(ProposalDevelopmentViewHelperServiceImpl.class);
 
     @Autowired
     @Qualifier("dateTimeService")

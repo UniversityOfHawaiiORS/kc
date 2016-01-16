@@ -238,6 +238,7 @@ public class BudgetUnrecoveredFandAAuditRule extends BudgetAuditRuleBase {
                         KeyConstants.AUDIT_ERROR_BUDGET_DISTRIBUTION_ONCAMPUS_FLAG_MISSING,
                         budgetUnrecoveredFARule.getPageId(), PARAMS));
                 retval = false;
+            }
 
             final Calendar projectStartDate = Calendar.getInstance();
             projectStartDate.setTime(budgetParent.getRequestedStartDateInitial());
@@ -262,10 +263,11 @@ public class BudgetUnrecoveredFandAAuditRule extends BudgetAuditRuleBase {
                         retval = false;
                         break;
                     }
-                }
             }
-        return retval;
         }
+
+        return retval;
+    }
     
     protected boolean unrecoveredFAMatches(BudgetUnrecoveredFandA obj1, BudgetUnrecoveredFandA obj2) {
     	return new EqualsBuilder()

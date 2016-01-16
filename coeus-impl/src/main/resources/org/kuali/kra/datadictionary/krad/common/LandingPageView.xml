@@ -25,8 +25,7 @@
     <bean id="Kc-LandingPage-DefaultView" parent="Kc-LandingPage-DefaultView-parentBean"/>
     <bean id="Kc-LandingPage-DefaultView-parentBean" abstract="true" parent="Uif-FormView"
           p:headerText="Welcome@{#userSession == null or #userSession.getPerson() == null ? '' : ', ' + #userSession.getPerson().getFirstName()}"
-          p:formClass="org.kuali.kra.web.krad.LandingPageForm"
-          p:additionalCssFiles="css/uh.css">
+          p:formClass="org.kuali.kra.web.krad.LandingPageForm">
         <property name="unifiedHeader" value="false"/>
         <property name="defaultBindingObjectPath" value=""/>
         <property name="singlePageView" value="true"/>
@@ -36,6 +35,7 @@
 		<property name="additionalCssFiles">
 			<list>
 				<value>css/common/landingPage.css</value>
+                <value>css/uh.css</value>
 			</list>
 		</property> 
     </bean>
@@ -47,15 +47,13 @@
                 <bean parent="Kc-LandingPage-UhGrid"/>
     			<bean parent="Kc-LandingPage-Links" />
             </list>
-		          </property>	
+        </property>
     </bean>
 
     <bean id="Kc-LandingPage-UhGrid" parent="Kc-LandingPage-UhGrid-parentBean"/>
     <bean id="Kc-LandingPage-UhGrid-parentBean" abstract="true" parent="Uif-CssGridGroup">
-    <bean id="Kc-LandingPage-Links" parent="Kc-LandingPage-Links-parentBean"/>
-    <bean id="Kc-LandingPage-Links-parentBean" abstract="true" parent="Uif-CssGridGroup">
-		          <property name="items">
-		            <list>
+        <property name="items">
+            <list>
                 <!-- KC-1225 Need to add message of the day feature back into 6.0 -->
                 <bean parent="Uif-MessageField" p:messageText="@{#getParam('KC-GEN','All','uh_message_of_the_day')}" p:colSpan="12" p:additionalCssClasses="uh_motd_text"/>
                 <bean parent="Uif-MessageField" p:messageText="Get started" p:colSpan="12" p:additionalCssClasses="uh_help_section_header"/>
@@ -71,10 +69,85 @@
                             p:controllerMapping="/proposalDevelopment"
                             p:methodToCall="docHandler"
                             p:requestParameters="command:initiate"/>
-    			<bean parent="Kc-LandingPage-SearchTasks" p:order="10" p:colSpan="9"/>
+                    </property>
+                </bean>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                   p:actionLabel="Find My Proposals"
+                   p:actionIconPlacement="TOP"
+                   p:iconClass="icon-search"
+                   p:additionalCssClasses="btn-success uh_help_button">
+                   <property name="actionUrl">
+                     <bean parent="Uif-Url"
+                           p:baseUrl="@{#ConfigProperties['application.url']}/kr-krad"
+                           p:viewId="AllDevelopmentProposals-LookupViewId"
+                           p:methodToCall="search"
+                           p:requestParameters="lookupCriteria[initiator]:@{#userSession == null ? '' : #userSession.getPerson().getPrincipalName()},viewName:AllLookupableDevelopmentProposals-LookupViewName"
+                           p:controllerMapping="/lookup" />
+                   </property>
+                </bean>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                      p:actionLabel="User Guides"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-drawer2"
+                      p:additionalCssClasses="btn-success uh_help_button"
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.user.guides.url')}');">
+                </bean>
+                <bean parent="Uif-MessageField" p:messageText="Get help" p:colSpan="12" p:additionalCssClasses="uh_help_section_header"/>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                      p:actionLabel="ORS Helpline"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-question-sign"
+                      p:additionalCssClasses="btn-warning uh_help_button"
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.helpline.request.url')}');">
+                </bean>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                      p:actionLabel="Add a sponsor"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-address-book"
+                      p:additionalCssClasses="btn-warning uh_help_button"
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.add.sponsor.url')}');">
+                </bean>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                      p:actionLabel="Add a performance site"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-home"
+                      p:additionalCssClasses="btn-warning uh_help_button"
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.add.performance.site.url')}');">
+                </bean>
+                <bean parent="Uif-MessageField" p:messageText="Get information" p:colSpan="12" p:additionalCssClasses="uh_help_section_header"/>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                      p:actionLabel="Workflow routing"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-shuffle"
+                      p:additionalCssClasses="btn-primary uh_help_button"
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.routing.url')}');">
+                </bean>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                      p:actionLabel="Delegations"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-profile"
+                      p:additionalCssClasses="btn-primary uh_help_button"
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.delegation.url')}');">
+                </bean>
+                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
+                      p:actionLabel="Award Status"
+                      p:actionIconPlacement="TOP"
+                      p:iconClass="icon-clock"
+                      p:additionalCssClasses="btn-primary uh_help_button"
+                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.award.status.url')}');">
+                </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="Kc-LandingPage-Links" parent="Kc-LandingPage-Links-parentBean"/>
+    <bean id="Kc-LandingPage-Links-parentBean" abstract="true" parent="Uif-CssGridGroup">
+        <property name="items">
+            <list>
+                <bean parent="Kc-LandingPage-SearchTasks" p:order="10" p:colSpan="9"/>
     			<bean parent="Kc-LandingPage-Quicklinks" p:order="20" p:colSpan="3"/>
     		</list>
-                    </property>
+        </property>
     </bean>
 
     <bean id="Kc-LandingPage-SearchTasks" parent="Kc-LandingPage-SearchTasks-parentBean"/>
@@ -104,81 +177,12 @@
                                     <entry key="html" value="true"/>
                                 </map>
                             </property>
-                </bean>
+                        </bean>
                     </property>
                 </bean>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                    p:actionLabel="Find My Proposals"
-                    p:actionIconPlacement="TOP"
-                    p:iconClass="icon-search"
-                    p:additionalCssClasses="btn-success uh_help_button">
-                    <property name="actionUrl">
-                        <bean parent="Uif-Url"
-                              p:baseUrl="@{#ConfigProperties['application.url']}/kr-krad"
-                              p:viewId="AllDevelopmentProposals-LookupViewId"
-                              p:methodToCall="search"
-                              p:requestParameters="lookupCriteria[initiator]:@{#userSession == null ? '' : #userSession.getPerson().getPrincipalName()},viewName:AllLookupableDevelopmentProposals-LookupViewName"
-                              p:controllerMapping="/lookup" />
-		          </property>
-		        </bean>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                      p:actionLabel="User Guides"
-                      p:actionIconPlacement="TOP"
-                      p:iconClass="icon-drawer2"
-                      p:additionalCssClasses="btn-success uh_help_button"
-                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.user.guides.url')}');">
-                </bean>
-
-
-
-                <bean parent="Uif-MessageField" p:messageText="Get help" p:colSpan="12" p:additionalCssClasses="uh_help_section_header"/>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                      p:actionLabel="ORS Helpline"
-                      p:actionIconPlacement="TOP"
-                      p:iconClass="icon-question-sign"
-                      p:additionalCssClasses="btn-warning uh_help_button"
-                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.helpline.request.url')}');">
-                </bean>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                      p:actionLabel="Add a sponsor"
-                      p:actionIconPlacement="TOP"
-                      p:iconClass="icon-address-book"
-                      p:additionalCssClasses="btn-warning uh_help_button"
-                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.add.sponsor.url')}');">
-                </bean>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                    p:actionLabel="Add a performance site"
-                    p:actionIconPlacement="TOP"
-                    p:iconClass="icon-home"
-                    p:additionalCssClasses="btn-warning uh_help_button"
-                    p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.add.performance.site.url')}');">
-                </bean>
-
-
-
-
-                <bean parent="Uif-MessageField" p:messageText="Get information" p:colSpan="12" p:additionalCssClasses="uh_help_section_header"/>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                      p:actionLabel="Workflow routing"
-                      p:actionIconPlacement="TOP"
-                      p:iconClass="icon-shuffle"
-                      p:additionalCssClasses="btn-primary uh_help_button"
-                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.routing.url')}');">
-                </bean>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                      p:actionLabel="Delegations"
-                      p:actionIconPlacement="TOP"
-                      p:iconClass="icon-profile"
-                      p:additionalCssClasses="btn-primary uh_help_button"
-                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.delegation.url')}');">
-                </bean>
-                <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
-                      p:actionLabel="Award Status"
-                      p:actionIconPlacement="TOP"
-                      p:iconClass="icon-clock"
-                      p:additionalCssClasses="btn-primary uh_help_button"
-                      p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.award.status.url')}');">
-                </bean>
+            </list>
+        </property>
+    </bean>
     
     <bean id="Kc-LandingPage-LinkGroup" parent="Uif-MenuList" p:additionalCssClasses="kcHome-linkGroup">
         <property name="header">
