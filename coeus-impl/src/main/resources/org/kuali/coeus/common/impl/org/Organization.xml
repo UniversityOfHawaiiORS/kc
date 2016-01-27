@@ -1203,6 +1203,7 @@
 
   <!-- Business Object Lookup Definition -->
   <bean id="Organization-lookupDefinition" parent="Organization-lookupDefinition-parentBean"/>
+  <bean id="Organization-LookupView" parent="Organization-LookupView-parentBean"/>
   <bean abstract="true" id="Organization-lookupDefinition-parentBean" parent="LookupDefinition">
     <property name="title" value="Organization Lookup"/><property name="defaultSort">
       <bean parent="SortDefinition"/>
@@ -1237,7 +1238,6 @@
     </property>
   </bean>
 
-  <bean id="Organization-LookupView" parent="Organization-LookupView-parentBean"/>
   <bean id="Organization-LookupView-parentBean" abstract="true" parent="Uif-LookupView">
     <property name="dataObjectClassName" value="org.kuali.coeus.common.framework.org.Organization"/>
     <property name="headerText" value="Organization Lookup"/>
