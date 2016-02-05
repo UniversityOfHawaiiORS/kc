@@ -25,6 +25,7 @@ import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.infrastructure.RoleConstants;
 import org.kuali.rice.core.api.util.ConcreteKeyValue;
 import org.kuali.rice.core.api.util.KeyValue;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.kim.api.role.Role;
 import org.kuali.rice.krad.uif.control.UifKeyValuesFinderBase;
 import org.kuali.rice.krad.uif.field.InputField;
@@ -70,10 +71,14 @@ public class ProposalRoleValuesFinder extends UifKeyValuesFinderBase {
             ProposalRoleService proposalRoleService = KcServiceLocator.getService(ProposalRoleService.class);
             List<Role> proposalRoles = proposalRoleService.getRolesForDisplay();
 
-
+            // KC-1088 Remove unnecessary PD permissions
+            String displayRoleIds = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN","All", "uh_pd_access_roles");
             for (Role role : proposalRoles) {
-                KeyValue pair = new ConcreteKeyValue(role.getName(), role.getName());
-                keyValues.add(pair);
+                // KC-1088 Remove unnecessary PD permissions
+                if (displayRoleIds == null || displayRoleIds.contains(role.getId().toString())) {
+                    KeyValue pair = new ConcreteKeyValue(role.getName(), role.getName());
+                    keyValues.add(pair);
+                }
             }
         }
         return keyValues;

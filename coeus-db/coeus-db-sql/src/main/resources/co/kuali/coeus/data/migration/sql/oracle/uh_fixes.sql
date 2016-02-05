@@ -30,11 +30,11 @@ values ('KC-GEN','All','uh.helpbutton.user.guides.url',sys_guid(),1,'CONFG'
 
 insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
 values ('KC-GEN','All','uh.helpbutton.routing.url',sys_guid(),1,'CONFG'
-	,'https://kcdev.ors.hawaii.edu/apps/routing','URL for Routing help button','A','KC');
+	,'https://apps.ors.hawaii.edu/routing','URL for Routing help button','A','KC');
 
 insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
 values ('KC-GEN','All','uh.helpbutton.delegation.url',sys_guid(),1,'CONFG'
-	,'https://kcdev.ors.hawaii.edu/apps/delegation','URL for Delegation help button','A','KC');
+	,'https://apps.ors.hawaii.edu/delegation','URL for Delegation help button','A','KC');
 
 insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
 values ('KC-GEN','All','uh.helpbutton.award.status.url',sys_guid(),1,'CONFG'
@@ -103,5 +103,85 @@ set val = 'AA000' where PARM_NM = 'budgetPersonDefaultJobCode';
 -- While fixing this JIRA I discovered that this question was not displaying correctly because this flag was set wrong
 update QUESTIONNAIRE_QUESTIONS set condition_flag = 'Y' where questionnaire_questions_id = '300002';
 -- KC-1048 END
+
+-- KC-1269 Change wording of questions to fit with new section names
+update QUESTION set question = replace(question,'Special Review','Compliance') where question like '%Special Review%';
+update QUESTION set question = replace(question,'Abstracts and Attachments','Attachments') where question like '%Abstracts and Attachments%';
+-- KC-1269 END
+
+-- KC-1281 Add data validation warning for keywords field
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh_enable_keyword_audit',sys_guid(),1,'CONFG' ,'W','enable Keyword audit rule. N=No, W=Warn, E=Error','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh_keyword_audit_message',sys_guid(),1,'CONFG' ,'You have not included any Keywords for this proposal, keywords help UH identify possible field experts for future funding opportunities.','Keyword Audit message if enabled.','A','KC');
+-- KC-1281 END
+
+-- KC-1088 Remove unnecessary PD permissions
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh_pd_access_roles',sys_guid(),1,'CONFG' ,':KC12106:KC12103:KC12104:KC12105:','Roll Ids of roles to be offered by PD Access Page for granting to individuals while document is in saved mode.','A','KC');
+-- KC-1088 END
+
+-- KC-1294 Make PD Help dropdown configurable
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.proposal.details.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/proposaldetails.htm',
+        'PD Proposal Details Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.s2s.opportunity.search.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/s2sopportunitysearch.htm',
+        'PD S2S Opportunity Search Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.delivery.information.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/deliveryinfo.htm',
+        'PD Delivery Information Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.sponsor.and.program.information.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/sponsorprograminformation.htm',
+        'PD Sponsor and Program Information Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.organization.and.location.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/organizationslocations.htm',
+        'PD Organization and Location Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.personnel.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/keypersonnel.htm',
+        'PD Key Personnel Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.credit.allocation.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/creditallocation.htm',
+        'PD Credit Allocation Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.compliance.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/compliance1.htm',
+        'PD Compliance Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.attachments.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/proposalattachmentstab.htm',
+        'PD Attachments Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.questionnaire.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/questionnaire.htm',
+        'PD Questionnaire Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.budget.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/budgetversionsscreen.htm',
+        'PD Budget Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.access.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/access1.htm',
+        'PD Access Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.supplemental.information.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/supplementalinformation.htm',
+        'PD Supplemental Information Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.summary.submit.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/summarysubmit.htm',
+        'PD Summary Submit Help Page URL.','A','KC');
+
+insert into KRCR_PARM_T (NMSPC_CD, CMPNT_CD, PARM_NM, OBJ_ID, VER_NBR, PARM_TYP_CD, VAL, PARM_DESC_TXT, EVAL_OPRTR_CD, APPL_ID)
+values ('KC-GEN','All','uh.pd.help.glossary.of.terms.url',sys_guid(),1,'CONFG' ,'https://mygrant.ors.hawaii.edu:443/mygrant/static/help/default.htm?turl=Documents/glossaryofterms.htm',
+        'PD Glossary of Terms Help Page URL.','A','KC');
+-- KC-1294 END
 
 commit;

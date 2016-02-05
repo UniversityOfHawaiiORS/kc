@@ -212,10 +212,13 @@ opacity:1;
             	                </c:if>
 						   </c:when>
 						   <c:otherwise>
+							   <!-- KC-1301 Awards attachments view button missing and Delete button present for viewers -->
 							   <c:if test="${!readOnly && !empty KualiForm.editingMode['CAN_MAINTAIN_AWARD_ATTACHMENTS']}">
+							   <c:if test="${KualiForm.document.awardList[0].awardAttachments[itrStatus.index].documentStatusCode != 'V'}">
 								<html:image property="methodToCall.deleteAttachment.line${itrStatus.index}.anchor${currentTabIndex}"
 									   src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif' styleClass="tinybutton"
 									   alt="Delete Attachment"/>
+							   </c:if>
 							   </c:if>
 						  </c:otherwise>
 						   </c:choose>

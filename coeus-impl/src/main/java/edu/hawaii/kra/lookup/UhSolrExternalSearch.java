@@ -60,7 +60,8 @@ public class UhSolrExternalSearch {
 			int i = 0;
 
 			while(docs.hasNext()) {
-				if (i++ > 100) {
+				// KC-1321 Return more results in person search
+				if (i++ >= 200) {
 					break;
 				}
 				SolrDocument d = docs.next();
@@ -151,7 +152,7 @@ public class UhSolrExternalSearch {
 		params.set("sort", "score desc, name_untouched asc");
 		params.set("mm", "25%");
 		params.set("fq", "kind:" + conf.get("kind"));
-		params.set("rows", 100);
+		params.set("rows", 200); // KC-1321 Return more results in person search
 
 		for (String p : paramsFromCaller.getParameterNames()) {
 			params.set(p, paramsFromCaller.get(p));

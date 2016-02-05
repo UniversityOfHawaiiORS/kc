@@ -1141,6 +1141,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         ProposalDevelopmentDocument pDoc = (ProposalDevelopmentDocument) documentService.getByDocumentHeaderId(pbo.getProposalDocument().getDocumentNumber());
         if (!pbo.isInHierarchy()) {
             rejectProposal(pDoc, renderMessage(PROPOSAL_ROUTING_REJECTED_ANNOTATION, reason), principalName, renderMessage(HIERARCHY_REJECTED_APPSTATUS));
+            // KC-937 When you return a proposal for changes, you receive an error and a message that may be misleading
+            getPessimisticLockService().releaseWorkflowPessimisticLocking(pDoc);
         } else if (pbo.isParent()) {
             rejectProposalHierarchy(pDoc, reason, principalName);
         } else {

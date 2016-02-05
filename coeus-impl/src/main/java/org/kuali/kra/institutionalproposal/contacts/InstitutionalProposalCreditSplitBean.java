@@ -312,9 +312,12 @@ public class InstitutionalProposalCreditSplitBean implements Serializable {
         
         boolean success = true;
         for(InstitutionalProposalPerson projectPerson: getInstitutionalProposal().getProjectPersons()) {
-            InstitutionalProposalPersonUnitCreditSplitRuleEvent event = new InstitutionalProposalPersonUnitCreditSplitRuleEvent(institutionalProposalDocument, projectPerson, 
-                                                                                                totalsMap.get(getPersonKey(projectPerson)));
-            success &= rule.checkInstitutionalProposalPersonUnitCreditSplitTotals(event);
+            // KC-1318 Remove requirement for Non-employee Co-Investigator to have a unit
+            if (projectPerson.isEmployee()) {
+                InstitutionalProposalPersonUnitCreditSplitRuleEvent event = new InstitutionalProposalPersonUnitCreditSplitRuleEvent(institutionalProposalDocument, projectPerson,
+                        totalsMap.get(getPersonKey(projectPerson)));
+                success &= rule.checkInstitutionalProposalPersonUnitCreditSplitTotals(event);
+            }
         }
         return success;                                                                               
     }

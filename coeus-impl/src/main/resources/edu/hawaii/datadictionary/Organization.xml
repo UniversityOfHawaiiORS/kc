@@ -50,6 +50,12 @@
     <bean id="Organization-LookupView" parent="Organization-LookupView-parentBean">
         <property name="viewHelperService" value="#{#getService('uhOrganizationLookupableKRAD')}"/>
         <property name="headerText" value="Organization Lookup"/>
+        <!-- KC-1283 For Primary Performance Site, searches can only be done using physical address. -->
+        <property name="defaultSortAttributeNames">
+            <list>
+                <value></value>
+            </list>
+        </property><!-- KC-1283 END -->
         <property name="criteriaFields">
             <list>
                 <bean p:propertyName="organizationSearchInput" parent="Uif-LookupCriteriaInputField">

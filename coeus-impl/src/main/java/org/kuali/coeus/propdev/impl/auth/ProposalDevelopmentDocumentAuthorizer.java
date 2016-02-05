@@ -122,7 +122,7 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
     public boolean canDeleteDocument(Document document, Person user) {
     	if(document != null && document instanceof Permissionable)
     		return getKcAuthorizationService().hasPermission(user.getPrincipalId(), (Permissionable)document, PermissionConstants.DELETE_PROPOSAL);
-    	else
+    	else 
     		return false;
     }
     
@@ -131,8 +131,8 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
     			PermissionConstants.CREATE_INSTITUTIONAL_PROPOSAL);
         if (hasPermission) {
         	hasPermission = getPermissionService().hasPermission(user.getPrincipalId(),
-                    InstitutionalProposalConstants.INSTITUTIONAL_PROPOSAL_NAMESPACE,
-                    PermissionConstants.SUBMIT_INSTITUTIONAL_PROPOSAL);
+                InstitutionalProposalConstants.INSTITUTIONAL_PROPOSAL_NAMESPACE, 
+                PermissionConstants.SUBMIT_INSTITUTIONAL_PROPOSAL);
     	}
         return hasPermission;
     }
@@ -406,9 +406,12 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
     		if (document.getDevelopmentProposal().getProposalPersons().stream()
     				.filter(person -> getProposalDevelopmentPermissionsService().hasCertificationPermissions(document, user, person))
     				.anyMatch(person -> true)) { 
-    			return true; 
-    		}    		
-    	}
+            return false;
+        }
+
+                return true;
+            }
+        }
         return false;
     }
     
@@ -419,7 +422,7 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
     protected boolean isProposalStateEditableForCertification(DevelopmentProposal developmentProposal) {
     	return getProposalStatesEditableForCertification().contains(developmentProposal.getProposalStateTypeCode());
     }
-    
+
     protected Set<String> getProposalStatesEditableForCertification() {
         Set<String> proposalStates = new HashSet<String>();
         if(isCertificationRequiredOnlyBeforeApproval()) {
@@ -439,10 +442,10 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
         if(keyPersonCertDefferalParam.equalsIgnoreCase(ProposalDevelopmentConstants.ParameterValues.KEY_PERSON_CERTIFICATION_BEFORE_APPROVE)) {
         	return true;
         }else {
-        	return false;
-        }
+        return false;
     }
-    
+    }
+
     protected boolean isAuthorizedToReplaceNarrative(Narrative narrative, Person user) {
         final ProposalDevelopmentDocument pdDocument = (ProposalDevelopmentDocument) narrative.getDevelopmentProposal().getDocument();
 
@@ -644,7 +647,7 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
 
     protected boolean isRevisionRequested(String code) {
         return StringUtils.equalsIgnoreCase(code, ProposalState.REVISIONS_REQUESTED);
-    }
+        }
 
     protected boolean isAuthorizedToRejectProposal(Document document, Person user) {
         final ProposalDevelopmentDocument pdDocument = ((ProposalDevelopmentDocument) document);

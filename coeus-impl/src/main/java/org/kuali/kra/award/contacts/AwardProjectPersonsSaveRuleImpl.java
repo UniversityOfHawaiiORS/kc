@@ -87,8 +87,10 @@ public class AwardProjectPersonsSaveRuleImpl implements AwardProjectPersonsSaveR
         boolean valid = true;
         int personCount = 0;
         for(AwardPerson p: projectPersons) {
-            if(p.isPrincipalInvestigator() || p.isCoInvestigator()
-                    || (p.isKeyPerson() && p.isOptInUnitStatus())) {
+            // KC-1318 Remove requirement for Non-employee Co-Investigator to have a unit
+            // isEmployee check below left in just so our code is a closer match to Kuali base code
+            if(p.isEmployee() && (p.isPrincipalInvestigator() || p.isCoInvestigator()
+                    || (p.isKeyPerson() && p.isOptInUnitStatus()))) {
                 personCount = personCount + 1;
                 if(p.getUnits().size() == 0) {
                     personCount = personCount - 1;

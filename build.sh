@@ -65,7 +65,7 @@ fi
 echo ${git_revision} > last_build.sha1
 
 
-mvn -Denvironment=mygrant -Dbuild.version=${build_version} -Dmaven.test.skip=true ${PRE_COMPILE} clean install
+mvn -Denvironment=mygrant -Dbuild.version=${build_version} -Dmaven.test.skip=true ${PRE_COMPILE} clean install 2>&1 | tee build.log
 
 
 if [ "${last_revision}" != "" ] 

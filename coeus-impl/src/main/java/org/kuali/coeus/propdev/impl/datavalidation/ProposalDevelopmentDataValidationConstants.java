@@ -103,6 +103,11 @@ public final class ProposalDevelopmentDataValidationConstants {
     // KC-966 Add FCOI Validation rule
     public static final String ATTACHMENT_INTERNAL_LOCATION = "Attachments.Internal";
 
+    // KC-1281 Add data validation warning for keywords field
+    public static final String KEYWORD_ENTRY_PAGE_ID = DETAILS_PAGE_ID;
+    public static final String KEYWORD_PAGE_NAME = DETAILS_PAGE_NAME;
+    public static final String KEYWORD_KEY = "document.developmentProposal.propScienceKeywords";
+
     private ProposalDevelopmentDataValidationConstants() {
         throw new UnsupportedOperationException("do not call");
     }
