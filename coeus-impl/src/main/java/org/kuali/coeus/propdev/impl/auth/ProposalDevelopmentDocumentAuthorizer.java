@@ -405,10 +405,7 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
     	if(isProposalStateEditableForCertification(document.getDevelopmentProposal())) {
     		if (document.getDevelopmentProposal().getProposalPersons().stream()
     				.filter(person -> getProposalDevelopmentPermissionsService().hasCertificationPermissions(document, user, person))
-    				.anyMatch(person -> true)) { 
-            return false;
-        }
-
+    				.anyMatch(person -> true)) {
                 return true;
             }
         }
