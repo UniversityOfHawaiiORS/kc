@@ -94,6 +94,8 @@ public class AwardDocumentAuthorizer extends KcTransactionalDocumentAuthorizerBa
             }
             else if (canExecuteAwardTask(user.getPrincipalId(), awardDocument, AwardTaskNames.VIEW_AWARD.getAwardTaskName())) {
                 editModes.add(AuthorizationConstants.EditMode.VIEW_ONLY);
+                // KC-1337 Administrative Contact on awards can not view attachments
+                editModes.add(CAN_VIEW_AWARD_ATTACHMENTS); 
             }
             else {
                 editModes.add(AuthorizationConstants.EditMode.UNVIEWABLE);
