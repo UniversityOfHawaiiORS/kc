@@ -405,6 +405,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     public AwardAmountInfo getLastAwardAmountInfo() {
         return awardAmountInfos.get(getIndexOfLastAwardAmountInfo());
     }
+    
+    public AwardAmountInfo getAwardAmountInfoForDisplay() throws WorkflowException {
+    	return awardAmountInfos.get(getIndexOfAwardAmountInfoForDisplay());
+    }
 
     public int getIndexOfAwardAmountInfoForDisplay() throws WorkflowException {
     	if (indexOfAwardAmountInfoForDisplay != null) {
@@ -2275,6 +2279,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
             initCentralAdminContacts();
         }
         return centralAdminContacts;
+    }
+    
+    public void setCentralAdminContacts(List<AwardUnitContact> centralAdminContacts) {
+    	this.centralAdminContacts = centralAdminContacts;
     }
 
     /**

@@ -43,7 +43,6 @@
     <!-- KC-801 Create KRMS function to return if unrecovered F & A is present in final PD budget...Moved here for KC 6.0 -->
     <context:component-scan base-package="edu.hawaii.proposaldevelopment.service" />
     <!-- UH Bean Config End -->
-    <!--<mvc:annotation-driven/> -->
 
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="properties" value="#{T(org.kuali.rice.core.api.config.property.ConfigContext).getCurrentContextConfig().getProperties()}" />

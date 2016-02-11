@@ -161,12 +161,25 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                         </list>
                     </property>
                 </bean>
+                <bean parent="Kc-Header-IframeMenuAction" p:actionUrl.viewId="Kc-Header-IframeView"
+                      p:actionLabel="REPORTS" p:order="50"
+                      p:render="@{(#getParamAsBoolean('KC-GEN','All','KUALI_REPORTS_ENABLED') == null ? false : #getParamAsBoolean('KC-GEN','All','KUALI_REPORTS_ENABLED'))
+                       	and #userSession != null
+                      	and #getService('unitAuthorizationService').hasPermission(#userSession.getPrincipalId(),
+                      		T(org.kuali.kra.infrastructure.RoleConstants).DEPARTMENT_ROLE_TYPE,
+                      		T(org.kuali.kra.infrastructure.PermissionConstants).RUN_GLOBAL_REPORTS)}">
+                    <property name="actionUrl.requestParameters">
+                        <map>
+                            <entry key="href" value="@{#ConfigProperties['kuali.reports.url']}"/>
+                        </map>
+                    </property>
+                </bean>
                 <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
                 <!-- KC-1206 Modify System Admin Portal header link to take you to the System Admin Tab -->
                 <bean parent="Uif-Link" p:href="@{#ConfigProperties['application.url']}/portal.do?selectedTab=portalSystemAdminBody"
                     p:wrapperCssClasses="pull-right" 
                     p:render="@{#hasPerm('KC-GEN','uh-view-sys-admin-portal')}"
-                    p:linkText="SYSTEM ADMIN PORTAL" p:order="50"/>
+                    p:linkText="SYSTEM ADMIN PORTAL" p:order="60"/>
             </list>        
         </property>
     </bean>
