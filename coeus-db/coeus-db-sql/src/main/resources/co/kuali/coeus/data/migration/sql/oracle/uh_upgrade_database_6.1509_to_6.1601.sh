@@ -88,6 +88,11 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1512_oracle_kc_rice_server_upgrade.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1512_oracle_kc_upgrade.sql
 
+    # Update to 1601
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_upgrade.sql
+
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
     grep -i error ${LOGDIR}/*.log

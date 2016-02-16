@@ -171,6 +171,11 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1511_oracle_kc_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1512_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1512_oracle_kc_upgrade.sql
 
+# Update to 1601
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_upgrade.sql
+
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
 
 echo "Done Grepping for errors in the logs"
