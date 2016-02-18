@@ -40,7 +40,7 @@ else
 fi
 
 git_revision=`git rev-parse HEAD`
-pom_version=`grep \<version\>15.*\<\/version\> pom.xml | sed -e s/\<version\>//  | sed -e s/\<.version\>// | sed -e s/^\ *15/15/`
+pom_version=`grep \<version\>16.*\<\/version\> pom.xml | sed -e s/\<version\>//  | sed -e s/\<.version\>// | sed -e s/^\ *16/16/`
 date=`date +%y.%m.%d.%H%M`
 build_version="6.${pom_version}-uh-build-${date}.${git_revision}"
 
