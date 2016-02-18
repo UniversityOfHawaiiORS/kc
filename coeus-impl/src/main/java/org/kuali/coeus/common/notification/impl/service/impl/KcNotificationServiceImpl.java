@@ -195,11 +195,17 @@ public class KcNotificationServiceImpl implements KcNotificationService {
             String uh_disable_action_list_notification_type_codes = parameterService.getParameterValueAsString(
                     Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, 
                     "UH_NOTIFICATION_DISABLE_ACTION_LIST_TYPE_CODES");
+            String actionTypeCode = context.getActionTypeCode();
+            // Ad Hoc passing null actionType Code, fix by looking for the context name and setting to 999
+            // since we use actionTypecodes to exclude in our preference override feature
+            if (actionTypeCode == null && context.getContextName().equals(NotificationType.AD_HOC_CONTEXT)) {
+                actionTypeCode = "999";
+            }
             List disable_action_list_action_codes = null;
-            if (uh_disable_action_list_notification_type_codes != null) {
+            if (context.getModuleCode().equals("3") && uh_disable_action_list_notification_type_codes != null) {
             	disable_action_list_action_codes = Arrays.asList(uh_disable_action_list_notification_type_codes.split(","));
             }
-            if (disable_action_list_action_codes != null && disable_action_list_action_codes.contains(context.getActionTypeCode())) {
+            if (disable_action_list_action_codes != null && disable_action_list_action_codes.contains(actionTypeCode)) {
             	LOG.info("Skipping Notification Action List because of UH override param UH_NOTIFICATION_DISABLE_ACTION_LIST_TYPE_CODES for action_code [" + context.getActionTypeCode() + "]");
             } else {
             sendNotification(contextName, subject, message, notificationRecipients);
@@ -208,10 +214,10 @@ public class KcNotificationServiceImpl implements KcNotificationService {
                     Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, 
                     "UH_NOTIFICATION_DISABLE_EMAIL_TYPE_CODES");
             List disable_email_action_codes = null;
-            if (uh_disable_email_notification_type_codes != null) {
+            if (context.getModuleCode().equals("3") && uh_disable_email_notification_type_codes != null) {
             	disable_email_action_codes = Arrays.asList(uh_disable_email_notification_type_codes.split(","));
             }
-            if (disable_email_action_codes != null && disable_email_action_codes.contains(context.getActionTypeCode())) {
+            if (disable_email_action_codes != null && disable_email_action_codes.contains(actionTypeCode)) {
             	LOG.info("Skipping Notification email because of UH override param UH_NOTIFICATION_DISABLE_EMAIL_TYPE_CODES for action_code [" + context.getActionTypeCode() + "]");
             } else {
             sendEmailNotification(subject, message, notificationRecipients, context.getEmailAttachments());
@@ -228,9 +234,44 @@ public class KcNotificationServiceImpl implements KcNotificationService {
         Set<NotificationRecipient.Builder> notificationRecipients = getNotificationRecipients(notificationTypeRecipients, context);
         Set<String> emailRecipients = getEmailRecipients(notificationTypeRecipients);
 
-        sendNotification(contextName, subject, message, notificationRecipients);
-        sendEmailNotification(subject, message, notificationRecipients, context.getEmailAttachments());
-        sendEmailNotification(getKcEmailService().getDefaultFromAddress(), emailRecipients, subject, message, context.getEmailAttachments());
+        // KC-1339 UH feature to disable action list notifications not working for Certify Notice and Ad-Hoc
+        //         Needed to duplicate KC-790 code from above as well as modify it a bit in both code paths.
+        // KC-790 Add ability to disable notification action list generation
+        //        Disable adding notification to action list if configured in parameter
+        //        Parameter should contain comma separated list of action codes
+        String uh_disable_action_list_notification_type_codes = parameterService.getParameterValueAsString(
+                Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE,
+                "UH_NOTIFICATION_DISABLE_ACTION_LIST_TYPE_CODES");
+        String actionTypeCode = context.getActionTypeCode();
+        // Ad Hoc passing null actionType Code, fix by looking for the context name and setting to 999
+        // since we use actionTypecodes to exclude in our preference override feature
+        if (actionTypeCode == null && context.getContextName().equals(NotificationType.AD_HOC_CONTEXT)) {
+            actionTypeCode = "999";
+        }
+        List disable_action_list_action_codes = null;
+        // Only managing PD notfications with this parameter so look for moduleCode = 3
+        if (context.getModuleCode().equals("3") && uh_disable_action_list_notification_type_codes != null) {
+            disable_action_list_action_codes = Arrays.asList(uh_disable_action_list_notification_type_codes.split(","));
+        }
+        if (disable_action_list_action_codes != null && disable_action_list_action_codes.contains(actionTypeCode)) {
+            LOG.info("Skipping Notification Action List because of UH override param UH_NOTIFICATION_DISABLE_ACTION_LIST_TYPE_CODES for action_code [" + context.getActionTypeCode() + "]");
+        } else {
+            sendNotification(contextName, subject, message, notificationRecipients);
+        }
+
+        String uh_disable_email_notification_type_codes = parameterService.getParameterValueAsString(
+                Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE,
+                "UH_NOTIFICATION_DISABLE_EMAIL_TYPE_CODES");
+        List disable_email_action_codes = null;
+        if (context.getModuleCode().equals("3") && uh_disable_email_notification_type_codes != null) {
+            disable_email_action_codes = Arrays.asList(uh_disable_email_notification_type_codes.split(","));
+        }
+        if (disable_email_action_codes != null && disable_email_action_codes.contains(actionTypeCode)) {
+            LOG.info("Skipping Notification email because of UH override param UH_NOTIFICATION_DISABLE_EMAIL_TYPE_CODES for action_code [" + context.getActionTypeCode() + "]");
+        } else {
+            sendEmailNotification(subject, message, notificationRecipients, context.getEmailAttachments());
+            sendEmailNotification(getKcEmailService().getDefaultFromAddress(), emailRecipients, subject, message, context.getEmailAttachments());
+        }
     }
     
     @Override
