@@ -1,7 +1,7 @@
 /*
  * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Copyright 2005-2015 Kuali, Inc.
+ * Copyright 2005-2016 Kuali, Inc.
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -26,6 +26,10 @@ import org.apache.struts.action.ActionForward;
 import org.kuali.coeus.sys.framework.controller.KcCommonControllerService;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
+import org.kuali.rice.krad.UserSession;
+import org.kuali.rice.krad.util.GlobalVariables;
+import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.rice.krad.web.service.ControllerService;
 import org.kuali.rice.krad.web.service.ModelAndViewService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +57,14 @@ public class LandingPageController {
     @Autowired
     @Qualifier("kcCommonControllerService")
     private KcCommonControllerService kcCommonControllerService;
+    
+    @Autowired
+    @Qualifier("parameterService")
+    private ParameterService parameterService;
+    
+    @Autowired
+    @Qualifier("kualiConfigurationService")
+    private ConfigurationService configurationService;
     
     @Transactional @RequestMapping(value = "/landingPage")
     public ModelAndView defaultRequest(@ModelAttribute("KualiForm") LandingPageForm form, BindingResult result,
@@ -87,49 +99,27 @@ public class LandingPageController {
         return getModelAndViewService().checkForm(form);
     }
 
-    // KC-1005 Fix logout
-    @Transactional @RequestMapping(value = "/landingPage", params = "methodToCall=logout")
-    public ModelAndView logout(@ModelAttribute(value = "KualiForm") LandingPageForm form, BindingResult result, HttpServletRequest request,
-                                       HttpServletResponse response) {
-
-        ConfigurationService configService =  CoreApiServiceLocator.getKualiConfigurationService();
-        String logoutUrlBase = configService.getPropertyValueAsString("rice.portal.logout.redirectUrl");
-
-        StringBuffer casLogoutUrl = new StringBuffer(logoutUrlBase);
-        casLogoutUrl.append("?service=");
-        casLogoutUrl.append(buildContextUrlBase(request));
-
-        // destroy the session
-        HttpSession session = request.getSession();
-        if (session != null) {
-            try {
-                session.invalidate();
-            }
-            catch (IllegalStateException e) {
-                // ignore failure, since that just means that the session has
-                // already been
-                // invalidated
-            }
-        }
-
-        // get 'em out of here
-        System.out.println("DEBUG DEBUG " + casLogoutUrl.toString());
-        return modelAndViewService.performRedirect(form,casLogoutUrl.toString(),new Properties());
+    @RequestMapping(value = "/landingPage", params = "methodToCall=logout")
+    public ModelAndView logout(@ModelAttribute(value = "KualiForm") LandingPageForm form, HttpServletRequest request) {
+         UserSession userSession = (UserSession) request.getSession().getAttribute(KRADConstants.USER_SESSION_KEY);
+         if (userSession != null && userSession.isBackdoorInUse()) {
+        	 userSession.clearBackdoorUser();
+        	 return getModelAndViewService().getModelAndView(form);
+         } else {
+        	 request.getSession().invalidate();
+        	 GlobalVariables.clear();
+        	 return getModelAndViewService().performRedirect(form, getLogoutUrlRedirect());
+         }
     }
 
-    private String buildContextUrlBase(HttpServletRequest request)
-    {
-        StringBuffer contextUrlBase = new StringBuffer();
-        contextUrlBase.append(request.getScheme());
-        contextUrlBase.append("://");
-        contextUrlBase.append(request.getServerName());
-        contextUrlBase.append(":");
-        contextUrlBase.append(request.getServerPort());
-        contextUrlBase.append(request.getContextPath());
+	String getLogoutUrlRedirect() {
+		String redirectString = getParameterService().getParameterValueAsString(KRADConstants.KNS_NAMESPACE, KRADConstants.DetailTypes.ALL_DETAIL_TYPE, KRADConstants.LOGOFF_REDIRECT_URL_PARAMETER);
 
-        return contextUrlBase.toString();
-    }
-    // KC-1005 end
+         if(redirectString == null) {
+             redirectString = getConfigurationService().getPropertyValueAsString(KRADConstants.LOGOFF_REDIRECT_URL_PROPERTY);
+         }
+		return redirectString;
+	}
 
     public ModelAndViewService getModelAndViewService() {
         return modelAndViewService;
@@ -154,4 +144,20 @@ public class LandingPageController {
     public void setControllerService(ControllerService controllerService) {
         this.controllerService = controllerService;
     }
+
+	public ParameterService getParameterService() {
+		return parameterService;
+	}
+
+	public void setParameterService(ParameterService parameterService) {
+		this.parameterService = parameterService;
+	}
+
+	public ConfigurationService getConfigurationService() {
+		return configurationService;
+	}
+
+	public void setConfigurationService(ConfigurationService configurationService) {
+		this.configurationService = configurationService;
+	}
 }

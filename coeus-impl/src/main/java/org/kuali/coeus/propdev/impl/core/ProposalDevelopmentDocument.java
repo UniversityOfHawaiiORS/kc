@@ -1,18 +1,18 @@
 /*
  * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
- * Copyright 2005-2015 Kuali, Inc.
- *
+ * Copyright 2005-2016 Kuali, Inc.
+ * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
- *
+ * 
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details.
- *
+ * 
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -55,7 +55,9 @@ import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.KewApiServiceLocator;
 import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.action.ActionTaken;
+import org.kuali.rice.kew.api.action.ActionType;
 import org.kuali.rice.kew.api.action.WorkflowDocumentActionsService;
+import org.kuali.rice.kew.api.document.WorkflowDocumentService;
 import org.kuali.rice.kew.framework.postprocessor.ActionTakenEvent;
 import org.kuali.rice.kew.framework.postprocessor.DocumentRouteStatusChange;
 import org.kuali.rice.kim.api.identity.Person;
@@ -111,6 +113,9 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
     private transient KcDocumentRejectionService kcDocumentRejectionService; 
 
 	@Transient
+    private transient WorkflowDocumentService workflowDocumentService;
+
+    @Transient
 	InstitutionalProposalService institutionalProposalService;
 	
     @Transient
@@ -201,6 +206,13 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
 		return kcDocumentRejectionService;
 	}
 	
+    protected WorkflowDocumentService getWorkflowDocumentService() {
+        if (workflowDocumentService == null){
+            workflowDocumentService = KewApiServiceLocator.getWorkflowDocumentService();
+        }
+        return workflowDocumentService;
+    }
+	
 	protected InstitutionalProposalService getInstitutionalProposalService () {
 		if ( institutionalProposalService == null){
 			institutionalProposalService = KcServiceLocator.getService(InstitutionalProposalService.class);
@@ -238,6 +250,8 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
 
     @Override
     public void doRouteStatusChange(DocumentRouteStatusChange dto) {
+
+        executeAsLastActionUser( () -> {
         super.doRouteStatusChange(dto);
         String newStatus = dto.getNewRouteStatus();
         String oldStatus = dto.getOldRouteStatus();
@@ -255,12 +269,15 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
                 }
             }
             bp.setProposalStateTypeCode(getProposalStateService().getProposalStateTypeCode(this, false));
-            
+                getDataObjectService().save(bp);
         }
+            return null;
+        });
     }
 
     @Override
     public void doActionTaken(ActionTakenEvent event) {
+        executeAsLastActionUser( () -> {
         super.doActionTaken(event);
         ActionTaken actionTaken = event.getActionTaken();
         if (LOG.isDebugEnabled()) {
@@ -297,12 +314,17 @@ public class ProposalDevelopmentDocument extends BudgetParentDocument<Developmen
             if (isLastSubmitterApprovalAction(event.getActionTaken()) && shouldAutogenerateInstitutionalProposal()) {
                 final InstitutionalProposal institutionalProposal = getInstitutionalProposalService().createInstitutionalProposal(this.getDevelopmentProposal(), this.getDevelopmentProposal().getFinalBudget());
                 this.setInstitutionalProposalNumber(institutionalProposal.getProposalNumber());
+                    getDataObjectService().save(this);
             }
         }
+            return null;
+        });
     }
 
     private boolean hasProposalBeenRejected(WorkflowDocument document) {
-        return getKcDocumentRejectionService().isDocumentOnInitialNode(document);
+        return getKcDocumentRejectionService().isDocumentOnInitialNode(document) &&
+            getWorkflowDocumentService().getAllActionsTaken(getDocumentNumber())
+                .stream().anyMatch(actionTaken -> actionTaken.getActionTaken() == ActionType.COMPLETE);
     }
 
     private boolean isLastSubmitterApprovalAction(ActionTaken actionTaken) {

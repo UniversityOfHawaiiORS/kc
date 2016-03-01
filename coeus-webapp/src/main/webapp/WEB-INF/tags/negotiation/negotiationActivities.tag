@@ -1,18 +1,18 @@
 <%--
    - Kuali Coeus, a comprehensive research administration system for higher education.
-   - 
-   - Copyright 2005-2015 Kuali, Inc.
-   - 
+   -
+   - Copyright 2005-2016 Kuali, Inc.
+   -
    - This program is free software: you can redistribute it and/or modify
    - it under the terms of the GNU Affero General Public License as
    - published by the Free Software Foundation, either version 3 of the
    - License, or (at your option) any later version.
-   - 
+   -
    - This program is distributed in the hope that it will be useful,
    - but WITHOUT ANY WARRANTY; without even the implied warranty of
    - MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    - GNU Affero General Public License for more details.
-   - 
+   -
    - You should have received a copy of the GNU Affero General Public License
    - along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --%>
@@ -32,7 +32,7 @@ function doFilterActivities() {
 				if ($jq(this).parents('div[id^="tab-"]').first().prev().find('input[id^="tab-"]').is('[src*="hide.gif"]')) {
 					$jq(this).parents('div[id^="tab-"]').first().show();
 				}
-				
+
 			} else {
 				$jq(this).parents('div[id^="tab-"]').first().prev().hide();
 				$jq(this).parents('div[id^="tab-"]').first().hide();
@@ -73,24 +73,24 @@ $jq(document).ready(function() {
     <td><html:select style="width: 100%;" property="negotiationActivityHelper.activitySortingTypeName">
           <c:forEach items="${krafn:getOptionList('org.kuali.kra.negotiations.sorting.ActivitySortingTypeValuesFinder', paramMap)}" var="option">
             <html:option value="${option.key}"><c:out value="${option.value}"/></html:option>
-          </c:forEach> 
+          </c:forEach>
     	</html:select>
     </td>
     <td style="text-align: center; width: 60px;"><html:image property="methodToCall.sort"
    		  			src="${ConfigProperties.kra.externalizable.images.url}tinybutton-sort.gif" styleClass="tinybutton" />
-   
+
 	</td>
    </tr>
     <th style="text-align: right; width: 5em;">Display:</th>
     <th colspan="2" style="text-align:left;">
-      <label><html:radio property="filterActivities" value="${KualiForm.filterAllActivities}" onchange="doFilterActivities();">All</html:radio></label> 
+      <label><html:radio property="filterActivities" value="${KualiForm.filterAllActivities}" onchange="doFilterActivities();">All</html:radio></label>
       <label><html:radio property="filterActivities" value="${KualiForm.filterPendingActivities}" onchange="doFilterActivities();">Pending</html:radio></label>
       <html:image property="methodToCall.printNegotiationActivity"
-						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif' 
+						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-print.gif'
 						alt="Print Negotiation Activity" styleClass="tinybutton" onclick="excludeSubmitRestriction=true" align="right"/>
    	</th>
    </tr>
-   
+
   </table>
   <c:forEach items="${KualiForm.document.negotiation.activities}" var="activity" varStatus="ctr">
     <!-- KC-856 Hide entire activity if restricted and user can not view restricted -->
@@ -124,12 +124,12 @@ $jq(document).ready(function() {
     <td><html:select style="width: 100%;" property="negotiationActivityHelper.attachmentSortingTypeName">
           <c:forEach items="${krafn:getOptionList('org.kuali.kra.negotiations.sorting.AttachmentSortingTypeValuesFinder', paramMap)}" var="option">
             <html:option value="${option.key}"><c:out value="${option.value}"/></html:option>
-          </c:forEach> 
+          </c:forEach>
     	</html:select>
     </td>
     <td style="text-align: center; width: 60px;"><html:image property="methodToCall.sort"
    		  			src="${ConfigProperties.kra.externalizable.images.url}tinybutton-sort.gif" styleClass="tinybutton" />
-   
+
 	</td>
    </tr>
   </table>
@@ -175,4 +175,4 @@ $jq(document).ready(function() {
 </kul:innerTab>
 
 </div>
-</kul:tab> 
+</kul:tab>
