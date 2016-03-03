@@ -712,14 +712,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
     public Date getProjectEndDate() {
         // KC-489 Project Ends Dates displayed incorrectly in Award Search results
-    	try {
-    		int i = this.getIndexOfAwardAmountInfoForDisplay();
-			return this.awardAmountInfos.get(i).getFinalExpirationDate();
-    	} catch (WorkflowException e) {
-    		e.printStackTrace();
-			return null;
-    	}
-        // END KC-489
+        int i = this.getIndexOfAwardAmountInfoForDisplay();
+        return this.awardAmountInfos.get(i).getFinalExpirationDate();
     }
 
     public void setProjectEndDate(Date date) {
