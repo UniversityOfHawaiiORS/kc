@@ -71,7 +71,8 @@ values ('RES-BOOT2095', 'KC1016');
 
 -- Award
 insert into krms_func_t (func_id, nmspc_cd, nm, desc_txt, rtrn_typ, typ_id, actv, ver_nbr)
-values ('RES-BOOT10019', 'KC-AWARD', 'doSponsorAndPrimeSponsorMatch', 'Check if Sponsor and Prime Sponsor are the same', 'java.lang.Boolean', 'KC10001', 'Y', 1);
+values ('RES-BOOT10019', 'KC-AWARD', 'doSponsorAndPrimeSponsorMatch', 'Check if Sponsor and Prime Sponsor are the same', 'java.lang.Boolean', 
+(select typ_id from KRMS_TYP_T where NM = 'Award Java Function Term Service'), 'Y', 1);
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
 values ('RES-BOOT10030', 'award', 'Award BO', 'org.kuali.coeus.common.framework.sponsor.Sponsorable', 'RES-BOOT10019', 1);
 
@@ -90,7 +91,8 @@ values ('RES-BOOT2096', 'KC1010');
 
 -- check prop value for previous version
 insert into krms_func_t (func_id, nmspc_cd, nm, desc_txt, rtrn_typ, typ_id, actv, ver_nbr)
-values ('RES-BOOT10020', 'KC-AWARD', 'checkPropertyValueForAnyPreviousVersion', 'Check if Property Value matches for any previous Award version', 'java.lang.Boolean', 'KC10001', 'Y', 1);
+values ('RES-BOOT10020', 'KC-AWARD', 'checkPropertyValueForAnyPreviousVersion', 'Check if Property Value matches for any previous Award version',
+'java.lang.Boolean', (select typ_id from KRMS_TYP_T where NM = 'Award Java Function Term Service'), 'Y', 1);
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
 values ('RES-BOOT10031', 'award', 'Award BO', 'org.kuali.coeus.common.framework.version.sequence.owner.SequenceOwner', 'RES-BOOT10020', 1);
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
@@ -112,7 +114,8 @@ values ('RES-BOOT2097', 'KC1010');
 
 -- hasPropertyChangedThisVersion
 insert into krms_func_t (func_id, nmspc_cd, nm, desc_txt, rtrn_typ, typ_id, actv, ver_nbr)
-values ('RES-BOOT10021', 'KC-AWARD', 'hasPropertyChangedThisVersion', 'Check if Property Value has changed since the previous Award version', 'java.lang.Boolean', 'KC10001', 'Y', 1);
+values ('RES-BOOT10021', 'KC-AWARD', 'hasPropertyChangedThisVersion', 'Check if Property Value has changed since the previous Award version', 
+'java.lang.Boolean', (select typ_id from KRMS_TYP_T where NM = 'Award Java Function Term Service'), 'Y', 1);
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
 values ('RES-BOOT10034', 'award', 'Award BO', 'org.kuali.coeus.common.framework.version.sequence.owner.SequenceOwner', 'RES-BOOT10021', 1);
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
@@ -132,7 +135,8 @@ values ('RES-BOOT2098', 'KC1010');
 
 -- hasSpecialReviewOfType here
 insert into krms_func_t (func_id, nmspc_cd, nm, desc_txt, rtrn_typ, typ_id, actv, ver_nbr)
-values ('RES-BOOT10022', 'KC-AWARD', 'hasSpecialReviewOfType', 'Check if Award has a special review with the specified type', 'java.lang.Boolean', 'KC10001', 'Y', 1);
+values ('RES-BOOT10022', 'KC-AWARD', 'hasSpecialReviewOfType', 'Check if Award has a special review with the specified type', 
+'java.lang.Boolean', (select typ_id from KRMS_TYP_T where NM = 'Award Java Function Term Service'), 'Y', 1);
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
 values ('RES-BOOT10036', 'award', 'Award BO', 'org.kuali.kra.award.home.Award', 'RES-BOOT10022', 1);
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)

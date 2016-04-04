@@ -19,7 +19,8 @@
 
 -- award person total effort
 insert into krms_func_t (func_id, nmspc_cd, nm, desc_txt, rtrn_typ, typ_id, actv, ver_nbr)
- values ('KC10013', 'KC-AWARD', 'awardPersonnelTotalEffort','Award total effort rule for award persons.', 'java.lang.Boolean', 'KC10001', 'Y', 1);
+ values ('KC10013', 'KC-AWARD', 'awardPersonnelTotalEffort','Award total effort rule for award persons.', 'java.lang.Boolean', 
+ (select typ_id from KRMS_TYP_T where NM = 'Award Java Function Term Service') , 'Y', 1);
 
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
 values ('KC10020', 'award', 'Award BO', 'org.kuali.kra.award.home.Award', 'KC10013', 1);
@@ -44,7 +45,7 @@ values ('KC2090', 'KC1010');
 
 -- award person calendar effort
 insert into krms_func_t (func_id, nmspc_cd, nm, desc_txt, rtrn_typ, typ_id, actv, ver_nbr)
- values ('KC10014', 'KC-AWARD', 'awardPersonnelCalendarEffort','Award calendar effort rule for award persons.', 'java.lang.Boolean', 'KC10001', 'Y', 1);
+ values ('KC10014', 'KC-AWARD', 'awardPersonnelCalendarEffort','Award calendar effort rule for award persons.', 'java.lang.Boolean', (select typ_id from KRMS_TYP_T where NM = 'Award Java Function Term Service'), 'Y', 1);
 
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
 values ('KC10022', 'award', 'Award BO', 'org.kuali.kra.award.home.Award', 'KC10014', 1);
@@ -70,7 +71,7 @@ values ('KC2091', 'KC1010');
 -- award comments rule
 
 insert into krms_func_t (func_id, nmspc_cd, nm, desc_txt, rtrn_typ, typ_id, actv, ver_nbr)
- values ('KC10015', 'KC-AWARD', 'awardCommentsRule','Rule to check award comments.', 'java.lang.Boolean', 'KC10001', 'Y', 1);
+ values ('KC10015', 'KC-AWARD', 'awardCommentsRule','Rule to check award comments.', 'java.lang.Boolean', (select typ_id from KRMS_TYP_T where NM = 'Award Java Function Term Service'), 'Y', 1);
 
 insert into krms_func_parm_t (func_parm_id, nm, desc_txt, typ, func_id, seq_no)
 values ('KC10024', 'award', 'Award BO', 'org.kuali.kra.award.home.Award', 'KC10015', 1);

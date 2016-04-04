@@ -71,7 +71,7 @@ mkdir -p ${LOGDIR}
 
 while [ "${ans0}" != "y" ] && [ "${ans0}" != "n" ]
 do
-    read -p "Run Step 1 - upgrade to 6.1602 ? (y/n)" ans0
+    read -p "Run Step 1 - upgrade to 6.1603 ? (y/n)" ans0
 done
 
 if [ "${ans0}" == "y" ]
@@ -96,6 +96,12 @@ then
     # Update to 1602
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1602_oracle_kc_rice_server_upgrade.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1602_oracle_kc_upgrade.sql
+
+    # Update to 1603
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_upgrade.sql
+
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
