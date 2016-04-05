@@ -176,9 +176,14 @@ sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_upgrade.sql
 
-#Update to 1512
+#Update to 1602
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1602_oracle_kc_rice_server_upgrade.sql
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1602_oracle_kc_upgrade.sql
+
+# Update to 1603
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_rice_server_upgrade.sql
+sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_upgrade.sql
 
 sqlplus "${un}"/"${pw}@${DBSvrNm}" < uh_fixes.sql
 
