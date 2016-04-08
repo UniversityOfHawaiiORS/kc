@@ -1,0 +1,11 @@
+
+To build uh-modifications-1603.49, check out each branch and run build.sh:
+
+schemaspy: schemaspy-1508.0162-branch
+rice: uh-rice-2.5.3.1603.0001
+coeus-api: kuali-coeus-api-1602.0001
+s2sgen: uh-modifications-1603.0009
+
+kc: uh-modifications-1603.49
+
+
