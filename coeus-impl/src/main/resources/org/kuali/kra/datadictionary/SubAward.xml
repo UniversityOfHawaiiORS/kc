@@ -133,8 +133,8 @@
   <bean id="SubAward-deMinimus" parent="SubAward-deMinimus-parentBean"/>
   <bean id="SubAward-deMinimus-parentBean" abstract="true" parent="AttributeReferenceDummy-genericBoolean">
     <property name="name" value="deMinimus" />
-    <property name="label" value="de Minimus" />
-    <property name="shortLabel" value="de Minimus" />
+    <property name="label" value="de Minimis" />
+    <property name="shortLabel" value="de Minimis" />
     <property name="summary" value="de Minimus" />
     <property name="description" value="de Minimus" />
   </bean>
