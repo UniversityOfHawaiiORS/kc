@@ -335,7 +335,8 @@
     <property name="forceUppercase" value="false" />
     <property name="label" value="Purchase Order ID" />
     <property name="shortLabel" value="Purchase Order ID" />
-    <property name="maxLength" value="10" />
+    <!-- KC-1021 Subaward - "Purchase Order ID" / "Requisition ID" -->
+    <property name="maxLength" value="25" />
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
     </property>
@@ -345,11 +346,13 @@
       </bean>
     </property>
     <property name="required" value="true" />
+    <!-- KC-1021 Subaward - "Purchase Order ID" / "Requisition ID" -->
     <property name="control" >
-      <bean parent="TextControlDefinition" p:size="10"/>
+      <bean parent="TextControlDefinition" p:size="25"/>
     </property>
+    <!-- KC-1021 Subaward - "Purchase Order ID" / "Requisition ID" -->
     <property name="controlField">
-      <bean p:size="10" parent="Uif-TextControl"/>
+      <bean p:size="25 " parent="Uif-TextControl"/>
     </property>
     <property name="summary" value="Purchase Order ID" />
     <property name="description" value="Purchase Order ID" />    
@@ -820,16 +823,18 @@
   <bean id="SubAward-requisitionId-parentBean" abstract="true" parent="AttributeDefinition">
     <property name="name" value="requisitionId" />
     <property name="forceUppercase" value="false" />
-    <property name="label" value="Requisition ID" />
-    <property name="shortLabel" value="Requisition ID" />
-    <property name="maxLength" value="50" />
+    <!-- KC-1021 Subaward - "Purchase Order ID" / "Requisition ID" -->
+    <property name="label" value="Service Center ID" />
+    <property name="shortLabel" value="Service Center ID" />
+    <property name="maxLength" value="2" />
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
     </property>
     <property name="required" value="false" />
+    <!-- KC-1021 Subaward - "Purchase Order ID" / "Requisition ID" -->
     <property name="control" >
       <bean parent="TextControlDefinition"
-            p:size="50" />
+            p:size="2" />
     </property>
     <property name="summary" value="Requisition ID" />
     <property name="description" value="Requisition ID" />    

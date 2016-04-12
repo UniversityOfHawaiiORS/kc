@@ -102,6 +102,8 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_rice_server_upgrade.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_upgrade.sql
 
+    # UH modificaitons for 1607 target release
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1021.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
