@@ -195,6 +195,8 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
         PropAwardPersonRole personRole = person.getRole();
         if (personRole.getRoleCode().equals(Constants.CO_INVESTIGATOR_ROLE)
                 || personRole.getRoleCode().equals(Constants.PRINCIPAL_INVESTIGATOR_ROLE)
+                // KC-1357 MPI personnel certification validation rule not working
+                || personRole.getRoleCode().equals(Constants.MULTI_PI_ROLE)
                 // KC-1068 Key Persons Certification Questions
                 // || (personRole.getRoleCode().equals(Constants.KEY_PERSON_ROLE) && person.getOptInCertificationStatus())) {
                 || (personRole.getRoleCode().equals(Constants.KEY_PERSON_ROLE) && person.isEmployee())) {
