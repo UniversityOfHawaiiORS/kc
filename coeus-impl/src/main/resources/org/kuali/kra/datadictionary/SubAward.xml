@@ -62,7 +62,9 @@
         <ref bean="SubAward-totalAvailableAmount" />    
         <ref bean="SubAward-docIdStatus" />  
         <ref bean="SubAward-lastUpdate" />
-        <ref bean="SubAward-subAwardCode" />    
+        <ref bean="SubAward-subAwardCode" />
+        <!-- KC-1351 Make ability to see saved status SubAwards -->
+        <ref bean="SubAward-sequenceNumber"/>
         <ref bean="SubAward-awardNumber" />
         <ref bean="SubAward-subAwardFundingSourceList.award.awardNumber"/>
         <ref bean="SubAward-costType" />
@@ -187,7 +189,32 @@
     <property name="summary" value="Subaward ID" />
     <property name="description" value="Subaward ID" />    
   </bean>
-   
+
+  <!-- KC-1351 Make ability to see saved status SubAwards -->
+  <bean id="SubAward-sequenceNumber" parent="SubAward-sequenceNumber-parentBean"/>
+  <bean id="SubAward-sequenceNumber-parentBean" abstract="true" parent="AttributeDefinition">
+    <property name="name" value="sequenceNumber"/>
+    <property name="forceUppercase" value="false"/>
+    <property name="label" value="Version Number"/>
+    <property name="shortLabel" value="Version Number"/>
+    <property name="maxLength" value="4"/>
+    <property name="validationPattern">
+      <bean parent="NumericValidationPattern"/>
+    </property>
+    <property name="validCharactersConstraint">
+      <bean parent="NumericPatternConstraint"/>
+    </property>
+    <property name="control">
+      <bean parent="TextControlDefinition" p:size="4"/>
+    </property>
+    <property name="controlField">
+      <bean p:size="4" parent="Uif-TextControl"/>
+    </property>
+    <property name="summary" value="Version Number" />
+    <property name="description" value="Version Number" />
+  </bean>
+  <!-- END KC-1351 -->
+
   <bean id="SubAward-organizationId" parent="SubAward-organizationId-parentBean" />
   <bean id="SubAward-organizationId-parentBean" abstract="true" parent="AttributeDefinition">
     <property name="name" value="organizationId" />
@@ -935,12 +962,24 @@
   <bean id="SubAward-LookupView" parent="SubAward-LookupView-parentBean"/>
   <bean id="SubAward-lookupDefinition-parentBean" abstract="true" parent="LookupDefinition">
     <property name="title" value="Subaward Lookup" />
-    <property name="lookupableID" value="subAwardLookupable" /><property name="defaultSort" >
-      <bean parent="SortDefinition"/>
+    <property name="lookupableID" value="subAwardLookupable" />
+    <property name="defaultSort" >
+      <bean parent="SortDefinition">
+        <!-- KC-1351 Make ability to see saved status SubAwards -->
+        <property name="attributeNames">
+          <list>
+            <value>subAwardCode</value>
+            <value>sequenceNumber</value>
+          </list>
+        </property>
+        <!-- END KC-1351 -->
+      </bean>
     </property>
     <property name="lookupFields" >
       <list>
         <bean p:attributeName="subAwardCode" parent="FieldDefinition" p:forceInquiry="true" />
+        <!-- KC-1351 Make ability to see saved status SubAwards -->
+        <bean p:attributeName="sequenceNumber" parent="FieldDefinition" p:forceInquiry="true" />
         <bean p:attributeName="organizationId" parent="FieldDefinition" p:forceInquiry="true" />
         <bean p:attributeName="organization.organizationName" parent="FieldDefinition" p:noLookup="true" />
         <bean p:attributeName="startDate" parent="FieldDefinition" p:forceInquiry="true" />
@@ -962,6 +1001,8 @@
       <list>
         <bean p:attributeName="requisitionerName" parent="FieldDefinition" p:forceInquiry="true"/>
         <bean p:attributeName="subAwardCode" parent="FieldDefinition" p:forceInquiry="true" />
+        <!-- KC-1351 Make ability to see saved status SubAwards -->
+        <bean p:attributeName="sequenceNumber" parent="FieldDefinition" p:forceInquiry="true" />
         <bean p:attributeName="organizationId" parent="FieldDefinition" p:forceInquiry="true" />
         <bean p:attributeName="organizationName" parent="FieldDefinition" p:forceInquiry="true" />
         <bean p:attributeName="startDate" parent="FieldDefinition" p:forceInquiry="true" />

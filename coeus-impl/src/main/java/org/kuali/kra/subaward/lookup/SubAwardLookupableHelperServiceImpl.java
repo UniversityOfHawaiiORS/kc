@@ -62,7 +62,8 @@ public class SubAwardLookupableHelperServiceImpl extends KraLookupableHelperServ
         super.setBackLocationDocFormKey(fieldValues);
         String requisitionerUserName = fieldValues.get(REQUISITIONER_USER_NAME);
         fieldValues.remove(REQUISITIONER_USER_NAME);
-        fieldValues.put(VERSION_HISTORY_STATUS_FOR_OJB, VersionStatus.ACTIVE.toString());
+        /* KC-1351 Make ability to see saved status SubAwards */
+        //fieldValues.put(VERSION_HISTORY_STATUS_FOR_OJB, VersionStatus.ACTIVE.toString());
         return filterForRequisitionerUserName((List<SubAward>) super.getSearchResultsUnbounded(fieldValues),requisitionerUserName);
     }
 
