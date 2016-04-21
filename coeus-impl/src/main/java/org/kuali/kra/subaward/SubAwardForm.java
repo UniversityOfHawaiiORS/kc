@@ -19,6 +19,8 @@
 
 package org.kuali.kra.subaward;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.struts.upload.FormFile;
 import org.kuali.coeus.common.framework.rolodex.Rolodex;
 import org.kuali.coeus.common.framework.version.history.VersionHistoryService;
@@ -29,10 +31,12 @@ import org.kuali.coeus.common.framework.auth.task.TaskAuthorizationService;
 import org.kuali.coeus.sys.framework.validation.Auditable;
 import org.kuali.coeus.sys.framework.model.KcTransactionalDocumentFormBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
+import org.kuali.kra.award.AwardForm;
 import org.kuali.kra.award.home.Award;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.TaskName;
 import org.kuali.coeus.common.framework.medusa.MedusaBean;
+import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.subaward.bo.*;
 import org.kuali.kra.subaward.customdata.CustomDataHelper;
 import org.kuali.kra.subaward.document.SubAwardDocument;
@@ -61,6 +65,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
 
     private static final long serialVersionUID = -1452575757578523254L;
 
+    private static final Log LOG = LogFactory.getLog(SubAwardForm.class);
     private static final String COLUMN = ":";
     private static final String USE_SUBAWARD_INVOICE_INQUIRY = "USE_SUBAWARD_INVOICE_INQUIRY";
 
@@ -350,7 +355,24 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         }
         return extraButtons;
     }
-    
+
+    // KC-1350 Allow creating multiple negotiations for SubAwards
+    public List<ExtraButton> getExtraTopButtons() {
+        extraButtons.clear();
+        extraButtons = super.getExtraButtons();
+        String externalImageURL = Constants.KRA_EXTERNALIZABLE_IMAGES_URI_KEY;
+
+        NegotiationService ngs = KcServiceLocator.getService(NegotiationService.class);
+        ConfigurationService configurationService = CoreApiServiceLocator.getKualiConfigurationService();
+        if (ngs.isAuthorizedToOpenNegotiations()) {
+            String generateNegotiationImage = configurationService.getPropertyValueAsString(externalImageURL) + "tinybutton-negotiations.gif";
+            addExtraButton("methodToCall.openNewNegotiation", generateNegotiationImage, "Open New Negotiation");
+        }
+
+        return extraButtons;
+    }
+    // KC-1350 END
+
     /*
      * returns flag indicating if edit button should be displayed at bottom of form 
      * 

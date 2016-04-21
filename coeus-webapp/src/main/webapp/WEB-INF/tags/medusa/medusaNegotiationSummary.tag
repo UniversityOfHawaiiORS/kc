@@ -30,7 +30,7 @@
 	    <img title="Open Negotiation" 
 	          alt="Open Negotiation" style="border: medium none ;" 
 	          src="static/images/tinybutton-opennegotiation.gif"/>
-	  </a>      	  
+	  </a>
       </td>
     </tr>
     <tr>

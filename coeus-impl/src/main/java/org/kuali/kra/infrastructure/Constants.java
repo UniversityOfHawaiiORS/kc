@@ -715,6 +715,9 @@ public interface Constants {
     
     public static final String TIME_AND_MONEY_DOCUMENT_STRING_FOR_SESSION = "TIME_AND_MONEY";
     public static final String AWARD_DOCUMENT_STRING_FOR_SESSION = "returnToAwardDocument";
+    // KC-1350 Allow creating multiple negotiations for SubAwards
+    public static final String SUBAWARD_DOCUMENT_STRING_FOR_SESSION = "returnToSubAwardDocument";
+    // KC-1350 END
     public static final String KRA_EXTERNALIZABLE_IMAGES_URI_KEY = "kra.externalizable.images.url";
     public static final String KR_EXTERNALIZABLE_IMAGES_URI_KEY = "kr.externalizable.images.url";
     
@@ -768,6 +771,9 @@ public interface Constants {
     public static final String MAPPING_CONTACTS_PAGE="contacts";
     public static final String MAPPING_CLOSEOUT_PAGE="closeout";
     public static final String MAPPING_SUBAWARD_ACTION_PAGE="subAwardActions";
+    // KC-1350 Allow creating multiple negotiations for SubAwards
+    public static final String MAPPING_SUBAWARD_BASIC = "basic";
+    // KC-1350 END
     public static final String SUBAWARD_SEQUENCE_SUBAWARD_CODE = "SUBAWARD_CODE_S";
     public static final String SUBAWARD_AUDIT_RULE_ERROR_KEY = "newSubAwardContact.rolodex.fullName";
     public static final String SUBAWARD_CONTACTS_PANEL_NAME = "Contacts";

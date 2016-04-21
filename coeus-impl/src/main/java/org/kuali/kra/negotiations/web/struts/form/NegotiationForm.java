@@ -358,12 +358,18 @@ public class NegotiationForm extends KcTransactionalDocumentFormBase implements 
         extraButtons.clear();
         String externalImageURL = Constants.KRA_EXTERNALIZABLE_IMAGES_URI_KEY;
          
-        Negotiation neg= this.getNegotiationDocument().getNegotiation();
-        if (this.getNegotiationDocument().getNegotiation().getNegotiationAssociationTypeId() != null && 
-            this.getNegotiationDocument().getNegotiation().getNegotiationAssociationTypeId().equals(getNegotiationService().getNegotiationAssociationType("AWD").getId())) {
-            String generateNegotiationsImage = CoreApiServiceLocator.getKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "tinybutton-openaward.gif";
-            addExtraButton("methodToCall.openAward", generateNegotiationsImage, "Open Award");
+        // KC-1350 Allow creating multiple negotiations for SubAwards
+        Negotiation neg = this.getNegotiationDocument().getNegotiation();
+        if (neg.getNegotiationAssociationTypeId() != null) {
+            if (neg.getNegotiationAssociationTypeId().equals(getNegotiationService().getNegotiationAssociationType("AWD").getId())) {
+                String generateNegotiationsImage = CoreApiServiceLocator.getKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "tinybutton-openaward.gif";
+                addExtraButton("methodToCall.openAward", generateNegotiationsImage, "Open Award");
+            } else if (neg.getNegotiationAssociationTypeId().equals(getNegotiationService().getNegotiationAssociationType("SWD").getId())) {
+                String openSubAwardImage = CoreApiServiceLocator.getKualiConfigurationService().getPropertyValueAsString(externalImageURL) + "tinybutton-opensubaward.gif";
+                addExtraButton("methodToCall.openSubAward", openSubAwardImage, "Open Subaward");
+            }
         }
+        // KC-1350 END
         
         return extraButtons;
     }

@@ -20,6 +20,7 @@
 
 <%@ include file="/WEB-INF/jsp/kraTldHeader.jsp"%>
 
+<%-- KC-1350 Allow creating multiple negotiations for SubAwards; Added an extra top button --%>
 <kul:documentPage
 	showDocumentInfo="true"
 	htmlFormAction="subAwardMedusa"
@@ -28,7 +29,8 @@
 	showTabButtons="true"
 	auditCount="0"
   	headerDispatch="${KualiForm.headerDispatch}"
-  	headerTabActive="medusa">
+  	headerTabActive="medusa"
+	extraTopButtons="${KualiForm.extraTopButtons}" >
 
 <kul:tabTop tabTitle="Medusa" defaultOpen="true" tabErrorKey="">
 <kra-m:medusa helpParameterNamespace="KC-SUBAWARD" helpParameterDetailType="Document" helpParameterName="subAwardMedusaHelpUrl" />

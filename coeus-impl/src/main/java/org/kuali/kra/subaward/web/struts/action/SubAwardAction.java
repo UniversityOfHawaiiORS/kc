@@ -42,6 +42,9 @@ import org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBas
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
+import org.kuali.kra.negotiations.bo.Negotiation;
+import org.kuali.kra.negotiations.document.NegotiationDocument;
+import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.subaward.SubAwardForm;
 import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.kra.subaward.bo.SubAwardAttachmentType;
@@ -57,18 +60,17 @@ import org.kuali.kra.subaward.reporting.printing.service.SubAwardPrintingService
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.kra.subaward.subawardrule.SubAwardDocumentRule;
 import org.kuali.kra.subaward.templateAttachments.SubAwardAttachmentFormBean;
+import org.kuali.kra.timeandmoney.history.TransactionDetail;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
+import org.kuali.rice.krad.service.*;
 import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.kns.web.struts.form.KualiForm;
 import org.kuali.rice.krad.rules.rule.event.DocumentEvent;
-import org.kuali.rice.krad.service.BusinessObjectService;
-import org.kuali.rice.krad.service.KRADServiceLocatorWeb;
-import org.kuali.rice.krad.service.KualiRuleService;
 import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,6 +83,9 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
     private static final Log LOG = LogFactory.getLog(SubAwardAction.class);
     private static final String SUBAWARD_AGREEMENT = "fdpAgreement";
     private static final String DOCUMENT_ROUTE_QUESTION="DocRoute";
+
+    // KC-1350 Allow creating multiple negotiations for SubAwards
+    private NegotiationService negotiationService;
 
     @Override
     public ActionForward execute(ActionMapping mapping,
@@ -627,4 +632,75 @@ public ActionForward blanketApprove(ActionMapping mapping,
       
       return  mapping.findForward(Constants.MAPPING_BASIC);
   }
+
+    // KC-1350 Allow creating multiple negotiations for SubAwards
+    protected NegotiationService getNegotiationService() {
+        if (negotiationService == null) {
+            negotiationService = KcServiceLocator.getService(NegotiationService.class);
+        }
+        return negotiationService;
+    }
+
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public ActionForward openNewNegotiation(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        SubAwardForm subAwardForm = (SubAwardForm) form;
+        SubAwardDocument subAwardDocument = subAwardForm.getSubAwardDocument();
+        ActionForward actionForward;
+
+        //if subAward document is view only then we don't need to save document before opening negotiation.
+        if ((!subAwardForm.getEditingMode().containsKey("viewOnly") || subAwardForm.getEditingMode().containsKey("fullEntry")) &&
+                !subAwardDocument.getDocumentHeader().getWorkflowDocument().isFinal()) {
+            this.save(mapping, form, request, response);
+        }
+
+        if (GlobalVariables.getMessageMap().hasErrors()) {
+            return mapping.findForward(Constants.MAPPING_SUBAWARD_BASIC);
+        }
+        DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
+
+        SubAward currentSubAward = subAwardDocument.getSubAward();
+
+        NegotiationDocument negotiationDocument = createDefaultNegotiationDocument(currentSubAward);
+
+        documentService.saveDocument(negotiationDocument);
+
+        String routeHeaderId = negotiationDocument.getDocumentHeader().getWorkflowDocument().getDocumentId();
+
+        // Document Locks not removed when opening negotiations from action buttons
+        setupDocumentExit();
+
+        String forward = buildForwardUrl(routeHeaderId);
+        actionForward = new ActionForward(forward, true);
+        //add this to session for return to SubAward action.
+        GlobalVariables.getUserSession  ().addObject(Constants.SUBAWARD_DOCUMENT_STRING_FOR_SESSION + "-" + routeHeaderId, subAwardDocument.getDocumentNumber());
+
+        return actionForward;
+    }
+
+    //protected NegotiationDocument createDefaultNegotiationDocument(ActionForm form) {
+    protected NegotiationDocument createDefaultNegotiationDocument(SubAward currentSubAward) throws Exception {
+        String subAwardNumber = currentSubAward.getSubAwardCode();
+        DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
+        NegotiationDocument negotiationDocument = (NegotiationDocument) documentService.getNewDocument(NegotiationDocument.class);
+
+        // Set required fields
+        // Description
+        negotiationDocument.getDocumentHeader().setDocumentDescription("ORS Post-Award Process " + currentSubAward.getAwardNumber());
+        // Negotiation Status to "In Progress"
+        negotiationDocument.getNegotiation().setNegotiationStatusId(getNegotiationService().getNegotiationStatus("IP").getId());
+        // Assigned To (Fake user ORS)
+        negotiationDocument.getNegotiation().setNegotiatorPersonId("ORS");
+        // Negotiation Association Type
+        Long assoicationType=getNegotiationService().getNegotiationAssociationType("SWD").getId();
+        negotiationDocument.getNegotiation().setNegotiationAssociationTypeId(assoicationType);
+        // Agreement Type to SubAward
+        negotiationDocument.getNegotiation().setNegotiationAgreementTypeId(getNegotiationService().getNegotiationAgreementType("SUB").getId());
+        // AssociatedDocumentId
+        negotiationDocument.getNegotiation().setAssociatedDocumentId(subAwardNumber);
+
+        negotiationDocument.getNegotiation().setNegotiationId(KcServiceLocator.getService(SequenceAccessorService.class).getNextAvailableSequenceNumber(Constants.NEGOTIATION_SEQUENCE_NAME));
+
+        return negotiationDocument;
+    }
+    // KC-1350 END
 }

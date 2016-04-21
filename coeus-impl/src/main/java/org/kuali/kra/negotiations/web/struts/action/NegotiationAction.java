@@ -21,6 +21,7 @@ package org.kuali.kra.negotiations.web.struts.action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.kuali.coeus.common.framework.version.VersionStatus;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
 import org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
@@ -31,6 +32,7 @@ import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.printing.service.NegotiationPrintingService;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.negotiations.web.struts.form.NegotiationForm;
+import org.kuali.kra.subaward.bo.SubAward;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase;
 import org.kuali.rice.krad.service.BusinessObjectService;
@@ -46,6 +48,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.kuali.kra.subaward.service.impl.SubAwardServiceImpl.SUB_AWARD_CODE;
+import static org.kuali.kra.subaward.service.impl.SubAwardServiceImpl.SUB_AWARD_SEQUENCE_STATUS;
 
 
 public class NegotiationAction extends KcTransactionalDocumentActionBase {
@@ -216,5 +221,61 @@ public class NegotiationAction extends KcTransactionalDocumentActionBase {
         return actionForward;
     }
     // KC-821 END
+
+    // KC-1350 Allow creating multiple negotiations for SubAwards
+    //        Link back to the subAward document from negotiation document
+    @SuppressWarnings({ "deprecation", "unchecked" })
+    public ActionForward openSubAward(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception{
+        NegotiationForm negotiationForm = (NegotiationForm) form;
+        NegotiationDocument negotiationDocument = negotiationForm.getNegotiationDocument();
+        ActionForward actionForward;
+
+        //if ((!negotiationDocument.getEditingMode().containsKey("viewOnly") || negotiationDocument.getEditingMode().containsKey("fullEntry")) &&
+        //        !negotiationDocument.getDocumentHeader().getWorkflowDocument().isFinal()) {
+        this.save(mapping, form, request, response);
+        //}
+
+        if(GlobalVariables.getMessageMap().hasErrors()) {
+            return mapping.findForward(Constants.MAPPING_SUBAWARD_BASIC);
+        }
+
+        Map<String, Object> fieldValues = new HashMap<String, Object>();
+        String subAwardCode = negotiationDocument.getNegotiation().getAssociatedDocumentId();
+        // Populate search field values with SubAward code which is found in associatedDocumentId in negotiations document
+        fieldValues.put(SUB_AWARD_CODE, subAwardCode);
+        //fieldValues.put(SUB_AWARD_SEQUENCE_STATUS, VersionStatus.ACTIVE.name());
+        BusinessObjectService businessObjectService =  KcServiceLocator.getService(BusinessObjectService.class);
+
+        List<SubAward> subAwards =
+                (List<SubAward>)businessObjectService.findMatching(SubAward.class, fieldValues);
+
+        // Get the subAward with the highest document number (newest)
+        Long lastDocumentNumber= new Long(0);
+        for (SubAward subAward:subAwards) {
+            Long thisDocNumber = Long.parseLong(subAward.getSubAwardDocument().getDocumentNumber());
+            if (lastDocumentNumber.compareTo(thisDocNumber) < 0) {
+                lastDocumentNumber = thisDocNumber;
+            }
+        }
+
+        // If lastDocumentNumer is equal to 0 then no SubAward document is found.
+        if (lastDocumentNumber.equals(0)) {
+            return mapping.findForward(Constants.MAPPING_SUBAWARD_BASIC);
+        }
+
+        String routeHeaderId = lastDocumentNumber.toString();
+
+        // Document Locks not removed when opening negotiations from action buttons
+        setupDocumentExit();
+
+        String forward = buildForwardUrl(routeHeaderId);
+        actionForward = new ActionForward(forward, true);
+
+        //add this to session for return to SubAward action.
+        GlobalVariables.getUserSession().addObject(Constants.SUBAWARD_DOCUMENT_STRING_FOR_SESSION + "-" + routeHeaderId, negotiationDocument.getDocumentNumber());
+
+        return actionForward;
+    }
+    // KC-1350 END
 
 }
