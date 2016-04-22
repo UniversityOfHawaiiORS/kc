@@ -60,6 +60,7 @@ import java.util.stream.Collectors;
 public class SubAward extends KcPersistableBusinessObjectBase
 implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotiable {
 
+    private static final org.apache.log4j.Logger LOG = org.apache.log4j.Logger.getLogger(SubAward.class);
     private static final long serialVersionUID = 1L;
     private static final String ROLODEX_ID_FIELD_NAME = "rolodexId";
     public static final String NOTIFICATION_TYPE_SUBMIT = "501";
@@ -1620,6 +1621,18 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
         }
         return null;
     }
+
+    // KC-1369 Adjust Subaward Search Options and Result Display
+    public SubAwardAmountInfo getCorrespondingSubAwardAmountInfo() {
+        Long curId = this.getSubAwardId();
+        for (SubAwardAmountInfo subAwardAmountInfo : getSubAwardAmountInfoList()) {
+            if (subAwardAmountInfo.getSubAwardId().equals(curId)) {
+                return subAwardAmountInfo;
+            }
+        }
+        return null;
+    }
+    // KC-1369 END
 
 	public void setAllSubAwardAmountInfos(
 			List<SubAwardAmountInfo> allSubAwardAmountInfos) {
