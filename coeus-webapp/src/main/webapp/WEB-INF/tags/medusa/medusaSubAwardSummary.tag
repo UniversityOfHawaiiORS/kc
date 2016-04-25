@@ -31,15 +31,6 @@
 	          alt="Open Subaward" style="border: medium none ;" 
 	          src="static/images/tinybutton-opensubaward.gif"/>
 	  </a>
-      <%-- KC-1530 Allow creating multiple negotiations for SubAward --%>
-      <%-- a href="${ConfigProperties.application.url}/negotiationNegotiation.do?methodToCall=docHandler&command=displayDocSearchView&docId=${node.bo.documentNumber}&medusaOpenedDoc=true" --%>
-      <a href="${ConfigProperties.application.url}/subAwardHome.do?methodToCall=docHandler&command=displayDocSearchView&docId=${node.bo.subAwardDocument.documentNumber}&medusaOpenedDoc=true"
-         target="_blank" class="medusaOpenLink">
-          <img title="Create Negotiation"
-               alt="Create Negotiation" style="border: medium none ;"
-               src="static/images/tinybutton-create.gif"/>
-      </a>
-      <%-- KC-1530 END --%>
       </td>
     </tr>    
     <tr>
