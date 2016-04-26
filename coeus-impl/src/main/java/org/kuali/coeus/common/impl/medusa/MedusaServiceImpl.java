@@ -781,7 +781,8 @@ public class MedusaServiceImpl implements MedusaService {
     protected Collection<Award> getAwards(SubAward subAward) {
         
         Collection<Award> awards = new ArrayList<Award>();
-        SubAward newestSubAaward = getSubAward(subAward.getSubAwardCode());
+        // KC-1373 Medusa tabs for Award and Subaward not displaying correct info
+        SubAward newestSubAaward = getSubAward(subAward.getSubAwardId());
 
         Collection<SubAwardFundingSource> subAwardFundingSources = newestSubAaward.getSubAwardFundingSourceList();
         for (SubAwardFundingSource subAwardFundingSource : subAwardFundingSources){
