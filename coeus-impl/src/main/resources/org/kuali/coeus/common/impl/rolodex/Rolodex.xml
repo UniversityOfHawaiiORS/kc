@@ -739,16 +739,23 @@
     </property>
     <property name="resultFields">
       <list>
+        <!-- KC-1375 Make search results display name fields
         <bean p:attributeName="rolodexId" p:forceInquiry="true" parent="FieldDefinition"/>
+        -->
         <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:attributeName="organization" parent="FieldDefinition"/>
+        -->
+        <!-- KC-1375 Make search results display name fields -->
         <bean p:attributeName="lastName" parent="FieldDefinition"/>
         <bean p:attributeName="firstName" parent="FieldDefinition"/>
+        <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:attributeName="middleName" parent="FieldDefinition"/>
         -->
         <bean p:attributeName="addressLine1" parent="FieldDefinition"/>
         <bean p:attributeName="addressLine2" parent="FieldDefinition"/>
+        <!-- KC-1375 Make search results display name fields
         <bean p:attributeName="addressLine3" parent="FieldDefinition"/>
+        -->
         <bean p:attributeName="city" parent="FieldDefinition"/>
         <!-- KC-1126 Modal window controls are not visible if there are too many search results
         <bean p:attributeName="county" parent="FieldDefinition"/>
