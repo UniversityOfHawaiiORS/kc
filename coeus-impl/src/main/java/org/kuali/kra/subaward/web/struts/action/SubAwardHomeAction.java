@@ -21,9 +21,11 @@ package org.kuali.kra.subaward.web.struts.action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.kuali.coeus.common.framework.unit.Unit;
 import org.kuali.coeus.common.framework.version.VersionStatus;
 import org.kuali.coeus.common.framework.version.history.VersionHistory;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
+import org.kuali.kra.award.contacts.AwardPerson;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.subaward.SubAwardForm;
 import org.kuali.kra.subaward.bo.SubAward;
@@ -277,6 +279,16 @@ public class SubAwardHomeAction extends SubAwardAction{
             subAwardForm.getSubAwardDocument().getSubAward(), fundingSources);
             subAwardForm.setNewSubAwardFundingSource(
             new SubAwardFundingSource());
+            // KC-1017 Change Requisitioner/Unit to PI/Lead Unit
+            AwardPerson pi = fundingSources.getAward().getPrincipalInvestigator();
+            Unit leadUnit = fundingSources.getAward().getLeadUnit();
+            if (pi != null) {
+                subAwardForm.getSubAward().setRequisitionerId(pi.getPersonId());
+            }
+            if (leadUnit != null) {
+                subAwardForm.getSubAward().setRequisitionerUnit(leadUnit.getUnitNumber());
+            }
+            // KC-1017 End
         }
         return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
     }

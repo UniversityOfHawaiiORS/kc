@@ -545,8 +545,10 @@
   <bean id="SubAward-requisitionerUserName-parentBean" abstract="true" parent="PersonImpl-principalName">
     <property name="name" value="requisitionerUserName" />
     <property name="forceUppercase" value="false" />
-    <property name="label" value="Requisitioner User Name" />
-    <property name="shortLabel" value="Requisitioner User Name" />
+    <!-- KC-1017 Change Requisitioner/Unit to PI/Lead Unit -->
+    <property name="label" value="PI Name" />
+    <property name="shortLabel" value="PI Name" />
+    <!-- KC-1017 End -->
     <property name="required" value="false" />
     <property name="validationPattern" >
             <bean parent="AnyCharacterValidationPattern" />
@@ -568,8 +570,10 @@
   <bean id="SubAward-requisitionerUnit-parentBean" abstract="true" parent="AttributeDefinition">
     <property name="name" value="requisitionerUnit" />
     <property name="forceUppercase" value="false" />
-    <property name="label" value="Requisitioner Unit" />
-    <property name="shortLabel" value="Requisitioner Unit" />
+    <!-- KC-1017 Change Requisitioner/Unit to PI/Lead Unit -->
+    <property name="label" value="Lead Unit" />
+    <property name="shortLabel" value="Lead Unit" />
+    <!-- KC-1017 End -->
     <property name="maxLength" value="80" />
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
