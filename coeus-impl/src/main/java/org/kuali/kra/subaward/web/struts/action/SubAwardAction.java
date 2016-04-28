@@ -677,15 +677,16 @@ public ActionForward blanketApprove(ActionMapping mapping,
         return actionForward;
     }
 
-    //protected NegotiationDocument createDefaultNegotiationDocument(ActionForm form) {
     protected NegotiationDocument createDefaultNegotiationDocument(SubAward currentSubAward) throws Exception {
-        String subAwardNumber = currentSubAward.getSubAwardCode();
+        String subAwardCode = currentSubAward.getSubAwardCode();
         DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
         NegotiationDocument negotiationDocument = (NegotiationDocument) documentService.getNewDocument(NegotiationDocument.class);
 
         // Set required fields
         // Description
-        negotiationDocument.getDocumentHeader().setDocumentDescription("ORS Post-Award Process " + currentSubAward.getAwardNumber());
+        // KC-1025 Prepopulate Fields in Negotiation with Subaward Information
+        negotiationDocument.getDocumentHeader().setDocumentDescription("Subaward " + currentSubAward.getSubAwardCode());
+
         // Negotiation Status to "In Progress"
         negotiationDocument.getNegotiation().setNegotiationStatusId(getNegotiationService().getNegotiationStatus("IP").getId());
         // Assigned To (Fake user ORS)
@@ -696,7 +697,7 @@ public ActionForward blanketApprove(ActionMapping mapping,
         // Agreement Type to SubAward
         negotiationDocument.getNegotiation().setNegotiationAgreementTypeId(getNegotiationService().getNegotiationAgreementType("SUB").getId());
         // AssociatedDocumentId
-        negotiationDocument.getNegotiation().setAssociatedDocumentId(subAwardNumber);
+        negotiationDocument.getNegotiation().setAssociatedDocumentId(subAwardCode);
 
         negotiationDocument.getNegotiation().setNegotiationId(KcServiceLocator.getService(SequenceAccessorService.class).getNextAvailableSequenceNumber(Constants.NEGOTIATION_SEQUENCE_NAME));
 
