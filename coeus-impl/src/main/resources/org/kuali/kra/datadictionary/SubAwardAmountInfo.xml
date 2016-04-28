@@ -325,6 +325,8 @@
   <bean id="SubAwardAmountInfo-modificationID" parent="SubAwardAmountInfo-modificationID-parentBean" />
   <bean id="SubAwardAmountInfo-modificationID-parentBean" abstract="true" parent="SubAward-modificationId">
       <property name="name" value="modificationID" />
+      <!-- KC-1389 Make History of Changes Modification ID a Required Field -->
+      <property name="required" value="true" />
   </bean> 
   
   <bean id="SubAwardAmountInfo-periodofPerformanceStartDate" parent="SubAwardAmountInfo-periodofPerformanceStartDate-parentBean" />
