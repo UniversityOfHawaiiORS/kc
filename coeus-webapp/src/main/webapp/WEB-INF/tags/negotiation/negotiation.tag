@@ -20,9 +20,6 @@
 
 <c:set var="negotiationAttributes" value="${DataDictionary.Negotiation.attributes}" />
 <c:set var="negotiationUnassociatedDetailAttributes" value="${DataDictionary.NegotiationUnassociatedDetail.attributes}" />
-<%-- KC-1025 Prepopulate Fields in Negotiation with Subaward Information --%>
-<c:set var="subAwardAttributes" value="${DataDictionary.SubAward.attributes}" />
-<%-- KC-1025 END --%>
 <c:set var="action" value="negotiationNegotiation" />
 <c:set var="className" value="org.kuali.kra.negotiations.document.NegotiationDocument" />
 <c:set var="readOnly" value="${not KualiForm.editingMode['fullEntry']}"/>
@@ -479,29 +476,8 @@
                 		<c:out value="${KualiForm.negotiationAssociatedDetailBean.proposalType}"/>
                 	</td>
                 	<th>
-						<%-- KC-1025 Prepopulate Fields in Negotiation with Subaward Information --%>
-                        <div align="right">
-							<kul:htmlAttributeLabel attributeEntry="${subAwardAttributes.siteInvestigator}" />
-                        </div>
-						<%-- KC-1025 END --%>
                 	</th>
                 	<td>
-                        <%-- KC-1025 Prepopulate Fields in Negotiation with Subaward Information --%>
-                        <div id="sub.fullName.div">
-                            <c:if test="${!empty KualiForm.document.negotiationList[0].associatedNegotiable.siteInvestigatorId}">
-                                <c:if test="${!empty KualiForm.document.negotiationList[0].associatedNegotiable.rolodex}">
-                                    <c:choose>
-                                        <c:when test="${empty KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.fullName}">
-                                            <c:out value="${KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.organization}"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <c:out value="${KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.fullName}" />
-                                        </c:otherwise>
-                                    </c:choose>
-                                </c:if>
-                            </c:if>
-                        </div>
-                        <%-- KC-1025 END --%>
                 	</td>
             	</tr>
             	<tr>

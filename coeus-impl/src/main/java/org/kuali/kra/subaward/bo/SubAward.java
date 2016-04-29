@@ -36,7 +36,6 @@ import org.kuali.coeus.common.permissions.impl.PermissionableKeys;
 import org.kuali.coeus.common.framework.auth.perm.Permissionable;
 import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
-import org.kuali.kra.award.home.Award;
 import org.kuali.kra.award.home.AwardType;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.negotiations.bo.Negotiable;
@@ -893,16 +892,6 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
 		this.subAwardFundingSource = subAwardFundingSource;
 	}
 
-    // KC-1025 Prepopulate Fields in Negotiation with Subaward Information
-    public SubAwardFundingSource getFirstSubAwardFundingSource() {
-        return subAwardFundingSourceList.get(0);
-    }
-
-    public Award getFirstFundingSourceAward() {
-        return (getFirstSubAwardFundingSource() == null)? null : getFirstSubAwardFundingSource().getAward();
-    }
-    // KC-1025 END
-
 	/**.
 	 * This is the Getter Method for subAwardContact
 	 * @return Returns the subAwardContact.
@@ -1345,9 +1334,7 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
 
     @Override
     public String getSponsorName() {
-        // KC-1025 Prepopulate Fields in Negotiation with Subaward Information
-        Award award = getFirstFundingSourceAward();
-        return (award != null && award.getSponsorName() != null)? award.getSponsorName() : EMPTY_STRING;
+        return EMPTY_STRING;
     }
 
     @Override
@@ -1357,16 +1344,12 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
 
     @Override
     public String getPrimeSponsorName() {
-        // KC-1025 Prepopulate Fields in Negotiation with Subaward Information
-        Award award = getFirstFundingSourceAward();
-        return (award != null && award.getPrimeSponsorName() != null)? award.getPrimeSponsorName() : EMPTY_STRING;
+        return EMPTY_STRING;
     }
 
     @Override
     public String getSponsorAwardNumber() {
-        // KC-1025 Prepopulate Fields in Negotiation with Subaward Information
-        Award award = getFirstFundingSourceAward();
-        return (award != null && award.getAwardNumber() != null)? award.getAwardNumber() : EMPTY_STRING;
+        return EMPTY_STRING;
     }
 
     @Override
