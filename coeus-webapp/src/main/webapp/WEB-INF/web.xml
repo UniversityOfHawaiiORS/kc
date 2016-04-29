@@ -82,8 +82,13 @@
 
     <filter>
         <filter-name>UserLoginFilter</filter-name>
-		<!-- UH Changes: KC-203: Use a custom UserLoginFilter. -->
-		<filter-class>edu.hawaii.rice.kew.web.UhKcUserLoginFilter</filter-class>
+	    <!-- UH Changes: KC-203: Use a custom UserLoginFilter. -->
+        <!-- KC-1363 KC failing to load users into Core Auth
+            Change back to this class and modify kc-config.xml for CAS Authorization
+             <filter-class>edu.hawaii.rice.kew.web.UhKcUserLoginFilter</filter-class>
+        -->
+        <!-- KC-1390 KC needs to convert to CORE Auth for COI release -->
+        <filter-class>edu.hawaii.rice.kew.web.UhKcAuthServiceUserLoginFilter</filter-class>
         <!-- Override with UH Login Filter NOTE: in KC 6.0 1512.93 the changed from UserLoginFilter to AuthServiceUserLoginFilter so we may need to do some work here for 1512
         <filter-class>org.kuali.coeus.sys.framework.auth.AuthServiceUserLoginFilter</filter-class>
         -->
