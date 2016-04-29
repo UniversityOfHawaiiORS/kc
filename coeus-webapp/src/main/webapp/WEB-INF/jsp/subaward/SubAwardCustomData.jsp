@@ -38,8 +38,9 @@
 		<kra:shortUrl shortUrl="${KualiForm.shortUrl}"/>
 		<kul:help parameterNamespace="KC-SUBAWARD" parameterDetailType="Document" parameterName="subAwardCustomDataHelpUrl" altText="help"/>
 	</div>
-	
-	<kra-customdata:customDataTab/>	
+	<%-- KC-1374 Default Subaward Custom Data tab Expanded --%>
+	<c:set var="uhOpenTab" value="true" scope="request" />
+	<kra-customdata:customDataTab/>
 	<c:choose>
 	<c:when test="${not KualiForm.editingMode['viewOnly']}">
 		<kul:documentControls transactionalDocument="true" suppressRoutingControls="true" suppressCancelButton="true" />
