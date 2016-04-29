@@ -895,6 +895,7 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
 
     // KC-1025 Prepopulate Fields in Negotiation with Subaward Information
     public SubAwardFundingSource getFirstSubAwardFundingSource() {
+        if (subAwardFundingSourceList.isEmpty()) return null;
         return subAwardFundingSourceList.get(0);
     }
 
