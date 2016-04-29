@@ -133,13 +133,19 @@
 		        	<kul:htmlAttributeLabel attributeEntry="${negotiationAttributes.negotiationAssociationTypeId}" />
 		        </div></th>
                 <td>
-                
-                	<kul:htmlControlAttribute property="document.negotiationList[0].negotiationAssociationTypeId" 
+                    <%-- KC-1214 Lock negotiation association type for Award and Subaward --%>
+					<%--
+
+                	<kul:htmlControlAttribute property="document.negotiationList[0].negotiationAssociationTypeId"
                 		attributeEntry="${negotiationAttributes.negotiationAssociationTypeId}" readOnly="${readOnly}"
                 		onchange="getElementsByName('methodToCall.changeAssociation')[0].click();"/>                		
                 		<html:image property="methodToCall.changeAssociation"
 					src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' styleClass="tinybutton" style="display:none"/>
-					
+
+					--%>
+
+                    <c:out value="${KualiForm.document.negotiationList[0].negotiationAssociationType.description}"/>
+                    <%-- KC-1214 END --%>
                 </td>
                 <th>
                 	<div align="right">
