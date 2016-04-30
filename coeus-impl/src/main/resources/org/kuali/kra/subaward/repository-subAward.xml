@@ -142,6 +142,8 @@
         <field-descriptor name="fileDataId" column="FILE_DATA_ID" jdbc-type="VARCHAR"/>
         <field-descriptor name="versionNumber" column="VER_NBR" jdbc-type="BIGINT" locking="true" />
         <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+        <!-- KC-1364 Bring in BU contributions - Transaction Type -->
+        <field-descriptor name="transactionTypeCode" column="TRANSACTION_TYPE_CODE" jdbc-type="VARCHAR" />
 
 		<reference-descriptor name="subAward" class-ref="org.kuali.kra.subaward.bo.SubAward" auto-retrieve="true" auto-update="none" auto-delete="none">
 			<foreignkey field-ref="subAwardId" />

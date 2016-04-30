@@ -45,6 +45,8 @@
 		        <ref bean="SubAwardAmountInfo-modificationID" />
 		        <ref bean="SubAwardAmountInfo-periodofPerformanceStartDate" />
 		        <ref bean="SubAwardAmountInfo-periodofPerformanceEndDate" />
+                <!-- KC-1364 Bring in BU contributions - Transaction Type -->
+                <ref bean="SubAwardAmountInfo-transactionTypeCode" />
 		      </list>
 		    </property>
  		 </bean>
@@ -352,10 +354,33 @@
     <property name="summary" value="Period of Performance End Date" />
     <property name="description" value="Period of Performance End Date" />    
   </bean>
-  
- <bean id="SubAwardAmountInfo-versionNumber" parent="SubAwardAmountInfo-versionNumber-parentBean" />
+
+  <!-- KC-1364 Bring in BU contributions - Transaction Type -->
+  <bean id="SubAwardAmountInfo-transactionTypeCode" parent="SubAwardAmountInfo-transactionTypeCode-parentBean" />
+
+  <bean id="SubAwardAmountInfo-transactionTypeCode-parentBean" parent="AttributeDefinition">
+    <property name="name" value="transactionTypeCode"/>
+    <property name="forceUppercase" value="false"/>
+    <property name="label" value="Transaction Type"/>
+    <property name="shortLabel" value="Transaction Type"/>
+    <property name="maxLength" value="25"/>
+    <property name="validationPattern">
+      <bean parent="AlphaNumericValidationPattern" p:allowWhitespace="true"/>
+    </property>
+    <property name="control">
+      <bean parent="SelectControlDefinition"
+            p:valuesFinderClass="edu.hawaii.subaward.SubawardTransactionTypeValuesFinder"/>
+    </property>
+    <property name="summary" value="Transaction Type"/>
+    <property name="description" value="Transaction Type "/>
+    <property name="required" value="true"/>
+  </bean>
+  <!-- KC-1364 END -->
+
+
+  <bean id="SubAwardAmountInfo-versionNumber" parent="SubAwardAmountInfo-versionNumber-parentBean" />
   <bean id="SubAwardAmountInfo-versionNumber-parentBean" abstract="true" parent="AttributeReferenceDummy-versionNumber"/>
- <!-- Business Object Inquiry Definition -->
+  <!-- Business Object Inquiry Definition -->
  <bean id="SubAwardAmountInfo-inquiryDefinition" parent="SubAwardAmountInfo-inquiryDefinition-parentBean" />
   <bean id="SubAwardAmountInfo-InquiryView" parent="SubAwardAmountInfo-InquiryView-parentBean"/>
   <bean id="SubAwardAmountInfo-inquiryDefinition-parentBean" abstract="true" parent="InquiryDefinition">

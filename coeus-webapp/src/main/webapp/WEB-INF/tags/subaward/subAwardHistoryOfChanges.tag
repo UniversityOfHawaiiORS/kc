@@ -99,8 +99,8 @@
             </tr>
               <c:if test="${readOnly!='true'}">
             <tr>
-    
-    				<th class="infoline" rowspan="4">
+					<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+    				<th class="infoline" rowspan="5">
 						Add:
 					</th>
 					
@@ -123,8 +123,8 @@
                 	<html:file property="newSubAwardAmountInfo.newFile"  />
                 	</c:if>
                 </td>
-   				 				
-   				<td class="infoline" rowspan="4"><div align="center">
+				<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+   				<td class="infoline" rowspan="5"><div align="center">
    					<c:if test="${readOnly!='true'}">
 						<html:image property="methodToCall.addAmountInfo.anchor${tabKey}" 
 						            src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' 
@@ -138,11 +138,11 @@
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" /></div></th>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationID}" /></div></th>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceStartDate}" /></div></th>
-            <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" /></div></th>                          
+            <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" /></div></th>
             </tr>
             
             <tr>
-            <td><div align="center">
+                <td><div align="center">
      					<kul:htmlControlAttribute property="newSubAwardAmountInfo.modificationEffectiveDate" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" datePicker="true"/>           
    					</div> 
    				</td>
@@ -161,25 +161,36 @@
      					<kul:htmlControlAttribute property="newSubAwardAmountInfo.periodofPerformanceEndDate" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" datePicker="true"/>           
    					</div> 
    				</td> 
-   				</tr>
-   				
-        	<tr>				
-				<th><div align="right"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.comments}" /></div></th>
+			</tr>
+			<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+			<tr>
+				<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}" /></div></th>
+				<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.comments}" /></div></th>
+			</tr>
+			<tr>
+				<td>
+				     <kul:htmlControlAttribute property="newSubAwardAmountInfo.transactionTypeCode" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}" />
+				</td>
                 <td colspan="3">
                       <kul:htmlControlAttribute property="newSubAwardAmountInfo.comments" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.comments}" />
                 </td>
-            </tr>     
+            </tr>
+			<%-- KC-1364 End --%>
    			</c:if>
    			</tbody>
    			<c:forEach var="amountInfo" items="${KualiForm.document.subAwardList[0].historicalAmountInfos}" varStatus="status">
+				    <%-- KC-1358 Subaward History of Changes ranking order (added indexDisplayOffset so second set starts at correct number) --%>
 					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}" 
 						amountInfoPath="document.subAwardList[0].historicalAmountInfos[${status.index}]" 
-						index="${status.index}" readOnly="true" currentTabIndex="${currentTabIndex }" formAction="${action}"/>
+						index="${status.index}" readOnly="true" currentTabIndex="${currentTabIndex }" formAction="${action}"
+						indexDisplayOffset="0"/>
+				    <c:set var="offset" value="${status.index+1}"/>
         	</c:forEach>
         	<c:forEach var="amountInfo" items="${KualiForm.document.subAwardList[0].subAwardAmountInfoList}" varStatus="status">
 					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}" 
-						amountInfoPath="document.subAwardList[0].subAwardAmountInfoList[${status.index}]" 
-						index="${status.index}" readOnly="${readOnly}" currentTabIndex="${currentTabIndex }" formAction="${action}"/>
+						amountInfoPath="document.subAwardList[0].subAwardAmountInfoList[${status.index}]"
+						index="${status.index}" readOnly="${readOnly}" currentTabIndex="${currentTabIndex }" formAction="${action}"
+					    indexDisplayOffset="${offset}"/>
         	</c:forEach>
         </table>
     </div>

@@ -22,12 +22,26 @@
 <%@ attribute name="amountInfo" required="true" type="org.kuali.kra.subaward.bo.SubAwardAmountInfo" %>
 <%@ attribute name="amountInfoPath" required="true" %>
 <%@ attribute name="index" required="true" %>
+<%-- KC-1358 Subaward History of Changes ranking order --%>
+<%@ attribute name="indexDisplayOffset" required="true" %>
 <%@ attribute name="currentTabIndex" required="true" %>
 <%@ attribute name="readOnly" required="true" %>
 <%@ attribute name="formAction" required="true" %>
 
+<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
 <tr>
-	<th width="9%" class="infoline" rowspan="3"><c:out value="${index+1}" /></th>
+	<%-- KC-1358 Subaward History of Changes ranking order --%>
+	<th width="9%" class="infoline" rowspan="6"><c:out value="${index+1+indexDisplayOffset}" /></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.effectiveDate}" /></div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.obligatedChange}" /></div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.anticipatedChange}" /></div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.fileName}" /></div></th>
+	<%-- <c:if test="${canModify}">  --%>
+	<kul:htmlAttributeHeaderCell literalLabel="Actions" scope="col"/>
+	<%-- </c:if> --%>
+</tr>
+<%-- KC-1364 End --%>
+<tr>
 	<td width="9%" valign="middle">
 		<div align="center">
 			<kul:htmlControlAttribute property="${amountInfoPath}.effectiveDate"
@@ -68,35 +82,44 @@
 			</div>
 		</c:if>
 	</td>
-	<td width="10%" valign="middle" rowspan="3">
+	<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+	<td width="10%" valign="middle" rowspan="5">
 		<div align="center">Attachment Actions :</div>
 		<br></br>
 		<div align="center">
 			<c:if test="${amountInfo.fileName!=null}">
 				<html:image
-					styleId="downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}"
-					property="methodToCall.downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}.anchor${currentTabIndex}"
-					src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif'
-					styleClass="tinybutton"
-					onclick="javascript: openNewWindow('${formAction}','downloadHistoryOfChangesAttachment','${amountInfo.subAwardAmountInfoId}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
+						styleId="downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}"
+						property="methodToCall.downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}.anchor${currentTabIndex}"
+						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif'
+						styleClass="tinybutton"
+						onclick="javascript: openNewWindow('${formAction}','downloadHistoryOfChangesAttachment','${amountInfo.subAwardAmountInfoId}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
 			</c:if>
 			<c:if test="${!readOnly}">
 				<html:image styleId="replaceHistoryOfChangesAttachment.line${index}"
-					onclick="javascript: showHide('fileDiv${index}','replaceDiv${index}') ; return false"
-					src='${ConfigProperties.kra.externalizable.images.url}tinybutton-replace.gif'
-					styleClass="tinybutton"
-					property="methodToCall.replaceNarrativeAttachment.line${index}.anchor${currentTabIndex};return false" />
+							onclick="javascript: showHide('fileDiv${index}','replaceDiv${index}') ; return false"
+							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-replace.gif'
+							styleClass="tinybutton"
+							property="methodToCall.replaceNarrativeAttachment.line${index}.anchor${currentTabIndex};return false" />
 				<c:if test="${amountInfo.fileName!=null}">
 					<html:image
-						property="methodToCall.deleteAmountInfo.line${index}.anchor${currentTabIndex}"
-						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif'
-						styleClass="tinybutton" />
+							property="methodToCall.deleteAmountInfo.line${index}.anchor${currentTabIndex}"
+							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif'
+							styleClass="tinybutton" />
 				</c:if>
 			</c:if>
 			<c:if test="${readOnly}">&nbsp;</c:if>
 		</div>
 	</td>
 </tr>
+<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+<tr>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" /></div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationID}" /></div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceStartDate}" /></div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" /></div></th>
+</tr>
+<%-- KC-1364 End --%>
 <tr>
 	<td width="9%" valign="middle">
 		<div align="center">
@@ -130,13 +153,19 @@
 		</div>
 	</td>
 </tr>
+<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
 <tr>
-	<th><div align="right">
-			<kul:htmlAttributeLabel
-				attributeEntry="${subAwardAmountInfoAttributes.comments}" />
-		</div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}" /></div></th>
+	<th colspan="3"><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.comments}" /></div></th>
+</tr>
+<tr>
+	<td><kul:htmlControlAttribute
+			property="${amountInfoPath}.transactionTypeCode"
+			attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}"
+			readOnly="${readOnly}" /></td>
 	<td colspan="3"><kul:htmlControlAttribute
 			property="${amountInfoPath}.comments"
 			attributeEntry="${subAwardAmountInfoAttributes.comments}"
 			readOnly="${readOnly}" /></td>
 </tr>
+<%-- KC-1364 End --%>
