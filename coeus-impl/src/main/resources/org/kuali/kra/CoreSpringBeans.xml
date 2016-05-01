@@ -650,6 +650,7 @@
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardReportType.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardStatus.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubawardTemplateType.xml</value>
+                <value>classpath:org/kuali/kra/datadictionary/SubAwardTransactionType.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubcontractingExpenditureCategoryAmountsInDateRange.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/docs/SubAwardTemplateInfo.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/SubAwardReports.xml</value>
@@ -928,6 +929,7 @@
                 <value>classpath:org/kuali/kra/datadictionary/docs/SubAwardReportTypeMaintenanceDocument.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/docs/SubAwardStatusMaintenanceDocument.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/docs/SubAwardTemplateTypeMaintenanceDocument.xml</value>
+                <value>classpath:org/kuali/kra/datadictionary/docs/SubAwardTransactionTypeMaintenanceDocument.xml</value>
                 <value>classpath:org/kuali/coeus/common/budget/impl/personnel/TbnPersonMaintenanceDocument.xml</value>
                 <value>classpath:org/kuali/kra/datadictionary/docs/TrainingMaintenanceDocument.xml</value>
                 <value>classpath:org/kuali/coeus/common/budget/impl/rate/TrainingStipendRateMaintenanceDocument.xml</value>

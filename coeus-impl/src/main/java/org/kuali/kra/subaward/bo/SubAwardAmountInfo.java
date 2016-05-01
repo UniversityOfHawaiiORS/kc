@@ -89,6 +89,7 @@ public class SubAwardAmountInfo extends KcPersistableBusinessObjectBase implemen
 
     /* KC-1364 Bring in BU contributions - Transaction Type */
     private String transactionTypeCode;
+    private SubAwardTransactionType subAwardTransactionType;
     
     /**
      * the SubAwardAmountInfo constructor.
@@ -391,6 +392,15 @@ public class SubAwardAmountInfo extends KcPersistableBusinessObjectBase implemen
     public void setTransactionTypeCode(String transactionTypeCode) {
         this.transactionTypeCode = transactionTypeCode;
     }
+
+    public SubAwardTransactionType getSubAwardTransactionType() {
+        return subAwardTransactionType;
+    }
+
+    public void setSubAwardTransactionType(SubAwardTransactionType subAwardTransactionType) {
+        this.subAwardTransactionType = subAwardTransactionType;
+    }
+
     /* KC-1364 End */
 
     /**

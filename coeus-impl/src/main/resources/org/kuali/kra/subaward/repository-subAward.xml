@@ -144,11 +144,25 @@
         <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
         <!-- KC-1364 Bring in BU contributions - Transaction Type -->
         <field-descriptor name="transactionTypeCode" column="TRANSACTION_TYPE_CODE" jdbc-type="VARCHAR" />
+        <reference-descriptor name="subAwardTransactionType" class-ref="org.kuali.kra.subaward.bo.SubAwardTransactionType" auto-retrieve="true" auto-update="none" auto-delete="none">
+            <foreignkey field-ref="transactionTypeCode"/>
+        </reference-descriptor>
+        <!-- KC-1364 End -->
 
 		<reference-descriptor name="subAward" class-ref="org.kuali.kra.subaward.bo.SubAward" auto-retrieve="true" auto-update="none" auto-delete="none">
 			<foreignkey field-ref="subAwardId" />
 		</reference-descriptor>
     </class-descriptor>
+
+    <!-- KC-1364 Bring in BU contributions - Transaction Type -->
+    <class-descriptor class="org.kuali.kra.subaward.bo.SubAwardTransactionType" table="SUBAWARD_TRANSACTION_TYPE">
+        <field-descriptor name="transactionTypeCode" column="TRANSACTION_TYPE_CODE" jdbc-type="VARCHAR" primarykey="true" />
+        <field-descriptor name="transactionTypeDescription" column="DESCRIPTION" jdbc-type="VARCHAR" />
+        <field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
+        <field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
+        <field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />
+    </class-descriptor>
+    <!-- KC-1364 End -->
     
     <class-descriptor class="org.kuali.kra.subaward.bo.SubAwardAmountReleased" table="SUBAWARD_AMT_RELEASED">
         <field-descriptor name="subAwardAmtReleasedId" column="SUBAWARD_AMT_RELEASED_ID" jdbc-type="INTEGER" primarykey="true"  autoincrement="true"  sequence-name="SUBAWARD_AMT_REL_ID_S"/>

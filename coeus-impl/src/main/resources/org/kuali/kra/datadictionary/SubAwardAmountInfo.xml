@@ -368,8 +368,13 @@
       <bean parent="AlphaNumericValidationPattern" p:allowWhitespace="true"/>
     </property>
     <property name="control">
-      <bean parent="SelectControlDefinition"
-            p:valuesFinderClass="edu.hawaii.subaward.SubawardTransactionTypeValuesFinder"/>
+        <bean parent="SelectControlDefinition"
+              p:businessObjectClass="org.kuali.kra.subaward.bo.SubAwardTransactionType"
+              p:valuesFinderClass="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
+              p:includeKeyInLabel="false"
+              p:includeBlankRow="false"
+              p:keyAttribute="transactionTypeCode"
+              p:labelAttribute="transactionTypeDescription" />
     </property>
     <property name="summary" value="Transaction Type"/>
     <property name="description" value="Transaction Type "/>

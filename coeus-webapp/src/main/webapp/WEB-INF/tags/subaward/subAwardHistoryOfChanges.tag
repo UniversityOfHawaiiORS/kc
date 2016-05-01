@@ -86,9 +86,13 @@
         </h3>
          
    <table cellpadding=0 cellspacing=0 summary="">
-       		<tbody class="addline">            
+       		<tbody class="addline">
+			<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+			<c:if test="${readOnly!='true'}">
             <tr>
-              <th><div align="left">&nbsp;</div></th> 
+				<th class="infoline" rowspan="6">
+					Add:
+				</th>
                <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.effectiveDate}" /></div></th>
                <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.obligatedChange}" /></div></th>
                <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.anticipatedChange}" /></div></th>
@@ -97,15 +101,8 @@
               	    <kul:htmlAttributeHeaderCell literalLabel="Actions" scope="col"/>
           	    <%-- </c:if> --%>
             </tr>
-              <c:if test="${readOnly!='true'}">
             <tr>
-					<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
-    				<th class="infoline" rowspan="5">
-						Add:
-					</th>
-					
-     			 
-     			<td><div align="center">
+    			<td><div align="center">
      					<kul:htmlControlAttribute property="newSubAwardAmountInfo.effectiveDate" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.effectiveDate}" datePicker="true"/>           
    					</div> 
    				</td>
@@ -123,7 +120,6 @@
                 	<html:file property="newSubAwardAmountInfo.newFile"  />
                 	</c:if>
                 </td>
-				<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
    				<td class="infoline" rowspan="5"><div align="center">
    					<c:if test="${readOnly!='true'}">
 						<html:image property="methodToCall.addAmountInfo.anchor${tabKey}" 
@@ -132,8 +128,8 @@
 					</c:if>
 	                </div>
 	            </td>   				
-   			</tr> 
-   			
+   			</tr>
+			<%-- KC-1364 End --%>
    			<tr>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" /></div></th>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationID}" /></div></th>
