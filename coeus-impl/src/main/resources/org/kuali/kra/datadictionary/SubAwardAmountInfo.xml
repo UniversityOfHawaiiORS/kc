@@ -370,7 +370,7 @@
     <property name="control">
         <bean parent="SelectControlDefinition"
               p:businessObjectClass="org.kuali.kra.subaward.bo.SubAwardTransactionType"
-              p:valuesFinderClass="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
+              p:valuesFinderClass="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinderNumericKeySort"
               p:includeKeyInLabel="false"
               p:includeBlankRow="false"
               p:keyAttribute="transactionTypeCode"

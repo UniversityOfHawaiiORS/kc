@@ -5,9 +5,9 @@ spool KC-1364.sql.log
 
 
 alter table SUBAWARD_AMOUNT_INFO 
-add ( TRANSACTION_TYPE_CODE varchar2(4) );
+add ( TRANSACTION_TYPE_CODE varchar2(3) );
 
-update SUBAWARD_AMOUNT_INFO set TRANSACTION_TYPE_CODE = 1 where TRANSACTION_TYPE_CODE is null;
+update SUBAWARD_AMOUNT_INFO set TRANSACTION_TYPE_CODE = '100' where TRANSACTION_TYPE_CODE is null;
 
 CREATE TABLE SUBAWARD_TRANSACTION_TYPE (
         TRANSACTION_TYPE_CODE VARCHAR2(3) NOT NULL,
@@ -24,25 +24,25 @@ PRIMARY KEY (TRANSACTION_TYPE_CODE) ;
 insert into subaward_transaction_type 
 (OBJ_ID,TRANSACTION_TYPE_CODE,DESCRIPTION,UPDATE_TIMESTAMP,UPDATE_USER)
 values
-(sys_guid(),'1','Initial',sysdate,'gouldner');
+(sys_guid(),'100','Initial',sysdate,'gouldner');
 
 insert into subaward_transaction_type 
 (OBJ_ID,TRANSACTION_TYPE_CODE,DESCRIPTION,UPDATE_TIMESTAMP,UPDATE_USER)
 values
-(sys_guid(),'2','Amendment $',sysdate,'gouldner');
+(sys_guid(),'200','Amendment $',sysdate,'gouldner');
 
 insert into subaward_transaction_type 
 (OBJ_ID,TRANSACTION_TYPE_CODE,DESCRIPTION,UPDATE_TIMESTAMP,UPDATE_USER)
 values
-(sys_guid(),'3','Amendment',sysdate,'gouldner');
+(sys_guid(),'300','Amendment',sysdate,'gouldner');
 
 insert into subaward_transaction_type 
 (OBJ_ID,TRANSACTION_TYPE_CODE,DESCRIPTION,UPDATE_TIMESTAMP,UPDATE_USER)
 values
-(sys_guid(),'4','Rebuild',sysdate,'gouldner');
+(sys_guid(),'400','Rebuild',sysdate,'gouldner');
 
 insert into subaward_transaction_type 
 (OBJ_ID,TRANSACTION_TYPE_CODE,DESCRIPTION,UPDATE_TIMESTAMP,UPDATE_USER)
 values
-
+(sys_guid(),'500','Correction',sysdate,'gouldner');
 
