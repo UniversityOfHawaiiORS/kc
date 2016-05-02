@@ -21,9 +21,7 @@
 <%@ attribute name="node" required="true" type="org.kuali.coeus.common.framework.medusa.MedusaNode"%>
   <table style="border: 1px solid rgb(147, 147, 147); padding: 0px; width: 97%; border-collapse: collapse;">
     <tr>
-      <%-- KC-1373 Medusa tabs for Award and Subaward not displaying correct info; use subAwardCode insted of subAwardId --%>
       <th colspan="4" style="border-style: solid; text-align: left; border-color: rgb(230, 230, 230) rgb(147, 147, 147) rgb(147, 147, 147); border-width: 1px; padding: 3px; border-collapse: collapse; background-color: rgb(184, 184, 184); background-image: none;">Subaward ${node.bo.subAwardCode}</th>
-      <%-- KC-1373 END --%>
     </tr>
     <tr>
       <td style="text-align: center;" colspan="4">
@@ -32,7 +30,7 @@
 	    <img title="Open Subaward" 
 	          alt="Open Subaward" style="border: medium none ;" 
 	          src="static/images/tinybutton-opensubaward.gif"/>
-	  </a>
+	  </a>      	  
       </td>
     </tr>    
     <tr>
