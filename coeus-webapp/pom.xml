@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.kuali.coeus</groupId>
         <artifactId>coeus</artifactId>
-        <version>1603.49</version>
+        <version>1604.50</version>
     </parent>
     <artifactId>coeus-webapp</artifactId>
     <packaging>war</packaging>
@@ -42,15 +42,10 @@
         <!-- tomcat properties -->
         <kc.context.path>/kc-${build.environment}</kc.context.path>
         <kc.port>8080</kc.port>
-
-        <frontend-maven-plugin.version>0.0.26</frontend-maven-plugin.version>
-        <frontend-maven-plugin.node.version>v0.12.7</frontend-maven-plugin.node.version>
-        <frontend-maven-plugin.npm.version>2.7.6</frontend-maven-plugin.npm.version>
         <jsfrontend.sources>src/main/jsfrontend</jsfrontend.sources>
         <generated.web.sources>${project.build.directory}/generated-web-sources</generated.web.sources>
         <help.web.sources>${project.build.directory}/generated-web-sources/help-web-sources</help.web.sources>
         <rice.web.sources>${project.build.directory}/generated-web-sources/rice-web-sources</rice.web.sources>
-        <jsfrontend.web.sources>${project.build.directory}/generated-web-sources/jsfrontend-web-sources</jsfrontend.web.sources>
 
         <rice.web.excludes>
             <!-- Exclude for the time being to use local file -->
@@ -70,7 +65,8 @@
             WEB-INF/tags/rice-portal/portalTabs.tag,
             kr/WEB-INF/jsp/KualiLookup.jsp,
             kr/WEB-INF/jsp/KualiMultipleValueLookup.jsp,
-            WEB-INF/tags/kr/page.tag
+            WEB-INF/tags/kr/page.tag,
+            krad/WEB-INF/ftl/lib/backdoor.ftl
         </rice.web.excludes>
 
         <rice.output.dir>${project.build.directory}/rice-server</rice.output.dir>
@@ -180,9 +176,6 @@
                         <resource>
                             <directory>${rice.web.sources}</directory>
                         </resource>
-                        <resource>
-                        	<directory>${jsfrontend.web.sources}</directory>
-                        </resource>
                     </webResources>
                 </configuration>
             </plugin>
@@ -211,6 +204,41 @@
                     <addWarDependenciesInClassloader>false</addWarDependenciesInClassloader>
                 </configuration>
             </plugin>
+        </plugins>
+    </build>
+    <profiles>
+    	<profile>
+    		<id>build-jsfrontend-node</id>
+    		<activation>
+    			<property>
+    				<name>!build-jsfrontend-node.off</name>
+    			</property>
+    		</activation>
+    		<properties>
+    		    <frontend-maven-plugin.version>0.0.26</frontend-maven-plugin.version>
+		        <frontend-maven-plugin.node.version>v0.12.7</frontend-maven-plugin.node.version>
+		        <frontend-maven-plugin.npm.version>2.7.6</frontend-maven-plugin.npm.version>
+		        <jsfrontend.web.sources>${project.build.directory}/generated-web-sources/jsfrontend-web-sources</jsfrontend.web.sources>
+    		</properties>
+    		<build>
+    			<plugins>    
+		            <plugin>
+		                <groupId>org.apache.maven.plugins</groupId>
+		                <artifactId>maven-war-plugin</artifactId>
+		                <configuration>
+		                    <webResources>
+		                        <resource>
+		                            <directory>${help.web.sources}</directory>
+		                        </resource>
+		                        <resource>
+		                            <directory>${rice.web.sources}</directory>
+		                        </resource>
+		                        <resource>
+		                        	<directory>${jsfrontend.web.sources}</directory>
+		                        </resource>
+		                    </webResources>
+		                </configuration>
+		            </plugin>
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
@@ -255,7 +283,7 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
+    	</profile>
         <profile>
             <id>clean-jsfrontend-node</id>
             <activation>
