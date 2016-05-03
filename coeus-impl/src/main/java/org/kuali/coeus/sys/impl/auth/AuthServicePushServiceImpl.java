@@ -19,11 +19,7 @@
 package org.kuali.coeus.sys.impl.auth;
 
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -36,12 +32,16 @@ import org.kuali.coeus.sys.framework.auth.AuthUser;
 import org.kuali.coeus.sys.framework.rest.AuthServiceRestUtilService;
 import org.kuali.coeus.sys.framework.rest.RestServiceConstants;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.kuali.rice.kim.api.KimConstants;
 import org.kuali.rice.kim.api.common.assignee.Assignee;
+import org.kuali.rice.kim.api.group.Group;
+import org.kuali.rice.kim.api.group.GroupMember;
 import org.kuali.rice.kim.api.group.GroupService;
 import org.kuali.rice.kim.api.identity.Person;
 import org.kuali.rice.kim.api.identity.PersonService;
 import org.kuali.rice.kim.api.permission.PermissionService;
+import org.kuali.rice.kim.api.services.KimApiServiceLocator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -98,20 +98,44 @@ public class AuthServicePushServiceImpl implements AuthServicePushService {
 	public AuthServicePushStatus pushAllUsers() {
 		AuthServicePushStatus status = new AuthServicePushStatus();
 		final List<String> admins = getAdminUsers();
-		
-		List<AuthUser> peopleToSync = getAllKIMPeople().stream()
-				.filter(person -> { return !ignoredUsers.contains(person.getPrincipalName()); })
-				.map(person -> {
-					AuthUser authUser = generateAuthUserFromKimPerson(person);
-					authUser.setRole(admins.contains(person.getPrincipalId()) ? ADMIN_ROLE : USER_ROLE);
-					return authUser;
-				}).collect(Collectors.toList());
+
+		// KC-1363 KC failing to load users into Core Auth
+		// This ridiculous line of code is impossible to debug when it goes wrong so breaking it up
+		// into reasonable code.  It's a lovely example of Java 8 stream but debugger can't step through it well.
+		// List<AuthUser> peopleToSync = getAllKIMPeople().stream(
+		//		.filter(person -> { return !ignoredUsers.contains(person.getPrincipalName()); })
+		//		.map(person -> {
+		//			AuthUser authUser = generateAuthUserFromKimPerson(person);
+		//			authUser.setRole(admins.contains(person.getPrincipalId()) ? ADMIN_ROLE : USER_ROLE);
+		//			return authUser;
+		//		}).collect(Collectors.toList());
+		List<AuthUser> peopleToSync = new ArrayList<AuthUser>();
+		List <Person> kimPersons = getAllKIMPeople();
+		// No need to filter out ignored users since we are using a Group to get users, just leave out whomever you don't want.
+
+		for (Person kimPerson : kimPersons) {
+			if (kimPerson != null) {
+				AuthUser authUser = generateAuthUserFromKimPerson(kimPerson);
+				authUser.setRole(admins.contains(kimPerson.getPrincipalId()) ? ADMIN_ROLE : USER_ROLE);
+				peopleToSync.add(authUser);
+			} else {
+				LOG.info("Ignoring null person");
+			}
+		}
+
 		status.setNumberOfUsers(peopleToSync.size());
 		Map<String, AuthUser> authPersonMap = getAllAuthServiceUsers().stream().collect(Collectors.toMap(AuthUser::getUsername,
 				Function.identity(), (v1, v2) -> v1));
 		for (AuthUser person : peopleToSync) {
 			AuthUser authServicePerson = authPersonMap.get(person.getUsername());
 			try {
+				// Fix issue that null KC email will always be different than empty CoreAuth Email
+				if (authServicePerson.getEmail() == null) {
+					authServicePerson.setEmail("");
+				}
+				// Fix issue that upper case in KC email will not match core auth email which forces lower case
+				person.setEmail(person.getEmail().toLowerCase());
+
 				if (person.isActive()) {
 					if (authServicePerson == null) {
 						addUserToAuthService(person, getOrGenerateUserPassword(person));
@@ -201,6 +225,20 @@ public class AuthServicePushServiceImpl implements AuthServicePushService {
 	}
 	
 	protected List<Person> getAllKIMPeople() {
+		String coreAuthUsersGroupName = CoreFrameworkServiceLocator
+				.getParameterService().getParameterValueAsString("KC-GEN",
+						"All", "core_auth_users_group_name");
+
+		if (coreAuthUsersGroupName != null && !coreAuthUsersGroupName.isEmpty()) {
+			List<Person> coreAuthUsers = new ArrayList<>();
+			Group coreAuthUsersGroup = getGroupService().getGroupByNamespaceCodeAndName("KC-GEN",coreAuthUsersGroupName);
+			List<String> groupMembers = getGroupService().getMemberPrincipalIds(coreAuthUsersGroup.getId());
+			for(String groupMember : groupMembers) {
+				Person member = personService.getPerson(groupMember);
+				coreAuthUsers.add(member);
+			}
+			return (coreAuthUsers);
+		}
 		return personService.findPeople(Collections.emptyMap());
 	}
 	
