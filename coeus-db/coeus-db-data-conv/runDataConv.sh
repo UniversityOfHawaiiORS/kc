@@ -1,5 +1,5 @@
 #NOTE: -cp option needs to be changed to ; delimited for running on windows : delimited for unix
-JARFILE=coeus-db-data-conv-1602.69.jar
+JARFILE=coeus-db-data-conv-1604.50.jar
 ROOT_PATH=/Users/gouldner/github/kc
 logdir="LOGDIR"
 
