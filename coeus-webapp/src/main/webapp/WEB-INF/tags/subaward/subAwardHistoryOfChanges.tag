@@ -178,15 +178,13 @@
 				    <%-- KC-1358 Subaward History of Changes ranking order (added indexDisplayOffset so second set starts at correct number) --%>
 					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}" 
 						amountInfoPath="document.subAwardList[0].historicalAmountInfos[${status.index}]" 
-						index="${status.index}" readOnly="true" currentTabIndex="${currentTabIndex }" formAction="${action}"
-						indexDisplayOffset="0"/>
+						index="${status.index}" readOnly="true" currentTabIndex="${currentTabIndex }" formAction="${action}"/>
 				    <c:set var="offset" value="${status.index+1}"/>
         	</c:forEach>
         	<c:forEach var="amountInfo" items="${KualiForm.document.subAwardList[0].subAwardAmountInfoList}" varStatus="status">
 					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}" 
 						amountInfoPath="document.subAwardList[0].subAwardAmountInfoList[${status.index}]"
-						index="${status.index}" readOnly="${readOnly}" currentTabIndex="${currentTabIndex }" formAction="${action}"
-					    indexDisplayOffset="${offset}"/>
+						index="${status.index + offset}" readOnly="${readOnly}" currentTabIndex="${currentTabIndex }" formAction="${action}"/>
         	</c:forEach>
         </table>
     </div>

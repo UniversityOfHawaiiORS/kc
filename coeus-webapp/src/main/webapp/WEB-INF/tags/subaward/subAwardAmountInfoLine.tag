@@ -22,16 +22,13 @@
 <%@ attribute name="amountInfo" required="true" type="org.kuali.kra.subaward.bo.SubAwardAmountInfo" %>
 <%@ attribute name="amountInfoPath" required="true" %>
 <%@ attribute name="index" required="true" %>
-<%-- KC-1358 Subaward History of Changes ranking order --%>
-<%@ attribute name="indexDisplayOffset" required="true" %>
 <%@ attribute name="currentTabIndex" required="true" %>
 <%@ attribute name="readOnly" required="true" %>
 <%@ attribute name="formAction" required="true" %>
 
 <%-- KC-1364 Bring in BU contributions - Transaction Type --%>
 <tr>
-	<%-- KC-1358 Subaward History of Changes ranking order --%>
-	<th width="9%" class="infoline" rowspan="6"><c:out value="${index+1+indexDisplayOffset}" /></th>
+	<th width="9%" class="infoline" rowspan="6"><c:out value="${index+1}" /></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.effectiveDate}" /></div></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.obligatedChange}" /></div></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.anticipatedChange}" /></div></th>
