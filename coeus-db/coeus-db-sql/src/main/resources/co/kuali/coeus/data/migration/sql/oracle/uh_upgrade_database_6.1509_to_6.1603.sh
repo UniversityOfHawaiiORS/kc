@@ -105,6 +105,8 @@ then
     # UH modificaitons for 1607 target release
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1021.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1364.sql
+    # KC-1403 Allow Subaward F&A rate to accept greater than or equal to 100
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1403.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
