@@ -122,8 +122,9 @@
   <bean id="SubAward-fAndARate-parentBean" abstract="true" parent="AttributeDefinition">
     <property name="name" value="fAndARate"/>
     <property name="forceUppercase" value="false" />
-    <property name="label" value="F &amp; A Rate" />
-    <property name="shortLabel" value="F &amp; A Rate" />
+    <!-- KC-1410 Add a % sign to the F&A field in Subaward -->
+    <property name="label" value="F &amp; A Rate &#40;&#37;&#41;" />
+    <property name="shortLabel" value="F &amp; A Rate &#40;&#37;&#41;" />
     <!-- KC-1403 Allow Subaward F&A rate to accept greater than or equal to 100 -->
     <property name="maxLength" value="6" />
     <property name="validationPattern" >
