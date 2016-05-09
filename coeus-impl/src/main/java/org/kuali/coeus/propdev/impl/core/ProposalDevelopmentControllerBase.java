@@ -45,7 +45,6 @@ import org.kuali.coeus.propdev.impl.person.ProposalPersonCoiIntegrationService;
 import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiography;
 import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiographyService;
 import org.kuali.coeus.propdev.impl.questionnaire.ProposalDevelopmentQuestionnaireHelper;
-import org.kuali.coeus.propdev.impl.specialreview.ProposalSpecialReview;
 import org.kuali.coeus.propdev.impl.specialreview.ProposalSpecialReviewExemption;
 import org.kuali.coeus.sys.framework.controller.KcCommonControllerService;
 import org.kuali.coeus.sys.framework.controller.UifExportControllerService;
@@ -287,7 +286,7 @@ public abstract class ProposalDevelopmentControllerBase {
              handleSponsorChange(proposalDevelopmentDocument);
              if (proposalDevelopmentDocument.getDevelopmentProposal().getS2sOpportunity() != null) {
                  handleProposalTypeChange(proposalDevelopmentDocument.getDevelopmentProposal());
-         }
+             }
          }
 
          preSave(proposalDevelopmentDocument);
@@ -361,21 +360,23 @@ public abstract class ProposalDevelopmentControllerBase {
              form.getProposalDevelopmentDocument().getDevelopmentProposal().getPropSpecialReviews().stream()
                      .filter(specialReview -> !specialReview.isLinkedToProtocol())
                      .forEach(specialReview -> form.getSpecialReviewHelper().prepareProtocolLinkViewFields(specialReview));
-                 }
-         getProjectPublisher().publishProject(getPropDevProjectRetrievalService().retrieveProject(form.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalNumber()));
-
+         }
+         final Project project = getPropDevProjectRetrievalService().retrieveProject(form.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalNumber());
+         if (project != null) {
+             getProjectPublisher().publishProject(project);
+         }
          return view;
-             }
+     }
 
     private void handleProposalTypeChange(DevelopmentProposal developmentProposal) {
         if (developmentProposal.getS2sOpportunity() != null) {
             String defaultS2sSubmissionTypeCode = getProposalTypeService().getDefaultSubmissionTypeCode(developmentProposal.getProposalTypeCode());
             developmentProposal.getS2sOpportunity().setS2sSubmissionTypeCode(defaultS2sSubmissionTypeCode);
             getDataObjectService().wrap(developmentProposal.getS2sOpportunity()).fetchRelationship("s2sSubmissionType");
-         }
-     }
+        }
+    }
 
-     public ModelAndView save(@ModelAttribute("KualiForm") DocumentFormBase form, BindingResult result,
+    public ModelAndView save(@ModelAttribute("KualiForm") DocumentFormBase form, BindingResult result,
              HttpServletRequest request, HttpServletResponse response, Class<? extends DocumentEventBase> eventClazz) throws Exception {
          ProposalDevelopmentDocumentForm pdForm = (ProposalDevelopmentDocumentForm) form;
          ProposalDevelopmentDocument proposalDevelopmentDocument = (ProposalDevelopmentDocument) pdForm.getDocument();
@@ -408,8 +409,11 @@ public abstract class ProposalDevelopmentControllerBase {
              pdForm.getProposalDevelopmentDocument().getDevelopmentProposal().getPropSpecialReviews().stream()
                      .filter(specialReview -> !specialReview.isLinkedToProtocol())
                      .forEach(specialReview -> pdForm.getSpecialReviewHelper().prepareProtocolLinkViewFields(specialReview));
-                 }
-         getProjectPublisher().publishProject(getPropDevProjectRetrievalService().retrieveProject(pdForm.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalNumber()));
+         }
+        final Project project = getPropDevProjectRetrievalService().retrieveProject(pdForm.getProposalDevelopmentDocument().getDevelopmentProposal().getProposalNumber());
+        if (project != null) {
+            getProjectPublisher().publishProject(project);
+        }
 
          return view;
      }
