@@ -130,7 +130,7 @@ public class AuthServicePushServiceImpl implements AuthServicePushService {
 			AuthUser authServicePerson = authPersonMap.get(person.getUsername());
 			try {
 				// Fix issue that null KC email will always be different than empty CoreAuth Email
-				if (authServicePerson.getEmail() == null) {
+				if (authServicePerson != null && authServicePerson.getEmail() == null) {
 					authServicePerson.setEmail("");
 				}
 				// Fix issue that upper case in KC email will not match core auth email which forces lower case
