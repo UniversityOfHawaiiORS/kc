@@ -163,4 +163,28 @@
 
                 <!-- Resource param for KRAD new for KC 6.0 -->
 		<param name="kc.resourceBundleNames">ApplicationResources,UhApplicationResources</param>
+
+                <!-- Default application rest services bas url used to set auth.base.url and coi.standalone.base.url -->
+                <!-- of not specifically overridden like we are doing below.  Setting in case other parts of the code -->
+                <!-- are still using it -->
+                <param name="application.rest.services.base.url">http://localhost:8070</param>
+
+                <!-- Core Auth Settings -->
+                <param name="auth.base.url">http://localhost:3000/</param>
+                <param name="filter.restlogin.class">org.kuali.coeus.sys.framework.auth.AuthServiceFilter</param>
+                <param name="filtermapping.restlogin.1">/*</param>
+                <param name="auth.core.enabled">true</param>
+                <!-- Core Auth communication token settings -->
+                <!-- You need to create an ADMIN user in Core Auth, generate a token for that user and enter in this parameter -->
+                <param name="auth.system.token"></param>
+
+                <!-- COI rest services config so KC can talk to COI -->
+                <!-- Note this isn't coi specific because kualico uses enginex reverse proxy -->
+                <!-- on one machine which then forwards to various services according to Terry -->
+                <!-- since we only have coi right now we can just keep everything on one machine for now. -->
+                <!-- I will need to start setting up enginex on my local machine to make this work. -->
+                <!-- for now we only have one so hard coding to coi's default port -->
+                <param name="coi.standalone.base.url">http://localhost:8070</param>
+                <param name="coi.projects.enabled">true</param>
+
 </config>
