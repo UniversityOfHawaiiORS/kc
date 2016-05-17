@@ -488,18 +488,21 @@
                 	<td>
                         <%-- KC-1025 Prepopulate Fields in Negotiation with Subaward Information --%>
                         <div id="sub.fullName.div">
-                            <c:if test="${!empty KualiForm.document.negotiationList[0].associatedNegotiable.siteInvestigatorId}">
-                                <c:if test="${!empty KualiForm.document.negotiationList[0].associatedNegotiable.rolodex}">
-                                    <c:choose>
-                                        <c:when test="${empty KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.fullName}">
-                                            <c:out value="${KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.organization}"/>
-                                        </c:when>
-                                        <c:otherwise>
-                                            <c:out value="${KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.fullName}" />
-                                        </c:otherwise>
-                                    </c:choose>
+							<%-- KC-1426 Unable to open award negotiation documents on kcdev3 --%>
+                            <c:if test="${KualiForm.document.negotiationList[0].negotiationAssociationType.description eq 'Subaward'}">
+                                <c:if test="${!empty KualiForm.document.negotiationList[0].associatedNegotiable.siteInvestigatorId}">
+                                    <c:if test="${!empty KualiForm.document.negotiationList[0].associatedNegotiable.rolodex}">
+                                        <c:choose>
+                                            <c:when test="${empty KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.fullName}">
+                                                <c:out value="${KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.organization}"/>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <c:out value="${KualiForm.document.negotiationList[0].associatedNegotiable.rolodex.fullName}" />
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </c:if>
                                 </c:if>
-                            </c:if>
+							</c:if>
                         </div>
                         <%-- KC-1025 END --%>
                 	</td>
