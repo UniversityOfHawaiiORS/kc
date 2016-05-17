@@ -173,7 +173,8 @@ public class CustomDataRule extends KcTransactionalDocumentRuleBase implements K
                 }
             } else if (DATE.equals(customAttributeDataType.getDescription())) {
                 if (attributeValue != null && !attributeValue.matches(DATE_REGEX)) {
-                    event.reportError(customAttribute, errorKey, RiceKeyConstants.ERROR_INVALID_FORMAT, customAttribute.getLabel(), attributeValue, validFormat);
+                    // KC-1377 Tax Compliance Issue Date invalid format not clear
+                    event.reportError(customAttribute, errorKey, KeyConstants.ERROR_INVALID_FORMAT_WITH_FORMAT, customAttribute.getLabel(), attributeValue, validFormat);
                     isValid = false;
                 } else {
                     try {

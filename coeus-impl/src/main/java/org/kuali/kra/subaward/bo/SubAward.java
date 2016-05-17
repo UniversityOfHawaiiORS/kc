@@ -1366,8 +1366,7 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
     @Override
     public String getSponsorAwardNumber() {
         // KC-1025 Prepopulate Fields in Negotiation with Subaward Information
-        Award award = getFirstFundingSourceAward();
-        return (award != null && award.getAwardNumber() != null)? award.getAwardNumber() : EMPTY_STRING;
+        return EMPTY_STRING;
     }
 
     @Override
