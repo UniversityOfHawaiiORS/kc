@@ -273,6 +273,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
                 <property name="items">
                     <list>
                         <bean parent="Kc-Header-Researcher-Group1" p:order="10"/>
+                        <bean parent="Kc-Header-Researcher-Group3" p:order="30"/>
                         <bean parent="Kc-Header-Researcher-Group4" p:order="40"/>
                     </list>
                 </property>
@@ -307,13 +308,12 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
 
     <!-- KC-955 Remove menu items from Researcher and Unit Tab -->
     <bean id="Kc-Header-Researcher-Group3" parent="Kc-Header-Researcher-Group3-parentBean"/>
-    <bean id="Kc-Header-Researcher-Group3-parentBean" abstract="true"
-          parent="Uif-SimpleGroup" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
+    <bean id="Kc-Header-Researcher-Group3-parentBean" abstract="true" parent="Uif-SimpleGroup" >
         <property name="items">
             <list>
                 <bean parent="Kc-Header-Researcher-COIMonolithGroup" p:order="10" p:render="@{!#ConfigProperties['coi.projects.enabled']}"/>
                 <bean parent="Kc-Header-Researcher-COIStandaloneGroup" p:order="20" p:render="@{#ConfigProperties['coi.projects.enabled']}"/>
-                <bean parent="Kc-Header-Researcher-IacucGroup" p:order="30"/>
+                <bean parent="Kc-Header-Researcher-IacucGroup" p:order="30" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}"/>
             </list>
         </property>
     </bean>
@@ -582,7 +582,7 @@ Portions of Kuali are copyrighted by other parties as described in the [link='@{
 
     <bean id="Kc-Header-Researcher-COIStandaloneGroup" parent="Kc-Header-Researcher-COIStandaloneGroup-parentBean"/>
     <bean id="Kc-Header-Researcher-COIStandaloneGroup-parentBean" abstract="true"
-          parent="Uif-MenuList" p:headerText="Conflict of Interest" p:render="@{#hasPerm('KC-GEN','uh-view-all-links')}">
+          parent="Uif-MenuList" p:headerText="Conflict of Interest">
         <property name="items">
             <list>
                 <bean parent="Uif-Link" p:href="@{#ConfigProperties['coi.standalone.base.url']}/coi" p:linkText="COI Dashboard" p:order="10"/>
@@ -932,6 +932,7 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                     <list>
                         <bean parent="Kc-Header-Unit-Group1" p:order="10"/>
                         <bean parent="Kc-Header-Unit-Group2-Uh-Modified" p:order="20"/>
+                        <bean parent="Kc-Header-Unit-CoiGroup-Uh-Modified" p:order="30"/>
                     </list>
                 </property>
             </bean>
@@ -967,6 +968,16 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
         <bean parent="Kc-Header-Unit-Group3" p:order="10" p:render="@{!#ConfigProperties['coi.projects.enabled']}"/>
         <bean parent="Kc-Header-Unit-COIStandaloneGroup" p:order="20" p:render="@{#ConfigProperties['coi.projects.enabled']}"/>
         </list>
+        </property>
+    </bean>
+
+    <bean id="Kc-Header-Unit-CoiGroup-Uh-Modified" parent="Kc-Header-Unit-CoiGroup-Uh-Modified-parentBean"/>
+    <bean id="Kc-Header-Unit-CoiGroup-Uh-Modified-parentBean" abstract="true" parent="Uif-SimpleGroup">
+        <property name="items">
+            <list>
+                <bean parent="Kc-Header-Unit-Group3" p:order="10" p:render="@{!#ConfigProperties['coi.projects.enabled']}"/>
+                <bean parent="Kc-Header-Unit-COIStandaloneGroup-Uh-Modified" p:order="20" p:render="@{#ConfigProperties['coi.projects.enabled']}"/>
+            </list>
         </property>
     </bean>
 
@@ -1296,6 +1307,19 @@ value="@{#ConfigProperties['application.url']}/kr/lookup.do?methodToCall=search&
                         </list>
                     </property>
                 </bean>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="Kc-Header-Unit-COIStandaloneGroup-Uh-Modified" parent="Kc-Header-Unit-COIStandaloneGroup-Uh-Modified-parentBean"/>
+    <bean id="Kc-Header-Unit-COIStandaloneGroup-Uh-Modified-parentBean" abstract="true" parent="Uif-MenuList"
+          p:headerText="Pre-Submission Compliance">
+        <property name="items">
+            <list>
+                <bean parent="Uif-SimpleHeaderFour" p:headerText="Conflict of Interest"
+                      p:order="5"/>
+                <bean parent="Uif-Link" p:href="@{#ConfigProperties['coi.standalone.base.url']}/coi/admin" p:linkText="COI Administrator Dashboard" p:order="10"/>
+                <bean parent="Uif-Link" p:href="@{#ConfigProperties['coi.standalone.base.url']}/coi/config" p:linkText="COI Configuration" p:order="20"/>
             </list>
         </property>
     </bean>
