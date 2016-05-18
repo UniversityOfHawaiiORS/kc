@@ -547,7 +547,17 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     	if (GlobalVariables.getMessageMap().hasNoErrors()) {
     		Negotiation negotiation = negotiationDocument.getNegotiation();
     		String awardNumber = negotiation.getAssociatedDocumentId();
-    		
+
+            // KC-1401 Subaward Memo Tool button in Negotiation fixed for Subaward
+            Negotiable doc = negotiation.getAssociatedDocument();
+            String docClass = "Award";
+            if (doc.getClass().getName().equals("org.kuali.kra.subaward.bo.SubAward")) {
+                docClass = "SubAward";
+            } else if (doc.getClass().getName().equals("org.kuali.kra.subaward.bo.Award")) {
+                docClass = "Award";
+            }
+            // END KC-1401 Subaward Memo Tool button in Negotiation fixed for Subaward
+
     	    String parameterName = (String) request.getAttribute(KRADConstants.METHOD_TO_CALL_ATTRIBUTE);
             if (StringUtils.isNotBlank(parameterName)) {
             	// KC-886 After sorting was added to negotiation activities memo tool launches with wrong code
@@ -567,7 +577,12 @@ public class NegotiationNegotiationAction extends NegotiationAction {
     		        String uh_memo_app_compose_url = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN","All", "uh_memo_app_compose_url");
     		        //  Launch Memo App URL ( add open_memo parameter and let tag file process it )
     		        ActionForward newActionForward = new ActionForward(actionForward);
-        	        String forward = newActionForward.getPath() + "?open_memo_tool=" + uh_memo_app_compose_url + "&memoToolAwardNumber=" + awardNumber + "&memoToolActivityTypeCode=" + activityTypeCode;
+        	        String forward = newActionForward.getPath()
+                                    + "?open_memo_tool=" + uh_memo_app_compose_url
+                                    + "&memoToolAwardNumber=" + awardNumber
+                                    + "&memoToolActivityTypeCode=" + activityTypeCode
+                                    // KC-1401 Subaward Memo Tool button in Negotiation fixed for Subaward
+                                    + "&docClass=" + docClass;
         	        newActionForward.setPath(forward);
     		        return newActionForward;
     		    }
