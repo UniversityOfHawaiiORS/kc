@@ -30,9 +30,10 @@
 <script type='text/javascript' src='dwr/interface/KraPersonService.js'></script>
 
 <!-- KC-822 Add send notification button and a link to launch Award Memo Tool -->
+<!-- KC-1401 Subaward Memo Tool button in Negotiation fixed for Subaward -->
 <% if (request.getParameter("open_memo_tool") != null) { %>
 <script type="text/javascript">
-    var memoOK = window.open('<%=request.getParameter("open_memo_tool")%>?awardNumber=<%=request.getParameter("memoToolAwardNumber")%>&activityTypeCode=<%=request.getParameter("memoToolActivityTypeCode")%>');
+    var memoOK = window.open('<%=request.getParameter("open_memo_tool")%>?awardNumber=<%=request.getParameter("memoToolAwardNumber")%>&docClass=<%=request.getParameter("docClass")%>&activityTypeCode=<%=request.getParameter("memoToolActivityTypeCode")%>');
     if (memoOK == null || typeof(memoOK)=='undefined') {
         alert("Sorry your browser prevented the pop-up of the Memo Tool.\nPlease disable your pop-up blocker to use the Memo Tool.\nIf you need help doing this please Contact the ORS Helpline 808-956-5198");
     }

@@ -1,0 +1,11 @@
+
+
+Versions for the dependencies are found in root pom.xml.
+
+Files in this dir with a build name (e.g. build_1603.49) list the name of the
+git repo that goes with each dependency version.
+
+Check each one out and run build.sh before running build.sh on KC.
+
+To start from IDEA configure a run/debug configuration with type "Tomcat Server" 
+
