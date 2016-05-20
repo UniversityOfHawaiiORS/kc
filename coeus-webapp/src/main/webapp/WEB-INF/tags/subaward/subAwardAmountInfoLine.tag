@@ -156,10 +156,14 @@
 	<th colspan="3"><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.comments}" /></div></th>
 </tr>
 <tr>
-	<td><kul:htmlControlAttribute
-			property="${amountInfoPath}.transactionTypeCode"
-			attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}"
-			readOnly="${readOnly}" /></td>
+	<td>
+		<div align="center">
+		    <kul:htmlControlAttribute
+			    property="${amountInfoPath}.transactionTypeCode"
+			    attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}"
+			    readOnly="${readOnly}" />
+		</div>
+	</td>
 	<td colspan="3"><kul:htmlControlAttribute
 			property="${amountInfoPath}.comments"
 			attributeEntry="${subAwardAmountInfoAttributes.comments}"
