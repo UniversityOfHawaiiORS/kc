@@ -37,34 +37,33 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.kuali.coeus.sys.framework.config.KcConfigurer;
-import org.kuali.coeus.sys.framework.controller.rest.CustomEditors.CustomSqlDateEditor;
-import org.kuali.coeus.sys.framework.controller.rest.CustomEditors.CustomSqlTimestampEditor;
 import org.kuali.coeus.sys.framework.controller.rest.audit.RestAuditLogger;
 import org.kuali.coeus.sys.framework.controller.rest.audit.RestAuditLoggerFactory;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.persistence.PersistenceVerificationService;
-import org.kuali.coeus.sys.framework.rest.DataDictionaryValidationException;
-import org.kuali.coeus.sys.framework.rest.ResourceNotFoundException;
-import org.kuali.coeus.sys.framework.rest.UnauthorizedAccessException;
-import org.kuali.coeus.sys.framework.rest.UnprocessableEntityException;
+import org.kuali.coeus.sys.framework.rest.*;
 import org.kuali.coeus.sys.framework.validation.ErrorHandlingUtilService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.kim.bo.KcKimAttributes;
 import org.kuali.rice.core.framework.config.module.ModuleConfigurer;
 import org.kuali.rice.kim.api.permission.PermissionService;
+import org.kuali.rice.krad.bo.PersistableBusinessObject;
 import org.kuali.rice.krad.data.CompoundKey;
+import org.kuali.rice.krad.data.DataObjectService;
+import org.kuali.rice.krad.data.PersistenceOption;
+import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DataDictionaryService;
 import org.kuali.rice.krad.service.DictionaryValidationService;
 import org.kuali.rice.krad.service.LegacyDataAdapter;
 import org.kuali.rice.krad.util.MessageMap;
 import org.springframework.beans.BeanWrapper;
-import org.springframework.beans.BeanWrapperImpl;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.BeanNameAware;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Required;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
@@ -87,7 +86,15 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	@Autowired
 	@Qualifier("legacyDataAdapter")
 	private LegacyDataAdapter legacyDataAdapter;
-	
+
+	@Autowired
+	@Qualifier("businessObjectService")
+	private BusinessObjectService businessObjectService;
+
+	@Autowired
+	@Qualifier("dataObjectService")
+	private DataObjectService dataObjectService;
+
 	@Autowired
 	@Qualifier("permissionService")
 	private PermissionService permissionService;
@@ -103,7 +110,6 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	@Autowired
 	@Qualifier("errorHandlingUtilService")
 	private ErrorHandlingUtilService errorHandlingUtilService;
-	
 	@Autowired
 	@Qualifier("persistenceVerificationService")
 	private PersistenceVerificationService persistenceVerificationService;
@@ -120,8 +126,21 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	@Qualifier("dataDictionaryService")
 	private DataDictionaryService dataDictionaryService;
 
-	@Value("classpath:org/kuali/coeus/sys/framework/controller/rest/SimpleCrudRestControllerBlueprintTemplate.md")
-	private Resource blueprintTemplate;
+	@Autowired
+	@Qualifier("restBeanWrapperFactory")
+	private RestBeanWrapperFactory restBeanWrapperFactory;
+
+	@Value("classpath:org/kuali/coeus/sys/framework/controller/rest/SimpleCrudRestControllerBlueprintTemplateGet.md")
+	private Resource blueprintTemplateGet;
+
+	@Value("classpath:org/kuali/coeus/sys/framework/controller/rest/SimpleCrudRestControllerBlueprintTemplatePut.md")
+	private Resource blueprintTemplatePut;
+
+	@Value("classpath:org/kuali/coeus/sys/framework/controller/rest/SimpleCrudRestControllerBlueprintTemplatePost.md")
+	private Resource blueprintTemplatePost;
+
+	@Value("classpath:org/kuali/coeus/sys/framework/controller/rest/SimpleCrudRestControllerBlueprintTemplateDelete.md")
+	private Resource blueprintTemplateDelete;
 
 	//this is all of the module configurers for the kc monolith.  It is used to get the base servlet path for the
 	//module this bean belongs to.  Set this as object type so spring doesn't try to do special Collection wiring
@@ -153,14 +172,20 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 
 	private String camelCasePluralName;
 
+	private Set<RequestMethod> supportedMethods =
+			Stream.of(RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE)
+			.collect(Collectors.toSet());
+
 	@RequestMapping(method=RequestMethod.GET)
 	public @ResponseBody Collection<R> getAll(@RequestParam(required=false) Map<String,String> parameters) {
+		assertMethodSupported(RequestMethod.GET);
 		assertUserHasReadAccess();
 		return translateAllDataObjects(doGetAll(parameters));
 	}
 
 	@RequestMapping(method=RequestMethod.GET, params={SCHEMA_PARM})
 	public @ResponseBody Map<String, Object> getSchema() {
+		assertMethodSupported(RequestMethod.GET);
 		return getSchemaMap();
 	}
 
@@ -174,6 +199,7 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 
 	@RequestMapping(value="/{code}", method=RequestMethod.GET)
 	public @ResponseBody R get(@PathVariable String code) {
+		assertMethodSupported(RequestMethod.GET);
 		assertUserHasReadAccess();
 
 		T dataObject = getFromDataStore(code);
@@ -185,6 +211,7 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 
 	@RequestMapping(method=RequestMethod.GET, params={BLUEPRINT_PARM})
 	public @ResponseBody Resource getBlueprint(HttpServletResponse response) {
+		assertMethodSupported(RequestMethod.GET);
 
 		response.setContentType("text/markdown");
 		response.setHeader("Content-Disposition", "attachment;filename=" + CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_HYPHEN).convert(this.getCamelCasePluralName()) + ".md");
@@ -193,12 +220,24 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	}
 
 	public Resource getBlueprintResource() {
-		String templateText;
-		try {
-			templateText = IOUtils.toString(blueprintTemplate.getInputStream(), "UTF-8"); ;
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		String templateText = "";
+
+		if (isMethodSupported(RequestMethod.GET)) {
+			templateText += getTemplateAsString(getBlueprintTemplateGet());
 		}
+
+		if (isMethodSupported(RequestMethod.PUT)) {
+			templateText += getTemplateAsString(getBlueprintTemplatePut());
+		}
+
+		if (isMethodSupported(RequestMethod.POST)) {
+			templateText += getTemplateAsString(getBlueprintTemplatePost());
+		}
+
+		if (isMethodSupported(RequestMethod.DELETE)) {
+			templateText += getTemplateAsString(getBlueprintTemplateDelete());
+		}
+
 		templateText = templateText.replaceAll("\\$\\{resourceName\\}", WordUtils.capitalizeFully(CaseFormat.UPPER_CAMEL.converterTo(CaseFormat.LOWER_HYPHEN).convert(this.getCamelCasePluralName()).replaceAll("-", " ")));
 		templateText = templateText.replaceAll("\\$\\{endpoint\\}", "/" + getModuleMapping() + getPath());
 		templateText = templateText.replaceAll("\\$\\{sampleKey\\}", "(key)");
@@ -213,9 +252,18 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 		return new ByteArrayResource(templateText.getBytes(Charset.forName("UTF-8")));
 	}
 
+	protected String getTemplateAsString(Resource source) {
+		try {
+			return IOUtils.toString(source.getInputStream(), "UTF-8");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	@RequestMapping(value="/{code}", method=RequestMethod.PUT)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void update(@PathVariable String code, @Valid @RequestBody R dto) {
+		assertMethodSupported(RequestMethod.PUT);
 		assertUserHasWriteAccess();
 		T dataObject = getFromDataStore(code);
 		if (dataObject == null) {
@@ -235,6 +283,7 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	@SuppressWarnings("unchecked")
 	public void update(@Valid @RequestBody Object dto) {
+		assertMethodSupported(RequestMethod.PUT);
 		assertUserHasWriteAccess();
 
 		if (dto instanceof List) {
@@ -248,6 +297,7 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	@ResponseStatus(HttpStatus.CREATED)
 	@SuppressWarnings("unchecked")
 	public @ResponseBody Object add(@Valid @RequestBody Object dto) {
+		assertMethodSupported(RequestMethod.POST);
 		assertUserHasWriteAccess();
 
 		if (dto instanceof List) {
@@ -260,6 +310,7 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	@RequestMapping(value="/{code}", method=RequestMethod.DELETE)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void delete(@PathVariable String code) {
+		assertMethodSupported(RequestMethod.DELETE);
 		assertUserHasWriteAccess();
 		doDelete(getFromDataStore(code));
 	}
@@ -267,8 +318,19 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	@RequestMapping(method=RequestMethod.DELETE, params={ALLOW_MULTI_PARM})
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void deleteAll(@RequestParam(required=false) Map<String,String> parameters) {
+		assertMethodSupported(RequestMethod.DELETE);
 		assertUserHasWriteAccess();
 		doGetAll(parameters).stream().forEach(this::doDelete);
+	}
+
+	protected void assertMethodSupported(RequestMethod method) {
+		if (!isMethodSupported(method)) {
+			throw new NotImplementedException(method + " not supported");
+		}
+	}
+
+	protected boolean isMethodSupported(RequestMethod method) {
+		return supportedMethods.contains(method);
 	}
 
 	protected abstract R convertDataObjectToDto(T dataObject);
@@ -473,7 +535,7 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 						final Object val = translateValue(entry.getKey(), entry.getValue());
 						return entry(entry.getKey(), val);
 					} catch (TypeMismatchException e) {
-						throw new ResourceNotFoundException(e.getMessage());
+						throw new ResourceNotFoundException(e.getMessage(), e);
 					}
 				})
 				.collect(entriesToMap()) : Collections.emptyMap();
@@ -562,11 +624,19 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 	}
 
 	protected T save(T dataObject) {
-        return getLegacyDataAdapter().save(dataObject);
+        if (useDataObjectService()) {
+			return getDataObjectService().save(dataObject, PersistenceOption.FLUSH, PersistenceOption.LINK_KEYS);
+		} else {
+			return (T) getBusinessObjectService().save((PersistableBusinessObject) dataObject);
+		}
 	}
 
 	protected void delete(T dataObject) {
 		getLegacyDataAdapter().delete(dataObject);
+	}
+
+	protected boolean useDataObjectService() {
+		return getDataObjectService().supports(getDataObjectClazz());
 	}
 
 	protected void assertUserHasWriteAccess() {
@@ -657,15 +727,12 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 		}
 
 		if (isRegisterMapping() && autoRegisterMapping != null) {
-			final String path = getPath() + "*";
+			final String path = getPath() + "**";
 			autoRegisterMapping.setUrlMap(Collections.singletonMap(getPath(), this));
 			autoRegisterMapping.registerHandler(path, this);
 		}
 
-		beanWrapper = new BeanWrapperImpl(dataObjectClazz);
-        beanWrapper.registerCustomEditor(java.sql.Timestamp.class, new CustomSqlTimestampEditor());
-        beanWrapper.registerCustomEditor(java.sql.Date.class, new CustomSqlDateEditor());
-
+		beanWrapper = getRestBeanWrapperFactory().newInstance(dataObjectClazz);
     }
 
 	public PermissionService getPermissionService() {
@@ -701,6 +768,22 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 		this.legacyDataAdapter = legacyDataAdapter;
 	}
 
+	public BusinessObjectService getBusinessObjectService() {
+		return businessObjectService;
+	}
+
+	public void setBusinessObjectService(BusinessObjectService businessObjectService) {
+		this.businessObjectService = businessObjectService;
+	}
+
+	public DataObjectService getDataObjectService() {
+		return dataObjectService;
+	}
+
+	public void setDataObjectService(DataObjectService dataObjectService) {
+		this.dataObjectService = dataObjectService;
+	}
+
 	public PersistenceVerificationService getPersistenceVerificationService() {
 		return persistenceVerificationService;
 	}
@@ -714,8 +797,8 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 		return dataObjectClazz;
 	}
 
-	public void setDataObjectClazz(
-			Class<T> dataObjectClazz) {
+	@Required
+	public void setDataObjectClazz(Class<T> dataObjectClazz) {
 		this.dataObjectClazz = dataObjectClazz;
 	}
 
@@ -848,5 +931,53 @@ public abstract class SimpleCrudRestControllerBase<T, R> extends RestController 
 
 	public void setDataDictionaryService(DataDictionaryService dataDictionaryService) {
 		this.dataDictionaryService = dataDictionaryService;
+	}
+
+	public RestBeanWrapperFactory getRestBeanWrapperFactory() {
+		return restBeanWrapperFactory;
+	}
+
+	public void setRestBeanWrapperFactory(RestBeanWrapperFactory restBeanWrapperFactory) {
+		this.restBeanWrapperFactory = restBeanWrapperFactory;
+	}
+
+	public Set<RequestMethod> getSupportedMethods() {
+		return supportedMethods;
+	}
+
+	public void setSupportedMethods(Set<RequestMethod> supportedMethods) {
+		this.supportedMethods = supportedMethods;
+	}
+
+	public Resource getBlueprintTemplateGet() {
+		return blueprintTemplateGet;
+	}
+
+	public void setBlueprintTemplateGet(Resource blueprintTemplateGet) {
+		this.blueprintTemplateGet = blueprintTemplateGet;
+	}
+
+	public Resource getBlueprintTemplatePut() {
+		return blueprintTemplatePut;
+	}
+
+	public void setBlueprintTemplatePut(Resource blueprintTemplatePut) {
+		this.blueprintTemplatePut = blueprintTemplatePut;
+	}
+
+	public Resource getBlueprintTemplatePost() {
+		return blueprintTemplatePost;
+	}
+
+	public void setBlueprintTemplatePost(Resource blueprintTemplatePost) {
+		this.blueprintTemplatePost = blueprintTemplatePost;
+	}
+
+	public Resource getBlueprintTemplateDelete() {
+		return blueprintTemplateDelete;
+	}
+
+	public void setBlueprintTemplateDelete(Resource blueprintTemplateDelete) {
+		this.blueprintTemplateDelete = blueprintTemplateDelete;
 	}
 }

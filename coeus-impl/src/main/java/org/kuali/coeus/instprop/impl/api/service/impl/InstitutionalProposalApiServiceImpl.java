@@ -2,8 +2,11 @@ package org.kuali.coeus.instprop.impl.api.service.impl;
 
 import com.codiform.moo.Moo;
 import com.codiform.moo.configuration.Configuration;
-import org.apache.commons.lang3.StringUtils;
+import org.kuali.coeus.common.api.document.service.CommonApiService;
+import org.kuali.coeus.common.api.rolodex.RolodexContract;
+import org.kuali.coeus.common.api.rolodex.RolodexService;
 import org.kuali.coeus.common.framework.custom.attr.CustomAttributeDocument;
+import org.kuali.coeus.common.framework.unit.Unit;
 import org.kuali.coeus.common.framework.version.VersionStatus;
 import org.kuali.coeus.instprop.impl.api.InstitutionalProposalApiConstants;
 import org.kuali.coeus.instprop.impl.api.dto.InstitutionalProposalDto;
@@ -13,10 +16,7 @@ import org.kuali.coeus.instprop.impl.api.service.InstitutionalProposalApiService
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.rest.UnprocessableEntityException;
-import org.kuali.coeus.sys.framework.service.KcServiceLocator;
-import org.kuali.coeus.sys.framework.validation.AuditHelper;
 import org.kuali.kra.award.home.ContactRole;
-import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.institutionalproposal.contacts.*;
 import org.kuali.kra.institutionalproposal.customdata.InstitutionalProposalCustomData;
 import org.kuali.kra.institutionalproposal.document.InstitutionalProposalDocument;
@@ -24,15 +24,11 @@ import org.kuali.kra.institutionalproposal.home.InstitutionalProposal;
 import org.kuali.kra.institutionalproposal.proposallog.ProposalLog;
 import org.kuali.kra.institutionalproposal.proposallog.service.ProposalLogService;
 import org.kuali.kra.institutionalproposal.service.InstitutionalProposalService;
-import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kim.api.identity.IdentityService;
 import org.kuali.rice.kim.api.identity.entity.Entity;
-import org.kuali.rice.krad.exception.ValidationException;
-import org.kuali.rice.krad.rules.rule.event.SaveDocumentEvent;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.kuali.rice.krad.service.DocumentService;
-import org.kuali.rice.krad.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -59,6 +55,10 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
     private IdentityService identityService;
 
     @Autowired
+    @Qualifier("rolodexService")
+    private RolodexService rolodexService;
+
+    @Autowired
     @Qualifier("businessObjectService")
     private BusinessObjectService businessObjectService;
 
@@ -66,92 +66,29 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
     @Qualifier("globalVariableService")
     private GlobalVariableService globalVariableService;
 
-    public InstitutionalProposalDocument saveDocument(InstitutionalProposalDocument proposalDocument) throws WorkflowException {
-        // Rice lets you save a cancelled doc, so check status before saving.
-        final WorkflowDocument workflowDocument = proposalDocument.getDocumentHeader().getWorkflowDocument();
-        if (isDocInModifiableState(workflowDocument)) {
-            initializeCollections(proposalDocument.getInstitutionalProposal());
-            try {
-                proposalDocument.validateBusinessRules(new SaveDocumentEvent("", proposalDocument));
-                proposalDocument = (InstitutionalProposalDocument) getDocumentService().saveDocument(proposalDocument);
-            } catch (ValidationException e) {
-                String errors = getValidationErrors() + " " + e.getMessage();
-                throw new UnprocessableEntityException(errors);
-            }
-        } else {
-            throw new UnprocessableEntityException("Document " + proposalDocument.getDocumentNumber() + " with status " + workflowDocument.getStatus() +
-                " is not in a state to be saved.");
-    }
-    return proposalDocument;
-    }
-
-    public boolean isDocInModifiableState(WorkflowDocument workflowDocument) {
-        return !workflowDocument.isCanceled();
-    }
-
-    public void routeDocument(InstitutionalProposalDocument proposalDocument) throws WorkflowException {
-        List<ErrorMessage> auditErrors = getAuditErrors(proposalDocument);
-        String errorMessage = StringUtils.EMPTY;
-        for (ErrorMessage error : auditErrors) {
-            errorMessage = errorMessage + KRADUtils.getMessageText(error, false);
-        }
-        if (!errorMessage.equalsIgnoreCase(StringUtils.EMPTY)) {
-            throw new UnprocessableEntityException(errorMessage);
-        }
-        try {
-            getDocumentService().routeDocument(proposalDocument, "", new ArrayList<>());
-        } catch (Exception e) {
-            throw new UnprocessableEntityException(e.getMessage());
-        }
-    }
-
-    protected List<ErrorMessage> getAuditErrors(InstitutionalProposalDocument proposalDocument) {
-        boolean auditPassed = KcServiceLocator.getService(AuditHelper.class).auditUnconditionally(proposalDocument);
-        List<ErrorMessage> errors = new ArrayList<>();
-        if (!auditPassed) {
-            for (String key: globalVariableService.getAuditErrorMap().keySet()) {
-                AuditCluster auditCluster = globalVariableService.getAuditErrorMap().get(key);
-                if (!StringUtils.equalsIgnoreCase(auditCluster.getCategory(), Constants.AUDIT_WARNINGS)) {
-                    List<AuditError> auditErrors = auditCluster.getAuditErrorList();
-                    for (AuditError auditError : auditErrors) {
-                        ErrorMessage errorMessage = new ErrorMessage();
-                        errorMessage.setErrorKey(auditError.getMessageKey());
-                        errorMessage.setMessageParameters(auditError.getParams());
-                        errors.add(errorMessage);
-                    }
-                }
-            }
-        }
-        return errors;
-    }
-
-    public String getValidationErrors() {
-        String errors = "";
-        for (Map.Entry<String, List<ErrorMessage>> entry : globalVariableService.getMessageMap().getErrorMessages().entrySet()) {
-            for (ErrorMessage msg : entry.getValue()) {
-                errors += KRADUtils.getMessageText(msg, false);
-            }
-        }
-        return errors;
-    }
+    @Autowired
+    @Qualifier("commonApiService")
+    private CommonApiService commonApiService;
 
     public void addCustomData(InstitutionalProposal institutionalProposal, InstitutionalProposalDto institutionalProposalDto) {
         Map<String, CustomAttributeDocument> customAttributeDocuments = institutionalProposal.getInstitutionalProposalDocument().getCustomAttributeDocuments();
-        institutionalProposalDto.getInstitutionalProposalCustomDataList().stream().forEach(customDataDto -> {
-            String customAttributeId = customDataDto.getCustomAttributeId().toString();
-            String customDataValue = customDataDto.getValue();
-            InstitutionalProposalCustomData customData = new InstitutionalProposalCustomData();
-            customAttributeDocuments.keySet().stream().forEach(id -> {
-                CustomAttributeDocument customAttributeDoc = customAttributeDocuments.get(id);
-                if(customAttributeId.equalsIgnoreCase(customAttributeDoc.getCustomAttribute().getId().toString())) {
-                    customData.setCustomAttributeId(customAttributeDoc.getId());
-                    customData.setCustomAttribute(customAttributeDoc.getCustomAttribute());
-                    customData.setValue(customDataValue);
-                    customData.setInstitutionalProposal(institutionalProposal);
-                }
+        if (institutionalProposalDto.getInstitutionalProposalCustomDataList() != null) {
+            institutionalProposalDto.getInstitutionalProposalCustomDataList().stream().forEach(customDataDto -> {
+                String customAttributeId = customDataDto.getCustomAttributeId().toString();
+                String customDataValue = customDataDto.getValue();
+                InstitutionalProposalCustomData customData = new InstitutionalProposalCustomData();
+                customAttributeDocuments.keySet().stream().forEach(id -> {
+                    CustomAttributeDocument customAttributeDoc = customAttributeDocuments.get(id);
+                    if (customAttributeId.equalsIgnoreCase(customAttributeDoc.getCustomAttribute().getId().toString())) {
+                        customData.setCustomAttributeId(customAttributeDoc.getId());
+                        customData.setCustomAttribute(customAttributeDoc.getCustomAttribute());
+                        customData.setValue(customDataValue);
+                        customData.setInstitutionalProposal(institutionalProposal);
+                        institutionalProposal.getInstitutionalProposalCustomDataList().add(customData);
+                    }
+                });
             });
-            institutionalProposal.getInstitutionalProposalCustomDataList().add(customData);
-        });
+        }
     }
 
     public InstitutionalProposalDocument saveInitialProposal(InstitutionalProposal proposal, String description) throws WorkflowException {
@@ -163,11 +100,11 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
         proposal.setInstitutionalProposalCustomDataList(new ArrayList<>());
         ipDocument.getDocumentHeader().setDocumentDescription(description);
         ipDocument.setInstitutionalProposal(proposal);
-        saveDocument(ipDocument);
+        commonApiService.saveDocument(ipDocument);
         return ipDocument;
     }
 
-    protected void initializeCollections(InstitutionalProposal proposal) {
+    public void initializeCollections(InstitutionalProposal proposal) {
         if(proposal.getProjectPersons() == null) proposal.setProjectPersons(new ArrayList<>());
         if(proposal.getInstitutionalProposalCustomDataList() == null ) proposal.setInstitutionalProposalCustomDataList(new ArrayList<>());
         if(proposal.getSpecialReviews() == null ) proposal.setSpecialReviews(new ArrayList<>());
@@ -181,33 +118,31 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
         if(proposal.getProposalComments() == null) proposal.setProposalComments(new ArrayList<>());
     }
 
-    public void updateProposalLog(boolean createProposalLog, String proposalLogNumber, InstitutionalProposalDocument ipDocument) {
-        if(createProposalLog) {
-            getProposalLogService().mergeProposalLog(proposalLogNumber);
-            getProposalLogService().updateMergedInstProposal(ipDocument.getInstitutionalProposal().getProposalId(), proposalLogNumber);
-        }
+    public void updateProposalLog(String proposalLogNumber, InstitutionalProposalDocument ipDocument) {
+        getProposalLogService().mergeProposalLog(proposalLogNumber);
+        getProposalLogService().updateMergedInstProposal(ipDocument.getInstitutionalProposal().getProposalId(), proposalLogNumber);
     }
 
-    public String createProposalLog(boolean createProposalLog, InstitutionalProposalDto ipDto) {
+    public String createProposalLog(InstitutionalProposalDto ipDto, IpPersonDto ipId) {
         String proposalLogNumber = null;
-        if (createProposalLog) {
-            ProposalLog proposalLog = addProposalLog(ipDto);
-            proposalLogNumber = proposalLog.getProposalNumber();
-            getProposalLogService().promoteProposalLog(proposalLogNumber);
-        }
+        ProposalLog proposalLog = addProposalLog(ipDto, ipId);
+        proposalLogNumber = proposalLog.getProposalNumber();
+        getProposalLogService().promoteProposalLog(proposalLogNumber);
         return proposalLogNumber;
     }
 
     public void addPersons(InstitutionalProposalDocument proposalDocument, List<IpPersonDto> personDtos) {
-        personDtos.stream().forEach(personDto -> {
-            addPerson(proposalDocument, personDto);
-        });
+        if (personDtos != null) {
+            personDtos.stream().forEach(personDto -> {
+                addPerson(proposalDocument, personDto);
+            });
+        }
     }
 
     public InstitutionalProposalPerson addPerson(InstitutionalProposalDocument proposalDocument, IpPersonDto personDto) {
         InstitutionalProposal proposal = proposalDocument.getInstitutionalProposal();
-        final InstitutionalProposalPerson projectPerson = (InstitutionalProposalPerson) convertDtoToDataObject(personDto, InstitutionalProposalPerson.class);
-        validatePerson(projectPerson);
+        final InstitutionalProposalPerson projectPerson = (InstitutionalProposalPerson) commonApiService.convertObject(personDto, InstitutionalProposalPerson.class);
+        validatePersonAndRole(projectPerson);
         if(projectPerson.isPrincipalInvestigator()) {
             proposal.refreshReferenceObject("leadUnit");
             proposal.initializeDefaultPrincipalInvestigator(projectPerson);
@@ -229,18 +164,29 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
         person.setProposalNumber(proposal.getProposalNumber());
         person.setSequenceNumber(proposal.getSequenceNumber());
         person.initializeDefaultCreditSplits();
-        person.setFaculty(person.getPerson().getFacultyFlag());
+        person.setFaculty(getFacultyFlag(person));
         person.setInstitutionalProposal(proposal);
         person.setContactRoleCode(person.getRoleCode());
         person.refreshContactRole();
         if(!person.isKeyPerson()) {
             InstitutionalProposalPersonUnit ipPersonUnit = new InstitutionalProposalPersonUnit();
-            ipPersonUnit.setUnitNumber(person.getPerson().getUnit().getUnitNumber());
+            ipPersonUnit.setUnitNumber(getPersonUnit(person).getUnitNumber());
             ipPersonUnit.initializeDefaultCreditSplits();
             person.add(ipPersonUnit);
         }
         validateAndAddPerson(proposalDocument, person, proposal);
         return person;
+    }
+
+    protected Unit getPersonUnit(InstitutionalProposalPerson person) {
+        return person.getPerson() != null? person.getPerson().getUnit() : person.getRolodex().getUnit();
+    }
+
+    private Boolean getFacultyFlag(InstitutionalProposalPerson person) {
+        if (person.getPerson() != null) {
+            return person.getPerson().getFacultyFlag();
+        }
+        return Boolean.FALSE;
     }
 
     private void validateAndAddPerson(InstitutionalProposalDocument proposalDocument, InstitutionalProposalPerson person, InstitutionalProposal proposal) {
@@ -249,20 +195,40 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
         if (success) {
             proposal.add(person);
         } else {
-            String errors = getValidationErrors();
+            String errors = commonApiService.getValidationErrors();
             throw new RuntimeException(errors);
         }
     }
 
+    public void validatePersonAndRole(InstitutionalProposalPerson person) {
+        validatePerson(person);
+
+        if (!person.isInvestigator() && !person.isKeyPerson()) {
+            throw new UnprocessableEntityException("Invalid role " + person.getRoleCode() + " for person " + getId(person));
+        }
+    }
+
     public void validatePerson(InstitutionalProposalPerson person) {
-        Entity personEntity = identityService.getEntityByPrincipalId(person.getPersonId());
-        boolean validRole = person.isInvestigator() || person.isKeyPerson();
-        if (personEntity == null) {
-            throw new UnprocessableEntityException("Invalid person " + person.getPersonId());
+        Entity personEntity = null;
+        RolodexContract rolodex = null;
+        if (person.getPersonId() != null) {
+            personEntity = identityService.getEntityByPrincipalId(person.getPersonId());
         }
-        if (!validRole) {
-            throw new UnprocessableEntityException("Invalid role " + person.getRoleCode() + " for person " + person.getPersonId());
+        else {
+            rolodex = rolodexService.getRolodex(person.getRolodexId());
+            if(rolodex != null) {
+                person.setRolodexId(rolodex.getRolodexId());
+                person.setPersonId(null);
+            }
         }
+
+        if (rolodex == null && personEntity == null) {
+                throw new UnprocessableEntityException("Invalid person or rolodex for person " + getId(person));
+        }
+    }
+
+    protected String getId(InstitutionalProposalPerson person) {
+        return person.getPersonId() != null ? person.getPersonId() : person.getRolodexId().toString();
     }
 
     public ArrayList<LinkedHashMap> getProposalPersons(ArrayList<LinkedHashMap> persons, String roleCode) {
@@ -275,13 +241,28 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
         return proposalPersons;
     }
 
-    public ProposalLog addProposalLog(InstitutionalProposalDto ipDto) {
-        ProposalLogDto proposalLogDto = (ProposalLogDto) convertDtoToDataObject(ipDto, ProposalLogDto.class);
-        ProposalLog proposalLog = (ProposalLog) convertDtoToDataObject(proposalLogDto, ProposalLog.class);
+    public ProposalLog addProposalLog(InstitutionalProposalDto ipDto, IpPersonDto personDto) {
+        ProposalLogDto proposalLogDto = (ProposalLogDto) commonApiService.convertObject(ipDto, ProposalLogDto.class);
+        ProposalLog proposalLog = (ProposalLog) commonApiService.convertObject(proposalLogDto, ProposalLog.class);
+        if (ipDto.getProposalTypeCode() == null) {
+            throw new UnprocessableEntityException("Proposal type code cannot be null.");
+        }
         proposalLog.setProposalTypeCode(ipDto.getProposalTypeCode().toString());
-        proposalLog.setCreateTimestamp(new java.sql.Timestamp(ipDto.getCreateTimestamp().getTime()));
+        if (ipDto.getCreateTimestamp() != null) {
+            proposalLog.setCreateTimestamp(new java.sql.Timestamp(ipDto.getCreateTimestamp().getTime()));
+        }
         proposalLog.setLogStatus(InstitutionalProposalApiConstants.LOG_STATUS_DEFAULT);
         proposalLog.setCreateUser("admin");
+
+        if (personDto != null) {
+            final InstitutionalProposalPerson projectPerson = (InstitutionalProposalPerson) commonApiService.convertObject(personDto, InstitutionalProposalPerson.class);
+            validatePerson(projectPerson);
+            if (projectPerson.isPrincipalInvestigator()) {
+                proposalLog.setRolodexId(projectPerson.getRolodexId());
+                proposalLog.setPiId(projectPerson.getPersonId());
+            }
+        }
+        proposalLog.setProposalNumber(institutionalProposalService.getNextInstitutionalProposalNumber());
         businessObjectService.save(proposalLog);
         return proposalLog;
     }
@@ -297,21 +278,11 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
         proposal.setInstitutionalProposalDocument(ipDocument);
     }
 
-
     public void initializeCostTotals(InstitutionalProposal proposal) {
         if(proposal.getTotalDirectCostTotal() == null) proposal.setTotalDirectCostTotal(ScaleTwoDecimal.ZERO);
         if(proposal.getTotalIndirectCostInitial() == null) proposal.setTotalIndirectCostInitial(ScaleTwoDecimal.ZERO);
         if(proposal.getTotalDirectCostInitial() == null) proposal.setTotalDirectCostInitial(ScaleTwoDecimal.ZERO);
         if(proposal.getTotalIndirectCostTotal() == null) proposal.setTotalIndirectCostTotal(ScaleTwoDecimal.ZERO);
-    }
-
-    public Object convertDtoToDataObject(Object input, Class clazz) {
-        Configuration mooConfig = new Configuration();
-        mooConfig.setSourcePropertiesRequired(false);
-        Moo moo = new Moo(mooConfig);
-        Object newDataObject = getNewDataObject(clazz);
-        moo.update(input, newDataObject);
-        return newDataObject;
     }
 
     public void updateDataObjectFromDto(Object existingDataObject, Object input) {
@@ -321,13 +292,6 @@ public class InstitutionalProposalApiServiceImpl implements InstitutionalProposa
         moo.update(input, existingDataObject);
     }
 
-    public Object getNewDataObject(Class clazz) {
-        try {
-            return clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            throw new RuntimeException("cannot create new data object", e);
-        }
-    }
 
     public void initializeData(InstitutionalProposal proposal) {
         initializeCollections(proposal);
