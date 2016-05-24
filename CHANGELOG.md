@@ -1,6 +1,158 @@
 
 
 ##CURRENT
+* RESKC-1325: added error messages for several s2s generators, upgrade s2s
+  * Travis Schneeberger on Mon, 23 May 2016 16:46:24 -0400 [View Commit](../../commit/63fa79471aed80034d45fa523412c5a5534e5861)
+
+##coeus-1605.36
+* RESKC-1336: Adding tests and fixing proposal create issues.
+  * Gayathri Athreya on Mon, 23 May 2016 11:34:31 -0700 [View Commit](../../commit/ed63fe8ba3b1555696f9aeae50f793b9f739c637)
+
+##coeus-1605.35
+* RESKC-1269: update documentation
+  * Travis Schneeberger on Mon, 23 May 2016 13:08:40 -0400 [View Commit](../../commit/19636974d8b637cf03fb6bc32d6f5dcfef364173)
+* RESKC-1269: handle anonymous access fields for our rest endpoints, add required property editors, make existing property editors a little more flexible in regards to different incoming types, replace dynabean with BeanWrapper to support nested properties, abstract configuration of BeanWrapper into a service, abstract rest property editors into a spring map to replace duplication. Make supported method configurable and make all BOs with anonymous access fields read only
+  * Travis Schneeberger on Mon, 23 May 2016 13:08:13 -0400 [View Commit](../../commit/f89ee31ad943c1631dc8ff29770488f5d215f6f9)
+
+##coeus-1605.34
+* No Changes
+
+
+##coeus-1605.33
+* RESKC-1353: Change the default view when a user does not have the View Personnel Salaries permission from "0.0" to "restricted" (#1754)  * Travis Schneeberger on Fri, 20 May 2016 14:06:25 -0400 [View Commit](../../commit/4f7ea5cfc4a54ae079b88c65060e758ea52f1648)
+
+##coeus-1605.32
+* No Changes
+
+
+##coeus-1605.31
+* No Changes
+
+
+##coeus-1605.30
+* forcing JPA to flush immediately to find persistence issues.  Making the BudgetCategoryCode required in the DD as it should be.
+  * Travis Schneeberger on Wed, 18 May 2016 16:30:09 -0400 [View Commit](../../commit/6eaa645716a951155094a5cc85b5e0d787bf0925)
+* Fixing test
+  * Gayathri Athreya on Wed, 18 May 2016 13:13:26 -0700 [View Commit](../../commit/b75e32f8f537ee855e307a7987afc88663fd29e8)
+* RESKC-1202:Add rest endpoint to list proposals with person whose natural order does not match
+
+  * This endpoint will assist in identifying potential proposals whose personnel data may be unmatched based on a previous ordering bug.
+  * blackcathacker on Tue, 17 May 2016 14:24:26 -0700 [View Commit](../../commit/5dd2f2fab59433857a87b93f97522a722c2503d1)
+* RESKC-1335: Protocol document endpoints
+  * Gayathri Athreya on Thu, 12 May 2016 22:53:46 -0700 [View Commit](../../commit/22e82c2cb303c006c4e1badc0f39d1675c116260)
+* Fix random errors on IP save.
+  * Gayathri Athreya on Mon, 16 May 2016 17:33:41 -0700 [View Commit](../../commit/e0c71e41ad4d731ac76443983c052ca00d3136e3)
+* RESKC-1202:Resolve index differences between sorted list and page properties
+  * blackcathacker on Mon, 16 May 2016 17:00:34 -0700 [View Commit](../../commit/f74d92637f3e718ad9511cbcf7e7e3c8479df70b)
+* setting several sponsor fields as required.  Check to make sure a criteria is valid before looking up references
+  * Travis Schneeberger on Mon, 16 May 2016 14:29:36 -0400 [View Commit](../../commit/b1b02d1138cda8799dbbf2350933774e7f2f2e7c)
+
+##coeus-1605.29
+* No Changes
+
+
+##coeus-1605.28
+* handle date strings that are empty strings.
+  * Travis Schneeberger on Fri, 13 May 2016 20:41:58 -0400 [View Commit](../../commit/7e0cb8c41a0040ae062b5697476a98f2928e947d)
+
+##coeus-1605.27
+* RESKC-1332: change role member api to use the standard api/v1 path.  Also allow anything using SimpleCrudRestControllers to have mapped paths with subpaths
+  * Travis Schneeberger on Thu, 12 May 2016 14:15:18 -0400 [View Commit](../../commit/eb697daea5432a8408467d5811d6a2d4c554d8b6)
+
+##coeus-1605.26
+* No Changes
+
+
+##coeus-1605.25
+* No Changes
+
+
+##coeus-1605.24
+* adding custom-report-type-documents api
+  * Travis Schneeberger on Wed, 11 May 2016 17:37:50 -0400 [View Commit](../../commit/c671ef0e94f97f3003c677ceaa2208aef589deae)
+* adding organization audit accepted type api
+  * Travis Schneeberger on Wed, 11 May 2016 16:26:06 -0400 [View Commit](../../commit/60da25392df4827071fe1fa48670c3587f9a2d84)
+
+##coeus-1605.23
+* IP proposal log fixes
+  * Gayathri Athreya on Wed, 11 May 2016 11:30:50 -0700 [View Commit](../../commit/eddf6cb8d38f8106b7923f79f35dedb2a69fa400)
+
+##coeus-1605.22
+* RESKC-1248: When you create a new protocol, the PI doesn't render on the person page when the  KC-PROTOCOL/ENABLE_DISCLOSURE_STATUS_FROM_COI_MODULE is set to Y.
+  * Travis Schneeberger on Tue, 10 May 2016 16:54:05 -0400 [View Commit](../../commit/8b977cf2eb0fe600b2381befc1be471f656e917e)
+
+##coeus-1605.21
+* No Changes
+
+
+##coeus-1605.20
+* No Changes
+
+
+##coeus-1605.19
+* No Changes
+
+
+##coeus-1605.18
+* RESKC-1301:Fix problem embedded KRAD lookups and double headers in KNS portal
+  * blackcathacker on Sun, 8 May 2016 19:22:27 -0700 [View Commit](../../commit/a0c01d0190d8f9ec53936f71666dee382d8223cd)
+
+##coeus-1605.17
+* RESKC-1301:Correct for double headers using postMessage and window.location redirect
+  * blackcathacker on Fri, 6 May 2016 17:46:35 -0700 [View Commit](../../commit/fa7a01b810dd775b7ec3b06d3c38a022bbdea232)
+
+##coeus-1605.16
+* Fix proposal number error. Fix null pointer when using no custom data. Add ability to add rolodex people. (#1729)  * Gayathri Athreya on Fri, 6 May 2016 17:33:13 -0700 [View Commit](../../commit/0b6230fb0cb7488aa911aa7be838dec603ba3894)
+
+##coeus-1605.15
+* RESKC-1290:Add quartz based conversion job and api endpoint for status of conversion
+  * blackcathacker on Thu, 5 May 2016 19:31:22 -0700 [View Commit](../../commit/681a593b6ef88da7300d611247b9b969942f173f)
+* RESKC-1290:Prepare attachment file for moving attachments to central file_data
+  * blackcathacker on Thu, 5 May 2016 12:19:53 -0700 [View Commit](../../commit/575338b7911de2a4afbb3de825d675bf88591f80)
+
+##coeus-1605.14
+* RESKC-1316:Limit rest api authentication to '/api/v1/' urls
+  * blackcathacker on Fri, 6 May 2016 13:10:03 -0700 [View Commit](../../commit/691ce8d751e3c52ef6cc9ce8c23516a6a155b37c)
+
+##coeus-1605.13
+* No Changes
+
+
+##coeus-1605.12
+* RESKC-673: fix footer getting stuck in middle of page
+
+  * Losing access to some of the left-hand navigation buttons, including Delivery Info, Budget, Access, Summary/Submit, etc. when page footer floats and does not allow user to scroll past.
+  * I believe it IS happening consistently when both left nav sections that have sub sections are open; so when both Basics and Key Personnel are open and showing sub menu options.
+  * Only workaround we have identified is to keep clicking nav buttons toward the top of the list which refreshes the screen until the issue resolves.
+  * Joe Williams on Thu, 5 May 2016 14:37:28 -0500 [View Commit](../../commit/8e787e0d28c3af133b4be795105cac819637b8e7)
+
+##coeus-1605.11
+* RESKC-1308: Fix IP to Award data feed. (#1723)
+
+  * System is ignoring the parameter setting for All_Sponsor_Hierarchy_NIH_Multiple_PI = Y.
+  * While it presents and allows the user to select PI/Multiple in IP and Award, and appears to add that participant, the person is not fully saved in the record.
+  * Their section 'disappears' on the Contacts screen, but the validation for Credit Split persists if that feature is enabled.
+  * Fix must resolve the following:
+  * 1. IP should not ignore the All Sponsor PI Multiple parameter
+  * 2. Award should not ignore the All Sponsor PI Multiple parameeter
+  * 3. When IP fed as funding source to Award, system should not ignore PI Multiple.
+  * 
+  * In stage:
+  * Award created and added IP *3284 as funding source which brings in 2 contacts: PI Maher and PI/Multi Majumdar.
+  * Added required fields to save; added template.
+  * Contacts screen: found Maher as PI, but Majumdar imports as a Key Person (SHOULD BE PI/Multiple).
+  * Test 1: Actions > Submit - got validation error re: credit split not = 100.
+  * Returned to Contacts: Majumdar was no longer visible on screen. Stuck - cancelled award.
+  * Test 2: recreated the award with the same funding proposal.
+  * On Contacts: DELETED Majumdar key person. Searched and added back as PI/Multiple. Saved,
+  * Again - Majumdar info on Contact screen disappears.
+  * Cannot submit award due to persistent validation error for credit split - so the person is still in the record.  * Gayathri Athreya on Thu, 5 May 2016 12:03:47 -0700 [View Commit](../../commit/40d827095a73765ae8f2cc0c0e18b1c8a41798ea)
+
+##coeus-1605.10
+* No Changes
+
+
+##coeus-1605.9
 * making the java melody storage directory configurable.
   * Travis Schneeberger on Wed, 4 May 2016 09:38:21 -0400 [View Commit](../../commit/36c4958861f9b74e372e6eb9a5f8920c5aacd470)
 
