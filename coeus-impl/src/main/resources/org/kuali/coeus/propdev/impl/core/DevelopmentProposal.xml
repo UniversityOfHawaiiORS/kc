@@ -1147,7 +1147,11 @@
 			<list>
         <bean parent="FieldDefinition" p:attributeName="proposalNumber" p:noLookup="true"/>
 				<bean parent="FieldDefinition" p:attributeName="proposalTypeCode" />
+				<!-- KC-1431 Proposal development search not working as expected -->
+				<bean parent="FieldDefinition" p:attributeName="proposalStateTypeCode" />
+				<!-- KC-1431 Proposal development search not working as expected
 				<bean parent="FieldDefinition" p:attributeName="hierarchyAwareProposalStatus.code" />
+				-->
 				<bean parent="FieldDefinition" p:attributeName="title" />
 				<bean parent="FieldDefinition" p:attributeName="deadlineDate" />
 				<bean parent="FieldDefinition" p:attributeName="sponsorCode" />
@@ -1174,7 +1178,11 @@
                 <bean parent="FieldDefinition" p:attributeName="programAnnouncementTitle" />
                 <bean parent="FieldDefinition" p:attributeName="cfdaNumber" />
 				<bean parent="FieldDefinition" p:attributeName="proposalType.description" />
+				<!-- KC-1431 Proposal development search not working as expected -->
+				<bean parent="FieldDefinition" p:attributeName="proposalState.description" />
+				<!-- KC-1431 Proposal development search not working as expected
 				<bean parent="FieldDefinition" p:attributeName="hierarchyAwareProposalStatus.description" />
+				-->
 				<bean parent="FieldDefinition" p:attributeName="title" />
 				<bean parent="FieldDefinition" p:attributeName="sponsorCode" />
 				<bean parent="FieldDefinition" p:attributeName="sponsor.sponsorName" />
@@ -1207,7 +1215,10 @@
       <list>
         <bean p:propertyName="proposalNumber" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
         <bean p:propertyName="proposalTypeCode" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
+		<bean p:propertyName="proposalStateTypeCode" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
+		<!-- KC-1431 Proposal development search not working as expected
         <bean p:propertyName="hierarchyAwareProposalStatus.code" p:enableAutoQuickfinder="false" parent="Uif-LookupCriteriaInputField"/>
+        -->
         <bean p:propertyName="title" parent="Uif-LookupCriteriaInputField"/>
 		  <bean p:propertyName="proposalPerson" parent="Uif-LookupCriteriaInputField"
 				p:fieldLabel.labelText="Proposal Person">
@@ -1313,12 +1324,20 @@
                         p:inquiryParameters="proposalType.code:code"/>
           </property>
         </bean>
+		<bean p:propertyName="proposalState.description" parent="Uif-DataField">
+		  <property name="inquiry">
+			  <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.propdev.impl.state.ProposalState"
+					p:inquiryParameters="proposalType.code:code"/>
+		  </property>
+		</bean>
+		<!--  KC-1431 Proposal development search not working as expected
         <bean p:propertyName="hierarchyAwareProposalStatus.description" parent="Uif-DataField">
             <property name="inquiry">
                 <bean parent="Uif-Inquiry" p:dataObjectClassName="org.kuali.coeus.propdev.impl.state.ProposalState"
                       p:inquiryParameters="hierarchyAwareProposalStatus.code:code"/>
             </property>
         </bean>
+        -->
         <bean p:propertyName="title" parent="Uif-DataField"/>
         <bean p:propertyName="prevGrantsGovTrackingID" parent="Uif-DataField"/>
         <bean p:propertyName="programAnnouncementNumber" parent="Uif-DataField"/>
@@ -1385,15 +1404,15 @@
           </list>
       </property>
   </bean>
-  
+
   <bean id="AllDevelopmentProposals-LookupViewId" parent="AllDevelopmentProposals-lookupView-parentBean" />
-   <bean id="AllDevelopmentProposals-lookupView-parentBean" abstract="true" parent="DevelopmentProposal-LookupView" p:viewName="AllLookupableDevelopmentProposals-LookupViewName" 
+   <bean id="AllDevelopmentProposals-lookupView-parentBean" abstract="true" parent="DevelopmentProposal-LookupView" p:viewName="AllLookupableDevelopmentProposals-LookupViewName"
 	p:headerText="All Proposal Development Document Lookup" >
   </bean>
 
 
-<bean id="EnrouteDevelopmentProposals-LookupViewId" parent="EnrouteDevelopmentProposals-lookupView-parentBean"/>    
-<bean id="EnrouteDevelopmentProposals-lookupView-parentBean" abstract="true" parent="DevelopmentProposal-LookupView"     p:viewName="EnrouteLookupableDevelopmentProposals-LookupViewName" p:headerText="Enroute Development Proposals Lookup" 
+<bean id="EnrouteDevelopmentProposals-LookupViewId" parent="EnrouteDevelopmentProposals-lookupView-parentBean"/>
+<bean id="EnrouteDevelopmentProposals-lookupView-parentBean" abstract="true" parent="DevelopmentProposal-LookupView"     p:viewName="EnrouteLookupableDevelopmentProposals-LookupViewName" p:headerText="Enroute Development Proposals Lookup"
      p:viewHelperService="#{#getService('enrouteDevelopmentProposalLookupable')}">
      <property name="criteriaFields">
       <list>
