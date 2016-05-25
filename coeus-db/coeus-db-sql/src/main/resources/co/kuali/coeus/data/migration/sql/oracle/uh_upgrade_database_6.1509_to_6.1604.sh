@@ -106,6 +106,10 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1604_oracle_kc_rice_server_upgrade.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1604_oracle_kc_upgrade.sql
 
+    # Update to 1605.37 (Note: private repo merge so there may be more for full 1605)
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1605_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1605_oracle_kc_upgrade.sql
+
     # UH modificaitons for 1607 target release
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1021.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1363.sql
