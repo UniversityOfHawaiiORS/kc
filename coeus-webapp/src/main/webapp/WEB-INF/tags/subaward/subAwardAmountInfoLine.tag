@@ -25,10 +25,13 @@
 <%@ attribute name="currentTabIndex" required="true" %>
 <%@ attribute name="readOnly" required="true" %>
 <%@ attribute name="formAction" required="true" %>
+<%-- KC-1457 Receive STE when replacing attachment in Subaward History of Change --%>
+<%@ attribute name="indexDisplayOffset" required="true" %>
 
 <%-- KC-1364 Bring in BU contributions - Transaction Type --%>
 <tr>
-	<th width="9%" class="infoline" rowspan="6"><c:out value="${index+1}" /></th>
+    <%-- KC-1457 Receive STE when replacing attachment in Subaward History of Change --%>
+	<th width="9%" class="infoline" rowspan="6"><c:out value="${index+1+indexDisplayOffset}" /></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.effectiveDate}" /></div></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.obligatedChange}" /></div></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.anticipatedChange}" /></div></th>
