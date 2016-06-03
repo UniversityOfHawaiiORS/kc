@@ -1,0 +1,118 @@
+
+
+This build requires the new kuali core app for auth
+
+To build uh-modifications-1605.37, check out each branch and run build.sh:
+
+schemaspy: schemaspy-1508.0162-branch
+rice: uh-rice-2.5.3.1603.0003
+kc-api: kuali-coeus-api-1604.0001
+kc-s2sgen: uh-modifications-1605.0005
+
+kc: uh-modifications-1605.37
+
+
+Then, modify (or get a fresh copy of):
+~/kuali/main/mygrant/kc-config.xml 
+
+* Had to fix paths for btm2.tlog
+* Fix path for activemq-data 
+* Fix path for datasource.tm.logdir
+* Change most instances of hostname to your ip address
+* set http.port to 443
+* correct app.context.name
+* check db user/pass
+
+
+
+# core branch should be uh-modification-16.05.1
+# See README.md in root dir
+
+nvm use 4.3.x
+
+npm install
+
+npm run build_client
+
+# see script startCore.sh in root dir
+  - npm run start_dev
+
+
+# see switchCoreToCas.sh 
+# To tell core to use cas you did:
+mongo
+> use db core-development
+> db.institutions.update({ subdomain: 'kuali'}, { $set: { provider: 'cas', casServiceUrl: 'https://kcdev.ors.hawaii.edu/cas', eppn: 'ePPN' }})
+
+
+# may need to fiddle with provider to turn cas on/off
+db.institutions.update({},{$set: {"provider":"cas"}})
+db.institutions.update({},{$set: {"provider":"auth"}})
+
+
+# At this point you may want to set up apache/nginx in front of kc, core, etc.
+# I set up apache 2.4.x (production at the time is 2.2.x)
+
+# install apache
+
+# generate self signed cert 
+# mkdir /etc/apache2/ssl if needed
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
+
+enable ssl
+sudo a2enmod ssl
+
+# confirm apache is listening on 443 
+sudo vim /etc/apache2/ports.conf
+
+# configure ssl 
+sudo vim /etc/apache2/sites-available/default-ssl.conf
+
+** default-ssl changes **
+under ServerAdmin for VirtualHost_default_:443, add:
+
+ServerName 128.171.128.155:443
+
+search and correct these entries:
+
+SSLEngine on
+SSLCertificateFile /etc/apache2/ssl/apache.crt
+SSLCertificateKeyFile /etc/apache2/ssl/apache.key
+** end of default-ssl changes **
+
+# enable virtual host:
+sudo a2ensite default-ssl
+
+sudo service apache2 restart
+
+# make sure firewall is allowed 443 port traffic, add if needed (ubuntu)
+sudo ufw show added
+sudo ufw allow 443/tcp
+
+# setup up reverse proxy settings
+# copy Redirect, ProxyPass, and ProxyPassReverse entries for kc, core, coi
+# from /etc/httpd/conf.d/ssl.conf on kcdev3, to your local /etc/apache2/sites-available/default-ssl.conf
+
+sudo service apache2 reload
+
+
+# configure core
+cp core-dist/core.conf.sample core-dist/core.conf
+vim core-.conf
+
+# for local mongo instances
+MONGO_URI=mongodb://127.0.0.1/core-development
+MONGO_USER=
+MONGO_PASS=
+
+SMTP_HOST=mail.hawaii.edu
+SMTP_PORT=25
+
+# CAS_SERVER_BASE_URL is actuall the URL cas will return to after successful login
+CAS_SERVER_BASE_URL=https://128.171.128.155
+NODE_ENV=production
+
+
+
+
+

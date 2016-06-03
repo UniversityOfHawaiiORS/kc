@@ -1,4 +1,7 @@
 
+
+This build requires the new kuali core app for auth
+
 To build uh-modifications-1603.49, check out each branch and run build.sh:
 
 schemaspy: schemaspy-1508.0162-branch
