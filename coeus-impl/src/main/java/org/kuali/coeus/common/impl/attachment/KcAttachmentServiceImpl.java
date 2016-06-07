@@ -48,7 +48,8 @@ public class KcAttachmentServiceImpl implements KcAttachmentService {
 
     private static final String REPLACEMENT_CHARACTER = "_";
     //Exclude everything but numbers, alphabets, dots, hyphens and underscores
-    private static final String REGEX_TITLE_FILENAME_PATTERN = "([^0-9a-zA-Z\\.\\-_])";
+    // KC-364 remove spaces from "invalid char" check for attachments
+    private static final String REGEX_TITLE_FILENAME_PATTERN = "([^0-9 a-zA-Z\\.\\-_])";
     private static final String REGEX_TITLE_SPECIAL_CHARACTER_PATTERN = "([^\\x00-\\x7F])";
     
     /**
