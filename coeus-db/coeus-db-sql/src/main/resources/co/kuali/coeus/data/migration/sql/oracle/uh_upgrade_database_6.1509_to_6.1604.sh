@@ -118,6 +118,8 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1403.sql
     # KC-1412 Make Service Center ID a dropdown
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1412.sql
+    # KC-1447 Extend Federal Award Project Description field in Subaward to 4000 character length
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1447.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
