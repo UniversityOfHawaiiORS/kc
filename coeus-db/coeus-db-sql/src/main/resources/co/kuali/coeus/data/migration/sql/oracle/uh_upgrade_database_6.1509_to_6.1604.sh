@@ -116,6 +116,8 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1364.sql
     # KC-1403 Allow Subaward F&A rate to accept greater than or equal to 100
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1403.sql
+    # KC-1412 Make Service Center ID a dropdown
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1412.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
