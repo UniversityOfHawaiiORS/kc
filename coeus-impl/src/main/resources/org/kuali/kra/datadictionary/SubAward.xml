@@ -98,7 +98,8 @@
     <property name="forceUppercase" value="false" />
     <property name="label" value="Federal Award Project Description" />
     <property name="shortLabel" value="Federal Award Project Desc" />
-    <property name="maxLength" value="200" />
+    <!-- KC-1447 Extend Federal Award Project Description field in Subaward to 4000 character length -->
+    <property name="maxLength" value="4000" />
     <property name="validationPattern" >
       <bean parent="AnyCharacterValidationPattern" p:allowWhitespace="true" />
     </property>
