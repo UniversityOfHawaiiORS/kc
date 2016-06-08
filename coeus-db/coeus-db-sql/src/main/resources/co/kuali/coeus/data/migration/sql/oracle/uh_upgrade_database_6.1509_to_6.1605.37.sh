@@ -71,7 +71,7 @@ mkdir -p ${LOGDIR}
 
 while [ "${ans0}" != "y" ] && [ "${ans0}" != "n" ]
 do
-    read -p "Run Step 1 - upgrade to 6.1603 ? (y/n)" ans0
+    read -p "Run Step 1 - upgrade to 6.1605.37 ? (y/n)" ans0
 done
 
 if [ "${ans0}" == "y" ]
