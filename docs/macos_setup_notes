@@ -21,5 +21,12 @@ edit /etc/apache2/extra/
 	- sudo openssl rsa -in server.key -out server.key
 - add cert to truststore for java (note using server.crt created above)
 	keytool -import -alias ronsmac.ors.hawaii.edu -file server.crt -keystore {JAVA_HOME}/jre/lib/security/cacerts -storepass changeit
+- note: if bad cert is accepted in chrome here is how to remove it
+	- chrome preferences
+	- show advanced
+	- manage certificates (this opens keychain)
+        - remove bad cert
+	
+
 
 
