@@ -45,7 +45,9 @@
         <property name="items">
             <list>
                 <bean parent="Kc-LandingPage-UhGrid"/>
+                <!-- KC-1461 Remove Homepage search bar and text links
     			<bean parent="Kc-LandingPage-Links" />
+    			-->
             </list>
         </property>
     </bean>
