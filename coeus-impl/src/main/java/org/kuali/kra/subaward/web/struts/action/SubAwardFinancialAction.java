@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.kuali.coeus.dc.subaward.SubAwardAmountInfoDao;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.subaward.SubAwardForm;
@@ -39,6 +40,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.kuali.kra.infrastructure.Constants.MAPPING_BASIC;
 
@@ -147,8 +149,28 @@ public class SubAwardFinancialAction extends SubAwardAction{
            SubAwardAmountInfo subAwardAmountInfo = subAwardDocument.getSubAward().getSubAwardAmountInfoList().get(getSelectedLine(request));
            subAwardAmountInfo.populateAttachment();
            saveSubAwardAmountInfo(subAwardAmountInfo);
+           // KC-1466 Error in view attachment from History of Change (while in a saved document)
+           // SubAwardAmountInfo data is updated, but not one in the cache
+           replaceUpdatedEntryInAllSubAwardAmountInfos(subAwardDocument.getSubAward(), subAwardAmountInfo);
            return mapping.findForward(MAPPING_BASIC);
     }
+
+    // KC-1466 Error in view attachment from History of Change (while in a saved document)
+    private void replaceUpdatedEntryInAllSubAwardAmountInfos(SubAward subAward, SubAwardAmountInfo updated) {
+        List<SubAwardAmountInfo> allAmountInfo = subAward.getAllSubAwardAmountInfos();
+        long id = updated.getSubAwardAmountInfoId();
+        SubAwardAmountInfo cur = null;
+
+        for (int i = 0; i < allAmountInfo.size(); i++) {
+           cur = allAmountInfo.get(i);
+           if (cur.getSubAwardAmountInfoId() == id) {
+               allAmountInfo.set(i, updated);
+               subAward.setAllSubAwardAmountInfos(allAmountInfo);
+               return;
+           }
+        }
+    }
+    // KC-1466 END
 
     public ActionForward downloadInvoiceAttachment(ActionMapping mapping,
      ActionForm form, HttpServletRequest request,
