@@ -1,0 +1,25 @@
+Problem: SIP caues issues with oracle because DYLD_LIBRARY_PATH is ignored with SIP enabled.
+Solution: disable SIP 
+# to disable boot in recovery (command-R while tunring on machine until apple logo)
+# then open terminal from tools and type "csrutil disable"  (or enable to turn SIP back on)
+
+Problem: configuring local SSL can be tricky hear are some notes.
+Solution: https://getgrav.org/blog/mac-os-x-apache-setup-ssl (helped but not complete for latest apache version here are some differences)
+edit /etc/apache2/httpd.conf
+- Configure ServerName example ServerName ronsmac.ors.hawaii.edu:80
+- uncomment Include /private/etc/apache2/extra/httpd-ssl.conf
+- uncomment LoadModule socache_shmcb_module libexec/apache2/mod_socache_shmcb.so
+- uncomment LoadModule ssl_module libexec/apache2/mod_ssl.so
+edit /etc/apache2/extra/
+- uncomment Listen 443
+- create certificate
+	- cd /etc/apache2
+	- sudo ssh-keygen -f server.key
+	- sudo openssl req -new -key server.key -out server.csr
+		(note common name should be server name example ronsmac.ors.hawaii.edu)
+	- sudo openssl x509 -req -days 3650 -in server.csr -signkey server.key -out server.crt
+	- sudo openssl rsa -in server.key -out server.key
+- add cert to truststore for java (note using server.crt created above)
+	keytool -import -alias ronsmac.ors.hawaii.edu -file server.crt -keystore {JAVA_HOME}/jre/lib/security/cacerts -storepass changeit
+
+
