@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kuali.coeus</groupId>
     <artifactId>coeus</artifactId>
-    <version>1605.37</version>
+    <version>1606.32</version>
     <packaging>pom</packaging>
     <name>Kuali Coeus</name>
     <description>
@@ -73,6 +73,7 @@
         <commons-codec.version>1.10</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
         <commons-collections4.version>4.0</commons-collections4.version>
+        <commons-csv.version>1.4</commons-csv.version>
         <commons-fileupload.version>1.3.1</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-io.version>2.4</commons-io.version>
@@ -112,7 +113,6 @@
         <mysql.artifactId>mysql-connector-java</mysql.artifactId>
         <mysql.version>5.1.38</mysql.version>
         <mvel.version>2.2.4.Final</mvel.version>
-        <opencsv.version>2.3</opencsv.version>
         <opensaml.version>2.6.1</opensaml.version>
         <oracle.groupId>com.oracle</oracle.groupId>
         <oracle.artifactId>ojdbc7</oracle.artifactId>
@@ -626,6 +626,12 @@
             </dependency>
 
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-csv</artifactId>
+                <version>${commons-csv.version}</version>
+            </dependency>
+
+            <dependency>
                 <groupId>commons-fileupload</groupId>
                 <artifactId>commons-fileupload</artifactId>
                 <version>${commons-fileupload.version}</version>
@@ -821,12 +827,6 @@
                 <version>${ehcache.version}</version>
                 <!-- consider making this optional so it's not always shipped with kc -->
                 <scope>runtime</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>net.sf.opencsv</groupId>
-                <artifactId>opencsv</artifactId>
-                <version>${opencsv.version}</version>
             </dependency>
 
             <dependency>
@@ -1922,7 +1922,7 @@
                 <build.spring.profiles.active>grm</build.spring.profiles.active>
 
                 <rsmart.cx.token.auth.version>1507.1</rsmart.cx.token.auth.version>
-                <rsmart.hr.rest.version>1605.0003</rsmart.hr.rest.version>
+                <rsmart.hr.rest.version>1606.0003</rsmart.hr.rest.version>
                 <kc-sql.version>1601.0002</kc-sql.version>
 
                 <scm.connection>scm:git:git://github.com/kualico/kc.git</scm.connection>
@@ -2527,7 +2527,7 @@
         <connection>${scm.connection}</connection>
         <developerConnection>${scm.developerConnection}</developerConnection>
         <url>${scm.url}</url>
-        <tag>coeus-1605.37</tag>
+        <tag>coeus-1606.32</tag>
   </scm>
 
     <distributionManagement>

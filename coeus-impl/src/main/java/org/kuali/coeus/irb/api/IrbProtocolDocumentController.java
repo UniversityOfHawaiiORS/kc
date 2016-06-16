@@ -40,6 +40,7 @@ import org.kuali.kra.irb.actions.ProtocolAction;
 import org.kuali.kra.irb.actions.ProtocolActionType;
 import org.kuali.kra.irb.actions.ProtocolStatus;
 import org.kuali.kra.irb.actions.approve.ProtocolApproveService;
+import org.kuali.kra.irb.actions.delete.ProtocolDeleteService;
 import org.kuali.kra.irb.actions.expeditedapprove.ProtocolExpeditedApproveBean;
 import org.kuali.kra.irb.actions.grantexemption.ProtocolGrantExemptionBean;
 import org.kuali.kra.irb.actions.grantexemption.ProtocolGrantExemptionService;
@@ -78,7 +79,7 @@ import java.util.stream.Collectors;
 
 
 @RequestMapping(value="/api/v1/")
-@Controller("protocolDocumentController")
+@Controller("irbProtocolDocumentController")
 public class IrbProtocolDocumentController extends RestController implements  InitializingBean {
     public static final String PROTOCOL_PERSON_ROLE = "protocolPersonRole";
     public static final String ROLODEX = "rolodex";
@@ -128,6 +129,10 @@ public class IrbProtocolDocumentController extends RestController implements  In
     @Qualifier("rolodexService")
     private RolodexService rolodexService;
 
+    @Autowired
+    @Qualifier("protocolDeleteService")
+    private ProtocolDeleteService protocolDeleteService;
+
     private List<String> irbProtocolDtoProperties;
     private List<String> irbPersonDtoProperties;
     private List<String> irbProtocolActionDtoProperties;
@@ -144,8 +149,9 @@ public class IrbProtocolDocumentController extends RestController implements  In
     @ResponseStatus(value = HttpStatus.CREATED)
     @ResponseBody
     IrbProtocolDto createProtocol(@RequestBody IrbProtocolDto protocolDto) throws WorkflowException, IllegalAccessException {
-        ProtocolDocument protocolDocument = (ProtocolDocument) getDocumentService().getNewDocument(ProtocolDocument.class);
-        Protocol protocol = (Protocol) commonApiService.convertObject(protocolDto, Protocol.class);
+        commonApiService.clearErrors();
+        ProtocolDocument protocolDocument = (ProtocolDocument) documentService.getNewDocument(ProtocolDocument.class);
+        Protocol protocol = commonApiService.convertObject(protocolDto, Protocol.class);
         protocolDocument.setProtocol(protocol);
         protocol.setProtocolDocument(protocolDocument);
         protocolDocument.initialize();
@@ -155,7 +161,7 @@ public class IrbProtocolDocumentController extends RestController implements  In
         createInitialProtocolAction(protocol);
         addProtocolPersonnel(protocol, protocolDto.getProtocolPersons());
         saveDocument(protocolDocument);
-        IrbProtocolDto irbProtocolDto = (IrbProtocolDto) commonApiService.convertObject(protocolDocument.getProtocol(), IrbProtocolDto.class);
+        IrbProtocolDto irbProtocolDto = commonApiService.convertObject(protocolDocument.getProtocol(), IrbProtocolDto.class);
         irbProtocolDto.setDocNbr(protocolDocument.getDocumentNumber());
         irbProtocolDto.setStatus(protocolDocument.getProtocol().getProtocolStatusCode());
         return irbProtocolDto;
@@ -169,12 +175,14 @@ public class IrbProtocolDocumentController extends RestController implements  In
     }
 
     public void addPerson(Protocol protocol, IrbProtocolPersonDto personDto) {
-        final ProtocolPerson protocolPerson = (ProtocolPerson) commonApiService.convertObject(personDto, ProtocolPerson.class);
+        final ProtocolPerson protocolPerson = commonApiService.convertObject(personDto, ProtocolPerson.class);
         final String personId = personDto.getPersonId();
         final Integer rolodexId = personDto.getRolodexId();
         commonApiService.validatePerson(personId, rolodexId);
         if(protocolPerson.isPrincipalInvestigator()) {
-            protocolPersonnelService.addProtocolPerson(protocol, createPrincipalInvestigator(personId, rolodexId, protocol));
+            final ProtocolPersonBase principalInvestigator = createPrincipalInvestigator(personId, rolodexId, protocol);
+            principalInvestigator.setAffiliationTypeCode(protocolPerson.getAffiliationTypeCode());
+            protocolPersonnelService.addProtocolPerson(protocol, principalInvestigator);
         } else {
             protocolPerson.setPersonName(getPersonName(personId, rolodexId));
             protocolPersonnelService.addProtocolPerson(protocol, protocolPerson);
@@ -208,10 +216,10 @@ public class IrbProtocolDocumentController extends RestController implements  In
     }
 
     public void createInitialProtocolAction(Protocol protocol) {
-            protocol.getProtocolActions().clear();
-            ProtocolActionBase protocolAction = new ProtocolAction(protocol, null, ProtocolActionType.PROTOCOL_CREATED);
-            protocolAction.setComments(ProtocolActionType.PROTOCOL_CREATED);
-            protocol.getProtocolActions().add(protocolAction);
+        protocol.getProtocolActions().clear();
+        ProtocolActionBase protocolAction = new ProtocolAction(protocol, null, ProtocolActionType.PROTOCOL_CREATED);
+        protocolAction.setComments(ProtocolActionType.PROTOCOL_CREATED);
+        protocol.getProtocolActions().add(protocolAction);
     }
 
     @RequestMapping(method= RequestMethod.DELETE, value="irb-protocol-documents/{documentNumber}",
@@ -219,11 +227,12 @@ public class IrbProtocolDocumentController extends RestController implements  In
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     @ResponseBody
     void deleteProtocol(@PathVariable Long documentNumber) throws WorkflowException {
+        commonApiService.clearErrors();
         ProtocolDocument protocolDocument = getProtocolDocument(documentNumber);
         DocumentRouteHeaderValue routeHeader = routeHeaderService.getRouteHeader(protocolDocument.getDocumentHeader().getWorkflowDocument().getDocumentId());
         if (!routeHeader.getDocRouteStatus().equalsIgnoreCase(KewApiConstants.ROUTE_HEADER_CANCEL_CD)) {
             try {
-                documentService.cancelDocument(protocolDocument, "Cancelled");
+                protocolDeleteService.delete(protocolDocument.getProtocol());
             }
             catch (InvalidActionTakenException e) {
                 throw new UnprocessableEntityException("Document " + documentNumber + " is not in a state to be cancelled.", e);
@@ -236,9 +245,10 @@ public class IrbProtocolDocumentController extends RestController implements  In
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     IrbProtocolDto getProtocol(@PathVariable Long documentNumber) {
+        commonApiService.clearErrors();
         ProtocolDocument protocolDocument = getProtocolDocument(documentNumber);
         Protocol protocol = protocolDocument.getProtocol();
-        IrbProtocolDto protocolDto = (IrbProtocolDto) commonApiService.convertObject(protocol, IrbProtocolDto.class);
+        IrbProtocolDto protocolDto = commonApiService.convertObject(protocol, IrbProtocolDto.class);
         protocolDto.setDocNbr(protocolDocument.getDocumentNumber());
         protocolDto.setStatus(protocolDocument.getProtocol().getProtocolStatusCode());
         return protocolDto;
@@ -249,25 +259,28 @@ public class IrbProtocolDocumentController extends RestController implements  In
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     IrbProtocolSubmissionDto takeAction(@RequestBody IrbProtocolActionDto protocolActionDto, @PathVariable Long documentNumber) throws Exception {
+        commonApiService.clearErrors();
         ProtocolDocument protocolDocument = getProtocolDocument(documentNumber);
-
         List<ErrorMessage> errors = commonApiService.getAuditErrors(protocolDocument);
         if (errors.size() == 0) {
             String actionTypeCode = protocolActionDto.getActionCode();
             final Protocol protocol = protocolDocument.getProtocol();
             if (actionTypeCode.equalsIgnoreCase(ProtocolActionType.SUBMIT_TO_IRB)) {
                 if (protocol.getProtocolStatus().getProtocolStatusCode().equalsIgnoreCase(ProtocolStatus.IN_PROGRESS)) {
-                    ProtocolSubmitAction submitAction = (ProtocolSubmitAction) commonApiService.convertObject(protocolActionDto, ProtocolSubmitAction.class);
+                    ProtocolSubmitAction submitAction = commonApiService.convertObject(protocolActionDto, ProtocolSubmitAction.class);
                     submitAction.setNewCommitteeId(submitAction.getCommitteeId());
                     protocol.setInitialSubmissionDate(protocolActionDto.getInitialSubmissionDate());
                     protocolSubmitActionService.submitToIrbForReview(protocol, submitAction);
+                    // Submission date is auto generated on ProtocolSubmission but is not if the value != null in Protocol.java
+                    // so make them equal in this case.
+                    protocol.getProtocolSubmission().setSubmissionDate(protocol.getInitialSubmissionDate());
                     commonApiService.routeDocument(protocolDocument);
                 } else {
                     throw new UnprocessableEntityException(ACTION_ERROR_MESSAGE);
                 }
             } else if (actionTypeCode.equalsIgnoreCase(ProtocolActionType.EXPEDITE_APPROVAL)) {
                 if (protocol.getProtocolStatus().getProtocolStatusCode().equalsIgnoreCase(ProtocolStatus.SUBMITTED_TO_IRB)) {
-                    ProtocolExpeditedApproveBean approveBean = (ProtocolExpeditedApproveBean) commonApiService.convertObject(protocolActionDto, ProtocolExpeditedApproveBean.class);
+                    ProtocolExpeditedApproveBean approveBean = commonApiService.convertObject(protocolActionDto, ProtocolExpeditedApproveBean.class);
                     approveBean.setAssignToAgenda(false);
                     approveBean.setExpirationDate(protocolApproveService.buildExpirationDate(protocol, approveBean.getApprovalDate()));
                     protocolApproveService.grantExpeditedApproval(protocol, approveBean);
@@ -276,7 +289,7 @@ public class IrbProtocolDocumentController extends RestController implements  In
                 }
             } else if (actionTypeCode.equalsIgnoreCase(ProtocolActionType.GRANT_EXEMPTION)) {
                 if (protocol.getProtocolStatus().getProtocolStatusCode().equalsIgnoreCase(ProtocolStatus.SUBMITTED_TO_IRB)) {
-                    ProtocolGrantExemptionBean exemptionBean = (ProtocolGrantExemptionBean) commonApiService.convertObject(protocolActionDto, ProtocolGrantExemptionBean.class);
+                    ProtocolGrantExemptionBean exemptionBean = commonApiService.convertObject(protocolActionDto, ProtocolGrantExemptionBean.class);
                     protocolGrantExemptionService.grantExemption(protocol, exemptionBean);
                 } else {
                     throw new UnprocessableEntityException(ACTION_ERROR_MESSAGE);
@@ -287,7 +300,8 @@ public class IrbProtocolDocumentController extends RestController implements  In
             }
         }
         ProtocolSubmission protocolSubmission = protocolDocument.getProtocol().getProtocolSubmission();
-        IrbProtocolSubmissionDto submissionDto = (IrbProtocolSubmissionDto) commonApiService.convertObject(protocolSubmission, IrbProtocolSubmissionDto.class);
+        IrbProtocolSubmissionDto submissionDto = commonApiService.convertObject(protocolSubmission, IrbProtocolSubmissionDto.class);
+        submissionDto.setApprovalDate(protocolDocument.getProtocol().getApprovalDate());
         return submissionDto;
     }
 
@@ -313,14 +327,55 @@ public class IrbProtocolDocumentController extends RestController implements  In
         }
     }
 
-    public DocumentService getDocumentService() {
-        return documentService;
-    }
-
     @Override
     public void afterPropertiesSet() throws Exception {
         irbProtocolDtoProperties = getDtoProperties(IrbProtocolDto.class);
         irbPersonDtoProperties = getDtoProperties(IrbProtocolPersonDto.class);
         irbProtocolActionDtoProperties = getDtoProperties(IrbProtocolActionDto.class);
     }
+
+    public void setDocumentService(DocumentService documentService) {
+        this.documentService = documentService;
+    }
+
+    public void setProtocolNumberService(ProtocolNumberService protocolNumberService) {
+        this.protocolNumberService = protocolNumberService;
+    }
+
+    public void setProtocolPersonnelService(ProtocolPersonnelService protocolPersonnelService) {
+        this.protocolPersonnelService = protocolPersonnelService;
+    }
+
+    public void setRouteHeaderService(RouteHeaderService routeHeaderService) {
+        this.routeHeaderService = routeHeaderService;
+    }
+
+    public void setCommonApiService(CommonApiService commonApiService) {
+        this.commonApiService = commonApiService;
+    }
+
+    public void setProtocolSubmitActionService(ProtocolSubmitActionService protocolSubmitActionService) {
+        this.protocolSubmitActionService = protocolSubmitActionService;
+    }
+
+    public void setProtocolApproveService(ProtocolApproveService protocolApproveService) {
+        this.protocolApproveService = protocolApproveService;
+    }
+
+    public void setProtocolGrantExemptionService(ProtocolGrantExemptionService protocolGrantExemptionService) {
+        this.protocolGrantExemptionService = protocolGrantExemptionService;
+    }
+
+    public void setKcPersonService(KcPersonService kcPersonService) {
+        this.kcPersonService = kcPersonService;
+    }
+
+    public void setRolodexService(RolodexService rolodexService) {
+        this.rolodexService = rolodexService;
+    }
+
+    public void setProtocolDeleteService(ProtocolDeleteService protocolDeleteService) {
+        this.protocolDeleteService = protocolDeleteService;
+    }
+
 }
