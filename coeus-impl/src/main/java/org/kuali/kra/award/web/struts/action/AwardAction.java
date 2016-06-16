@@ -172,34 +172,35 @@ public class AwardAction extends BudgetParentActionBase {
     //question constants
     private static final String QUESTION_VERIFY_SYNC="VerifySync";
     private static final String QUESTION_VERIFY_EMPTY_SYNC="VerifyEmptySync";
-    
+
     private static final Log LOG = LogFactory.getLog( AwardAction.class );
-   
+    private transient SponsorHierarchyService sponsorHierarchyService;
+
     private enum SuperUserAction {
         SUPER_USER_APPROVE, TAKE_SUPER_USER_ACTIONS
     }
-    
+
     private static final AwardTemplateSyncScope[] DEFAULT_SCOPES_REQUIRE_VERIFY_FOR_EMPTY = new AwardTemplateSyncScope[] {
             AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
             AwardTemplateSyncScope.SPONSOR_CONTACTS_TAB,
             AwardTemplateSyncScope.REPORTS_TAB
     };
-    
-    
-    private static final AwardTemplateSyncScope[] DEFAULT_AWARD_TEMPLATE_SYNC_SCOPES = new AwardTemplateSyncScope[] { 
-        AwardTemplateSyncScope.AWARD_PAGE,
-        AwardTemplateSyncScope.COST_SHARE,
-        AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
-        AwardTemplateSyncScope.SPONSOR_CONTACTS_TAB,
-        AwardTemplateSyncScope.TERMS_TAB,
-        AwardTemplateSyncScope.REPORTS_TAB,
-        AwardTemplateSyncScope.COMMENTS_TAB
-        };
+
+
+    private static final AwardTemplateSyncScope[] DEFAULT_AWARD_TEMPLATE_SYNC_SCOPES = new AwardTemplateSyncScope[] {
+            AwardTemplateSyncScope.AWARD_PAGE,
+            AwardTemplateSyncScope.COST_SHARE,
+            AwardTemplateSyncScope.PAYMENTS_AND_INVOICES_TAB,
+            AwardTemplateSyncScope.SPONSOR_CONTACTS_TAB,
+            AwardTemplateSyncScope.TERMS_TAB,
+            AwardTemplateSyncScope.REPORTS_TAB,
+            AwardTemplateSyncScope.COMMENTS_TAB
+    };
 
     private static final String DOCUMENT_ROUTE_QUESTION="DocRoute";
-    
+
     private static final String ADD_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";
-    private static final String DEL_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";    
+    private static final String DEL_SYNC_CHANGE_QUESTION = "document.question.awardhierarchy.sync";
 
     private transient ParameterService parameterService;
     private transient AwardBudgetService awardBudgetService;
@@ -415,7 +416,7 @@ public class AwardAction extends BudgetParentActionBase {
         holdingPageForward.addParameter(KcHoldingPageConstants.HOLDING_PAGE_DOCUMENT_ID, routeHeaderId);
         return routeToHoldingPage(basicForward, forward, holdingPageForward, returnLocation, routeHeaderId);
     }
-    
+
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         AwardForm awardForm = (AwardForm) form;
@@ -535,7 +536,7 @@ public class AwardAction extends BudgetParentActionBase {
         }
         for(AwardSponsorTerm awardSponsorTerm : award.getAwardSponsorTerms()) {
         	awardSponsorTerm.setAward(award);
-        }
+    }
         // RRG KC-477 END
     }
 
@@ -588,61 +589,6 @@ public class AwardAction extends BudgetParentActionBase {
 
     protected AwardHierarchyService getAwardHierarchyService(){
         return KcServiceLocator.getService(AwardHierarchyService.class);
-    }
-
-    protected boolean isValidSave(AwardForm awardForm) {
-        AwardDocument awardDocument = (AwardDocument) awardForm.getDocument();
-        String leadUnitNumber = awardDocument.getLeadUnitNumber();
-        List<AwardPerson> persons = awardDocument.getAward().getProjectPersons();
-
-        if (StringUtils.isNotEmpty(leadUnitNumber) && checkNoMoreThanOnePI(awardDocument.getAward()) && isMultiPiValid(awardDocument.getAward().getSponsorCode(), persons)) {
-            String userId = GlobalVariables.getUserSession().getPrincipalId();
-            UnitAuthorizationService authService = KcServiceLocator.getService(UnitAuthorizationService.class);
-            return authService.hasMatchingQualifiedUnits(userId, Constants.MODULE_NAMESPACE_AWARD,
-                    AwardPermissionConstants.MODIFY_AWARD.getAwardPermission(), leadUnitNumber);
-        }
-        return false;
-    }
-
-    protected boolean isMultiPiValid(String sponsor, List<AwardPerson> persons) {
-        boolean valid = true;
-        boolean multiPiAllowed = isMultiPiAllowed(sponsor);
-        for(int index = 0; index < persons.size(); index++) {
-            if (persons.get(index).isMultiplePi() && multiPiAllowed) {
-                valid = false;
-                GlobalVariables.getMessageMap().putError("projectPersonnelBean.projectPersonnel[" + index + "].contactRoleCode",
-                            AwardProjectPersonsSaveRule.ERROR_AWARD_PROJECT_PERSON_MULTIPLE_PI_EXISTS);
-            }
-        }
-        return valid;
-    }
-
-    protected boolean isMultiPiAllowed(String sponsor) {
-        PropAwardPersonRoleService awardPersonRoleService = getPropAwardPersonRoleService();
-        SponsorHierarchyService sponsorHierarchyService = getSponsorHierarchyService();
-
-        return awardPersonRoleService.areAllSponsorsMultiPi() || sponsorHierarchyService.isSponsorNihMultiplePi(sponsor);
-    }
-
-    public PropAwardPersonRoleService getPropAwardPersonRoleService() {
-        return KcServiceLocator.getService(PropAwardPersonRoleService.class);
-    }
-
-    protected boolean checkNoMoreThanOnePI(Award award) {
-        int piCount = 0;
-        ArrayList<String> fields = new ArrayList<>();
-        for(int i = 0; i < award.getProjectPersons().size(); i++) {
-            if(award.getProjectPersons().get(i).isPrincipalInvestigator()){
-                piCount++;
-                fields.add("projectPersonnelBean.projectPersonnel[" + i + "].contactRoleCode");
-            }
-        }
-
-        if (piCount > 1 ) {
-            fields.stream().forEach(field -> GlobalVariables.getMessageMap().putError(field, AwardProjectPersonsSaveRule.ERROR_AWARD_PROJECT_PERSON_MULTIPLE_PI_EXISTS));
-            return true;
-        }
-        return false;
     }
 
     protected final boolean applyRules(DocumentEvent event) {
@@ -972,30 +918,18 @@ public class AwardAction extends BudgetParentActionBase {
             newAwardAmountInfo.setAmountObligatedToDate(rootAward.getObligatedTotalDirect().add(rootAward.getObligatedTotalIndirect()));
             newAwardAmountInfo.setObligatedTotalDirect(rootAward.getObligatedTotalDirect());
             newAwardAmountInfo.setObligatedTotalIndirect(rootAward.getObligatedTotalIndirect());
-            newAwardAmountInfo.setObligatedChange(rootAwardAmountInfo.getObligatedChange());
-            newAwardAmountInfo.setObligatedChangeDirect(rootAwardAmountInfo.getObligatedTotalDirect());
-            newAwardAmountInfo.setObligatedChangeIndirect(rootAwardAmountInfo.getObligatedTotalIndirect());
-            newAwardAmountInfo.setAnticipatedChange(rootAwardAmountInfo.getAnticipatedChange());
             newAwardAmountInfo.setAnticipatedTotalAmount(rootAward.getAnticipatedTotalDirect().add(rootAward.getAnticipatedTotalIndirect()));
             newAwardAmountInfo.setAnticipatedTotalDirect(rootAward.getAnticipatedTotalDirect());
             newAwardAmountInfo.setAnticipatedTotalIndirect(rootAward.getAnticipatedTotalIndirect());
-            newAwardAmountInfo.setAnticipatedChangeDirect(rootAwardAmountInfo.getAnticipatedTotalDirect());
-            newAwardAmountInfo.setAnticipatedChangeIndirect(rootAwardAmountInfo.getAnticipatedTotalIndirect());
             newAwardAmountInfo.setObliDistributableAmount(rootAward.getObligatedTotalDirect().add(rootAward.getObligatedTotalIndirect()));
             newAwardAmountInfo.setAntDistributableAmount(rootAward.getAnticipatedTotalDirect().add(rootAward.getAnticipatedTotalIndirect()));
         } else {
             newAwardAmountInfo.setAmountObligatedToDate(rootAwardAmountInfo.getAmountObligatedToDate());
             newAwardAmountInfo.setObligatedTotalDirect(rootAward.getObligatedTotalDirect());
             newAwardAmountInfo.setObligatedTotalIndirect(rootAward.getObligatedTotalIndirect());
-            newAwardAmountInfo.setObligatedChange(rootAwardAmountInfo.getObligatedChange());
-            newAwardAmountInfo.setObligatedChangeDirect(rootAwardAmountInfo.getObligatedChangeDirect());
-            newAwardAmountInfo.setObligatedChangeIndirect(rootAwardAmountInfo.getObligatedChangeIndirect());
-            newAwardAmountInfo.setAnticipatedChange(rootAwardAmountInfo.getAnticipatedChange());
             newAwardAmountInfo.setAnticipatedTotalAmount(rootAward.getAnticipatedTotal());
             newAwardAmountInfo.setAnticipatedTotalDirect(rootAward.getAnticipatedTotalDirect());
             newAwardAmountInfo.setAnticipatedTotalIndirect(rootAward.getAnticipatedTotalIndirect());
-            newAwardAmountInfo.setAnticipatedChangeDirect(rootAwardAmountInfo.getAnticipatedChangeDirect());
-            newAwardAmountInfo.setAnticipatedChangeIndirect(rootAwardAmountInfo.getAnticipatedChangeIndirect());
             newAwardAmountInfo.setObliDistributableAmount(rootAward.getObligatedTotal());
             newAwardAmountInfo.setAntDistributableAmount(rootAward.getAnticipatedTotal());
         }
@@ -1483,7 +1417,14 @@ public class AwardAction extends BudgetParentActionBase {
     }
 
     protected SponsorHierarchyService getSponsorHierarchyService() {
-        return KcServiceLocator.getService(SponsorHierarchyService.class);
+        if (sponsorHierarchyService == null) {
+            sponsorHierarchyService = KcServiceLocator.getService(SponsorHierarchyService.class);
+        }
+        return sponsorHierarchyService;
+    }
+
+    public void setSponsorHierarchyService(SponsorHierarchyService sponsorHierarchyService) {
+        this.sponsorHierarchyService = sponsorHierarchyService;
     }
 
     @Override
