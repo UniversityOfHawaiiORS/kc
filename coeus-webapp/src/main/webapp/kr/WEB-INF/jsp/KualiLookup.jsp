@@ -21,18 +21,15 @@
 
 <%--NOTE: DO NOT FORMAT THIS FILE, DISPLAY:COLUMN WILL NOT WORK CORRECTLY IF IT CONTAINS LINE BREAKS --%>
 <c:set var="headerMenu" value="" />
-<!-- KC-755 Remove Organization Lookup from Address Book -->
 <c:set var="boClassName" value="${KualiForm.lookupable.businessObjectClass.name}"/>
-
+<!-- KC-1463 Need the "create new" button in Address Book Lookup in Maintenance -->
 <!-- KCIU Customization Starts 
 Suppresses the Create New button on the top right corner-->
 <c:if test="${KualiForm.suppressActions!=true and KualiForm.supplementalActionsEnabled!=true}">
-    <c:if test="${not fn:contains(boClassName,'org.kuali.coeus.common.framework.rolodex.Rolodex')}">
     <c:set var="headerMenu" value="${KualiForm.lookupable.createNewUrl}   ${KualiForm.lookupable.htmlMenuBar}" />
-    </c:if>
 </c:if>
+<!-- KC-1463 End -->
 <!-- KCIU Customization Ends -->
-<!-- KC-755 END -->
 <c:if test="${!empty KualiForm.backLocation}">
     <c:choose>
      <c:when test="${fn:contains(KualiForm.backLocation,'?')}">
@@ -218,16 +215,16 @@ Suppresses the Create New button on the top right corner-->
 			     UH version is hard coded link to the help line, no point in parameter overhead for this one it's one hard coded value for our help desk link
 			<c:set var="adminEmail" value='<%=org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN", "All", "LOOKUP_CONTACT_EMAIL")%>' />
 			-->
-			<c:if test="${!empty reqSearchResultsActualSize}" >			
+			<c:if test="${!empty reqSearchResultsActualSize}" >
     			<c:choose>
 						<c:when test="${fn:contains(boClassName,'org.kuali.coeus.common.framework.rolodex.NonOrganizationalRolodex')}">
     			    			<!--  Cannot create this by parsing the createNewUrl because NonOrganizationalRolodex is not a maint doc and does not have one-->
     				  			Can't find who you are looking for? Contact the <a href=http://www.ors.hawaii.edu/helpline/index.php?/Tickets/Submit/RenderForm/10 target="_blank">ORS Helpline</a> to add someone.<br>
 						</c:when>
-						<c:when test="${fn:contains(boClassName,'org.kuali.kra.bo.Rolodex')}">
-    				  			Can't find what you are looking for? Click <a href="${KRADConstants.MAINTENANCE_ACTION}?businessObjectClassName=org.kuali.kra.bo.Rolodex&methodToCall=start">here</a> to add a new Address Book entry.<br>
+						<c:when test="${fn:contains(boClassName,'org.kuali.coeus.common.framework.rolodex.Rolodex')}">
+    				  			Can't find what you are looking for? Click <a href="${KRADConstants.MAINTENANCE_ACTION}?businessObjectClassName=org.kuali.coeus.common.framework.rolodex.Rolodex&methodToCall=start">here</a> to add a new Address Book entry.<br>
 						</c:when>
-				</c:choose>
+ 				</c:choose>
 			</c:if>
 				
 			<!-- KCIU Customization Ends -->
