@@ -130,8 +130,10 @@
   <bean id="SubAwardContact-contactTypeCode-parentBean" abstract="true" parent="AttributeDefinition">
        <property name="name" value="contactTypeCode" />
     <property name="forceUppercase" value="false" />
-    <property name="label" value="Contact Type" />
-    <property name="shortLabel" value="Contact Type Code" />
+    <!-- KC-1452 Correct error message on adding contact and project role in subaward -->
+    <property name="label" value="Project Role" />
+    <property name="shortLabel" value="Project Role" />
+    <!-- KC-1452 END -->
     <property name="maxLength" value="22" />
     <property name="validationPattern" >
       <bean parent="NumericValidationPattern" />
