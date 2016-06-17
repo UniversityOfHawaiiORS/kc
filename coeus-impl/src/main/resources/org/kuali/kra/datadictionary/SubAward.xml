@@ -539,8 +539,10 @@
   <bean id="SubAward-requisitionerId-parentBean" abstract="true" parent="PersonImpl-principalId">
     <property name="name" value="requisitionerId" />
     <property name="forceUppercase" value="false" />
-    <property name="label" value="Requisitioner ID" />
-    <property name="shortLabel" value="Requisitioner ID" />
+    <!-- KC-1450 Re-label Requisitioner ID to PI Name on upper right hand corner display of subaward -->
+    <property name="label" value="PI Name" />
+    <property name="shortLabel" value="PI Name" />
+    <!-- KC-1450 END -->
     <property name="displayLabelAttribute" value="requisitionerUserName" />
         <property name="control">
             <bean parent="TextControlDefinition" p:size="40" />
