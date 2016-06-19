@@ -28,6 +28,7 @@
 		<param name="cas.url">https://cas-test.its.hawaii.edu/cas</param>
 		
 		<!-- New KC 6.0 CAS settings -->
+<!-- Start comment here to switch to core auth -->
 		<param name="filter.logout.class">org.jasig.cas.client.session.SingleSignOutFilter</param>
 		<param name="filter.logout.casServerUrlPrefix">${cas.url}</param>
 		<param name="filtermapping.logout.1">/*</param>
@@ -44,6 +45,7 @@
 		<param name="filtermapping.caswrapper.4">/*</param>
 		<param name="listener.logout.class">org.jasig.cas.client.session.SingleSignOutHttpSessionListener</param>
 		<param name="rice.portal.logout.redirectUrl">${cas.url}/logout</param>
+<!-- End comment here to switch to core auth -->
 		
 		<!-- S2S Configuration Common DEV/PROD -->
 		<param name="s2s.keystore.password">changeit</param>
@@ -170,6 +172,8 @@
                 <param name="application.rest.services.base.url">http://localhost:8070</param>
 
                 <!-- Core Auth Settings -->
+<!-- To enable Core Auth comment out CAS section above and uncomment this section -->
+<!-- Uncomment this section to switch to CORE Auth
                 <param name="auth.base.url">http://localhost:3000/</param>
                 <param name="filter.restlogin.class">org.kuali.coeus.sys.framework.auth.AuthServiceFilter</param>
                 <param name="filtermapping.restlogin.1">/*</param>
@@ -177,6 +181,9 @@
                 <!-- Core Auth communication token settings -->
                 <!-- You need to create an ADMIN user in Core Auth, generate a token for that user and enter in this parameter -->
                 <param name="auth.system.token"></param>
+                <!-- Fix Core auth fails log out of cas -->
+                <param name="rice.portal.logout.redirectUrl">${auth.base.url}/auth/signout?redirect_to=${cas.url}/logout?service=${application.url}</param>
+-->
 
                 <!-- COI rest services config so KC can talk to COI -->
                 <!-- Note this isn't coi specific because kualico uses enginex reverse proxy -->

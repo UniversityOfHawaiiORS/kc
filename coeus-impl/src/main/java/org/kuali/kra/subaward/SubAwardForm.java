@@ -231,9 +231,11 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
             getUpdateUser();
         }
 
+        // KC-1451 Display PI Name in upper right hand corner display of subaward
         getDocInfo().add(new HeaderField(
         "DataDictionary.SubAward.attributes.requisitionerId",
-        subAwardDocument.getSubAward().getRequisitionerUserName()));
+        subAwardDocument.getSubAward().getRequisitionerName()));
+        // KC-1451 END
         getDocInfo().add(new HeaderField(
         "DataDictionary.SubAward.attributes.docIdStatus", docIdAndStatus));
         if (subAwardDocument.getSubAward().getUnit() != null) {
