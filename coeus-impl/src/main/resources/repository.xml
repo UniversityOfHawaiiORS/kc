@@ -1224,7 +1224,6 @@
 
 	<class-descriptor class="org.kuali.coeus.common.framework.person.citi.PersonTrainingCitiMap" table="PERSON_TRAINING_CITI_MAP">
 		<field-descriptor name="id" column="ID" jdbc-type="BIGINT" primarykey="true" sequence-name="SEQ_PERSON_TRAINING_CITI_MAP" autoincrement="true"/>
-		<field-descriptor name="curriculumNumber" column="CURRICULUM_NUMBER" jdbc-type="VARCHAR" />
 		<field-descriptor name="groupId" column="GROUP_ID" jdbc-type="VARCHAR" />
 		<field-descriptor name="stageNumber" column="STAGE_NUMBER" jdbc-type="VARCHAR" />
 		<field-descriptor name="trainingCode" column="TRAINING_CODE" jdbc-type="INTEGER" />
@@ -1631,5 +1630,14 @@
 		<field-descriptor name="message" column="MSG" jdbc-type="BLOB" />
 		<field-descriptor name="priority" column="PRIORITY" jdbc-type="BIGINT" />
 		<field-descriptor name="xid" column="XID" jdbc-type="VARCHAR" />
+	</class-descriptor>
+
+	<class-descriptor class="org.kuali.coeus.sys.framework.auth.CoreImpersonation" table="CORE_IMPERSONATION">
+		<field-descriptor name="id" column="ID" jdbc-type="BIGINT" primarykey="true" />
+		<field-descriptor name="loginTimestamp" column="LOGIN_TIMESTAMP" jdbc-type="TIMESTAMP"/>
+		<field-descriptor name="impersonatedUserId" column="IMPERSONATED_USER_ID" jdbc-type="VARCHAR" />
+		<field-descriptor name="impersonatedByUserId" column="IMPERSONATED_BY_USER" jdbc-type="VARCHAR" />
+		<field-descriptor name="impersonationDisplayName" column="IMPERSONATION_DISPLAY_NAME" jdbc-type="VARCHAR" />
+		<field-descriptor name="requestedResource" column="REQUESTED_RESOURCE" jdbc-type="VARCHAR" />
 	</class-descriptor>
 </descriptor-repository>

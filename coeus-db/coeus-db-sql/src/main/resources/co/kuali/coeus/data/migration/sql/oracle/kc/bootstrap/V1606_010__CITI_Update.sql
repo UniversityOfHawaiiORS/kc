@@ -1,7 +1,7 @@
 --
 -- Kuali Coeus, a comprehensive research administration system for higher education.
 --
--- Copyright 2005-2015 Kuali, Inc.
+-- Copyright 2005-2016 Kuali, Inc.
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,8 +17,10 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
+ALTER TABLE PERSON_TRAINING_CITI_MAP DROP CONSTRAINT UQ2_PERSON_TRAINING_CITI_MAP;
 
-\. ./rice/bootstrap/V1606_003__CITI_job_Params.sql
-\. ./rice/bootstrap/V1606_009__Auth_param.sql
-\. ./rice/bootstrap/V1606_011__ViewDispositionPerm.sql
-commit;
+ALTER TABLE PERSON_TRAINING_CITI_MAP DROP COLUMN CURRICULUM_NUMBER;
+
+ALTER TABLE PERSON_TRAINING_CITI_MAP
+  ADD CONSTRAINT UQ2_PERSON_TRAINING_CITI_MAP
+UNIQUE (GROUP_ID, STAGE_NUMBER);
