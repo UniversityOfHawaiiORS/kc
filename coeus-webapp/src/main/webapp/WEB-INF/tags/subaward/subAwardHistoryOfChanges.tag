@@ -122,10 +122,9 @@
                 </td>
    				<td class="infoline" rowspan="5"><div align="center">
    					<c:if test="${readOnly!='true'}">
-						<%-- KC-1458 Attachment in History of Change should not disappear after system flags error in other fields --%>
-						<html:image property="methodToCall.addAmountInfo.anchor${tabKey}"
+						<html:image property="methodToCall.addAmountInfo.anchor${tabKey}" 
 						            src='${ConfigProperties.kra.externalizable.images.url}tinybutton-add1.gif' 
-						            styleClass="tinybutton" onclick="return validateNewSubAwardHistoryOfChangesForm()"/>
+						            styleClass="tinybutton"/>
 					</c:if>
 	                </div>
 	            </td>   				
@@ -190,73 +189,5 @@
 						index="${status.index}" indexDisplayOffset="${offset}" readOnly="${readOnly}" currentTabIndex="${currentTabIndex }" formAction="${action}"/>
         	</c:forEach>
         </table>
-		<%-- KC-1458 Attachment in History of Change should not disappear after system flags error in other fields --%>
-		<script type="text/javascript">
-			function validateNewSubAwardHistoryOfChangesForm() {
-				var fileField = document.getElementsByName('newSubAwardAmountInfo.newFile')[0];
-				if (fileField.value != '') {
-					var errorMsg = '';
-					var effectiveDate = document.getElementById('newSubAwardAmountInfo.effectiveDate');
-					var obligatedChange = document.getElementById('newSubAwardAmountInfo.obligatedChange');
-					var anticipatedChange = document.getElementById('newSubAwardAmountInfo.anticipatedChange');
-					var modificationEffectiveDate = document.getElementById('newSubAwardAmountInfo.modificationEffectiveDate');
-					var modificationId = document.getElementById('newSubAwardAmountInfo.modificationID');
-					var periodofPerformanceStartDate = document.getElementById('newSubAwardAmountInfo.periodofPerformanceStartDate');
-					var periodofPerformanceEndDate = document.getElementById('newSubAwardAmountInfo.periodofPerformanceEndDate');
-					var transactionType = document.getElementById('newSubAwardAmountInfo.transactionTypeCode');
-					var selectedTransactionType = transactionType.options[transactionType.selectedIndex].text;
-					var dateRegex = /^(0[1-9]|1[0-2])\/([0][1-9]|[12]\d|3[01])\/20\d{2}$/;
-					var numberRegex = /^((0|[1-9]\d*)|((0|[1-9]\d*)\.\d+))$/;
-					if (effectiveDate.value == '') {
-						errorMsg += 'Effective Date is a required field.\n';
-					} else if (!dateRegex.exec(effectiveDate.value)) {
-						errorMsg += 'Effective Date is not a valid date. (MM/DD/YYYY)\n';
-					}
-					if (obligatedChange.value == '') {
-						errorMsg += 'Obligated Change is a required field.\n';
-					} else if (!numberRegex.exec(obligatedChange.value)) {
-						errorMsg += 'Obligated Change should be numeric\n';
-					}
-					if (anticipatedChange.value == '') {
-						errorMsg += 'Anticipated Change is a required field.\n';
-					} else if (!numberRegex.exec(anticipatedChange.value)) {
-						errorMsg += 'Anticipated Change should be numeric\n';
-					} else if (obligatedChange.value != '' && numberRegex.exec(obligatedChange.value)) {
-						if (anticipatedChange.value < obligatedChange.value) {
-							errorMsg += 'Anticipated Change must be greater than or equal to Obligated Change\n';
-						}
-					}
-					if (modificationEffectiveDate.value != '' && !dateRegex.exec(modificationEffectiveDate.value)) {
-						errorMsg += 'Modification Effective Date is not a valid date. (MM/DD/YYYY)\n';
-					}
-					if (modificationId.value == '') {
-						errorMsg += 'Modification ID is a required field.\n';
-					}
-					if (periodofPerformanceStartDate.value != '' && !dateRegex.exec(periodofPerformanceStartDate.value)) {
-						errorMsg += 'Period of Performance Start Date is not a valid date. (MM/DD/YYYY)\n';
-					}
-					if (periodofPerformanceEndDate.value != '') {
-					    if (!dateRegex.exec(periodofPerformanceEndDate.value)) {
-							errorMsg += 'Period of Performance End Date is not a valid date. (MM/DD/YYYY)\n';
-						} else if (periodofPerformanceStartDate.value != '' && dateRegex.exec(periodofPerformanceStartDate.value)) {
-							let date1 = Date.parse(periodofPerformanceStartDate.value);
-							let date2 = Date.parse(periodofPerformanceEndDate.value);
-							if (date1 > date2) {
-								errorMsg += 'Period of Performance Start Date must be before or equal to Period of Performance End Date\n';
-							}
-						}
-					}
-					if (selectedTransactionType == 'select') {
-						errorMsg += 'Transaction Type is a required field.\n';
-					}
-					if (errorMsg != '') {
-						alert(errorMsg);
-						return false;
-					}
-				}
-				return true;
-			}
-		</script>
-		<%-- KC-1458 END --%>
     </div>
 </kul:tab>
