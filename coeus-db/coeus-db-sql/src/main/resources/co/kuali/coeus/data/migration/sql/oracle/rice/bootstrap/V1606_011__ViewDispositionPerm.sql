@@ -1,7 +1,7 @@
 --
 -- Kuali Coeus, a comprehensive research administration system for higher education.
 --
--- Copyright 2005-2015 Kuali, Inc.
+-- Copyright 2005-2016 Kuali, Inc.
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -17,8 +17,7 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
 
-
-\. ./rice/bootstrap/V1606_003__CITI_job_Params.sql
-\. ./rice/bootstrap/V1606_009__Auth_param.sql
-\. ./rice/bootstrap/V1606_011__ViewDispositionPerm.sql
-commit;
+INSERT INTO KRIM_ROLE_PERM_T (ROLE_PERM_ID, OBJ_ID, VER_NBR, ROLE_ID, PERM_ID, ACTV_IND)
+       VALUES ('KC' || KRIM_ROLE_PERM_ID_S.NEXTVAL, SYS_GUID(), 1,
+               (SELECT ROLE_ID FROM KRIM_ROLE_T WHERE ROLE_NM='COI Administrator'),
+               (SELECT PERM_ID FROM KRIM_PERM_T WHERE NM='View COI Disclosure Disposition' AND NMSPC_CD='KC-SYS'), 'Y');

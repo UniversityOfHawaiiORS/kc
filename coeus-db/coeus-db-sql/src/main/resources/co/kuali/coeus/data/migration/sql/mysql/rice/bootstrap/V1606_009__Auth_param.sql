@@ -1,7 +1,7 @@
 --
 -- Kuali Coeus, a comprehensive research administration system for higher education.
 --
--- Copyright 2005-2015 Kuali, Inc.
+-- Copyright 2005-2016 Kuali, Inc.
 --
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU Affero General Public License as
@@ -16,9 +16,5 @@
 -- You should have received a copy of the GNU Affero General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 --
-
-
-\. ./rice/bootstrap/V1606_003__CITI_job_Params.sql
-\. ./rice/bootstrap/V1606_009__Auth_param.sql
-\. ./rice/bootstrap/V1606_011__ViewDispositionPerm.sql
-commit;
+insert into krcr_parm_t (nmspc_cd, cmpnt_cd, parm_nm, obj_id, ver_nbr, parm_typ_cd, val, parm_desc_txt, eval_oprtr_cd, appl_id)
+values ('KC-SYS', 'All', 'auth.impersonation.logging', UUID(), 1, 'CONFG', 'N', 'Used to test core auth impersonation logging. deprecated and will be removed.', 'A', 'KC');

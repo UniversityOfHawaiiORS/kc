@@ -50,12 +50,12 @@ public class KcEmailServiceImpl implements KcEmailService {
 
     @Autowired
     @Qualifier("mailSender")
-    private JavaMailSenderImpl mailSender;    
+    private JavaMailSenderImpl mailSender;
     
     @Autowired
     @Qualifier("parameterService")
     private ParameterService parameterService;
-    
+
     @Autowired
     @Qualifier("kualiConfigurationService")
     private ConfigurationService configurationService;

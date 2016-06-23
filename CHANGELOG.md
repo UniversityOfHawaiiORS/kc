@@ -4,6 +4,113 @@
 * No Changes
 
 
+##coeus-1606.55
+* No Changes
+
+
+##coeus-1606.53
+* No Changes
+
+
+##coeus-1606.52
+* Typo in evaluating hierarchies in KRMS rules (#1818)
+
+  * RESKC-1384: fix typo in hierarchy name, use constant
+  * tdurkin on Wed, 22 Jun 2016 14:49:16 -0400 [View Commit](../../commit/aacf084657faad673387c2de21267d1bbd28925e)
+* RESKC-1431: Update descriptions of FOTv3 arg value lookup elements.
+  * Gayathri Athreya on Wed, 22 Jun 2016 11:56:56 -0500 [View Commit](../../commit/bc4968cd508e889a7f2249f8ca55b20b28d4689f)
+
+##coeus-1606.51
+* Medusa icons (#1813)
+
+  * RESKC-1362: Display Award Status Icons on Medusa
+  * tdurkin on Wed, 22 Jun 2016 09:32:15 -0400 [View Commit](../../commit/e816c49e30b2212c0d9599fd1e47122731d599ea)
+
+##coeus-1606.50
+* RESKC-1423: Display follow-up date on CITI recrds in person training table (#1814)
+
+  * tdurkin on Tue, 21 Jun 2016 19:39:55 -0400 [View Commit](../../commit/f392be5e795d0f2855e19f3e4dbe4e734174aca2)
+
+##coeus-1606.49
+* No Changes
+
+
+##coeus-1606.48
+* Add modification number to award medusa view. (#1810)
+
+* [UITSRA-4461] adding the Modification ID to the award details in Medusa
+  * 
+* [UITRSA-4461] Adding field to Prop Dev KRAD version of Medusa
+  * 
+* [UITSRA-4461] Fixing layout error
+  * tdurkin on Tue, 21 Jun 2016 14:14:11 -0400 [View Commit](../../commit/722e1e380aed7fc7b5f85f76d804eaed3d222b3a)
+* RESKC-1419: add view disposition perm to coi admin role,refresh disclosure status and dispostion when navigating to contacts page
+  * Joe Williams on Tue, 21 Jun 2016 09:02:50 -0500 [View Commit](../../commit/3ba8453f5aa4a35fd9b9ed6f8cc2357e7be6bb9c)
+
+##coeus-1606.44
+* No Changes
+
+
+##coeus-1606.43
+* fix oracle (#1808)
+
+  * tdurkin on Mon, 20 Jun 2016 10:50:08 -0400 [View Commit](../../commit/ad5946331c3c473f27c5bdf112ec8fc8f1d87724)
+
+##coeus-1606.42
+* No Changes
+
+
+##coeus-1606.41
+* RESKC-1422: Change CITI to not require CR Number for course mapping. Also change … (#1800)
+
+  * RESKC-1422: change CITI to not require CR Number for course mapping. Also change to not delete current records if no endpoints are defined.  * tdurkin on Sun, 19 Jun 2016 16:08:19 -0400 [View Commit](../../commit/dcc5e069a43d8a72bfb330085f467be015b7e6df)
+* core impersonation (#1805)
+
+  * RESKC-1407: core impersonation logging will log a warning and save to a table when a user requests a resource while impersonating another user.  * tdurkin on Sun, 19 Jun 2016 16:07:39 -0400 [View Commit](../../commit/d79a4d19a0e248997951e6924661566dc8fd12ab)
+
+##coeus-1606.40
+* No Changes
+
+
+##coeus-1606.39
+* Fix failing test.
+  * Gayathri Athreya on Sun, 19 Jun 2016 00:05:22 -0700 [View Commit](../../commit/f3dad08f9ca860e8e432d829389fbdf2f4d2fa8a)
+* RESKC-935: S2S Form D: PHS 398 Cover Page Supplement 3.0 form update for 2016
+  * Gayathri Athreya on Thu, 9 Jun 2016 15:37:46 -0700 [View Commit](../../commit/482b6dd61537745e975a9ab7df0a4da7a7015819)
+
+##coeus-1606.38
+* No Changes
+
+
+##coeus-1606.37
+* No Changes
+
+
+##coeus-1606.36
+* Convert YNQ Explanations along with questions (#1794)
+
+  * Douglas Pace on Thu, 16 Jun 2016 12:37:49 -0700 [View Commit](../../commit/46db200964dd8c1477a5619e03b3bbc60a16f0cb)
+* fix spelling on parameter name
+  * noahuci on Sun, 5 Jun 2016 16:01:09 -0700 [View Commit](../../commit/eefb3826f829878ed8d11d03c224e0906b71f22f)
+* RESKC-662: Fix dynamic open/close of certification questionnaires.
+  * Terry Durkin on Thu, 16 Jun 2016 13:21:40 -0400 [View Commit](../../commit/74651687be576d3d052c4e9bde60c9b0cd7495a9)
+
+##coeus-1606.35
+* No Changes
+
+
+##coeus-1606.34
+* No Changes
+
+
+##coeus-1606.33
+* RESKC-1403: update award coi status on refresh
+  * Joe Williams on Wed, 15 Jun 2016 10:10:32 -0500 [View Commit](../../commit/43aba17c5686568d564d66798c39bbccf518e4d8)
+
+##coeus-1606.32
+* No Changes
+
+
 ##coeus-1606.31
 * No Changes
 
