@@ -94,6 +94,9 @@
 		</collection-descriptor>
 		<collection-descriptor name="subAwardAmountInfoList" proxy="true" element-class-ref="org.kuali.kra.subaward.bo.SubAwardAmountInfo" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="object" auto-delete="object">
 			<inverse-foreignkey field-ref="subAwardId"/>
+            <!-- KC-1473 Subaward History of Changes ranking order - Variation 2 -->
+            <orderby name="subAwardAmountInfoId" sort="ASC" />
+            <!-- KC-1473 END -->
 		</collection-descriptor> 
 		<collection-descriptor name="allSubAwardAmountInfos" proxy="true" element-class-ref="org.kuali.kra.subaward.bo.SubAwardAmountInfo" collection-class="org.apache.ojb.broker.util.collections.ManageableArrayList" auto-retrieve="true" auto-update="none" auto-delete="none">
 			<query-customizer class="org.kuali.kra.subaward.bo.AllSubAwardAmountInfoQueryCustomizer"/>
