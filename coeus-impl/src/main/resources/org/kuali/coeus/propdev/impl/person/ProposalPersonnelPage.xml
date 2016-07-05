@@ -749,8 +749,9 @@
 			<list>
                 <bean parent="Uif-MessageField" p:messageText="@{#ViewHelper.getQuestionMoreInfo(#lp.questionnaireQuestion.question)}"
                         p:hidden="true"/>
+                                <!-- KC-1475 Key Person Certification is locked when a non-employee is listed at the bottom of the Key Personnel tab -->
 				<bean id="proposalPersonQuestionnaire-InputField" parent="Questionnaire-InputField-parentBean" 
-                    p:readOnly="@{document.developmentProposal.isChild() or document.getCertifyViewOnly()}"
+                    p:readOnly="@{document.developmentProposal.isChild() or #parent.readOnly}"
 					p:order="10" />
                 <bean parent="Uif-InputField" p:propertyName="question.lookupReturn" p:fieldLabel.render="false">
                     <property name="control">
