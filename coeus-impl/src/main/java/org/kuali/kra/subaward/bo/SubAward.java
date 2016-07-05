@@ -18,6 +18,7 @@
  */
 package org.kuali.kra.subaward.bo;
 
+import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.common.framework.custom.CustomDataContainer;
 import org.kuali.coeus.common.framework.custom.DocumentCustomData;
 import org.kuali.coeus.common.framework.org.Organization;
@@ -44,6 +45,7 @@ import org.kuali.kra.negotiations.bo.NegotiationPersonDTO;
 import org.kuali.kra.subaward.customdata.SubAwardCustomData;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
+import org.kuali.rice.kew.api.document.DocumentStatus;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.springframework.util.AutoPopulatingList;
 
@@ -1668,4 +1670,85 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
     public List<? extends DocumentCustomData> getCustomDataList() {
         return getSubAwardCustomDataList();
     }
+
+    // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
+    public void calculateHistoricalAmountInfo() {
+        List<SubAwardAmountInfo> subAwardAmountInfoList = this.getHistoricalAmountInfos();
+
+        this.resetSubAwardTotalAmount();
+        if (subAwardAmountInfoList != null && subAwardAmountInfoList.size() > 0) {
+            for (SubAwardAmountInfo subAwardAmountInfo: subAwardAmountInfoList) {
+                this.updateByAmountInfo(subAwardAmountInfo);
+            }
+            this.updateTotalReleasedAmount(true);
+        }
+    }
+
+    private void resetSubAwardTotalAmount() {
+        this.setTotalObligatedAmount(new ScaleTwoDecimal(0.00));
+        this.setTotalAnticipatedAmount(new ScaleTwoDecimal(0.00));
+        this.setTotalAmountReleased(new ScaleTwoDecimal(0.00));
+        this.setTotalAvailableAmount(new ScaleTwoDecimal(0.00));
+    }
+
+    public void updateByAmountInfo(SubAwardAmountInfo amountInfo) {
+        if (amountInfo.getObligatedChange() != null) {
+            this.setTotalObligatedAmount(this.getTotalObligatedAmount().add(amountInfo.getObligatedChange()));
+        }
+        if (amountInfo.getAnticipatedChange() != null) {
+            this.setTotalAnticipatedAmount(this.getTotalAnticipatedAmount().add(amountInfo.getAnticipatedChange()));
+        }
+        if (amountInfo.getModificationEffectiveDate() != null) {
+            this.setModificationEffectiveDate(amountInfo.getModificationEffectiveDate());
+        }
+        if (amountInfo.getModificationID() != null) {
+            this.setModificationId(amountInfo.getModificationID());
+        }
+        if (amountInfo.getPeriodofPerformanceStartDate() != null) {
+            this.setPerformanceStartDate(amountInfo.getPeriodofPerformanceStartDate());
+        }
+        if (amountInfo.getPeriodofPerformanceEndDate() != null) {
+            this.setPerformanceEnddate(amountInfo.getPeriodofPerformanceEndDate());
+        }
+    }
+
+    public void updateTotalReleasedAmount(boolean historical) {
+        long subAwardId = this.getSubAwardId();
+        List<SubAwardAmountReleased> subAwardAmountReleasedList = this.getSubAwardAmountReleasedList();
+        for (SubAwardAmountReleased subAwardAmountReleased: subAwardAmountReleasedList) {
+            if (subAwardAmountReleased.getAmountReleased() == null) continue;
+            if (StringUtils.equals(subAwardAmountReleased.getInvoiceStatus(), DocumentStatus.DISAPPROVED.getCode())
+                    || StringUtils.equals(subAwardAmountReleased.getInvoiceStatus(), DocumentStatus.CANCELED.getCode())
+                    || StringUtils.equals(subAwardAmountReleased.getInvoiceStatus(), DocumentStatus.RECALLED.getCode())) continue;
+            if ((historical && subAwardAmountReleased.getSubAwardId() != subAwardId) ||
+                    (!historical && subAwardAmountReleased.getSubAwardId() == subAwardId)) {
+                this.setTotalAmountReleased(this.getTotalAmountReleased().add(subAwardAmountReleased.getAmountReleased()));
+            }
+        }
+        updateTotalAvailableAmount();
+    }
+
+    public void updateTotalAvailableAmount() {
+        this.setTotalAvailableAmount(this.getTotalObligatedAmount().subtract(this.getTotalAmountReleased()));
+    }
+
+    // Updates SubAwardAmountInfo instances cached in allSubAwardAmountInfos
+    public void replaceUpdatedEntriesInAllSubAwardAmountInfos(List<SubAwardAmountInfo> updated) {
+        List<SubAwardAmountInfo> allAmountInfo = this.getAllSubAwardAmountInfos();
+        Map<Integer, Integer> amountInfoIndex = new HashMap<>();
+        SubAwardAmountInfo cur;
+
+        for (int i = 0; i < allAmountInfo.size(); i++) {
+            cur = allAmountInfo.get(i);
+            amountInfoIndex.put(cur.getSubAwardAmountInfoId(), i);
+        }
+        for (SubAwardAmountInfo amountInfo : updated) {
+            Integer id = amountInfo.getSubAwardAmountInfoId();
+            if (amountInfoIndex.containsKey(id)) {
+                allAmountInfo.set(amountInfoIndex.get(id), amountInfo);
+            }
+        }
+        this.setAllSubAwardAmountInfos(allAmountInfo);
+    }
+    // KC-1448 END
 }

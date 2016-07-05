@@ -54,11 +54,17 @@ public class SubAwardFinancialAction extends SubAwardAction{
         SubAwardForm subAwardForm = (SubAwardForm) form;
         SubAwardAmountInfo amountInfo = subAwardForm.getNewSubAwardAmountInfo();
         SubAward subAward = subAwardForm.getSubAwardDocument().getSubAward();
+
         if (new SubAwardDocumentRule().processAddSubAwardAmountInfoBusinessRules(amountInfo, subAward)) {
             addAmountInfoToSubAward(subAwardForm.getSubAwardDocument(). getSubAward(), amountInfo);
             subAwardForm.setNewSubAwardAmountInfo(new SubAwardAmountInfo());
         }
-        KcServiceLocator.getService(SubAwardService.class).calculateAmountInfo(subAwardForm.getSubAwardDocument().getSubAward());
+        // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
+        // Moved the functionality of SubAwardServiceImple#calculateAmountInfo to SubAwardDocumentRule.
+        // SubAward's amount info summary is updated through checking the business rules.
+        // No need to call calculateAmountInfo here.
+        //KcServiceLocator.getService(SubAwardService.class).calculateAmountInfo(subAwardForm.getSubAwardDocument().getSubAward());
+
         return mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
      }
 

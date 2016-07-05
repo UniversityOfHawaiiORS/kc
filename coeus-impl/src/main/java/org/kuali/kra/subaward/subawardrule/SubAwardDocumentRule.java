@@ -44,6 +44,7 @@ import static org.kuali.kra.infrastructure.KeyConstants.SUBAWARD_ATTACHMENT_DESC
 import static org.kuali.kra.infrastructure.KeyConstants.ERROR_REQUIRED_SUBAWARD_TEMPLATE_INFO_CARRY_FORWARD_REQUESTS_SENT_TO;
 
 import java.util.Collections;
+import java.util.List;
 
 /**
  * This class is for rule validation while
@@ -68,8 +69,11 @@ SubAwardTemplateInfoRule {
     private static final String NEW_SUBAWARD = "document.subAwardList[0]";
     private static final String SUBAWARD_START_DATE =".startDate";
     private static final String SITEINVESTIGATOR =".siteInvestigatorId";
-    private static final String AMOUNT_INFO_OBLIGATED_AMOUNT = "newSubAwardAmountInfo.obligatedChange";
-    private static final String AMOUNT_INFO_ANTICIPATED_AMOUNT = "newSubAwardAmountInfo.anticipatedChange";
+    // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
+    private static final String NEW_AMOUNT_INFO = "newSubAwardAmountInfo";
+    private static final String AMOUNT_INFO_OBLIGATED_AMOUNT = ".obligatedChange";
+    private static final String AMOUNT_INFO_ANTICIPATED_AMOUNT = ".anticipatedChange";
+    // KC-1448 END
 
     private static final String ROLODEX_ID="newSubAwardContact.rolodex.fullName";
     private static final String CONTACT_TYPE_CODE="newSubAwardContact.contactTypeCode";
@@ -80,7 +84,9 @@ SubAwardTemplateInfoRule {
     private static final String REPORT_TYPE = "subAwardAttachmentFormBean.newReport.subAwardReportTypeCode";
     
     private static final String AWARD_NUMBER="newSubAwardFundingSource.award.awardNumber";
-    private static final String AMOUNT_PERIOD_OF_PERFORMANCE_START_DATE = "newSubAwardAmountInfo.periodofPerformanceStartDate";
+    // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
+    private static final String AMOUNT_PERIOD_OF_PERFORMANCE_START_DATE = ".periodofPerformanceStartDate";
+    // KC-1448 END
     private static final org.apache.commons.logging.Log LOG = org.apache.commons.logging.LogFactory.getLog(SubAwardDocumentRule.class);
     public static final String DESCRIPTION = ".description";
     public static final String SUB_AWARD_ATTACHMENT_TYPE_CODE = ".subAwardAttachmentTypeCode";
@@ -167,19 +173,79 @@ SubAwardTemplateInfoRule {
         return rulePassed;
     }
 
+    // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
     public boolean processAddSubAwardAmountInfoBusinessRules(SubAwardAmountInfo amountInfo,SubAward subAward) {
-        boolean rulePassed = true; 
-        
-        GlobalVariables.getMessageMap().addToErrorPath("newSubAwardAmountInfo");
-        rulePassed &= getDictionaryValidationService().isBusinessObjectValid(amountInfo); 
-        GlobalVariables.getMessageMap().removeFromErrorPath("newSubAwardAmountInfo");
-        
+        boolean rulePassed = true;
+
+        rulePassed &= processSaveSubAwardAmountInfoBusinessRules(subAward);
+
+        GlobalVariables.getMessageMap().addToErrorPath(NEW_AMOUNT_INFO);
+        rulePassed &= getDictionaryValidationService().isBusinessObjectValid(amountInfo);
+        GlobalVariables.getMessageMap().removeFromErrorPath(NEW_AMOUNT_INFO);
+
+        rulePassed &= processSubAwardAmountInfoBusinessRules(amountInfo, subAward, NEW_AMOUNT_INFO);
+
+        subAward.updateByAmountInfo(amountInfo);
+        subAward.updateTotalAvailableAmount();
+        amountInfo.setAnticipatedAmount(subAward.getTotalAnticipatedAmount());
+        amountInfo.setObligatedAmount(subAward.getTotalObligatedAmount());
+
+        return rulePassed;
+    }
+
+    // Checks all the SubAwardAmountInfo that belong to subAward
+    public boolean processSaveSubAwardAmountInfoBusinessRules(SubAward subAward) {
+        boolean rulePassed = true;
+
+        // Set total of obligatedChange, anticipatedChange, releasedAmount, and availableAmount calculated from historical data
+        subAward.calculateHistoricalAmountInfo();
+
+        List<SubAwardAmountInfo> amountInfoList = subAward.getSubAwardAmountInfoList();
+
+        int i = 0;
+        for (SubAwardAmountInfo amountInfo : amountInfoList) {
+            rulePassed &= processSaveSubAwardAmountInfoBusinessRules(subAward, amountInfo, i);
+
+            // Update total of obligatedChange, anticipatedChange, periodofPerformance{Start|End}Date
+            subAward.updateByAmountInfo(amountInfo);
+            amountInfo.setAnticipatedAmount(subAward.getTotalAnticipatedAmount());
+            amountInfo.setObligatedAmount(subAward.getTotalObligatedAmount());
+            i++;
+        }
+        // Update total of releasedAmount and availableAmount from not historical data
+        if (i > 0) subAward.updateTotalReleasedAmount(false);
+
+        if (rulePassed) {
+            // Updates SubAwardAmountInfo instances cached in allSubAwardAmountInfos.
+            // Otherwise some fields will not change without reloading.
+            subAward.replaceUpdatedEntriesInAllSubAwardAmountInfos(amountInfoList);
+        }
+        return rulePassed;
+    }
+
+    // Checks a specific SubAwardAmountInfo that belong to subAward
+    private boolean processSaveSubAwardAmountInfoBusinessRules(SubAward subAward, SubAwardAmountInfo amountInfo, int index) {
+        boolean rulePassed = true;
+
+        String errorPathPrefix = NEW_SUBAWARD + ".subAwardAmountInfoList[" + String.valueOf(index) + "]";
+        GlobalVariables.getMessageMap().addToErrorPath(errorPathPrefix);
+        rulePassed &= getDictionaryValidationService().isBusinessObjectValid(amountInfo);
+        GlobalVariables.getMessageMap().removeFromErrorPath(errorPathPrefix);
+
+        rulePassed &= processSubAwardAmountInfoBusinessRules(amountInfo, subAward, errorPathPrefix);
+
+        return rulePassed;
+    }
+
+    private boolean processSubAwardAmountInfoBusinessRules(SubAwardAmountInfo amountInfo, SubAward subAward, String prefix) {
+        boolean rulePassed = true;
+
         ScaleTwoDecimal obligatedAmount = subAward.getTotalObligatedAmount();
         if (amountInfo.getObligatedChange() != null) {
             obligatedAmount = obligatedAmount.add(amountInfo.getObligatedChange());
             if (obligatedAmount.isNegative()) {
                 rulePassed = false; 
-                reportError(AMOUNT_INFO_OBLIGATED_AMOUNT, KeyConstants.ERROR_AMOUNT_INFO_OBLIGATED_AMOUNT_NEGATIVE); 
+                reportError(prefix + AMOUNT_INFO_OBLIGATED_AMOUNT, KeyConstants.ERROR_AMOUNT_INFO_OBLIGATED_AMOUNT_NEGATIVE);
             }
         }
         ScaleTwoDecimal anticipatedAmount = subAward.getTotalAnticipatedAmount();
@@ -187,29 +253,30 @@ SubAwardTemplateInfoRule {
             anticipatedAmount = anticipatedAmount.add(amountInfo.getAnticipatedChange());
             if (anticipatedAmount.isNegative()) {
                 rulePassed = false; 
-                reportError(AMOUNT_INFO_ANTICIPATED_AMOUNT, KeyConstants.ERROR_AMOUNT_INFO_ANTICIPATED_AMOUNT_NEGATIVE); 
+                reportError(prefix + AMOUNT_INFO_ANTICIPATED_AMOUNT, KeyConstants.ERROR_AMOUNT_INFO_ANTICIPATED_AMOUNT_NEGATIVE);
             }
         }
-        
+
         if (obligatedAmount.isGreaterThan(anticipatedAmount)) {
             rulePassed = false;
-            reportError(AMOUNT_INFO_ANTICIPATED_AMOUNT, KeyConstants.ERROR_AMOUNT_INFO_OBLIGATED_AMOUNT_GREATER_THAN_ANTICIPATED_AMOUNT); 
+            reportError(prefix + AMOUNT_INFO_ANTICIPATED_AMOUNT, KeyConstants.ERROR_AMOUNT_INFO_OBLIGATED_AMOUNT_GREATER_THAN_ANTICIPATED_AMOUNT);
         }
-        
+
         if (obligatedAmount.isLessThan(subAward.getTotalAmountReleased())) {
             rulePassed = false;
-            reportError(AMOUNT_INFO_OBLIGATED_AMOUNT, KeyConstants.ERROR_SUBAWARD_OBLIGATED_AMOUNT_SHOULD_BE_GREATER_AMOUNT_RELEASED); 
+            reportError(prefix + AMOUNT_INFO_OBLIGATED_AMOUNT, KeyConstants.ERROR_SUBAWARD_OBLIGATED_AMOUNT_SHOULD_BE_GREATER_AMOUNT_RELEASED);
         }
-        
+
         if (amountInfo.getPeriodofPerformanceStartDate() != null && amountInfo.getPeriodofPerformanceEndDate()!= null) {
             if(amountInfo.getPeriodofPerformanceStartDate().after(amountInfo.getPeriodofPerformanceEndDate())){
                 rulePassed = false;
-                reportError(AMOUNT_PERIOD_OF_PERFORMANCE_START_DATE,
+                reportError(prefix + AMOUNT_PERIOD_OF_PERFORMANCE_START_DATE,
                         KeyConstants.ERROR_PERIOD_OF_PERFORMANCE_START_DATE_SHOULD_BE_GREATER_THAN_ERROR_PERIOD_OF_PERFORMANCE_END_DATE);         
             }
         }
         return rulePassed;
     }
+    // KC-1448 END
 
     public boolean processAddSubAwardContactBusinessRules(SubAwardContact subAwardContact,SubAward subAward) {
         boolean rulePassed = true;          

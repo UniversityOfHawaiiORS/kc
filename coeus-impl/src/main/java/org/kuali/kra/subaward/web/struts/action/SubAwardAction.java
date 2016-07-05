@@ -19,11 +19,8 @@
 
 package org.kuali.kra.subaward.web.struts.action;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -36,6 +33,7 @@ import org.kuali.coeus.common.framework.print.AttachmentDataSource;
 import org.kuali.coeus.common.framework.version.VersionStatus;
 import org.kuali.coeus.common.framework.version.history.VersionHistoryService;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
+import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.coeus.sys.framework.validation.AuditHelper;
 import org.kuali.coeus.sys.framework.validation.AuditHelper.ValidationState;
 import org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase;
@@ -46,13 +44,8 @@ import org.kuali.kra.negotiations.bo.Negotiation;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.service.NegotiationService;
 import org.kuali.kra.subaward.SubAwardForm;
-import org.kuali.kra.subaward.bo.SubAward;
-import org.kuali.kra.subaward.bo.SubAwardAttachmentType;
-import org.kuali.kra.subaward.bo.SubAwardAttachments;
-import org.kuali.kra.subaward.bo.SubAwardForms;
-import org.kuali.kra.subaward.bo.SubAwardFundingSource;
+import org.kuali.kra.subaward.bo.*;
 import org.kuali.kra.subaward.customdata.SubAwardCustomData;
-import org.kuali.kra.subaward.bo.SubAwardTemplateInfo;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.notification.SubAwardNotificationContext;
 import org.kuali.kra.subaward.reporting.printing.SubAwardPrintType;
@@ -64,6 +57,7 @@ import org.kuali.kra.timeandmoney.history.TransactionDetail;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
+import org.kuali.rice.kew.api.document.DocumentStatus;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kns.question.ConfirmationQuestion;
 import org.kuali.rice.krad.service.*;
@@ -251,14 +245,32 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
         if (subAward.getSubAwardId() == null) {
             getVersionHistoryService().updateVersionHistory(subAward, VersionStatus.PENDING, userId);
         }
+        SubAwardDocumentRule rule = new SubAwardDocumentRule();
         if (new SubAwardDocumentRule().processAddSubAwardBusinessRules(subAward) && new SubAwardDocumentRule().processAddSubAwardTemplateInfoBusinessRules(subAward)) {
-            ActionForward forward = super.save(mapping, form, request, response);
-            getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
-            return forward;
+             // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
+             if (onFinancialTab(mapping, request) && !rule.processSaveSubAwardAmountInfoBusinessRules(subAward)) {
+                 return mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
+             } else {
+                 ActionForward forward = super.save(mapping, form, request, response);
+                 getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
+                 getSubAwardService().calculateAmountInfo(subAward);
+                 return forward;
+             }
+             // KC-1448 END
         } else {
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
     }
+
+    // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
+    // Should return true only when saving a SubAward doc or adding a new SubAwardAmountInfo on SubAward Financial Tab.
+    private boolean onFinancialTab(ActionMapping mapping, HttpServletRequest request) {
+        if (mapping.getPath().equals("/subAwardFinancial") && request.getRequestURI().endsWith("/subAwardFinancial.do")) {
+            return true;
+        }
+        return false;
+    }
+    // KC-1448 END
 
     /**
     *
