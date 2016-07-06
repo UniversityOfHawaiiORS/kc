@@ -1,6 +1,6 @@
 *CITI Integration*
 
-Kuali Research integrates with CITI (www.citiprogram.com) in order to populate person training.  This integration works by
+Kuali Research integrates with CITI (www.citiprogram.org) in order to populate person training.  This integration works by
 downloading CITI training data into a staging table.  The staging table is processed and validated.  Valid records are
 converted (using configured mapping information) to person training records.  Error messages are persisted for invalid
 records.  These error messages can be queried through standard maintenance screen from within the System Admin section
@@ -21,8 +21,6 @@ These parameters are configured to the standard default values used by CITI.
 
 All CITI datasets must be configured with the following fields for integration to work without error:
 
-Curriculum Number (CR Number)
-Curriculum
 Group Id
 Group
 Passing Score
@@ -31,7 +29,7 @@ Stage
 Institutional Username
 
 To map CITI training data to Person Training records, mapping entries must be created.  These records map the combination
-of group, curriculum, and stage to training code.  The maintenance table for this is located within the System Admin
+of group and stage to training code.  The maintenance table for this is located within the System Admin
 section of the Kuali Research portal. If mapping data is not present and CITI integration is turned on mapping records
 will automatically be created without training codes selected.
 
