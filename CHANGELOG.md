@@ -1,6 +1,97 @@
 
 
 ##CURRENT
+* RESKC-1264: Integrate segment analyitcs into KNS and KRAD web resources (#1838)
+
+* RESKC-1264: Integrate segment analyitcs into KNS and KRAD web resources
+  * 
+* RESKC-1264: set up defaults for web analytics.
+  * tdurkin on Fri, 1 Jul 2016 16:24:18 -0400 [View Commit](../../commit/54873e5cbe5fba7609809970ab7d24925acde0a5)
+
+##coeus-1607.4
+* No Changes
+
+
+##coeus-1607.3
+* Update CITI.md (#1836)
+
+  * Removed references to CR Number and Curriculum being required for mapping, since we changed this in the code.  * Jen F on Fri, 1 Jul 2016 11:55:32 -0400 [View Commit](../../commit/c7ef6a1aeb9c96266cb3449f62fa526c2f4bb071)
+
+##coeus-1607.2
+* RESKC-1264: Integrate segment analyitcs into KNS and KRAD web resources (#1835)
+
+  * tdurkin on Fri, 1 Jul 2016 08:36:12 -0400 [View Commit](../../commit/f8bbbe1c588efcf46732bba358c2c70f526e43a3)
+
+##coeus-1607.1
+* No Changes
+
+
+##coeus-1606.68
+* Include query parameters when directing to core-auth for login (#1834)
+
+  * Douglas Pace on Thu, 30 Jun 2016 12:54:13 -0700 [View Commit](../../commit/cfbb9a4d49462836f6b64a869b5f1da20c939be7)
+
+##coeus-1606.67
+* citiprogram.com is a phishing site (#1833)
+
+  * tdurkin on Thu, 30 Jun 2016 13:45:40 -0400 [View Commit](../../commit/514b0c97e69b9da7fe94ecff2723e668b73e9c97)
+
+##coeus-1606.66
+* No Changes
+
+
+##coeus-1606.65
+* upgrade node and npm version (#1832)
+
+  * Douglas Pace on Wed, 29 Jun 2016 12:24:22 -0700 [View Commit](../../commit/7c9df009797e9ca523f6d3f65e6a86c8423ed993)
+
+##coeus-1606.64
+* No Changes
+
+
+##coeus-1606.63
+* Fix industrial printout related to summary personnel (#1829)
+
+  * Douglas Pace on Wed, 29 Jun 2016 10:06:27 -0700 [View Commit](../../commit/f7bf113edccffbfc832463d41dcbdd3108efc5ae)
+* RESKC-1436: Fix s2s validation errors.
+  * Gayathri Athreya on Tue, 28 Jun 2016 15:44:27 -0700 [View Commit](../../commit/590577a1b2b19664ad9181975546ae358fc7d87d)
+
+##coeus-1606.62
+* RESKC-1432: Actual questionnaire fix
+  * Gayathri Athreya on Tue, 28 Jun 2016 12:38:26 -0700 [View Commit](../../commit/1560400de01a9576e229aea00e6ad0fbe74512cd)
+
+##coeus-1606.61
+* RESKC-1432: Fix questionnaire.
+  * Gayathri Athreya on Tue, 28 Jun 2016 11:40:34 -0700 [View Commit](../../commit/7626eaf90a6dd11050cb8a972cf34752ec7ff8ae)
+
+##coeus-1606.60
+* RESKC-1409, RESKC-1422: adding some int tests, making CR number & curriculum not required, removing from course BO, renaming column and fields
+  * Travis Schneeberger on Mon, 27 Jun 2016 15:51:55 -0400 [View Commit](../../commit/6af751ba13aa592bc0234d3a8c3fffddcbf8eed6)
+
+##coeus-1606.59
+* RESKC-1418: Change Coi to COI on Award, IP, IRB, and IACUC Personnel Screens when displaying Disclosure and Disposition Status (#1815)
+
+  * tdurkin on Fri, 24 Jun 2016 12:57:28 -0400 [View Commit](../../commit/ead3c85784ba5dda47c7738b69f337f718562218)
+
+##coeus-1606.58
+* Fix integration tests.
+  * Gayathri Athreya on Fri, 24 Jun 2016 10:24:20 -0500 [View Commit](../../commit/3be337e3948b304c944078ce93c129f6bbada8c0)
+* RESKC-1432: Child questionnaire answers fix.
+  * If the user selects an answer to a question which then requires a child question to be answered, if the user then backtracks and answers the question in reverse (so that a child question is not required) then the child answer still appears as the initial answer on the form pages.
+  * Gayathri Athreya on Thu, 23 Jun 2016 13:31:14 -0500 [View Commit](../../commit/ca79e2e4b30c47575cf691c7078e5a919fa31d94)
+* RESKC-1401: fixing merge issue by working around deepCopy behavior with a list.  To reproduce:
+
+  * Created Amendment of Protocol (IRB or IACUC) and added a 4 attachments. Then  approved the amendment and the amendment merged into the main protocol but the attachments did not merge.
+  * Additionally, when looking at the amendment, it now displays all the attachments doubled.
+  * Travis Schneeberger on Thu, 23 Jun 2016 10:50:25 -0400 [View Commit](../../commit/2b18c8ab0fa4988501424fb2c42495a7f9097991)
+
+##coeus-1606.57
+* Use budget line item id as part of key to avoid ignoring multiple summary line items
+  * blackcathacker on Wed, 22 Jun 2016 11:08:43 -0700 [View Commit](../../commit/8836b23fdd0ab17a7ee1ee5149c233a5a74ce216)
+* Use budget details rate and base when summary personnel line item
+  * blackcathacker on Wed, 22 Jun 2016 10:27:53 -0700 [View Commit](../../commit/64ef520a2f2a9ec841dfc152d84431aa5e10cca5)
+
+##coeus-1606.56
 * No Changes
 
 
