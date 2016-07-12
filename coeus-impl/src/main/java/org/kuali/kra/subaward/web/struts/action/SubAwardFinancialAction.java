@@ -33,6 +33,7 @@ import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.kra.subaward.subawardrule.SubAwardDocumentRule;
 import org.kuali.rice.krad.rules.rule.event.SaveDocumentEvent;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,17 +56,23 @@ public class SubAwardFinancialAction extends SubAwardAction{
         SubAwardAmountInfo amountInfo = subAwardForm.getNewSubAwardAmountInfo();
         SubAward subAward = subAwardForm.getSubAwardDocument().getSubAward();
 
-        if (new SubAwardDocumentRule().processAddSubAwardAmountInfoBusinessRules(amountInfo, subAward)) {
-            addAmountInfoToSubAward(subAwardForm.getSubAwardDocument(). getSubAward(), amountInfo);
-            subAwardForm.setNewSubAwardAmountInfo(new SubAwardAmountInfo());
-        }
+        // KC-1476 Need better mechanism on how history of changes entry is added when there is error in date fields
+        boolean businessRulePassed = new SubAwardDocumentRule().processAddSubAwardAmountInfoBusinessRules(amountInfo, subAward);
+
         // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
         // Moved the functionality of SubAwardServiceImple#calculateAmountInfo to SubAwardDocumentRule.
         // SubAward's amount info summary is updated through checking the business rules.
         // No need to call calculateAmountInfo here.
         //KcServiceLocator.getService(SubAwardService.class).calculateAmountInfo(subAwardForm.getSubAwardDocument().getSubAward());
 
-        return mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
+        ActionForward forward = mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
+
+        if (!GlobalVariables.getMessageMap().hasErrors() && businessRulePassed) {
+            addAmountInfoToSubAward(subAwardForm.getSubAwardDocument().getSubAward(), amountInfo);
+            subAwardForm.setNewSubAwardAmountInfo(new SubAwardAmountInfo());
+        }
+        return forward;
+        // KC-1476 END
      }
 
     boolean addAmountInfoToSubAward(SubAward subAward,SubAwardAmountInfo amountInfo){
