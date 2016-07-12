@@ -56,19 +56,20 @@ public class SubAwardFinancialAction extends SubAwardAction{
         SubAwardAmountInfo amountInfo = subAwardForm.getNewSubAwardAmountInfo();
         SubAward subAward = subAwardForm.getSubAwardDocument().getSubAward();
 
+        // KC-1476 Need better mechanism on how history of changes entry is added when there is error in date fields
+        boolean businessRulePassed = new SubAwardDocumentRule().processAddSubAwardAmountInfoBusinessRules(amountInfo, subAward);
+
         // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
         // Moved the functionality of SubAwardServiceImple#calculateAmountInfo to SubAwardDocumentRule.
         // SubAward's amount info summary is updated through checking the business rules.
         // No need to call calculateAmountInfo here.
         //KcServiceLocator.getService(SubAwardService.class).calculateAmountInfo(subAwardForm.getSubAwardDocument().getSubAward());
 
-        // KC-1476 Need better mechanism on how history of changes entry is added when there is error in date fields
         ActionForward forward = mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
-        if (new SubAwardDocumentRule().processAddSubAwardAmountInfoBusinessRules(amountInfo, subAward)) {
-            if (!GlobalVariables.getMessageMap().hasErrors()) {
-                addAmountInfoToSubAward(subAwardForm.getSubAwardDocument().getSubAward(), amountInfo);
-                subAwardForm.setNewSubAwardAmountInfo(new SubAwardAmountInfo());
-            }
+
+        if (!GlobalVariables.getMessageMap().hasErrors() && businessRulePassed) {
+            addAmountInfoToSubAward(subAwardForm.getSubAwardDocument().getSubAward(), amountInfo);
+            subAwardForm.setNewSubAwardAmountInfo(new SubAwardAmountInfo());
         }
         return forward;
         // KC-1476 END
