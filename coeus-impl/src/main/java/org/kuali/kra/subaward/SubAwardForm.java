@@ -368,7 +368,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         NegotiationService ngs = KcServiceLocator.getService(NegotiationService.class);
         ConfigurationService configurationService = CoreApiServiceLocator.getKualiConfigurationService();
         if (ngs.isAuthorizedToOpenNegotiations()) {
-            String generateNegotiationImage = configurationService.getPropertyValueAsString(externalImageURL) + "tinybutton-negotiations.gif";
+            String generateNegotiationImage = configurationService.getPropertyValueAsString(externalImageURL) + "tinybutton-negotiations-add.gif";
             addExtraButton("methodToCall.openNewNegotiation", generateNegotiationImage, "Open New Negotiation");
         }
 
