@@ -192,6 +192,8 @@ public class MedusaServiceImpl implements MedusaService {
                 addVertex(graph, subAward);
                 buildGraph(graph, subAward);
                 nodes = getParentNodes(graph, new String[]{preferredModule, Constants.SUBAWARD_MODULE});
+                // KC-1481 Subaward Summary in Medusa tab displays data from old version
+                filterOldAwardsFromSubAwards(nodes);
             }
         } else if (StringUtils.equals(moduleName, Constants.IRB_MODULE)) {
             Protocol protocol = getProtocol(moduleIdentifier);
@@ -210,7 +212,43 @@ public class MedusaServiceImpl implements MedusaService {
         }
         return nodes;
     }
-    
+
+    // KC-1481 Subaward Summary in Medusa tab displays data from old version
+    private void filterOldAwardsFromSubAwards(List<MedusaNode> nodes) {
+        for (MedusaNode node : nodes) {
+            if (StringUtils.equals(node.getType(), "subaward")) {
+                node.setChildNodes(removeOldAwardsFromSubAward((SubAward)node.getData(), (List<MedusaNode>) node.getChildNodes()));
+            }
+            filterOldAwardsFromSubAwards((List<MedusaNode>) node.getChildNodes());
+        }
+    }
+
+    private List<MedusaNode> removeOldAwardsFromSubAward(SubAward subAward, List<MedusaNode> nodes) {
+        if (nodes.stream().filter(node -> node.getType().equals("award")).count() <= 1) {
+            return nodes;
+        }
+
+        List<SubAwardFundingSource> fundingSources = subAward.getSubAwardFundingSourceList();
+        if (fundingSources.isEmpty()) return nodes;
+        List<Long> expectedAwardIds = fundingSources.stream().map(node -> node.getAwardId()).collect(Collectors.toList());
+        if (expectedAwardIds.isEmpty()) return nodes;
+
+        List<MedusaNode> filtered = new ArrayList<MedusaNode>();
+        for (MedusaNode node : nodes) {
+            if (StringUtils.equals(node.getType(), "award")) {
+                Award award = (Award) node.getData();
+                if (expectedAwardIds.contains((Long)award.getAwardId())) {
+                    filtered.add(node);
+                }
+            } else {
+                filtered.add(node);
+            }
+        }
+        if (filtered.isEmpty()) return nodes;
+        return filtered;
+    }
+    // KC-1481 END
+
     /**
      * 
      * Adds a new bo to the graph like hash after checking to make sure the same bo is not already added.
