@@ -18,7 +18,10 @@
  */
 package org.kuali.kra.award.home;
 
+import com.codiform.moo.annotation.Ignore;
+import com.codiform.moo.annotation.Property;
 import org.apache.commons.lang3.StringUtils;
+import org.kuali.coeus.award.finance.AwardPosts;
 import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
 import org.kuali.coeus.common.framework.custom.CustomDataContainer;
 import org.kuali.coeus.common.framework.custom.DocumentCustomData;
@@ -93,8 +96,11 @@ import org.kuali.kra.timeandmoney.service.TimeAndMoneyHistoryService;
 import org.kuali.kra.timeandmoney.transactions.AwardTransactionType;
 import org.kuali.rice.core.api.CoreApiServiceLocator;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
+import org.kuali.rice.core.api.criteria.CountFlag;
+import org.kuali.rice.core.api.criteria.QueryByCriteria;
 import org.kuali.rice.kew.api.exception.WorkflowException;
 import org.kuali.rice.kim.api.role.Role;
+import org.kuali.rice.krad.data.DataObjectService;
 import org.kuali.rice.krad.service.BusinessObjectService;
 import org.springframework.util.AutoPopulatingList;
 
@@ -152,9 +158,14 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     private static final String ACCOUNT_TYPE_CODE = "accountTypeCode";
     private static final String UNIT_NUMBER = "unitNumber";
     private static final String COLON = ":";
+    public static final String AWARD_ID = "awardId";
     private Long awardId;
     private AwardDocument awardDocument;
+    @Property(update = false)
+    @Ignore
     private String awardNumber;
+    @Property(update = false)
+    @Ignore
     private Integer sequenceNumber;
     @AwardSyncableProperty
     private String sponsorCode;
@@ -322,6 +333,9 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     private Integer fedAwardYear;
     private Date fedAwardDate;
 
+    @SkipVersioning
+    private transient DataObjectService dataObjectService;
+
     public Award() {
         super();
         initializeAwardWithDefaultValues();
@@ -359,6 +373,20 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
             }
         }
         return commentMap;
+    }
+
+    public boolean isPosted() {
+        Map<String, Object> criteria = new HashMap<>();
+        criteria.put(AWARD_ID, getAwardId());
+        return getDataObjectService().findMatching(AwardPosts.class,
+                QueryByCriteria.Builder.andAttributes(criteria).setCountFlag(CountFlag.ONLY).build()).getTotalRowCount() != 0;
+    }
+
+    public DataObjectService getDataObjectService() {
+        if(dataObjectService == null) {
+            dataObjectService = KcServiceLocator.getService(DataObjectService.class);
+        }
+        return dataObjectService;
     }
 
     public Integer getTemplateCode() {
@@ -733,8 +761,6 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.beginDate = beginDate;
     }
 
-
-
     public String getCostSharingIndicator() {
         return costSharingIndicator;
     }
@@ -746,6 +772,10 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
     public List<AwardFundingProposal> getFundingProposals() {
         return fundingProposals;
+    }
+
+    public void setFundingProposals(List<AwardFundingProposal> fundingProposals) {
+        this.fundingProposals = fundingProposals;
     }
 
     /**
@@ -2486,6 +2516,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     public String getPrimeSponsorName() {
         return getPrimeSponsor() == null ? EMPTY_STRING : getPrimeSponsor().getSponsorName();
     }
+
 
     @Override
     public String getSubAwardOrganizationName() {

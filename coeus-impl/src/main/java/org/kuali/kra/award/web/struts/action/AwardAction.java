@@ -30,12 +30,10 @@ import org.apache.struts.action.ActionMapping;
 import org.apache.struts.action.ActionRedirect;
 import org.kuali.coeus.coi.framework.*;
 import org.kuali.coeus.common.framework.auth.SystemAuthorizationService;
-import org.kuali.coeus.common.framework.person.PropAwardPersonRoleService;
 import org.kuali.coeus.common.framework.version.VersionStatus;
 import org.kuali.coeus.common.framework.version.history.VersionHistory;
 import org.kuali.coeus.common.framework.version.history.VersionHistoryService;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
-import org.kuali.coeus.common.framework.auth.UnitAuthorizationService;
 import org.kuali.coeus.common.framework.auth.perm.KcAuthorizationService;
 import org.kuali.coeus.sys.framework.controller.KcHoldingPageConstants;
 import org.kuali.coeus.sys.framework.validation.AuditHelper;
@@ -51,9 +49,12 @@ import org.kuali.kra.award.awardhierarchy.sync.AwardSyncType;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncCreationService;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService;
 import org.kuali.kra.award.budget.AwardBudgetService;
+<<<<<<< HEAD
 import org.kuali.kra.award.contacts.AwardPerson;
 import org.kuali.kra.award.contacts.AwardProjectPersonsSaveRule;
 import org.kuali.kra.award.contacts.AwardSponsorContact;
+=======
+>>>>>>> coeus-1607.38
 import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
@@ -422,7 +423,7 @@ public class AwardAction extends BudgetParentActionBase {
         AwardForm awardForm = (AwardForm) form;
 
         Award award = awardForm.getAwardDocument().getAward();
-        checkAwardNumber(award);
+        getAwardService().checkAwardNumber(award);
         
         if (award.getAwardApprovedSubawards() == null || award.getAwardApprovedSubawards().isEmpty()) {
             award.setSubContractIndicator(Constants.NO_FLAG);
@@ -504,6 +505,7 @@ public class AwardAction extends BudgetParentActionBase {
         return ((AwardForm) form).getAwardDocument();
     }
 
+<<<<<<< HEAD
     protected void checkAwardNumber(Award award) {
         if (Award.DEFAULT_AWARD_NUMBER.equals(award.getAwardNumber())) {
             AwardNumberService awardNumberService = getAwardNumberService();
@@ -541,6 +543,8 @@ public class AwardAction extends BudgetParentActionBase {
         // RRG KC-477 END
     }
 
+=======
+>>>>>>> coeus-1607.38
     protected AwardNumberService getAwardNumberService() {
         return KcServiceLocator.getService(AwardNumberService.class);
     }

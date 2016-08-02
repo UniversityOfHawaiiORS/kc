@@ -273,6 +273,7 @@
         <property name="versioningService" ref="versioningService" />
         <property name="versionHistoryService" ref="versionHistoryService" />
         <property name="sponsorHierarchyService" ref="sponsorHierarchyService" />
+        <property name="awardNumberService" ref="awardNumberService" />
         <property name="awardDao" ref="awardDao" />
     </bean>
     
@@ -1388,7 +1389,7 @@
     <import resource="classpath:org/kuali/coeus/sys/framework/ImportSimpleCrudRestSpringBeans.xml" />
 
 
-    <bean parent="simpleReadOnlyMapBasedRestController" p:dataObjectClazz="org.kuali.kra.award.home.Award" class="org.kuali.coeus.award.api.AwardController" />
+    <bean parent="simpleReadOnlyMapBasedRestController" p:dataObjectClazz="org.kuali.kra.award.home.Award" class="org.kuali.coeus.award.api.AwardControllerVersion1" />
     <bean parent="simpleReadOnlyMapBasedRestController" p:dataObjectClazz="org.kuali.kra.award.home.AwardAmountInfo" />
     <bean parent="simpleCrudMapBasedRestController" p:dataObjectClazz="org.kuali.kra.timeandmoney.transactions.AwardAmountTransaction" />
     <bean parent="simpleReadOnlyMapBasedRestController" p:dataObjectClazz="org.kuali.kra.award.paymentreports.specialapproval.approvedequipment.AwardApprovedEquipment" p:camelCasePluralName="AwardApprovedEquipment" />
