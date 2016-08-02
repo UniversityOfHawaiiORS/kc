@@ -1,6 +1,192 @@
 
 
 ##CURRENT
+* API endpoint to version awards. (#1870)
+
+* API endpoint to version awards.
+  * 
+* Review comments.
+  * Gayathri Athreya on Thu, 28 Jul 2016 12:56:56 -0700 [View Commit](../../commit/92d2a86370e1d49451c351dda6195195b1a91652)
+
+##coeus-1607.37
+* No Changes
+
+
+##coeus-1607.36
+* RESKC-1501: fixing attachments that are deleted in an amendment so that they are deleted when the amendment is merged into a new protocol after approval.  Steps to reproduce:
+
+  * Create and submit a protocol with an attachment
+  * Expedited approve it
+  * Create an amendment choosing to Add/Modify attachments
+  * Remove the attachment in the amendment
+  * Submit and approve the amendment
+  * The amendment is incorporate into the protocol but the deleted attachment is still there
+  * It should appear in history as removed but should no longer be an active attachment
+  * Travis Schneeberger on Fri, 22 Jul 2016 13:36:25 -0400 [View Commit](../../commit/3a2a4ee35519178bb1fd84d71a35b7e651fe233c)
+
+##coeus-1607.35
+* No Changes
+
+
+##coeus-1607.34
+* RESKC-1486: add warning dialog before approval
+  * Joe Williams on Mon, 25 Jul 2016 10:09:19 -0500 [View Commit](../../commit/2dd682dbe06a6e27b15f2d360c4fa5a9e9333f5e)
+
+##coeus-1607.33
+* RESKC-1488: fix issue where budget versions list disappears when completing a budget
+  * Joe Williams on Mon, 25 Jul 2016 08:21:10 -0500 [View Commit](../../commit/5cb506a32d960ce66cbaa00cc3cef76d68faf744)
+
+##coeus-1607.32
+* adding shaded s3 dependency
+  * Travis Schneeberger on Thu, 21 Jul 2016 12:02:42 -0400 [View Commit](../../commit/87ffc18fb4f1bf005ac9f4ee6d77d12aae5baf99)
+
+##coeus-1607.31
+* removing support until we clear up jackson conflict with aws client
+  * Travis Schneeberger on Wed, 20 Jul 2016 17:41:22 -0400 [View Commit](../../commit/48432d1892a8bc68c0210b675a6a17c236dab269)
+
+##coeus-1607.29
+* RESKC-1511: fixing versioning bug
+  * Travis Schneeberger on Wed, 20 Jul 2016 16:11:16 -0400 [View Commit](../../commit/4970d4df7fb7a077b08902f97552acae803d00b5)
+
+##coeus-1607.28
+* No Changes
+
+
+##coeus-1607.27
+* No Changes
+
+
+##coeus-1607.26
+* No Changes
+
+
+##coeus-1607.25
+* Including v2 endpoints in auth (#1868)
+
+  * Gayathri Athreya on Tue, 19 Jul 2016 10:57:20 -0700 [View Commit](../../commit/34f230531340a6922c7313d94cc0c6729d3ec4ce)
+* RESKC-1487:handle non employee proposal person conversion
+  * Joe Williams on Fri, 15 Jul 2016 09:24:21 -0500 [View Commit](../../commit/19afaa6a52eec6025cefca74dadf6d8b1464b24d)
+
+##coeus-1607.24
+* adding defaults for startup issues
+  * Travis Schneeberger on Tue, 19 Jul 2016 11:37:59 -0400 [View Commit](../../commit/342c9c64735ad9a7e99ac617ebafda34bf7b4c94)
+* creating quartz conversion job
+  * Travis Schneeberger on Thu, 14 Jul 2016 15:53:04 -0400 [View Commit](../../commit/4e6ae171a02e5675ed62343b2eecb080e2c195f0)
+* Reimplement KcAttachmentDataDao with S3 support
+  * Travis Schneeberger on Wed, 13 Jul 2016 16:14:50 -0400 [View Commit](../../commit/5b31444269607b6d745d3e5459b9134ab85e9c96)
+
+##coeus-1607.23
+* REOPS-944: Fix protocol delete. Protocol delete was not setting the status on the protocol, fixed it. (#1839)
+
+  * Add functionality to perform action 201 and fix code so expiration date saves.
+  * 
+  * Make action date on submission action configurable. Refactored so protocol services do not get the document from the protcol for saving since this causes a lot of elements to not be saved.  * Gayathri Athreya on Fri, 15 Jul 2016 14:19:13 -0700 [View Commit](../../commit/576649ac2ef44b0857df46f08cc8d1f089dbda49)
+
+##coeus-1607.22
+* RESKC-1463: Fix/add Canadian Provinces
+  * Terry Durkin on Thu, 14 Jul 2016 16:50:56 -0400 [View Commit](../../commit/8b8b3c89c67e955f8edb18e11fc364155ec26a9f)
+
+##coeus-1607.21
+* No Changes
+
+
+##coeus-1607.20
+* fix integration tests #no release (#1861)
+
+  * Gayathri Athreya on Thu, 14 Jul 2016 15:28:54 -0700 [View Commit](../../commit/a9d09cc4fd3a5ffe108f41657e8dfae223792260)
+* RESKC-1265: Adding ability to post information from time and money document. Added associated time and money API to pull information. (#1856)
+
+  * Gayathri Athreya on Thu, 14 Jul 2016 14:18:59 -0700 [View Commit](../../commit/72436d72c4860cc4b00b54bdae49ee019f958af0)
+
+##coeus-1607.19
+* No Changes
+
+
+##coeus-1607.18
+* RESKC-1487: fix migrated proposal person full names to match system generated names
+  * Joe Williams on Wed, 13 Jul 2016 11:37:48 -0500 [View Commit](../../commit/711bb5b038bdb015bd433e8587aa0db8b1591c02)
+
+##coeus-1607.17
+* No Changes
+
+
+##coeus-1607.16
+* RESKC-1263: Minor changes. (#1855)
+
+  * Gayathri Athreya on Tue, 12 Jul 2016 15:41:39 -0700 [View Commit](../../commit/108d266797f15329cd93bb9f7fd3c6b18e071c9a)
+
+##coeus-1607.15
+* Move financial API documentation into a new file. (#1853)
+
+  * Gayathri Athreya on Tue, 12 Jul 2016 13:17:19 -0700 [View Commit](../../commit/edcec11a1990d93e9865826ea7677cf9a6cd79f0)
+
+##coeus-1607.14
+* fix integration tests. (#1852)
+
+  * Gayathri Athreya on Tue, 12 Jul 2016 12:13:29 -0700 [View Commit](../../commit/5adeda2621fe2d969f1f21afc68fa09bd91c7f39)
+* first commit (#1847)
+
+* RESKC-1461: Adding budget API endpoints and new status.
+  * 
+* RESKC-1461: Adding documentation and moving methods to V2.
+  * Gayathri Athreya on Tue, 12 Jul 2016 08:54:09 -0700 [View Commit](../../commit/7aea9b92edeb38d19ce50e3b97fdc5182d9b387c)
+
+##coeus-1607.13
+* Handle s2s communication errors better (#1850)
+
+  * Handle the S2sCommunicationException to provide the user an error message instead of an exception page  * Douglas Pace on Mon, 11 Jul 2016 18:39:34 -0700 [View Commit](../../commit/29c4387572b30e484b62183130ae9ffcca7b1dce)
+
+##coeus-1607.12
+* RESKC-1477: Address performance issues when opening Subawards with many invoices (#1849)
+
+  * tdurkin on Mon, 11 Jul 2016 18:34:20 -0400 [View Commit](../../commit/98849adc181a55bfaee3b91b4e878f8f5964f84e)
+
+##coeus-1607.11
+* No Changes
+
+
+##coeus-1607.10
+* No Changes
+
+
+##coeus-1607.9
+* RESKC-1372: Questionnaire branching not working in some situations when question criteria is Contains Text (#1846)
+
+  * tdurkin on Fri, 8 Jul 2016 12:56:03 -0400 [View Commit](../../commit/a77a53fd4acc894781bf6a1481f29f6db46e002e)
+
+##coeus-1607.8
+* No Changes
+
+
+##coeus-1607.7
+* Fix integration tests. (#1845)
+
+  * Gayathri Athreya on Thu, 7 Jul 2016 17:07:54 -0700 [View Commit](../../commit/d40cde257194cfb5a5cefdb9f219f9d507dac2ea)
+* Fix sql files
+  * Gayathri Athreya on Thu, 7 Jul 2016 13:41:54 -0700 [View Commit](../../commit/bb01361eebc0359ebe6a6ba00eab045e5e66b0bc)
+* RESKC-1263: Adding award post functionality. (#1840)
+
+* RESKC-1263: Adding award post functionality.
+  * Currently, the system allows user to "create account" in the financial system via the API, or "Post" a submitted award budget to the API. We need to expand this post feature to award.
+  * User Story
+  * As a user with the ability to Post an Award,
+  * I need to be able to complete updates to an already existing award and then after that award is submitted and finalized, send those updates to the Financial API manually via a Post button. So that the Financial system shows the recent award changes.
+  * 
+* RESKC-1263: Refactored according to review comments.
+  * 
+* RESKC-1263: Renaming file to fix errors.
+  * Gayathri Athreya on Thu, 7 Jul 2016 12:21:12 -0700 [View Commit](../../commit/f638534557d6ffcb4e2d394d270b9332593423bf)
+
+##coeus-1607.6
+* RESKC-1383: fixing integration test by adding a null check
+  * Travis Schneeberger on Wed, 6 Jul 2016 16:50:39 -0400 [View Commit](../../commit/0535b4da1a2a43a7a010a378e0dcced7f24bc355)
+* RESKC-1431: Fixing descriptions.
+  * Removing the 4 digits codes from the heading options from the drop-down.
+  * Gayathri Athreya on Wed, 29 Jun 2016 11:51:09 -0700 [View Commit](../../commit/af666b6dc0536a90bb44deeba92e0aedb841a7b2)
+* RESKC-1383: When protocol is Submitted to IRB/IACUC the COI project is not pushed with an updated status.
+  * Travis Schneeberger on Wed, 29 Jun 2016 10:05:20 -0400 [View Commit](../../commit/774a4a81f25e3ebe135d917701053a3564907dc2)
+
+##coeus-1607.5
 * RESKC-1264: Integrate segment analyitcs into KNS and KRAD web resources (#1838)
 
 * RESKC-1264: Integrate segment analyitcs into KNS and KRAD web resources

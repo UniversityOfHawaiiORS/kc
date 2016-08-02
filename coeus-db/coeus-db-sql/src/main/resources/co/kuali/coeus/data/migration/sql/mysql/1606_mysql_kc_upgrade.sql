@@ -29,4 +29,6 @@
 \. ./kc/bootstrap/V1606_012__arg_value_desc_fix.sql
 \. ./kc/bootstrap/V1606_013__CITI_Update.sql
 \. ./kc/bootstrap/V1606_014__s2s_errors.sql
+\. ./kc/bootstrap/V1606_015__FOT_desc_fix.sql
+\. ./kc/bootstrap/V1606_016__award_post.sql
 commit;
