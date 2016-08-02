@@ -49,12 +49,9 @@ import org.kuali.kra.award.awardhierarchy.sync.AwardSyncType;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncCreationService;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService;
 import org.kuali.kra.award.budget.AwardBudgetService;
-<<<<<<< HEAD
 import org.kuali.kra.award.contacts.AwardPerson;
 import org.kuali.kra.award.contacts.AwardProjectPersonsSaveRule;
 import org.kuali.kra.award.contacts.AwardSponsorContact;
-=======
->>>>>>> coeus-1607.38
 import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
@@ -505,7 +502,6 @@ public class AwardAction extends BudgetParentActionBase {
         return ((AwardForm) form).getAwardDocument();
     }
 
-<<<<<<< HEAD
     protected void checkAwardNumber(Award award) {
         if (Award.DEFAULT_AWARD_NUMBER.equals(award.getAwardNumber())) {
             AwardNumberService awardNumberService = getAwardNumberService();
@@ -543,8 +539,6 @@ public class AwardAction extends BudgetParentActionBase {
         // RRG KC-477 END
     }
 
-=======
->>>>>>> coeus-1607.38
     protected AwardNumberService getAwardNumberService() {
         return KcServiceLocator.getService(AwardNumberService.class);
     }
