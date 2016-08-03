@@ -71,59 +71,20 @@ mkdir -p ${LOGDIR}
 
 while [ "${ans0}" != "y" ] && [ "${ans0}" != "n" ]
 do
-    read -p "Run Step 1 - upgrade to 6.1605.37 ? (y/n)" ans0
+    read -p "Run Step 1 - upgrade to 6.1607.38 ? (y/n)" ans0
 done
 
 if [ "${ans0}" == "y" ]
 then
-    # Update to 1510
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1510_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1510_oracle_kc_upgrade.sql
-
-    # Update to 1511
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1511_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1511_oracle_kc_upgrade.sql
-
-    # Update to 1512
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1512_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1512_oracle_kc_upgrade.sql
-
-    # Update to 1601
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1601_oracle_kc_upgrade.sql
-
-    # Update to 1602
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1602_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1602_oracle_kc_upgrade.sql
-
-    # Update to 1603
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1603_oracle_kc_upgrade.sql
-
-    # Update to 1604
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1604_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1604_oracle_kc_upgrade.sql
-
-    # Update to 1605.37 (Note: private repo merge so there may be more for full 1605)
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1605_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1605_oracle_kc_upgrade.sql
-
-    # Update to 1606.32
+    # Update to 1606
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1606_oracle_kc_rice_server_upgrade.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1606_oracle_kc_upgrade.sql
 
-    # UH modificaitons for 1607 target release
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1021.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1363.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1364.sql
-    # KC-1403 Allow Subaward F&A rate to accept greater than or equal to 100
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1403.sql
-    # KC-1412 Make Service Center ID a dropdown
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1412.sql
-    # KC-1447 Extend Federal Award Project Description field in Subaward to 4000 character length
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1447.sql
+    # Update to 1607
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1607_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1607_oracle_kc_upgrade.sql
+
+    # UH modificaitons for next target release
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
