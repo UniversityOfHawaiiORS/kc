@@ -178,7 +178,8 @@
           parent="Uif-CssGridSection" p:header.headerText="Assign a role">
         <property name="items">
             <list>
-                <bean parent="Uif-InputField" p:propertyName="parameterMap['roleNames']" p:order="10">
+                <!-- KC-1304 Cannot add viewer once proposal if finalized - added readOnly=false -->
+                <bean parent="Uif-InputField" p:propertyName="parameterMap['roleNames']" p:readOnly="false" p:order="10">
                 <property name="control">
                     <bean parent="Uif-VerticalCheckboxesControl"/>
                 </property>
