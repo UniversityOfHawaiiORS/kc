@@ -1107,13 +1107,11 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
 
     // KC-1369 Adjust Subaward Search Options and Result Display
     public SubAwardAmountInfo getCorrespondingSubAwardAmountInfo() {
-        Long curId = this.getSubAwardId();
-        for (SubAwardAmountInfo subAwardAmountInfo : getSubAwardAmountInfoList()) {
-            if (subAwardAmountInfo.getSubAwardId().equals(curId)) {
-                return subAwardAmountInfo;
-            }
-        }
-        return null;
+        // KC-1474 Return the Mod ID from most recent History of Change entry in Subaward Search
+        List<SubAwardAmountInfo> amountInfoList = getSubAwardAmountInfoList();
+        if (amountInfoList.isEmpty()) return null;
+        return amountInfoList.get(amountInfoList.size() - 1);
+        // KC-1474 END
     }
     // KC-1369 END
 

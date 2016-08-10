@@ -138,6 +138,8 @@ public class ProposalDevelopmentConstants {
         public static final String MAINTAIN_HIERARCHY_EDIT_MODE = "maintainProposalHierarchy";
         public static final String CAN_SAVE_CERTIFICATION = "canSaveCertification";
         public static final String MODIFY_S2S = "modifyS2s";
+        // KC-1304 Cannot add viewer once proposal if finalized - added MODIFY_PERMISSIONS
+        public static final String MODIFY_PERMISSIONS = "modifyPermissions";
     }
 
     public static class KewConstants {

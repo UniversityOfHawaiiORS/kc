@@ -87,8 +87,8 @@
       <c:set var="hideOpen" value="hideOpen"/>
       <c:set var="currentDoc" value="true"/>
     </c:if>
-    <%-- KC-1373 Medusa tabs for Award and Subaward not displaying correct info; medusaServiceImpl expects subAwardId instead of subAwardCode --%>
-    <span class="medusaNode"><a name="${node.type}-${node.bo.subAwardId}" class="${hideOpen}"><img src="static/images/sponsor12.gif"/>Subaward ${node.bo.subAwardCode}</a></span><a></a>
+    <%-- KC-1373 Medusa tabs for Award and Subaward not displaying correct info --%>
+    <span class="medusaNode"><a name="${node.type}-${node.bo.subAwardCode}" class="${hideOpen}"><img src="static/images/sponsor12.gif"/>Subaward ${node.bo.subAwardCode}</a></span><a></a>
     <%-- KC-1373 END --%>
   </c:when>
    <c:when test="${node.type == 'irb'}">

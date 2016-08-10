@@ -39,9 +39,10 @@
 					p:performClientSideValidation="true" p:methodToCall="navigate" 
 					p:actionLabel="Back" p:finalizeMethodToCall="finalizeNavigationLinks"
 					p:finalizeMethodAdditionalArguments="previous" p:order="10" />
+				<!-- KC-1304 Cannot add viewer once proposal if finalized - added MODIFY_PERMISSIONS check -->
 				<bean parent="Uif-SecondaryActionButton" p:ajaxSubmit="false"
 					p:performClientSideValidation="true" p:methodToCall="save"
-					p:actionLabel="Save" p:order="20" p:render="@{(!#parent.readOnly and canEdit) or #editModes[#proposalAuthConsts.CAN_SAVE_CERTIFICATION] or #editModes[#proposalAuthConsts.MODIFY_S2S]}"/>
+					p:actionLabel="Save" p:order="20" p:render="@{(!#parent.readOnly and canEdit) or #editModes[#proposalAuthConsts.CAN_SAVE_CERTIFICATION] or #editModes[#proposalAuthConsts.MODIFY_S2S] or #editModes[#proposalAuthConsts.MODIFY_PERMISSIONS]}"/>
 				<bean parent="Uif-PrimaryActionButton" p:ajaxSubmit="true"
 					p:performClientSideValidation="true" p:methodToCall="navigate"
 					p:actionLabel="Save and Continue" p:finalizeMethodToCall="finalizeNavigationLinks"
