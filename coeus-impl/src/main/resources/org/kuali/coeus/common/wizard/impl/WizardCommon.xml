@@ -36,19 +36,22 @@
             <bean parent="Uif-VerticalBoxLayout"/>
         </property>
     </bean>
-
+    <!-- KC-1304 Cannot add viewer once proposal if finalized - added readOnly=false to all items -->
     <bean id="Kc-Wizard-EmployeeInputFields" abstract="true" parent="Kc-Wizard-EmployeeInputFields-parentBean"/>
     <bean id="Kc-Wizard-EmployeeInputFields-parentBean" parent="Uif-CssGridSection-1FieldLabelColumn">
         <property name="items">
             <list>
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['lastName']" p:order="20"
+                      p:readOnly="false"
                       p:dictionaryAttributeName="lastName" />
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['firstName']" p:order="30"
+                      p:readOnly="false"
                       p:dictionaryAttributeName="firstName" />
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['principalName']" p:order="40"
+                      p:readOnly="false"
                       p:dictionaryAttributeName="userName" />
                 <!-- KC-958 Remove Fields from Employee Search and Non-Employee Search
                 <bean parent="Kc-Wizard-PersonInputField"
@@ -60,6 +63,7 @@
                       -->
                 <bean parent="Kc-Wizard-PersonInputField"
                       p:propertyName="lookupFieldValues['primaryDepartmentCode']"
+                      p:readOnly="false"
                       p:order="70" p:dictionaryAttributeName="organizationIdentifier">
                     <property name="quickfinder">
                         <bean parent="Uif-QuickFinderByScript" p:dataObjectClassName="org.kuali.coeus.common.framework.unit.Unit"
@@ -67,6 +71,7 @@
                     </property>
                 </bean>
                 <bean parent="Kc-Wizard-PersonInputField"
+                      p:readOnly="false"
                       p:propertyName="lookupFieldValues['campusCode']" p:order="80"
                       p:dictionaryAttributeName="campusCode">
                     <property name="quickfinder">
