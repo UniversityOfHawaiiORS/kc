@@ -250,7 +250,13 @@ public class SubAwardAmountInfo extends KcPersistableBusinessObjectBase implemen
             setDocument(newFileData);
             if (newFileData.length > 0) {
                 setFileName(newFile.getFileName());
-                setMimeType(newFile.getContentType());
+                // KC-1485 Exception when attaching documents to subaward
+                String mimeType = newFile.getContentType();
+                if (mimeType.length()>100) {
+                    mimeType = StringUtils.remove(mimeType,'\\');
+                    mimeType = StringUtils.remove(mimeType,'"');
+                }
+                setMimeType(mimeType);
             }
         } catch (IOException e) {
         	throw new RuntimeException(e);
