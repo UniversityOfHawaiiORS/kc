@@ -185,7 +185,8 @@ public class ProposalDevelopmentDocumentAuthorizer extends KcKradTransactionalDo
         }
                 
         if (isAuthorizedToModifyProposalRoles(doc, user)) {
-            editModes.add("modifyPermissions");
+            // KC-1304 Cannot add viewer once proposal if finalized - changed hard coded text to use constant MODIFY_PERMISSIONS
+            editModes.add(ProposalDevelopmentConstants.AuthConstants.MODIFY_PERMISSIONS);
         }
                 
         if (isAuthorizedToAddNarrative(doc, user)) {
