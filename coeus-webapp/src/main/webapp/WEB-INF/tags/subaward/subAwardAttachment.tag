@@ -218,6 +218,8 @@ opacity:1;
             	                 </c:if>
             	              </c:when>
 						   <c:otherwise>
+							   <!-- KC-1488 Hide any add/replace/delete attachment features in finalized document -->
+							   <c:if test="${!readOnly}">
 								    <html:image property="methodToCall.deleteAttachment.line${itrStatus.index}.anchor${currentTabIndex}"
 									   src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif' styleClass="tinybutton"
 									   alt="Delete Attachment"/>
@@ -225,6 +227,7 @@ opacity:1;
 												onclick="javascript: showHide('instFileDiv${itrStatus.index}','replaceInstDiv${itrStatus.index}') ; return false"  
 												src='${ConfigProperties.kra.externalizable.images.url}tinybutton-replace.gif' styleClass="tinybutton"
 												property="methodToCall.replaceNarrativeAttachment.line${itrStatus.index}.anchor${currentTabIndex};return false" />
+							   </c:if>
 							</c:otherwise>    
 						   </c:choose>
 					   </c:if>

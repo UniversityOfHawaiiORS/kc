@@ -80,8 +80,8 @@ opacity:1;
 					</div>
 				</th>
              </tr>
-             
-                <c:if test="${!empty KualiForm.editingMode['CAN_MAINTAIN_AWARD_ATTACHMENTS']}">
+                <!-- KC-1488 Hide any add/replace/delete attachment features in finalized document -->
+                <c:if test="${!empty KualiForm.editingMode['CAN_MAINTAIN_AWARD_ATTACHMENTS'] && !readOnly}">
                 <tbody class="addline">
 	             <tr>
 	                <td align="center" valign="middle" class="infoline">
