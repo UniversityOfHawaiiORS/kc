@@ -265,7 +265,14 @@ public class TimeAndMoneyServiceImpl implements TimeAndMoneyService {
         if (timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode() == null) {
             isNoCostExtension = false;
         }else {
-            isNoCostExtension = timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(NO_COST_EXTENSION_CODE);//Transaction type code for No Cost Extension
+            // KC-733 No Cost Extension hard coded to trans code of 10
+            // (found during KC-727 investigation)
+            // As of version 1608.0028 of kc the hard code was refactored and this code was changed to a constant.
+            // However since we have two values for no cost extention we still need our two code used for this check 
+            // so this jira fix has been moved to this new file.  It was in TimeAndMoneyAction.java before the refactor.
+            //isNoCostExtension = timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(NO_COST_EXTENSION_CODE);//Transaction type code for No Cost Extension
+            isNoCostExtension = timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(7)
+                             || timeAndMoneyDocument.getAwardAmountTransactions().get(0).getTransactionTypeCode().equals(8);
         }
         //if Dates have changed in a node in hierarchy view and the Transaction Type is a No Cost Extension,
         //we need to record this as a transaction in history.
@@ -323,6 +330,15 @@ public class TimeAndMoneyServiceImpl implements TimeAndMoneyService {
             if (!found) {
                 needToSave = true;
             }
+        }
+        // KC-727 TimeAndMoney, Direct/F&A Funds Distribution fields not saving
+        // The above check works as long as the lists are of the same length.  If one or the
+        // other are different in size then it fails.  A quick check for size match covers
+        // this condition
+        // NOTE: In upgrade to 1608.0028 this code was moved from AwardActions.java to this file
+        //       so I had to move this modification into the new code.
+        if (awardFandADistributions.size() != tAndMFandADistributions.size()) {
+            needToSave = true;
         }
         return needToSave;
     }
