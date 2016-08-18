@@ -33,6 +33,7 @@
         <ref bean="SubAward-fedAwardProjDesc" />
         <ref bean="SubAward-fAndARate" />
         <ref bean="SubAward-deMinimus" />
+        <ref bean="SubAward-ffataRequired" />
       	<ref bean="SubAward-subAwardId" />                
         <ref bean="SubAward-organizationId" />
         <ref bean="SubAward-startDate" />
@@ -158,6 +159,15 @@
     <property name="shortLabel" value="De Minimis" />
     <property name="summary" value="de Minimus" />
     <property name="description" value="de Minimus" />
+  </bean>
+
+  <bean id="SubAward-ffataRequired" parent="SubAward-ffataRequired-parentBean"/>
+  <bean id="SubAward-ffataRequired-parentBean" abstract="true" parent="AttributeReferenceDummy-genericBoolean">
+    <property name="name" value="ffataRequired" />
+    <property name="label" value="FFATA Required" />
+    <property name="shortLabel" value="FFATA Required" />
+    <property name="summary" value="FFATA Required" />
+    <property name="description" value="FFATA Required" />
   </bean>
 
   <bean id="SubAward-subAwardId" parent="SubAward-subAwardId-parentBean" />
@@ -688,11 +698,11 @@
     <property name="label" value="Site Investigator" />
     <property name="shortLabel" value="Site Investigator" />
     <property name="maxLength" value="22" />
-    <property name="validationPattern" >
-      <bean parent="NumericValidationPattern" />
+    <property name="validationPattern">
+      <bean parent="IntegerValidationPattern" p:allowNegative="true"/>
     </property>
     <property name="validCharactersConstraint">
-      <bean parent="NumericPatternConstraint"/>
+      <bean parent="IntegerPatternConstraint" p:allowNegative="true"/>
     </property>
     <property name="required" value="false" />
     <property name="control" >

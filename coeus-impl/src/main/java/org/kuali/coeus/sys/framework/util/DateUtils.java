@@ -40,7 +40,7 @@ public final class DateUtils {
             "(?:\\s*([a-z]{2,5}))?", //time zone abbreviation (optional)
             Pattern.CASE_INSENSITIVE);
     private static final Pattern TIME_PATTERN_24_HOUR = Pattern.compile("([01][0-9]|2[0-3])" + // hour
-            "(?:(?::|\\.)?([0-5][0-9]))" + // minute (optional)
+            "(?:(?::|\\.)?([0-5][0-9]))" + // minute
             "(?:\\s*(\\b[ap]m?\\b|\\b[ap]\\.m\\.\\s?))?" + // AM/PM (optional)
             "(?:\\s*([a-z]{2,5}))?", //time zone abbreviation (optional)
             Pattern.CASE_INSENSITIVE);
@@ -461,8 +461,8 @@ public final class DateUtils {
         	}
         }
         else {
-            return hour + ":" + minute + " " + amPmMarker;
-        }
+        return hour + ":" + minute + " " + amPmMarker;
+    }
         //KC-605 END
     }
 
@@ -477,7 +477,9 @@ public final class DateUtils {
         }
         else if (intHour >= 12) {
             amPmMarker = "PM";
+            if (intHour > 12) {
             intHour -= 12;
+        }
         }
         if (minute == null) {
             minute = "00";

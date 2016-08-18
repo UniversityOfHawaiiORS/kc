@@ -1,4 +1,4 @@
- /*
+/*
  * Kuali Coeus, a comprehensive research administration system for higher education.
  * 
  * Copyright 2005-2016 Kuali, Inc.
@@ -358,7 +358,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         }
         return extraButtons;
     }
-
+    
     // KC-1350 Allow creating multiple negotiations for SubAwards
     public List<ExtraButton> getExtraTopButtons() {
         extraButtons.clear();
@@ -381,9 +381,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
      * 
      */
     public boolean getDisplayEditButton() {
-        return !getSubAwardDocument().getDocumentHeader().getWorkflowDocument().isCanceled()
-                // KC-1409 Hide "edit" button in older versions of subaward
-                && VersionStatus.ACTIVE.toString().equals(getSubAwardDocument().getSubAward().getSubAwardSequenceStatus());
+        return !getSubAwardDocument().getDocumentHeader().getWorkflowDocument().isCanceled() && VersionStatus.ACTIVE.toString().equals(getSubAwardDocument().getSubAward().getSubAwardSequenceStatus());
     }
 
     public String getShortUrl() {
