@@ -47,13 +47,8 @@ import org.kuali.kra.award.awardhierarchy.sync.AwardSyncType;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncCreationService;
 import org.kuali.kra.award.awardhierarchy.sync.service.AwardSyncService;
 import org.kuali.kra.award.budget.AwardBudgetService;
-import org.kuali.kra.award.contacts.AwardPerson;
-import org.kuali.kra.award.contacts.AwardProjectPersonsSaveRule;
-import org.kuali.kra.award.contacts.AwardSponsorContact;
-import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
-import org.kuali.kra.award.home.AwardSponsorTerm;
 import org.kuali.kra.award.home.AwardService;
 import org.kuali.kra.award.notesandattachments.attachments.AwardAttachmentFormBean;
 import org.kuali.kra.award.paymentreports.ReportClass;
@@ -61,7 +56,6 @@ import org.kuali.kra.award.paymentreports.awardreports.AwardReportTerm;
 import org.kuali.kra.award.paymentreports.awardreports.AwardReportTermRecipient;
 import org.kuali.kra.award.paymentreports.awardreports.reporting.service.ReportTrackingService;
 import org.kuali.kra.award.paymentreports.closeout.CloseoutReportTypeValuesFinder;
-import org.kuali.kra.award.timeandmoney.AwardDirectFandADistribution;
 import org.kuali.kra.award.service.AwardDirectFandADistributionService;
 import org.kuali.kra.award.service.AwardReportsService;
 import org.kuali.kra.award.service.AwardSponsorTermService;
@@ -101,8 +95,6 @@ import org.kuali.rice.krad.util.KRADConstants;
 import org.kuali.kra.negotiations.bo.Negotiation;
 import org.kuali.kra.negotiations.document.NegotiationDocument;
 import org.kuali.kra.negotiations.service.NegotiationService;
-import edu.hawaii.award.bo.UhAwardExtension;
-import org.kuali.rice.kns.service.DataDictionaryService;
 import org.kuali.rice.krad.service.SequenceAccessorService;
 // KC-821 END
 import javax.servlet.http.HttpServletRequest;
@@ -486,43 +478,6 @@ public class AwardAction extends BudgetParentActionBase {
         return ((AwardForm) form).getAwardDocument();
     }
 
-    protected void checkAwardNumber(Award award) {
-        if (Award.DEFAULT_AWARD_NUMBER.equals(award.getAwardNumber())) {
-            AwardNumberService awardNumberService = getAwardNumberService();
-            String awardNumber = awardNumberService.getNextAwardNumber();
-            award.setAwardNumber(awardNumber);
-        }
-        if (Award.DEFAULT_AWARD_NUMBER.equals(award.getAwardAmountInfos().get(0).getAwardNumber())) {
-            award.getAwardAmountInfos().get(0).setAwardNumber(award.getAwardNumber());
-        }
-        award.getAwardApprovedSubawards().stream()
-                .filter(approvedSubaward -> Award.DEFAULT_AWARD_NUMBER.equals(approvedSubaward.getAwardNumber()))
-                .forEach(approvedSubaward -> approvedSubaward.setAwardNumber(award.getAwardNumber()));
-
-        for(AwardComment comment : award.getAwardComments()) {
-            comment.setAward(award);
-        }
-
-        for(AwardCustomData customData : award.getAwardCustomDataList()) {
-            customData.setAward(award);
-        }
-        // RRG KC-477 BEGIN - Award Persons are getting added with award_number 000000-00000 when created from IP or Funding Proposal
-        for(AwardPerson awardPerson : award.getProjectPersons()) {
-        	awardPerson.setAward(award);
-        }
-        for(AwardReportTerm awardReportTerm : award.getAwardReportTermItems()) {
-        	awardReportTerm.setAward(award);
-    
-        }
-        for(AwardSponsorContact awardSponsorContact : award.getSponsorContacts()) {
-        	awardSponsorContact.setAward(award);
-        }
-        for(AwardSponsorTerm awardSponsorTerm : award.getAwardSponsorTerms()) {
-        	awardSponsorTerm.setAward(award);
-    }
-        // RRG KC-477 END
-    }
-
     protected AwardNumberService getAwardNumberService() {
         return KcServiceLocator.getService(AwardNumberService.class);
     }
@@ -706,36 +661,6 @@ public class AwardAction extends BudgetParentActionBase {
 
     }
 
-    protected TransactionDetail addTransactionDetails(String sourceAwardNumber, String destinationAwardNumber, Integer sequenceNumber, String documentNumber, 
-            String commentsString, Award rootAward){
-        TransactionDetail transactionDetail = new TransactionDetail();
-        transactionDetail.setSourceAwardNumber(sourceAwardNumber);
-        transactionDetail.setSequenceNumber(sequenceNumber);
-        transactionDetail.setDestinationAwardNumber(destinationAwardNumber);
-        if(isDirectIndirectViewEnabled()){
-            transactionDetail.setAnticipatedAmount(rootAward.getAnticipatedTotalDirect().add(rootAward.getAnticipatedTotalIndirect()));
-            transactionDetail.setAnticipatedDirectAmount(rootAward.getAnticipatedTotalDirect());
-            transactionDetail.setAnticipatedIndirectAmount(rootAward.getAnticipatedTotalIndirect());
-            transactionDetail.setObligatedAmount(rootAward.getObligatedTotalDirect().add(rootAward.getObligatedTotalIndirect()));
-            transactionDetail.setObligatedDirectAmount(rootAward.getObligatedTotalDirect());
-            transactionDetail.setObligatedIndirectAmount(rootAward.getObligatedTotalIndirect());
-        } else {
-            transactionDetail.setAnticipatedAmount(rootAward.getAnticipatedTotal());
-            transactionDetail.setAnticipatedDirectAmount(rootAward.getAnticipatedTotal());
-            transactionDetail.setAnticipatedIndirectAmount(new ScaleTwoDecimal(0));
-            transactionDetail.setObligatedAmount(rootAward.getObligatedTotal());
-            transactionDetail.setObligatedDirectAmount(rootAward.getObligatedTotal());
-            transactionDetail.setObligatedIndirectAmount(new ScaleTwoDecimal(0));
-        }
-        transactionDetail.setAwardNumber(rootAward.getAwardNumber());
-        transactionDetail.setTransactionId(0L);
-        transactionDetail.setTimeAndMoneyDocumentNumber(documentNumber);
-        transactionDetail.setComments(commentsString);
-        transactionDetail.setTransactionDetailType(TransactionDetailType.PRIMARY.toString());
-        return transactionDetail;
-        
-    }
-
     // KC-821 KC Negotiation - UH Customization, Only allow one Negotiation per child award.
     protected NegotiationService getNegotiationService() {
         if (negotiationService == null) {
@@ -759,8 +684,7 @@ public class AwardAction extends BudgetParentActionBase {
         if(GlobalVariables.getMessageMap().hasNoErrors()){
             //AwardForm awardForm = (AwardForm) form;
             DocumentService documentService = KcServiceLocator.getService(DocumentService.class);
-            TransactionDetail transactionDetail = null;
-        
+
             Award currentAward = awardDocument.getAward();
     
             Map<String, Object> fieldValues = new HashMap<String, Object>();
@@ -829,36 +753,6 @@ public class AwardAction extends BudgetParentActionBase {
 
     }
     // KC-821 END  
-
-    protected TransactionDetail addTransactionDetails(String sourceAwardNumber, String destinationAwardNumber, Integer sequenceNumber, String documentNumber, 
-            String commentsString, Award rootAward){
-        TransactionDetail transactionDetail = new TransactionDetail();
-        transactionDetail.setSourceAwardNumber(sourceAwardNumber);
-        transactionDetail.setSequenceNumber(sequenceNumber);
-        transactionDetail.setDestinationAwardNumber(destinationAwardNumber);
-        if(isDirectIndirectViewEnabled()){
-            transactionDetail.setAnticipatedAmount(rootAward.getAnticipatedTotalDirect().add(rootAward.getAnticipatedTotalIndirect()));
-            transactionDetail.setAnticipatedDirectAmount(rootAward.getAnticipatedTotalDirect());
-            transactionDetail.setAnticipatedIndirectAmount(rootAward.getAnticipatedTotalIndirect());
-            transactionDetail.setObligatedAmount(rootAward.getObligatedTotalDirect().add(rootAward.getObligatedTotalIndirect()));
-            transactionDetail.setObligatedDirectAmount(rootAward.getObligatedTotalDirect());
-            transactionDetail.setObligatedIndirectAmount(rootAward.getObligatedTotalIndirect());
-        } else {
-            transactionDetail.setAnticipatedAmount(rootAward.getAnticipatedTotal());
-            transactionDetail.setAnticipatedDirectAmount(rootAward.getAnticipatedTotal());
-            transactionDetail.setAnticipatedIndirectAmount(new ScaleTwoDecimal(0));
-            transactionDetail.setObligatedAmount(rootAward.getObligatedTotal());
-            transactionDetail.setObligatedDirectAmount(rootAward.getObligatedTotal());
-            transactionDetail.setObligatedIndirectAmount(new ScaleTwoDecimal(0));
-        }
-        transactionDetail.setAwardNumber(rootAward.getAwardNumber());
-        transactionDetail.setTransactionId(0L);
-        transactionDetail.setTimeAndMoneyDocumentNumber(documentNumber);
-        transactionDetail.setComments(commentsString);
-        transactionDetail.setTransactionDetailType(TransactionDetailType.PRIMARY.toString());
-        return transactionDetail;
-        
-    }
 
     protected ParameterService getParameterService() {
         if (this.parameterService == null) {
@@ -1365,7 +1259,6 @@ public class AwardAction extends BudgetParentActionBase {
     protected VersionHistoryService getVersionHistoryService() {
         return KcServiceLocator.getService(VersionHistoryService.class);
     }
-
 
     @Override
     public ActionForward performLookup(ActionMapping mapping, ActionForm form, HttpServletRequest request,

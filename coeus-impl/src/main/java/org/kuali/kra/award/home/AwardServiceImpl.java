@@ -30,11 +30,14 @@ import org.kuali.coeus.common.framework.version.history.VersionHistoryService;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.award.AwardNumberService;
+import org.kuali.kra.award.contacts.AwardPerson;
+import org.kuali.kra.award.contacts.AwardSponsorContact;
 import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.dao.AwardDao;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.infrastructure.AwardRoleConstants;
 import org.kuali.kra.award.notesandattachments.attachments.AwardAttachment;
+import org.kuali.kra.award.paymentreports.awardreports.AwardReportTerm;
 import org.kuali.kra.award.version.service.AwardVersionService;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
@@ -198,9 +201,25 @@ public class AwardServiceImpl implements AwardService {
         for(AwardComment comment : award.getAwardComments()) {
             comment.setAward(award);
         }
+
         for(AwardCustomData customData : award.getAwardCustomDataList()) {
             customData.setAward(award);
         }
+        // RRG KC-477 BEGIN - Award Persons are getting added with award_number 000000-00000 when created from IP or Funding Proposal
+        for(AwardPerson awardPerson : award.getProjectPersons()) {
+            awardPerson.setAward(award);
+        }
+        for(AwardReportTerm awardReportTerm : award.getAwardReportTermItems()) {
+            awardReportTerm.setAward(award);
+
+        }
+        for(AwardSponsorContact awardSponsorContact : award.getSponsorContacts()) {
+            awardSponsorContact.setAward(award);
+        }
+        for(AwardSponsorTerm awardSponsorTerm : award.getAwardSponsorTerms()) {
+            awardSponsorTerm.setAward(award);
+        }
+        // RRG KC-477 END
     }
 
     public AwardDocument generateAndPopulateAwardDocument(AwardDocument oldAwardDocument, Award newVersion) throws WorkflowException {
