@@ -84,6 +84,10 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1607_oracle_kc_rice_server_upgrade.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1607_oracle_kc_upgrade.sql
 
+    # Update to 1608
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1608_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1608_oracle_kc_upgrade.sql
+
     # UH modificaitons for next target release
 
     echo "Grepping for errors in the logs"
