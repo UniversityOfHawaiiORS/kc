@@ -44,6 +44,7 @@ import org.kuali.kra.award.customdata.AwardCustomData;
 import org.kuali.kra.award.dao.AwardDao;
 import org.kuali.kra.award.document.AwardDocument;
 import org.kuali.kra.award.home.Award;
+import org.kuali.kra.award.home.AwardAmountInfo;
 import org.kuali.kra.award.home.AwardService;
 import org.kuali.kra.award.home.AwardSponsorTerm;
 import org.kuali.kra.award.home.fundingproposal.AwardFundingProposalBean;
@@ -181,23 +182,28 @@ public class AwardController extends RestController implements InitializingBean 
         return versionAward(awardDto, award);
     }
 
-    protected AwardDto versionAward(AwardDto awardDto, Award award) throws WorkflowException {
-        AwardDocument oldAwardDocument = (AwardDocument) commonApiService.getDocumentFromDocId(Long.parseLong(award.getAwardDocument().getDocumentNumber()));
-        String rootAwardNumber = awardService.getRootAwardNumber(award.getAwardNumber());
-        if(timeAndMoneyExistenceService.validateTimeAndMoneyRule(award, rootAwardNumber)) {
-            if (award.getAwardSequenceStatus().equalsIgnoreCase(Constants.PENDING)) {
+    protected AwardDto versionAward(AwardDto awardDto, Award awardToVersion) throws WorkflowException {
+        AwardDocument oldAwardDocument = (AwardDocument) commonApiService.getDocumentFromDocId(Long.parseLong(awardToVersion.getAwardDocument().getDocumentNumber()));
+        String rootAwardNumber = awardService.getRootAwardNumber(awardToVersion.getAwardNumber());
+        if(timeAndMoneyExistenceService.validateTimeAndMoneyRule(awardToVersion, rootAwardNumber)) {
+            if (awardToVersion.getAwardSequenceStatus().equalsIgnoreCase(Constants.PENDING)) {
                 throw new UnprocessableEntityException(PENDING_VERSION_ERROR);
             }
-            VersionHistory foundPending = versionHistoryService.findPendingVersion(award);
+            VersionHistory foundPending = versionHistoryService.findPendingVersion(awardToVersion);
             if(foundPending != null) {
                 throw new UnprocessableEntityException(PENDING_VERSION_ERROR);
             } else {
-                award.setNewVersion(true);
-                Award newAwardVersion = versioningService.createNewVersion(award);
+                awardToVersion.setNewVersion(true);
+                Award newAwardVersion = versioningService.createNewVersion(awardToVersion);
+                List<AwardAmountInfo> oldAwardAmountInfos = newAwardVersion.getAwardAmountInfos();
                 commonApiService.updateDataObjectFromDto(newAwardVersion, awardDto);
+                newAwardVersion.setAwardAmountInfos(oldAwardAmountInfos);
                 defaultValues(newAwardVersion, awardDto);
-                translateCollections(awardDto, newAwardVersion, newAwardVersion.getAwardDocument());
+                newAwardVersion.getAwardDocument().setAward(newAwardVersion);
+                translateCollections(awardDto, newAwardVersion.getAwardDocument());
                 AwardDocument newAwardDocument = awardService.generateAndPopulateAwardDocument(oldAwardDocument, newAwardVersion);
+                newAwardDocument.getAward().setAwardTransactionTypeCode(awardDto.getAwardTransactionTypeCode());
+                addFundingProposals(awardDto, newAwardVersion);
                 newAwardDocument = (AwardDocument) documentService.saveDocument(newAwardDocument);
                 awardService.updateAwardSequenceStatus(newAwardDocument.getAward(), VersionStatus.PENDING);
                 versionHistoryService.updateVersionHistory(newAwardDocument.getAward(), VersionStatus.PENDING,
@@ -267,7 +273,9 @@ public class AwardController extends RestController implements InitializingBean 
         defaultValues(award, awardDto);
         AwardDocument awardDocument = (AwardDocument) documentService.getNewDocument(AwardDocument.class);
         awardDocument.setAward(award);
-        translateCollections(awardDto, award, awardDocument);
+        translateCollections(awardDto, awardDocument);
+        addFundingProposals(awardDto, award);
+
         awardService.checkAwardNumber(award);
         awardService.updateCurrentAwardAmountInfo(award);
         AwardDocument newDocument = (AwardDocument) commonApiService.saveDocument(awardDocument);
@@ -289,14 +297,15 @@ public class AwardController extends RestController implements InitializingBean 
         return newAwardDto;
     }
 
-    protected void translateCollections(AwardDto awardDto, Award award, AwardDocument awardDocument) {
-        awardDocument.getAward().setProjectPersons(new ArrayList<>());
+    protected void translateCollections(AwardDto awardDto, AwardDocument awardDocument) {
+
+        final Award award = awardDocument.getAward();
+        award.setProjectPersons(new ArrayList<>());
         final List<AwardPersonDto> projectPersons = awardDto.getProjectPersons();
         addPersons(projectPersons, awardDocument);
         addSponsorTerms(award, awardDto);
         addReportTerms(award, awardDto);
         addCustomData(awardDocument, award, awardDto);
-        addFundingProposals(awardDto, award);
         addAmountInfo(awardDto, award);
         translateSponsorContacts(awardDto, award);
         if(!globalVariableService.getMessageMap().getErrorMessages().isEmpty()) {
@@ -415,16 +424,17 @@ public class AwardController extends RestController implements InitializingBean 
     }
 
     protected void addPersons(List<AwardPersonDto> awardPersonsDto, AwardDocument awardDocument) {
+        Award award = awardDocument.getAward();
         if (awardPersonsDto != null) {
             List<AwardPerson> awardPersons = awardPersonsDto.stream().map(awardPersonDto -> {
                 AwardPerson awardPerson = commonApiService.convertObject(awardPersonDto, AwardPerson.class);
                 AwardProjectPersonnelBean awardProjectPersonnelBean = new AwardProjectPersonnelBean(awardDocument);
                 awardProjectPersonnelBean.addPersonUnits(awardPerson);
-                awardPerson.setAward(awardDocument.getAward());
+                awardPerson.setAward(award);
                 return awardPerson;
             }).collect(Collectors.toList());
-
-            awardDocument.getAward().getProjectPersons().addAll(awardPersons);
+            award.setProjectPersons(awardPersons);
+            awardDocument.setAward(award);
         }
 
     }
@@ -486,6 +496,9 @@ public class AwardController extends RestController implements InitializingBean 
                 AwardFundingProposalBean fundingProposalBean = new AwardFundingProposalBean();
                 fundingProposalBean.setMergeTypeCode(awardFundingProposalDto.getMergeTypeCode());
                 InstitutionalProposal institutionalProposal = institutionalProposalService.getInstitutionalProposal(awardFundingProposalDto.getProposalId().toString());
+                if(institutionalProposal == null) {
+                    throw new UnprocessableEntityException("The funding proposal with proposal id " + awardFundingProposalDto.getProposalId() + " cannot be located");
+                }
                 fundingProposalBean.setNewFundingProposal(institutionalProposal);
                 fundingProposalBean.validateAndPerformFeed(new ArrayList<>(), award);
             });
