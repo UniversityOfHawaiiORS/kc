@@ -34,6 +34,7 @@ import org.kuali.rice.krad.util.KRADConstants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class CoiProjectAction extends KualiAction {
@@ -83,7 +84,11 @@ public class CoiProjectAction extends KualiAction {
 
     public Collection<ProjectRetrievalService> getRetrievalServices() {
         if (retrievalServices == null) {
-            retrievalServices = KcServiceLocator.getServicesOfType(ProjectRetrievalService.class);
+            // KC-1497 Project Push from KC to COI pushes to much data
+            // Fix Project push only push Awards not everything else (No IP, PD, IRB, IACUC etc)
+            //retrievalServices = KcServiceLocator.getServicesOfType(ProjectRetrievalService.class);
+            retrievalServices = new ArrayList<ProjectRetrievalService>();
+            retrievalServices.add(KcServiceLocator.getService("awardProjectRetrievalService"));
         }
 
         return retrievalServices;

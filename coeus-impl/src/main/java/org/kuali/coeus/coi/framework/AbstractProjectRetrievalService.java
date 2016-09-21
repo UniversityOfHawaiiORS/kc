@@ -19,6 +19,8 @@
 package org.kuali.coeus.coi.framework;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcOperations;
@@ -37,6 +39,7 @@ import static org.kuali.coeus.sys.framework.util.CollectionUtils.entry;
 public abstract class AbstractProjectRetrievalService implements ProjectRetrievalService {
 
     protected static final String SOURCE_UNIQUE_IDENTIFIER_METADATA = "sourceUniqueIdentifier";
+    private static final Log LOG = LogFactory.getLog(AbstractProjectRetrievalService.class);
 
     @Autowired
     @Qualifier("jdbcOperations")
@@ -48,7 +51,24 @@ public abstract class AbstractProjectRetrievalService implements ProjectRetrieva
 
         if (!projects.isEmpty()) {
             final Map<String, List<ProjectPerson>> persons = getPersonsMap();
-            persons.forEach((k,v) -> projects.get(k).setPersons(v));
+            // KC-1497 Project Push from KC to COI pushes to much data
+            // While testing Projct Push for this change received null exception if PD has no people
+            if (persons != null) {
+                // KC-1497 Project Push from KC to COI pushes to much data
+                // This code is throwing exception but as written impossible to debug so changing to a proper loop
+                // for easy debugging
+                //persons.forEach((k, v) -> projects.get(k).setPersons(v));
+                for (Map.Entry<String, List<ProjectPerson>> entry : persons.entrySet()) {
+                    String key = entry.getKey();
+                    List<ProjectPerson> value = entry.getValue();
+                    Project project = projects.get(key);
+                    if (project != null) {
+                        project.setPersons(value);
+                    } else {
+                        LOG.warn("Project/Person Mapping mis-match Project not found for key=" + key);
+                    }
+                }
+            }
         }
 
         return projects.values();

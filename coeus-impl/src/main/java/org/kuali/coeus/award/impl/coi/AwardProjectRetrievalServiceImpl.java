@@ -38,11 +38,25 @@ public class AwardProjectRetrievalServiceImpl extends AbstractProjectRetrievalSe
             "INNER JOIN AWARD t ON t.AWARD_NUMBER = x.AWARD_NUMBER and t.SEQUENCE_NUMBER = x.maxseq " +
             "LEFT OUTER JOIN SPONSOR u ON t.SPONSOR_CODE = u.SPONSOR_CODE";
 
+
     private static final String AWARD_ALL_PROJECT_PERSON_QUERY = "SELECT t.AWARD_ID, t.PERSON_ID, t.ROLODEX_ID, t.CONTACT_ROLE_CODE, t.AWARD_NUMBER, t.SEQUENCE_NUMBER FROM (" + AWARD_ALL_HIGHEST_SEQUENCE_QUERY + ") x " +
             "INNER JOIN AWARD_PERSONS t ON t.AWARD_NUMBER = x.AWARD_NUMBER and t.SEQUENCE_NUMBER = x.maxseq";
 
+
     private static final String AWARD_PROJECT_QUERY = AWARD_ALL_PROJECT_QUERY + " WHERE t.AWARD_NUMBER = ?";
     private static final String AWARD_PROJECT_PERSON_QUERY = AWARD_ALL_PROJECT_PERSON_QUERY + " WHERE t.AWARD_NUMBER = ?";
+
+    // KC-1497 Project Push from KC to COI pushes to much data
+    private static final String UH_FILTER_ALL_PROJECT_PUSH_FILTER = " INNER JOIN AWARD_END_DATES_INFO_VIEW V on x.AWARD_NUMBER = V.AWARD_NUMBER and x.maxseq = V.SEQUENCE_NUMBER " + // Add UH View for project end date
+                                                                    " where t.award_number like '%-00001' " + // only shell awards should be pushed
+                                                                    " and V.PROJECT_END_DATE > sysdate " + // use our UH View to check project end date
+                                                                    " and t.status_code = 1 "; // Only active awards;
+    private static final String UH_ALL_PROJECT_PUSH_PERSON_FILTER = " INNER JOIN AWARD_END_DATES_INFO_VIEW V on x.AWARD_NUMBER = V.AWARD_NUMBER and x.maxseq = V.SEQUENCE_NUMBER" + // Add UH View for project end date
+                                                                    " JOIN AWARD a ON a.AWARD_NUMBER = x.AWARD_NUMBER and a.SEQUENCE_NUMBER = x.maxseq" + // UH Add award for where clause
+                                                                    " where t.award_number like '%-00001' and V.PROJECT_END_DATE > sysdate and a.status_code = 1"; // Add Where clause with UH criteria;
+
+    // KC-1494 Only disclose on award child records in COI disclosure
+    private static final String UH_AWARD_PUSH_FILTER = " and t.award_number not like '%-00001'";
 
     @Override
     protected Project toProject(ResultSet rs) throws SQLException {
@@ -85,17 +99,20 @@ public class AwardProjectRetrievalServiceImpl extends AbstractProjectRetrievalSe
 
     @Override
     protected String allProjectQuery() {
-        return AWARD_ALL_PROJECT_QUERY;
+        // KC-1497 Project Push from KC to COI pushes to much data
+        return AWARD_ALL_PROJECT_QUERY + UH_FILTER_ALL_PROJECT_PUSH_FILTER;
     }
 
     @Override
     protected String allProjectPersonQuery() {
-        return AWARD_ALL_PROJECT_PERSON_QUERY;
+        // KC-1497 Project Push from KC to COI pushes to much data
+        return AWARD_ALL_PROJECT_PERSON_QUERY + UH_ALL_PROJECT_PUSH_PERSON_FILTER;
     }
 
     @Override
     protected String projectQuery() {
-        return AWARD_PROJECT_QUERY;
+        // KC-1494 Only disclose on award child records in COI disclosure
+        return AWARD_PROJECT_QUERY + UH_AWARD_PUSH_FILTER;
     }
 
     @Override
