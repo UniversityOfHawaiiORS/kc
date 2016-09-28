@@ -89,6 +89,7 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1608_oracle_kc_upgrade.sql
 
     # UH modificaitons for next target release
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1508.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}

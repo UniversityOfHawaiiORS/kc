@@ -35,10 +35,15 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 	
 	private static HashSet<String>kcUsers=new HashSet<String>();
 	private static String kcUserGroupId;
+	// KC-1508  Make new "UH COI Users" group for COI only users
+	private static HashSet<String>coiUsers=new HashSet<String>();
+	private static String coiUserGroupId;
 	// KC-901 Add ability for help desk to run the uhims process on demand
 	private static Boolean uhimsRunning=false;
 
 	private static String appUrl;
+	// KC-1508  Make new "UH COI Users" group for COI only users
+	private static String coiUrl;
 	private static String contextName;
 		
 	// KC-901 Add ability for help desk to run the uhims process on demand
@@ -83,6 +88,7 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 	
 	public static void flushKcUserGroupCache() {
 		kcUsers=new HashSet<String>();
+		coiUsers=new HashSet<String>();
 	}
 	
 	String getKcUserGroupId() {
@@ -92,6 +98,16 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 			kcUserGroupId = kcUserGroup.getId();
 		}
 		return kcUserGroupId;
+	}
+
+	// KC-1508  Make new "UH COI Users" group for COI only users
+	String getCoiUserGroupId() {
+		if (coiUserGroupId == null) {
+			GroupService groupService = KimApiServiceLocator.getGroupService();
+			Group coiUserGroup=groupService.getGroupByNamespaceCodeAndName("KC-GEN", "UH COI Users");
+			coiUserGroupId = coiUserGroup.getId();
+		}
+		return coiUserGroupId;
 	}
 	
 	
@@ -135,19 +151,63 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 				boolean inKcUsersGroup = KimApiServiceLocator.getGroupService().isMemberOfGroup(principal.getPrincipalId(), getKcUserGroupId());
 				if (inKcUsersGroup) {
                 	kcUsers.add(principalName);
-                } else {
-                	// User is not in "UH KC Users" group so redirect them to permission denied page.
-        	        // Check if request is already forwarded to Permission Denied to prevent redirect loop
-        	        String channelTitle=(String)request.getParameter("channelTitle");
-        	        // KC-1204 Only allow users in the "UH KC Users" group to access myGRANT
-                    if (request.getRequestURL() != null && !request.getRequestURL().toString().contains("PermissionDenied")) {
-        		        response.sendRedirect(getAppUrl() + "/PermissionDenied.do");
-        		        return;
-        	        }
                 }
 			}
 			// KC-531 End
         }
+
+		// KC-1508  Make new "UH COI Users" group for COI only users
+		if (!kcUsers.contains(principalName) && !coiUsers.contains(principalName)) {
+			Principal principal = KimApiServiceLocator.getIdentityService().getPrincipalByPrincipalName(principalName);
+			if (principal == null || !principal.isActive()) {
+				ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
+				String logoutUrlBase = configService.getPropertyValueAsString("filter.casLogoutUrl");
+				String profilerNotFoundRedirectUrl = configService.getPropertyValueAsString("filter.profilerNotFoundRedirectUrl");
+
+				// Logout and redirect to profiler account not found page
+				response.sendRedirect(logoutUrlBase + "?service=" + profilerNotFoundRedirectUrl);
+
+				// destroy the session
+				HttpSession session = request.getSession();
+				if (session != null) {
+					try {
+						session.invalidate();
+					}
+					catch (IllegalStateException e) {
+						// ignore failure, since that just means that the session has
+						// already been
+						// invalidated
+					}
+				}
+				return;
+			} else  {
+				boolean inCoiUsersGroup = KimApiServiceLocator.getGroupService().isMemberOfGroup(principal.getPrincipalId(), getCoiUserGroupId());
+				if (inCoiUsersGroup) {
+					coiUsers.add(principalName);
+				}
+			}
+			// KC-531 End
+		}
+
+		// If still not in either group the user doesn't have either group so don't let them into mygrant
+		if (!kcUsers.contains(principalName) && !coiUsers.contains(principalName)) {
+			// User is not in "UH KC Users" group so redirect them to permission denied page.
+			// Check if request is already forwarded to Permission Denied to prevent redirect loop
+			String channelTitle=(String)request.getParameter("channelTitle");
+			// KC-1204 Only allow users in the "UH KC Users" or "UH COI Users" group to access myGRANT
+			if (request.getRequestURL() != null && !request.getRequestURL().toString().contains("PermissionDenied")) {
+				response.sendRedirect(getAppUrl() + "/PermissionDenied.do");
+				return;
+			}
+		}
+
+		// If user is in "UH COI Users" but not in "UH KC Users" then redirect them directly to COI module
+		if (!kcUsers.contains(principalName) && coiUsers.contains(principalName)) {
+			response.sendRedirect(getCoiUrl());
+			return;
+		}
+		// KC-1508 END
+
 		// If user with no System Admin permission tries to access system admin pages
 		// redirect to KRAD app url
 		if (request.getRequestURL() != null && request.getRequestURL().toString().contains(getContextName() + "/portal")) {
@@ -157,6 +217,7 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 				return;
 			}
 		}
+
         super.doFilter(request, response, chain);
     }
 
@@ -166,6 +227,15 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 			appUrl = configService.getPropertyValueAsString("application.url");
 		}
 		return appUrl;
+	}
+
+	// KC-1508  Make new "UH COI Users" group for COI only users
+	public static String getCoiUrl() {
+		if (coiUrl == null) {
+			ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
+			coiUrl = configService.getPropertyValueAsString("coi.standalone.base.url") + "/coi";
+		}
+		return coiUrl;
 	}
 
 	public static String getContextName() {
