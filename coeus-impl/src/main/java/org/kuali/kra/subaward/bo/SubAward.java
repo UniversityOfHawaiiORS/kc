@@ -146,6 +146,7 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
     private ScaleTwoDecimal fAndARate;
     private Boolean deMinimus;
     private Boolean ffataRequired;
+    private String fsrsSubawardNumber;
 
     private SubAwardCostType subAwardCostType;
 
@@ -164,6 +165,7 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
     private List<SubAwardContact> subAwardContactsList;
     private List<SubAwardCloseout> subAwardCloseoutList;
     private List<SubAwardCustomData> subAwardCustomDataList;
+    private List<SubAwardFfataReporting> subAwardFfataReporting;
 
     @SkipVersioning
     private transient List<SubAwardAmountReleased> subAwardAmountReleasedList;
@@ -662,7 +664,15 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
 		this.subAwardCustomDataList = subAwardCustomDataList;
 	}
 
-	public String getStatusDescription() {
+    public List<SubAwardFfataReporting> getSubAwardFfataReporting() {
+        return subAwardFfataReporting;
+    }
+
+    public void setSubAwardFfataReporting(List<SubAwardFfataReporting> subAwardFfataReporting) {
+        this.subAwardFfataReporting = subAwardFfataReporting;
+    }
+
+    public String getStatusDescription() {
         SubAwardStatus status = getSubAwardStatus();
         statusDescription = status != null ? status.getDescription() : null;
         return statusDescription;
@@ -676,6 +686,7 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
         subAwardCloseoutList = new AutoPopulatingList<>(SubAwardCloseout.class);
         subAwardCustomDataList = new AutoPopulatingList<>(SubAwardCustomData.class);
         subAwardReportList = new AutoPopulatingList<>(SubAwardReports.class);
+        subAwardFfataReporting = new AutoPopulatingList<>(SubAwardFfataReporting.class);
     }
 
     public void setSubAwardDocument(SubAwardDocument subAwardDocument) {
@@ -1066,6 +1077,14 @@ implements Permissionable, SequenceOwner<SubAward>, CustomDataContainer, Negotia
 
     public void setFfataRequired(Boolean ffataRequired) {
         this.ffataRequired = ffataRequired;
+    }
+
+    public String getFsrsSubawardNumber() {
+        return fsrsSubawardNumber;
+    }
+
+    public void setFsrsSubawardNumber(String fsrsSubawardNumber) {
+        this.fsrsSubawardNumber = fsrsSubawardNumber;
     }
 
     public ScaleTwoDecimal getfAndARate() {
