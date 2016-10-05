@@ -23,17 +23,16 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
+import org.kuali.coeus.common.api.sponsor.hierarchy.SponsorHierarchyService;
 import org.kuali.coeus.common.framework.krms.KrmsRulesExecutionService;
-import org.kuali.coeus.common.framework.print.AttachmentDataSource;
 import org.kuali.coeus.common.framework.version.VersionStatus;
 import org.kuali.coeus.common.framework.version.history.VersionHistoryService;
 import org.kuali.coeus.common.notification.impl.service.KcNotificationService;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
+import org.kuali.coeus.propdev.impl.coi.CoiConstants;
 import org.kuali.coeus.sys.framework.validation.AuditHelper;
 import org.kuali.coeus.sys.framework.validation.AuditHelper.ValidationState;
 import org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase;
@@ -48,14 +47,12 @@ import org.kuali.kra.subaward.bo.*;
 import org.kuali.kra.subaward.customdata.SubAwardCustomData;
 import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.kra.subaward.notification.SubAwardNotificationContext;
-import org.kuali.kra.subaward.reporting.printing.SubAwardPrintType;
 import org.kuali.kra.subaward.reporting.printing.service.SubAwardPrintingService;
 import org.kuali.kra.subaward.service.SubAwardService;
 import org.kuali.kra.subaward.subawardrule.SubAwardDocumentRule;
 import org.kuali.kra.subaward.templateAttachments.SubAwardAttachmentFormBean;
 import org.kuali.kra.timeandmoney.history.TransactionDetail;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
-import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.kew.api.KewApiConstants;
 import org.kuali.rice.kew.api.document.DocumentStatus;
 import org.kuali.rice.kew.api.exception.WorkflowException;
@@ -74,8 +71,6 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
 
     public static final String DISABLE_ATTACHMENT_REMOVAL = "disableAttachmentRemoval";
     private transient SubAwardService subAwardService;
-    private static final Log LOG = LogFactory.getLog(SubAwardAction.class);
-    private static final String SUBAWARD_AGREEMENT = "fdpAgreement";
     private static final String DOCUMENT_ROUTE_QUESTION="DocRoute";
 
     // KC-1350 Allow creating multiple negotiations for SubAwards
@@ -94,7 +89,7 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
         ActionForward actionForward = super.
         execute(mapping, form, request, response);
         if (GlobalVariables.getAuditErrorMap().isEmpty()) {
-            KcServiceLocator.getService(AuditHelper.class).auditConditionally((SubAwardForm) form);
+            getAuditHelper().auditConditionally((SubAwardForm) form);
         }
         if (subAwardForm.isAuditActivated()){
             subAwardForm.setUnitRulesMessages(getUnitRulesMessages(subAwardForm.getSubAwardDocument()));
@@ -106,19 +101,18 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
                 if(subAwardAttachmentsList != null && !subAwardAttachmentsList.isEmpty()) {
                      for(SubAwardAttachments subAwardAttachments:subAwardAttachmentsList) {
                             if(subAwardAttachments.getFileName() != null) {
-                                String printAttachmentTypeInclusion=KcServiceLocator.getService(ParameterService.class).getParameterValueAsString(Constants.MODULE_NAMESPACE_SUBAWARD, ParameterConstants.DOCUMENT_COMPONENT, Constants.PARAMETER_PRINT_ATTACHMENT_TYPE_INCLUSION);
+                                String printAttachmentTypeInclusion=getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_SUBAWARD, ParameterConstants.DOCUMENT_COMPONENT, Constants.PARAMETER_PRINT_ATTACHMENT_TYPE_INCLUSION);
                                 String[] attachmentTypeCode=printAttachmentTypeInclusion.split("\\,");
-                                for (int typeCode = 0; typeCode < attachmentTypeCode.length; typeCode++) {
-                                    if (StringUtils.equals(subAwardAttachments.getSubAwardAttachmentTypeCode(),attachmentTypeCode[typeCode])) {
-                                        String[] fileNameSplit = subAwardAttachments.getFileName().toString().split("\\.pdf");
-                                        SubAwardPrintingService printService = KcServiceLocator.getService(SubAwardPrintingService.class);
-                                        if (printService.isPdf(subAwardAttachments.getAttachmentContent())) {
+                                for (String anAttachmentTypeCode : attachmentTypeCode) {
+                                    if (StringUtils.equals(subAwardAttachments.getSubAwardAttachmentTypeCode(), anAttachmentTypeCode)) {
+                                        String[] fileNameSplit = subAwardAttachments.getFileName().split("\\.pdf");
+                                        if (getSubAwardPrintingService().isPdf(subAwardAttachments.getAttachmentContent())) {
                                             subAwardAttachments.setFileNameSplit(fileNameSplit[0]);
                                         }
                                     }
                                 }
                              }
-                            SubAwardAttachmentType subAwardAttachmentTypeValue =  KcServiceLocator.getService(BusinessObjectService.class).findBySinglePrimaryKey(SubAwardAttachmentType.class, subAwardAttachments.getSubAwardAttachmentTypeCode());
+                            SubAwardAttachmentType subAwardAttachmentTypeValue =  getBusinessObjectService().findBySinglePrimaryKey(SubAwardAttachmentType.class, subAwardAttachments.getSubAwardAttachmentTypeCode());
                             subAwardAttachments.setTypeAttachment(subAwardAttachmentTypeValue);
                      }
                 }
@@ -151,16 +145,6 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
         return forward;
     }
 
-    /**.
-     * this method is for handleDocument
-     * @param mapping the ActionMapping
-     * @param form the ActionForm
-     * @param request the Request
-     * @param response the Response
-     * @param subAwardForm the SubAwardForm
-     * @return ActionForward
-     * @throws Exception
-     */
     ActionForward handleDocument(ActionMapping mapping, ActionForm form, HttpServletRequest request,
                                   HttpServletResponse response, SubAwardForm subAwardForm) throws Exception {
 
@@ -180,14 +164,7 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
         }
         return forward;
     }
-    /**.
-    *
-    * loadDocumentInForm
-     * @param request the Request
-     * @param subAwardForm the SubAwardForm
-    * @throws WorkflowException
-    *
-    */
+
     protected void loadDocumentInForm(HttpServletRequest request,
     SubAwardForm subAwardForm)
     throws WorkflowException {
@@ -201,13 +178,6 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
                 docIdRequestParameter);
     }
 
-    /**.
-    *
-    * This method builds the string for the ActionForward
-    * @param forwardPath
-    * @param docIdRequestParameter
-    * @return String
-    */
    public String buildForwardStringForActionListCommand(String forwardPath,
 		 String docIdRequestParameter) {
        StringBuilder sb = new StringBuilder();
@@ -219,10 +189,7 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
        return sb.toString();
    }
 
-    /**
-     * @see org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase#loadDocument(
-     * org.kuali.rice.kns.web.struts.form.KualiDocumentFormBase)
-     */
+    @Override
     protected void loadDocument(KualiDocumentFormBase kualiForm)
     throws WorkflowException {
         super.loadDocument(kualiForm);
@@ -230,10 +197,7 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
         getSubAwardDocument().getSubAward();
     }
 
-    /**
-     * @see org.kuali.coeus.sys.framework.controller.KcTransactionalDocumentActionBase
-     * #save(org.apache.struts.action.ActionMapping, org.apache.struts.action.ActionForm, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
+
     @Override
     public ActionForward save(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         SubAwardForm subAwardForm = (SubAwardForm) form;
@@ -251,10 +215,10 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
              if (onFinancialTab(mapping, request) && !rule.processSaveSubAwardAmountInfoBusinessRules(subAward)) {
                  return mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
              } else {
-                 ActionForward forward = super.save(mapping, form, request, response);
-                 getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
+            ActionForward forward = super.save(mapping, form, request, response);
+            getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
                  getSubAwardService().calculateAmountInfo(subAward);
-                 return forward;
+            return forward;
              }
              // KC-1448 END
         } else {
@@ -272,62 +236,47 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
     }
     // KC-1448 END
 
-    /**
-    *
-    * This method gets called upon navigation to subaward tab.
-   * @param mapping the ActionMapping
-     * @param form the ActionForm
-     * @param request the Request
-     * @param response the Response
-    * @return ActionForward
-    */
    public ActionForward subAward(ActionMapping mapping,
  ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
        return mapping.findForward(Constants.MAPPING_SUBAWARD_PAGE);
    }
 
-    /**
-     *
-     * This method gets called upon navigation to fundingSource tab.
-    * @param mapping the ActionMapping
-     * @param form the ActionForm
-     * @param request the Request
-     * @param response the Response
-     * @return
-     */
     public ActionForward fundingSource(ActionMapping mapping, ActionForm form,
     HttpServletRequest request, HttpServletResponse response) {
 
         return mapping.findForward(Constants.MAPPING_FUNDING_SOURCE_PAGE);
     }
 
-    /**
-    *
-    * This method gets called upon navigation to amountInfo tab.
- * @param mapping the ActionMapping
-     * @param form the ActionForm
-     * @param request the Request
-     * @param response the Response
-    * @return ActionForward
-    */
    public ActionForward financial(ActionMapping mapping, ActionForm form,
 		  HttpServletRequest request, HttpServletResponse response) {
 
        return mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
    }
-   /**
-   *
-   * This method gets called upon navigation to template information tab.
-* @param mapping the ActionMapping
-    * @param form the ActionForm
-    * @param request the Request
-    * @param response the Response
-   * @return ActionForward
-   */
+
    public ActionForward templateInformation(ActionMapping mapping, ActionForm form,
            HttpServletRequest request, HttpServletResponse response) {
         setDisableRemovalAttachmentIndicator(((SubAwardForm) form).getSubAwardAttachmentFormBean());
+
+       final String hierarchyName = getParameterService().getParameterValueAsString(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, Constants.PARAMETER_COMPONENT_DOCUMENT, CoiConstants.COI_SPONSOR_HIERARCHY);
+
+       if (((SubAwardForm) form).getSubAward().getSubAwardTemplateInfo().isEmpty()) {
+           ((SubAwardForm) form).getSubAward().getSubAwardTemplateInfo().add(new SubAwardTemplateInfo());
+       }
+
+       ((SubAwardForm) form).getSubAward().getSubAwardTemplateInfo().forEach(info -> {
+           if (info.getFcio() == null &&
+                   ((SubAwardForm) form).getSubAward().getSubAwardFundingSourceList().stream()
+                           .filter(source -> source.getAward() != null)
+                           .filter(source -> source.getAward().getPrimeSponsor() != null)
+                           .map(source -> source.getAward().getPrimeSponsorCode())
+                           .distinct()
+                           .anyMatch(sponsorCode -> getSponsorHierarchyService().isSponsorInHierarchy(sponsorCode, hierarchyName))) {
+
+               info.setFcio(true);
+           }
+       });
+
         return mapping.findForward(Constants.MAPPING_TEMPLATE_PAGE);
     }
 
@@ -338,15 +287,7 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
                     ParameterConstants.DOCUMENT_COMPONENT, DISABLE_ATTACHMENT_REMOVAL));
         }
     }
-   /**
-   *
-   * This method gets called upon navigation to amountReleased tab.
-  * @param mapping the ActionMapping
-  * @param form the ActionForm
-  * @param request the Request
-  * @param response the Response
-   * @return ActionForward
-   */
+
   public ActionForward amountReleased(
 		ActionMapping mapping, ActionForm form,
 	HttpServletRequest request, HttpServletResponse response) {
@@ -354,43 +295,16 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
       return mapping.findForward(Constants.MAPPING_AMOUNT_RELEASED_PAGE);
   }
   
-  /**
-  *
-  * This method gets called upon navigation to Contacts tab.
-   * @param mapping the ActionMapping
-  * @param form the ActionForm
-  * @param request the Request
-  * @param response the Response
-   * @return ActionForward
-  */
  public ActionForward contacts(ActionMapping mapping, ActionForm form,
 	HttpServletRequest request, HttpServletResponse response) {
 
      return mapping.findForward(Constants.MAPPING_CONTACTS_PAGE);
  }
 
- /**.
- *
- * This method gets called upon navigation to closeouts tab.
-   * @param mapping the ActionMapping
-  * @param form the ActionForm
-  * @param request the Request
-  * @param response the Response
-   * @return ActionForward
- */
 public ActionForward closeouts(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) {       
 
     return mapping.findForward(Constants.MAPPING_CLOSEOUT_PAGE);
 }
-/**
-*
-* This method gets called upon navigation to custom data tab.
-  * @param mapping the ActionMapping
-  * @param form the ActionForm
-  * @param request the Request
-  * @param response the Response
-   * @return ActionForward
-*/
 
 public ActionForward customData(ActionMapping mapping, ActionForm form
         , HttpServletRequest request, HttpServletResponse response) {
@@ -399,35 +313,16 @@ public ActionForward customData(ActionMapping mapping, ActionForm form
     return mapping.findForward(Constants.MAPPING_CUSTOM_DATA);
 }
 
-/**
-*
-* This method gets called upon navigation to subaward action tab.
-  * @param mapping the ActionMapping
-  * @param form the ActionForm
-  * @param request the Request
-  * @param response the Response
-   * @return ActionForward
-*/
-
 public ActionForward subAwardActions(ActionMapping mapping,
 ActionForm form, HttpServletRequest request, HttpServletResponse response) {
 
     return mapping.findForward(Constants.MAPPING_SUBAWARD_ACTION_PAGE);
 }
 
-/**
- * @return
- */
 protected VersionHistoryService getVersionHistoryService() {
     return KcServiceLocator.getService(VersionHistoryService.class);
 }
 
-/**.
-*
-* This method gets called upon getting SubAwardService
-  * @param
-  * @return subAwardService
-*/
 public SubAwardService getSubAwardService() {
     if (subAwardService == null) {
         subAwardService = KcServiceLocator.getService(SubAwardService.class);
@@ -442,7 +337,6 @@ public void setSubAwardService(SubAwardService subAwardService) {
 /**
  * This method sets an subAwardCode on an subAward if
  * the subAwardCode hasn't been initialized yet.
- * @param subAward
  */
 protected void checkSubAwardCode(SubAward subAward){
     if (subAward.getSubAwardCode() == null) {
@@ -470,7 +364,7 @@ public ActionForward route(ActionMapping mapping, ActionForm form, HttpServletRe
 
     SubAwardForm subAwardForm = (SubAwardForm) form;
     subAwardForm.setAuditActivated(false);
-    ValidationState status = KcServiceLocator.getService(AuditHelper.class).isValidSubmission(subAwardForm, true);
+    ValidationState status = getAuditHelper().isValidSubmission(subAwardForm, true);
     Object question = request.getParameter(KRADConstants.QUESTION_INST_ATTRIBUTE_NAME);
     Object buttonClicked = request.getParameter(KRADConstants.QUESTION_CLICKED_BUTTON);
     String methodToCall = ((KualiForm) form).getMethodToCall();
@@ -491,7 +385,7 @@ public ActionForward route(ActionMapping mapping, ActionForm form, HttpServletRe
         } else {
             GlobalVariables.getMessageMap().clearErrorMessages();
             GlobalVariables.getMessageMap().
-            putError("datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION, new String[] {});
+            putError("datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION);
             subAwardForm.setAuditActivated(true);   
             return mapping.findForward(Constants.MAPPING_BASIC);
         }
@@ -505,7 +399,7 @@ public ActionForward blanketApprove(ActionMapping mapping,
     SubAwardForm subAwardForm = (SubAwardForm) form;
 
     subAwardForm.setAuditActivated(false);
-    ValidationState status = KcServiceLocator.getService(AuditHelper.class).
+    ValidationState status = getAuditHelper().
     isValidSubmission(subAwardForm, true);
     if ((status == ValidationState.OK) || (status == ValidationState.WARNING)) {
         sendNotification(mapping, subAwardForm, SubAward.NOTIFICATION_TYPE_SUBMIT, "Submit SubAward");
@@ -513,7 +407,7 @@ public ActionForward blanketApprove(ActionMapping mapping,
     } else {
         GlobalVariables.getMessageMap().clearErrorMessages();
         GlobalVariables.getMessageMap().
-        putError("datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION, new String[]{});
+        putError("datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION);
         subAwardForm.setAuditActivated(true);
         return mapping.findForward(Constants.MAPPING_BASIC);
 
@@ -526,32 +420,22 @@ public ActionForward blanketApprove(ActionMapping mapping,
    HttpServletResponse response) throws Exception {
       SubAwardForm subAwardForm = (SubAwardForm) form;
       ActionForward forward = mapping.findForward(Constants.MAPPING_BASIC);
-      ValidationState status = KcServiceLocator.getService(AuditHelper.class).
+      ValidationState status = getAuditHelper().
       isValidSubmission(subAwardForm, true);
 
       if ((status == ValidationState.OK) || (status == ValidationState.WARNING)) {
-          return forward = super.approve(mapping, form, request, response);
+          return super.approve(mapping, form, request, response);
       } else {
           GlobalVariables.getMessageMap().clearErrorMessages();
           GlobalVariables.getMessageMap().
           putError("datavalidation", KeyConstants.
-          ERROR_WORKFLOW_SUBMISSION,  new String[] {});
+          ERROR_WORKFLOW_SUBMISSION);
 
           return forward;
       }
   }
 
 
-  /**
-   * This method is for medusa
-   * This method is for @throws Exception...
-   * @param mapping the ActionMapping
-   * @param form the ActionForm
-   * @param request the Request
-   * @param response the Response
-   * @return ActionForward
-   * @throws Exception
-   */
   public ActionForward medusa(ActionMapping mapping,
           ActionForm form, HttpServletRequest request,
           HttpServletResponse response) throws Exception {
@@ -591,59 +475,25 @@ public ActionForward blanketApprove(ActionMapping mapping,
   protected KcNotificationService getNotificationService() {
       return KcServiceLocator.getService(KcNotificationService.class);
   }
-  /**
-   * 
-   * Handy method to stream the byte array to response object
-   * @param attachmentDataSource
-   * @param response
-   * @throws Exception
-   */
-
  
-  /**
-   * 
-   * This method is called to print forms
-   * @param mapping
-   * @param form
-   * @param request
-   * @param response
-   * @return
-   * @throws Exception
-   */
  public ActionForward printForms(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-         Map<String, Object> reportParameters = new HashMap<String, Object>();          
          SubAwardForm subAwardForm = (SubAwardForm) form;
-         List<SubAwardForms> printFormTemplates = new ArrayList<SubAwardForms>();
-         List<SubAwardForms> subAwardFormList = subAwardForm.getSubAwardDocument().getSubAwardList().get(0).getSubAwardForms();
-         SubAwardPrintingService printService = KcServiceLocator.getService(SubAwardPrintingService.class);
-         printFormTemplates = printService.getSponsorFormTemplates(subAwardForm.getSubAwardPrintAgreement(),subAwardFormList);
-              Collection<SubAwardFundingSource> fundingSource = (Collection<SubAwardFundingSource>) KcServiceLocator
-                      .getService(BusinessObjectService.class).findAll(SubAwardFundingSource.class);
-              if(subAwardForm.getSubAwardPrintAgreement().getFundingSource() != null){
-                  for (SubAwardFundingSource subAwardFunding : fundingSource) {
-                      if(subAwardForm.getSubAwardPrintAgreement().getFundingSource().equals(subAwardFunding.getSubAwardFundingSourceId().toString())){
-                          reportParameters.put("awardNumber",subAwardFunding.getAward().getAwardNumber());
-                          reportParameters.put("awardTitle",subAwardFunding.getAward().getParentTitle());
-                          reportParameters.put("sponsorAwardNumber",subAwardFunding.getAward().getSponsorAwardNumber());
-                          reportParameters.put("sponsorName",subAwardFunding.getAward().getSponsor().getSponsorName());
-                          reportParameters.put("cfdaNumber",subAwardFunding.getAward().getCfdaNumber());
-                          reportParameters.put("awardID",subAwardFunding.getAward().getAwardId());
+        streamToResponse(getSubAwardPrintingService().printSubAwardFDPReport(subAwardForm.getSubAwardPrintAgreement(), subAwardForm.getSubAwardDocument().getSubAward()), response);
+        return mapping.findForward(Constants.MAPPING_BASIC);
                       }
+
+    protected SponsorHierarchyService getSponsorHierarchyService() {
+        return KcServiceLocator.getService(SponsorHierarchyService.class);
                   }
+
+    protected SubAwardPrintingService getSubAwardPrintingService() {
+        return KcServiceLocator.getService(SubAwardPrintingService.class);
               }
-              SubAwardPrintingService subAwardPrintingService = KcServiceLocator.getService(SubAwardPrintingService.class);
-              AttachmentDataSource dataStream ;
-              reportParameters.put(SubAwardPrintingService.SELECTED_TEMPLATES, printFormTemplates);
-              reportParameters.put("fdpType",subAwardForm.getSubAwardPrintAgreement().getFdpType());
-              if(subAwardForm.getSubAwardPrintAgreement().getFdpType().equals(SUBAWARD_AGREEMENT)){
-                  dataStream = subAwardPrintingService.printSubAwardFDPReport(subAwardForm.getSubAwardDocument().getSubAward(), SubAwardPrintType.SUB_AWARD_FDP_TEMPLATE, reportParameters);
-              } else{
-                  dataStream = subAwardPrintingService.printSubAwardFDPReport(subAwardForm.getSubAwardDocument().getSubAward(), SubAwardPrintType.SUB_AWARD_FDP_MODIFICATION, reportParameters);
+
+    protected AuditHelper getAuditHelper() {
+        return KcServiceLocator.getService(AuditHelper.class);
               }                                           
-              streamToResponse(dataStream,response);
       
-      return  mapping.findForward(Constants.MAPPING_BASIC);
-  }
 
     // KC-1350 Allow creating multiple negotiations for SubAwards
     protected NegotiationService getNegotiationService() {

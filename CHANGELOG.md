@@ -1,6 +1,393 @@
 
 
 ##CURRENT
+* No Changes
+
+
+##coeus-1609.0055
+* No Changes
+
+
+##coeus-1609.0054
+* No Changes
+
+
+##coeus-1609.0053
+* No Changes
+
+
+##coeus-1609.0052
+* Add performance for protocol history back in with additional null checking
+  * Terry Durkin on Wed, 28 Sep 2016 10:44:57 -0400 [View Commit](../../commit/189dd1dd00f53685a870a3228b1dc0d9f992bbb6)
+
+##coeus-1609.0051
+* RESKC-1680: adding support for approval comments and attachments
+  * Travis Schneeberger on Fri, 23 Sep 2016 17:31:00 -0400 [View Commit](../../commit/dc4852f7d949ffdbe0548380cae49bc7d2bb7b43)
+
+##coeus-1609.0050
+* Revert "Amend renew perf"
+  * tdurkin on Tue, 27 Sep 2016 17:37:53 -0400 [View Commit](../../commit/f7020edad2515a763e666447246239f1f3f63ea9)
+
+##coeus-1609.0049
+* RESKC-1713: Improve performance on Protocol History
+  * Terry Durkin on Fri, 23 Sep 2016 13:53:57 -0400 [View Commit](../../commit/bef80f5e8bf12c5edee18c73033e6ca53cc4f16d)
+
+##coeus-1609.0048
+* RESKC-1724: upgrading rice, switching fancybox to the kuali fork
+  * Travis Schneeberger on Tue, 27 Sep 2016 09:54:50 -0400 [View Commit](../../commit/5a39b43a36d3cb27f714104cd747d0fe604d1433)
+
+##coeus-1609.0047
+* RESKC-1722, RESKC-1568: adding pdf extension for attachment downloads, fixing Attachment4Required checkbox so that it isn't always checked
+  * Travis Schneeberger on Mon, 26 Sep 2016 12:24:39 -0400 [View Commit](../../commit/056328b3dcc097ef78374f23cd191fe4747324cd)
+
+##coeus-1609.0046
+* No Changes
+
+
+##coeus-1609.0045
+* No Changes
+
+
+##coeus-1609.0044
+* No Changes
+
+
+##coeus-1609.0043
+* - Fix award budget endpoint for amount overrides (#1995)
+
+  * tdurkin on Fri, 23 Sep 2016 16:00:13 -0400 [View Commit](../../commit/87a08cd1f06da5da31aded653f62b478afe54b7b)
+
+##coeus-1609.0042
+* No Changes
+
+
+##coeus-1609.0041
+* fixing question integration test #noreelase (#1994)
+
+  * Douglas Pace on Fri, 23 Sep 2016 11:02:29 -0700 [View Commit](../../commit/bee63bc5b042a22c2cfca835178dd91a07a9550a)
+
+##coeus-1609.0040
+* RESKC-1692:fix fancybox issues with multiple personnel or locations on iacuc procecures
+  * Joe Williams on Fri, 23 Sep 2016 09:11:48 -0500 [View Commit](../../commit/eaac0498a0ad66d17f261a549ba2807a105e869a)
+
+##coeus-1609.0039
+* No Changes
+
+
+##coeus-1609.0038
+* RESKC-1692: downgrade fancbox
+  * Joe Williams on Wed, 21 Sep 2016 14:50:33 -0500 [View Commit](../../commit/a3d66c1d60cc644820c1b3776cd57d0e2496c4be)
+
+##coeus-1609.0037
+* No Changes
+
+
+##coeus-1609.0036
+* RESKC-1163:Validate the award number instead of award id to determine duplicate funding sources in subaward (#1984)
+
+  * Douglas Pace on Wed, 21 Sep 2016 11:57:59 -0700 [View Commit](../../commit/70f9782cfdbb0b9354842fd133a66a3d19a204b9)
+
+##coeus-1609.0035
+* Fixing some null pointers in Budget controller. (#1986)
+
+  * Gayathri Athreya on Wed, 21 Sep 2016 08:48:20 -0700 [View Commit](../../commit/8ae6d6c63e21857eaf3d87ebad8aac75b4457244)
+* RESKC-1719: When two comments have the same date the show comments history view is broken where the show hide buttons do not function correctly.  To fix this, the innerTab must use an index rather than the non-unique label.  Also, escaping the comment text since it is free form.
+  * Travis Schneeberger on Wed, 21 Sep 2016 09:51:57 -0400 [View Commit](../../commit/f364580fe4f947a2dfff5b04593f3313d9ed66cb)
+* RESKC-1675: Adding a few properties to Award GET. (#1983)
+
+  * Gayathri Athreya on Tue, 20 Sep 2016 13:39:31 -0700 [View Commit](../../commit/77f80c5991982bd60e517c1a5f27a84ca8c22a20)
+
+##coeus-1609.0034
+* Adding summary field to protocol. (#1980)
+
+  * Gayathri Athreya on Tue, 20 Sep 2016 12:01:07 -0700 [View Commit](../../commit/aaf68cd8d0d4d56f3f80c441ac9eec0d392671a3)
+
+##coeus-1609.0033
+* No Changes
+
+
+##coeus-1609.0032
+* RESKC-1597:Ensure order of subaward amount infos after customizer (#1982)
+
+  * Douglas Pace on Mon, 19 Sep 2016 12:56:07 -0700 [View Commit](../../commit/f6b0b81a9afddc2b984088f097cb318257e5d60b)
+* RESKC-513: fixing labels for Negotiation Agreement Type & Negotiation Association Type maintenance documents
+  * Travis Schneeberger on Mon, 19 Sep 2016 14:35:27 -0400 [View Commit](../../commit/10565dc9dd8b300924463c6e52e2c2872c42a2ff)
+
+##coeus-1609.0031
+* RESKC-1699: fixing the req org logic so that it will obtain the unit & org correctly when FDP_ORG_FROM_REQUISITIONER_UNIT is set to 'Y'
+  * Travis Schneeberger on Fri, 16 Sep 2016 17:18:10 -0400 [View Commit](../../commit/22521d4251171e39b374270c98400c9b96c61608)
+* RESKC-1714: fixing several ffata bugs
+  * Travis Schneeberger on Fri, 16 Sep 2016 16:38:04 -0400 [View Commit](../../commit/c138ea9ea747cdb38d84f8811de1cbbdf6df9a6f)
+
+##coeus-1609.0029
+* No Changes
+
+
+##coeus-1609.0028
+* Fix issues because of clone scripts. (#1977)
+
+  * Gayathri Athreya on Fri, 16 Sep 2016 10:42:44 -0700 [View Commit](../../commit/a90fcc727074948c22f89f98e0286ae18410051b)
+* RESKC-1709: fix blank notification being sent when proxy cert notification was disabled.
+  * Terry Durkin on Thu, 15 Sep 2016 16:17:54 -0400 [View Commit](../../commit/bd2a5a79adf7b6a2617263a399f43012ef8efc9c)
+* RESKC-1594: integration test for ffata rule
+  * Travis Schneeberger on Thu, 15 Sep 2016 20:37:38 -0400 [View Commit](../../commit/0ab95c2c160da28e31b1c676410c01074db9f130)
+* RESKC-1210: adding FFATA Reporting support
+  * Travis Schneeberger on Thu, 15 Sep 2016 15:56:37 -0400 [View Commit](../../commit/b092d0b66a38ed0a475da35fb37a4a24591566dc)
+
+##coeus-1609.0027
+* No Changes
+
+
+##coeus-1609.0026
+* Training doc changes. (#1973)
+
+  * Gayathri Athreya on Thu, 15 Sep 2016 14:26:09 -0700 [View Commit](../../commit/1f9549e3e687d523269ff439df9e01c489e16c14)
+* RESKC-1679: Award hierarchy endpoints and tests. (#1972)
+
+  * Gayathri Athreya on Thu, 15 Sep 2016 14:19:51 -0700 [View Commit](../../commit/54cebb0e94cecc095bf9e84d51bda80bc51d2b5e)
+
+##coeus-1609.0025
+* RESKC-1475: fixing spelling error on medusa screen
+  * Travis Schneeberger on Thu, 15 Sep 2016 15:44:36 -0400 [View Commit](../../commit/e593f3dc5cbddd189057a2c59d33e8486f48df6e)
+
+##coeus-1609.0024
+* No Changes
+
+
+##coeus-1609.0023
+* No Changes
+
+
+##coeus-1609.0022
+* RESKC-1563: update parameter descriptions for FDP reporting
+  * Travis Schneeberger on Tue, 13 Sep 2016 11:18:15 -0400 [View Commit](../../commit/4741c4f462af7bb964f2daa97d2bb7486c291f72)
+
+##coeus-1609.0021
+* No Changes
+
+
+##coeus-1609.0020
+* No Changes
+
+
+##coeus-1609.0019
+* Exclude dependency (#1965)
+
+  * Gayathri Athreya on Mon, 12 Sep 2016 12:46:54 -0700 [View Commit](../../commit/4b7fc2fdc6d14a648b4c26ed6a37a06a4b1d1f7a)
+* RESKC-1563: add missing KC-SUBAWARD/All component
+  * Travis Schneeberger on Mon, 12 Sep 2016 15:44:33 -0400 [View Commit](../../commit/037e08dc249e8ec8d8f68e2f7b59e5c20d31abdc)
+* Added base test code and a PD test. (#1958)
+
+* Added base test code and a PD test.
+  * 
+* Refactored and added award test.
+  * 
+* Add IP tests.
+  * 
+* Fix dependency issues
+  * 
+* Added IRB tests and refactored other tests
+  * 
+* IACUC tests
+  * Gayathri Athreya on Mon, 12 Sep 2016 10:42:01 -0700 [View Commit](../../commit/f33a96b8dbdd6dd7b146291e3bab350f33db678c)
+* RESKC-1563: adding updated templates and mappings, adding tests
+  * Travis Schneeberger on Fri, 9 Sep 2016 13:45:32 -0400 [View Commit](../../commit/46f0c05d30a36096abad5fd1aa04c85a5f1a6db3)
+
+##coeus-1609.0018
+* RESKC-1688: Better error handling and return doc status (#1960)
+
+  * Gayathri Athreya on Sat, 10 Sep 2016 16:28:58 -0700 [View Commit](../../commit/493dc2c993ec6768ced1cca494d757ab132f8f15)
+
+##coeus-1609.0017
+* RESKC-1689: SF424A future year budget amount mapping
+  * Terry Durkin on Sat, 10 Sep 2016 14:24:29 -0400 [View Commit](../../commit/903e07de636e1962707af899b73c563d3da550c4)
+
+##coeus-1609.0016
+* Added field module code to training document (#1954)
+
+  * Gayathri Athreya on Thu, 8 Sep 2016 10:49:42 -0700 [View Commit](../../commit/460d27cd6fb4398cedfa1ce96b7f52014f19af7b)
+
+##coeus-1609.0015
+* No Changes
+
+
+##coeus-1609.0014
+* No Changes
+
+
+##coeus-1609.0013
+* RESKC-1559: fixed issue where disclosure status page would print on award notice whenver a co-i was added to an award
+  * Joe Williams on Wed, 7 Sep 2016 09:07:28 -0500 [View Commit](../../commit/f0e9957cefc28661008e6b67c44df20ca11f1009)
+
+##coeus-1609.0012
+* No Changes
+
+
+##coeus-1609.0011
+* Removed bad test (#1950)
+
+  * Gayathri Athreya on Tue, 6 Sep 2016 15:31:31 -0700 [View Commit](../../commit/58cb172baf044ad676f9355c91789d0b4a4f2d81)
+* Fix award dates and totals while versioning. (#1949)
+
+  * Gayathri Athreya on Tue, 6 Sep 2016 13:41:19 -0700 [View Commit](../../commit/0367a31824f4e9abddfe8429389c8b8f38c0d5bf)
+
+##coeus-1609.0010
+* No Changes
+
+
+##coeus-1609.0009
+* No Changes
+
+
+##coeus-1609.0008
+* No Changes
+
+
+##coeus-1609.0006
+* RESKC-1488: update page when closing budget versions dialog
+
+  * Create a Summary budget
+  * Enter a direct cost amount of any value
+  * Toolbar > Budget Versions > Action > Complete Budget. OK to complete . Okay to close the modal.
+  * Result: 'complete budget' button is still present: Budget is NOT locked down until user takes an action that causes a save.
+  * 1. clicks save
+  * 2. navigates to another window
+  * 3. opens Budget Settings and closes
+  * 3. clicks Complete Budget
+  * ISSUE: When the Periods & Totals screen is in focus and this Toolbar "complete budget' option is used, the P&T screen remained Editable. I was able to revise the data on that screen, and then at Save, it was saved the data and finalized the Complete Budget action WITH That change.
+  * Joe Williams on Thu, 1 Sep 2016 14:14:42 -0500 [View Commit](../../commit/d695021c615fae0de6e7675c7b929153847f606d)
+
+##coeus-1609.0005
+* RESKC-1566:Upgrade Rice to pull in incident report fixes (#1948)
+
+  * Douglas Pace on Thu, 1 Sep 2016 17:21:37 -0700 [View Commit](../../commit/46eb7ba63bac4ba1ceb4e5b7360c348b5792d6d8)
+
+##coeus-1609.0004
+* No Changes
+
+
+##coeus-1609.0003
+* No Changes
+
+
+##coeus-1609.0002
+* No Changes
+
+
+##coeus-1609.0001
+* No Changes
+
+
+##coeus-1608.0051
+* No Changes
+
+
+##coeus-1608.0050
+* RESKC-1616:Fix typo in subaward modification types (#1941)
+
+  * Douglas Pace on Wed, 31 Aug 2016 09:07:27 -0700 [View Commit](../../commit/2857d894f371120e36b7805ecd2626b841bcb3a9)
+
+##coeus-1608.0049
+* No Changes
+
+
+##coeus-1608.0048
+* No Changes
+
+
+##coeus-1608.0047
+* RESKC-1538: Fix a merge issue with updated protocol number logic (#1939)
+
+  * tdurkin on Tue, 30 Aug 2016 14:02:53 -0400 [View Commit](../../commit/ecf27fffdd61f0b53cdcbf55940bf4bb2c449025)
+
+##coeus-1608.0046
+* RESKC-1562: Do not create empty s2s opportunity. (#1937)
+
+  * Gayathri Athreya on Tue, 30 Aug 2016 10:19:01 -0700 [View Commit](../../commit/12d8e45e14270a99295d5e5a027a46fa0108310c)
+
+##coeus-1608.0045
+* Completed personnel and non-personnel save, cancel award budget doc and start of test. (#1932)
+
+  * Added test and method to route document.
+  * 
+  * Working around override F&A rate bug and fixing test.  * Gayathri Athreya on Tue, 30 Aug 2016 08:17:22 -0700 [View Commit](../../commit/3ac7d9444e3a2d0c09a5250475b437e44086106f)
+
+##coeus-1608.0044
+* Fixing award amunt info date issues. (#1936)
+
+  * Gayathri Athreya on Mon, 29 Aug 2016 14:10:48 -0700 [View Commit](../../commit/95e5a48986a0031de89f9b2fdad004a4c967fdc0)
+
+##coeus-1608.0043
+* No Changes
+
+
+##coeus-1608.0042
+* RESKC-1455: add Prime Sponsor is PHS for FCOI regulation
+  * Travis Schneeberger on Fri, 26 Aug 2016 13:50:03 -0400 [View Commit](../../commit/8d1d7816ec0b94e00b454c7aaa2aa92ddc3e2afe)
+* RESKC-1073,RESKC-1455,RESKC-1454: add fsrs subaward number, add is r&d field, add includes cost sharing field
+
+  * RESKC-1455: add is r&d field
+
+  * RESKC-1455: add includes cost sharing field
+
+  * RESKC-1455: add includes cost sharing field
+  * Travis Schneeberger on Mon, 22 Aug 2016 20:40:03 -0400 [View Commit](../../commit/10ecab75b4a451143e21faa40fbbf0a9d40f2498)
+
+##coeus-1608.0041
+* No Changes
+
+
+##coeus-1608.0040
+* RESKC-1538: Fix a null issue with Protocol Minutes; add more null checking (#1930)
+
+  * tdurkin on Wed, 24 Aug 2016 14:15:24 -0400 [View Commit](../../commit/db8cd5e8f8cf9ddcf0a0f4e396d90fcf93a0f8a8)
+
+##coeus-1608.0039
+* No Changes
+
+
+##coeus-1608.0038
+* No Changes
+
+
+##coeus-1608.0037
+* No Changes
+
+
+##coeus-1608.0036
+* RESKC-1456:Subaward Modification Type (#1919)
+
+  * Douglas Pace on Tue, 23 Aug 2016 16:40:25 -0700 [View Commit](../../commit/b4c74ad828de37f8994a232530974863b0f4fe99)
+* Fix int test issues (#1923)
+
+* Fix int test issues
+  * 
+* more test fixes
+  * tdurkin on Tue, 23 Aug 2016 19:15:20 -0400 [View Commit](../../commit/981e046dc07fcd14746dfc5a4ce7620108246b26)
+* RESKC-1538: IRB Performance improvements by adding protocol/submission number to comm_schedule_minutes. (#1921)
+
+  * tdurkin on Tue, 23 Aug 2016 10:36:27 -0400 [View Commit](../../commit/fda89f643dcc9637327bd3d1c563d109a6766aaf)
+
+##coeus-1608.0035
+* RESKC-1574: remove legacy save behavior
+  * Travis Schneeberger on Mon, 22 Aug 2016 13:19:12 -0400 [View Commit](../../commit/9ac19ab3868f0649fc8cb3549ea8bab0f950a061)
+
+##coeus-1608.0034
+* RESKC-1467: Incorrect Lead Unit number when two units have the same name (#1918)
+
+  * tdurkin on Sun, 21 Aug 2016 20:36:27 -0400 [View Commit](../../commit/ef04e23b04147663bf1a1c87c52ccd1cc7cf5692)
+
+##coeus-1608.0033
+* No Changes
+
+
+##coeus-1608.0032
+* RESKC-1502: support Data Dictionary overrides
+  * Travis Schneeberger on Thu, 18 Aug 2016 16:11:52 -0400 [View Commit](../../commit/ccdd4a0647c7d585aa49cb32afa9c5814abe5f0e)
+* RESKC-1526:Set all attachments to final on new protocol when versioning
+  * blackcathacker on Fri, 19 Aug 2016 09:57:43 -0700 [View Commit](../../commit/bbe01ed45d045829462bb91d0d90eb7b39ce9c8c)
+
+##coeus-1608.0031
 * Fix funding proposal addition when versioning awards. (#1914)
 
   * Gayathri Athreya on Thu, 18 Aug 2016 10:52:43 -0700 [View Commit](../../commit/fdb5103c03601b3755f28d200fb72a72db4a15d2)

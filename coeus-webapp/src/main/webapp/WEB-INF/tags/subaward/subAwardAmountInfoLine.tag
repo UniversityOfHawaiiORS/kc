@@ -89,23 +89,23 @@
 		<div align="center">
 			<c:if test="${amountInfo.fileName!=null}">
 				<html:image
-						styleId="downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}"
-						property="methodToCall.downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}.anchor${currentTabIndex}"
-						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif'
-						styleClass="tinybutton"
-						onclick="javascript: openNewWindow('${formAction}','downloadHistoryOfChangesAttachment','${amountInfo.subAwardAmountInfoId}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
+					styleId="downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}"
+					property="methodToCall.downloadHistoryOfChangesAttachment.line${amountInfo.subAwardAmountInfoId}.anchor${currentTabIndex}"
+					src='${ConfigProperties.kra.externalizable.images.url}tinybutton-view.gif'
+					styleClass="tinybutton"
+					onclick="javascript: openNewWindow('${formAction}','downloadHistoryOfChangesAttachment','${amountInfo.subAwardAmountInfoId}',${KualiForm.formKey},'${KualiForm.document.sessionDocument}'); return false" />
 			</c:if>
 			<c:if test="${!readOnly}">
 				<html:image styleId="replaceHistoryOfChangesAttachment.line${index}"
-							onclick="javascript: showHide('fileDiv${index}','replaceDiv${index}') ; return false"
-							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-replace.gif'
-							styleClass="tinybutton"
-							property="methodToCall.replaceNarrativeAttachment.line${index}.anchor${currentTabIndex};return false" />
+					onclick="javascript: showHide('fileDiv${index}','replaceDiv${index}') ; return false"
+					src='${ConfigProperties.kra.externalizable.images.url}tinybutton-replace.gif'
+					styleClass="tinybutton"
+					property="methodToCall.replaceNarrativeAttachment.line${index}.anchor${currentTabIndex};return false" />
 				<c:if test="${amountInfo.fileName!=null}">
 					<html:image
-							property="methodToCall.deleteAmountInfo.line${index}.anchor${currentTabIndex}"
-							src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif'
-							styleClass="tinybutton" />
+						property="methodToCall.deleteAmountInfo.line${index}.anchor${currentTabIndex}"
+						src='${ConfigProperties.kra.externalizable.images.url}tinybutton-delete1.gif'
+						styleClass="tinybutton" />
 				</c:if>
 			</c:if>
 			<c:if test="${readOnly}">&nbsp;</c:if>

@@ -85,9 +85,10 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
     private int defaultFollowUpDayDifference = 0;
     private SubAwardAttachmentFormBean subAwardAttachmentFormBean;
     private SubAwardReports newSubAwardReport;
+    private SubAwardFfataReporting newSubAwardFfataReporting;
     private SubAwardPrintAgreement subAwardPrintAgreement;
     private SubAwardForms subAwardForms;
-    private SubAward subAward;
+
     private transient ParameterService parameterService;
    
 
@@ -131,10 +132,12 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
 		this.newFile = newFile;
 	}
 
+	@Override
 	public boolean isAuditActivated() {
 		return auditActivated;
 	}
 
+	@Override
 	public void setAuditActivated(boolean auditActivated) {
 		this.auditActivated = auditActivated;
 	}
@@ -147,6 +150,14 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
 			SubAwardFundingSource newSubAwardFundingSource) {
 		this.newSubAwardFundingSource = newSubAwardFundingSource;
 	}
+
+    public SubAwardFfataReporting getNewSubAwardFfataReporting() {
+        return newSubAwardFfataReporting;
+    }
+
+    public void setNewSubAwardFfataReporting(SubAwardFfataReporting newSubAwardFfataReporting) {
+        this.newSubAwardFfataReporting = newSubAwardFfataReporting;
+    }
 
 	public SubAwardAmountInfo getNewSubAwardAmountInfo() {
 		return newSubAwardAmountInfo;
@@ -165,6 +176,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
 		this.newSubAwardAmountReleased = newSubAwardAmountReleased;
 	}
 
+    @Override
 	public CustomDataHelper getCustomDataHelper() {
 		return customDataHelper;
 	}
@@ -182,10 +194,6 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         this.notificationHelper = notificationHelper;
     }
 
-    public void setSubAward(SubAward subAward) {
-        this.subAward = subAward;
-    }
-
 	public SubAwardForm() {
         super();
         initialize();
@@ -201,6 +209,7 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
         notificationHelper = new NotificationHelper<>();
         subAwardAttachmentFormBean = new SubAwardAttachmentFormBean(this);
         subAwardPrintAgreement = new SubAwardPrintAgreement();
+        newSubAwardFfataReporting = new SubAwardFfataReporting();
     }
 
     public SubAwardDocument getSubAwardDocument() {
@@ -378,7 +387,6 @@ implements PermissionsForm, Auditable, CustomDataDocumentForm {
 
     /*
      * returns flag indicating if edit button should be displayed at bottom of form 
-     * 
      */
     public boolean getDisplayEditButton() {
         return !getSubAwardDocument().getDocumentHeader().getWorkflowDocument().isCanceled() && VersionStatus.ACTIVE.toString().equals(getSubAwardDocument().getSubAward().getSubAwardSequenceStatus());

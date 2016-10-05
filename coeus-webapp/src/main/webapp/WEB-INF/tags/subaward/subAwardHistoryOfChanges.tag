@@ -88,7 +88,7 @@
         </h3>
          
    <table cellpadding=0 cellspacing=0 summary="">
-       		<tbody class="addline">
+       		<tbody class="addline">            
 			<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
 			<c:if test="${readOnly!='true'}">
             <tr>
@@ -104,7 +104,7 @@
           	    <%-- </c:if> --%>
             </tr>
             <tr>
-    			<td><div align="center">
+     			<td><div align="center">
      					<kul:htmlControlAttribute property="newSubAwardAmountInfo.effectiveDate" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.effectiveDate}" datePicker="true"/>           
    					</div> 
    				</td>
@@ -130,17 +130,17 @@
 					</c:if>
 	                </div>
 	            </td>   				
-   			</tr>
+   			</tr> 
 			<%-- KC-1364 End --%>
    			<tr>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" /></div></th>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationID}" /></div></th>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceStartDate}" /></div></th>
-            <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" /></div></th>
+            <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" /></div></th>                          
             </tr>
             
             <tr>
-                <td><div align="center">
+            <td><div align="center">
      					<kul:htmlControlAttribute property="newSubAwardAmountInfo.modificationEffectiveDate" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" datePicker="true"/>           
    					</div> 
    				</td>
@@ -159,9 +159,9 @@
      					<kul:htmlControlAttribute property="newSubAwardAmountInfo.periodofPerformanceEndDate" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" datePicker="true"/>           
    					</div> 
    				</td> 
-			</tr>
+   				</tr>
 			<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
-			<tr>
+        	<tr>				
 				<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}" /></div></th>
 				<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.comments}" /></div></th>
 			</tr>
@@ -172,22 +172,22 @@
                 <td colspan="3">
                       <kul:htmlControlAttribute property="newSubAwardAmountInfo.comments" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.comments}" />
                 </td>
-            </tr>
+            </tr>     
 			<%-- KC-1364 End --%>
    			</c:if>
    			</tbody>
    			<c:forEach var="amountInfo" items="${KualiForm.document.subAwardList[0].historicalAmountInfos}" varStatus="status">
 				    <%-- KC-1358 Subaward History of Changes ranking order (added indexDisplayOffset so second set starts at correct number) --%>
                     <%-- KC-1457 Receive STE when replacing attachment in Subaward History of Change --%>
-					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}"
-						amountInfoPath="document.subAwardList[0].historicalAmountInfos[${status.index}]"
+					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}" 
+						amountInfoPath="document.subAwardList[0].historicalAmountInfos[${status.index}]" 
 						index="${status.index}" indexDisplayOffset="${0}" readOnly="true" currentTabIndex="${currentTabIndex }" formAction="${action}"/>
 				    <c:set var="offset" value="${status.index+1}"/>
         	</c:forEach>
         	<c:forEach var="amountInfo" items="${KualiForm.document.subAwardList[0].subAwardAmountInfoList}" varStatus="status">
                     <%-- KC-1457 Receive STE when replacing attachment in Subaward History of Change --%>
-					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}"
-						amountInfoPath="document.subAwardList[0].subAwardAmountInfoList[${status.index}]"
+					<kra-sub:subAwardAmountInfoLine amountInfo="${amountInfo}" 
+						amountInfoPath="document.subAwardList[0].subAwardAmountInfoList[${status.index}]" 
 						index="${status.index}" indexDisplayOffset="${offset}" readOnly="${readOnly}" currentTabIndex="${currentTabIndex }" formAction="${action}"/>
         	</c:forEach>
         </table>

@@ -161,9 +161,9 @@
                 <!-- KC-950 Rename "Reject" button within the Proposal Actions tab -->
                 <bean parent="Uif-MessageField" p:messageText="Are you sure you want to return this document for changes ?" p:order="10"/>
                 <!-- KC-950 Rename "Reject" button within the Proposal Actions tab -->
-                <bean parent="Uif-InputField" p:propertyName="rejectReason" p:order="20"
+                <bean parent="Uif-InputField" p:propertyName="actionReason" p:order="20"
                         p:fieldLabel.labelText="Reason returning for changes"/>
-                <bean parent="Uif-InputField" p:propertyName="rejectFile" p:order="30"
+                <bean parent="Uif-InputField" p:propertyName="actionFile" p:order="30"
                       p:fieldLabel.labelText="Attachment">
                     <property name="control">
                         <bean parent="Uif-FileControl"/>
@@ -181,6 +181,33 @@
         </property>
 
             </bean>
+
+    <bean id="PropDev-SubmitPage-ApproveDialog" parent="Uif-DialogGroup-YesNo"
+          p:fieldBindingObjectPath="proposalDevelopmentApprovalBean"
+          p:readOnly="false">
+        <property name="items">
+            <list>
+                <bean parent="Uif-MessageField" p:messageText="Are you sure you want to approve this document?" p:order="10"/>
+                <bean parent="Uif-InputField" p:propertyName="actionReason" p:order="20"
+                      p:fieldLabel.labelText="Approval Reason" p:required="false"/>
+                <bean parent="Uif-InputField" p:propertyName="actionFile" p:order="30"
+                      p:fieldLabel.labelText="Attachment">
+                    <property name="control">
+                        <bean parent="Uif-FileControl"/>
+                    </property>
+                </bean>
+            </list>
+        </property>
+        <property name="footer.items">
+            <list>
+                <bean parent="Uif-PrimaryActionButton" p:actionLabel="OK" p:methodToCall="approveCheck" p:order="10"
+                      p:dialogDismissOption="REQUEST"  p:successCallback="dismissDialog('PropDev-SubmitPage-ApproveDialog');" p:dialogResponse="true"/>
+                <bean parent="Uif-SecondaryActionButton" p:actionLabel="Cancel" p:methodToCall="cancelApprove" p:order="20"
+                      p:dialogDismissOption="REQUEST" p:successCallback="dismissDialog('PPropDev-SubmitPage-ApproveDialog');" p:dialogResponse="false"/>
+            </list>
+        </property>
+
+    </bean>
 
     <bean id="PropDev-SubmitPage-SummaryTabGroup" parent="PropDev-SubmitPage-SummaryTabGroup-parentBean" />
 <bean id="PropDev-SubmitPage-SummaryTabGroup-parentBean" abstract="true" parent="Uif-TabGroup">

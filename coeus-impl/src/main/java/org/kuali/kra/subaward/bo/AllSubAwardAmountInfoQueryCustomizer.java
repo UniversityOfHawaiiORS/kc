@@ -37,6 +37,7 @@ public class AllSubAwardAmountInfoQueryCustomizer extends QueryCustomizerDefault
     	Criteria crit = new Criteria();
     	crit.addEqualTo("subAward.subAwardCode", ((SubAward)anObject).getSubAwardCode());
     	crit.addIn("subAward.subAwardSequenceStatus", Arrays.asList(new String[]{VersionStatus.ACTIVE.toString(), VersionStatus.PENDING.toString(), VersionStatus.ARCHIVED.toString()}));
+    	crit.addOrderByAscending("subAwardAmountInfoId");
         aQuery.setCriteria(crit);
         // KC-1473 Subaward History of Changes ranking order - Variation 2
         aQuery.addOrderByAscending("subAwardCode");
