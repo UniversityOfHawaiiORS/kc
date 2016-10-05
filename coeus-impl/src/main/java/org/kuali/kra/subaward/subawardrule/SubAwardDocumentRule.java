@@ -36,6 +36,7 @@ import org.kuali.kra.subaward.document.SubAwardDocument;
 import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
+import org.kuali.rice.krad.util.GlobalVariables;
 import org.kuali.kra.subaward.subawardrule.events.AddSubAwardAttachmentEvent;
 
 import java.util.Collections;
@@ -76,7 +77,6 @@ SubAwardFfataReportingRule {
     private static final String DATE_FLLOWUP = "newSubAwardCloseout.dateFollowup";
     private static final String REPORT_TYPE = "subAwardAttachmentFormBean.newReport.subAwardReportTypeCode";
     static final String AWARD_NUMBER="newSubAwardFundingSource.award.awardNumber";
-    private static final String AMOUNT_PERIOD_OF_PERFORMANCE_START_DATE = "newSubAwardAmountInfo.periodofPerformanceStartDate";
     private static final String DESCRIPTION = ".description";
     private static final String SUB_AWARD_ATTACHMENT_TYPE_CODE_PROP = ".subAwardAttachmentTypeCode";
     private static final String NEW_SUB_AWARD_FFATA_REPORTING = "newSubAwardFfataReporting";
@@ -207,6 +207,7 @@ SubAwardFfataReportingRule {
         return rulePassed;
     }
 
+    // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
     // Checks a specific SubAwardAmountInfo that belong to subAward
     private boolean processSaveSubAwardAmountInfoBusinessRules(SubAward subAward, SubAwardAmountInfo amountInfo, int index) {
         boolean rulePassed = true;
