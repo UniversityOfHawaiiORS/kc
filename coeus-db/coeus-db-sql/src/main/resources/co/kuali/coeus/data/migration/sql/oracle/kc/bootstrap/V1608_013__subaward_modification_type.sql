@@ -31,13 +31,18 @@ alter table SUBAWARD_AMOUNT_INFO add constraint FK3_SUBAWARD_AMOUNT_INFO foreign
     REFERENCES SUBAWARD_MODIFICATION_TYPE (CODE);
     
 insert into subaward_modification_type (code, description, active, update_user, update_timestamp, ver_nbr, obj_id)
-	values ('RESBOOT1000', 'No Cost Extension', 'Y', 'admin', sysdate, 1, SYS_GUID());
+	values ('100', 'Initial', 'Y', 'admin', sysdate, 1, SYS_GUID());
 	
 insert into subaward_modification_type (code, description, active, update_user, update_timestamp, ver_nbr, obj_id)
-	values ('RESBOOT1001', 'Increment', 'Y', 'admin', sysdate, 1, SYS_GUID());
+	values ('200', 'Amendment $', 'Y', 'admin', sysdate, 1, SYS_GUID());
 
 insert into subaward_modification_type (code, description, active, update_user, update_timestamp, ver_nbr, obj_id)
-	values ('RESBOOT1002', 'Continuation of Other', 'Y', 'admin', sysdate, 1, SYS_GUID());
+	values ('300', 'Amendment', 'Y', 'admin', sysdate, 1, SYS_GUID());
 
+insert into subaward_modification_type (code, description, active, update_user, update_timestamp, ver_nbr, obj_id)
+	values ('400', 'Rebuild', 'Y', 'admin', sysdate, 1, SYS_GUID());
+
+insert into subaward_modification_type (code, description, active, update_user, update_timestamp, ver_nbr, obj_id)
+	values ('500', 'Correction', 'Y', 'admin', sysdate, 1, SYS_GUID());
 
 	
