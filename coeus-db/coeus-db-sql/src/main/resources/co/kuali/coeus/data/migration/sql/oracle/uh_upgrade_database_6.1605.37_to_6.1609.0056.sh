@@ -88,6 +88,10 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1608_oracle_kc_rice_server_upgrade.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1608_oracle_kc_upgrade.sql
 
+    # Update to 1609
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1609_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1609_oracle_kc_upgrade.sql
+
     # UH modificaitons for next target release
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1508.sql
 
