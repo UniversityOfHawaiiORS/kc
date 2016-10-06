@@ -90,10 +90,6 @@ public class SubAwardAmountInfo extends KcPersistableBusinessObjectBase implemen
     private SubAward subAward;
     
     private transient KcAttachmentDataDao kcAttachmentDataDao;
-
-    /* KC-1364 Bring in BU contributions - Transaction Type */
-    private String transactionTypeCode;
-    private SubAwardTransactionType subAwardTransactionType;
     
     /**
      * the SubAwardAmountInfo constructor.
@@ -393,25 +389,6 @@ public class SubAwardAmountInfo extends KcPersistableBusinessObjectBase implemen
     public void setModificationID(String modificationID) {
         this.modificationID = modificationID;
     }
-
-    /* KC-1364 Bring in BU contributions - Transaction Type */
-    public String getTransactionTypeCode() {
-        return transactionTypeCode;
-    }
-
-    public void setTransactionTypeCode(String transactionTypeCode) {
-        this.transactionTypeCode = transactionTypeCode;
-    }
-
-    public SubAwardTransactionType getSubAwardTransactionType() {
-        return subAwardTransactionType;
-    }
-
-    public void setSubAwardTransactionType(SubAwardTransactionType subAwardTransactionType) {
-        this.subAwardTransactionType = subAwardTransactionType;
-    }
-
-    /* KC-1364 End */
 
     /**
      * Gets the periodofPerformanceStartDate.

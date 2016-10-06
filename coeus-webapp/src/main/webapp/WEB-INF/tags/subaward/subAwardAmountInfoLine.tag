@@ -28,7 +28,7 @@
 <%-- KC-1457 Receive STE when replacing attachment in Subaward History of Change --%>
 <%@ attribute name="indexDisplayOffset" required="true" %>
 
-<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+<%-- KC-1512 Merge our Subaward Transaction Type with Kuali Subaward Modification Type (Add improved headers for fields) --%>
 <tr>
     <%-- KC-1457 Receive STE when replacing attachment in Subaward History of Change --%>
 	<th width="9%" class="infoline" rowspan="6"><c:out value="${index+1+indexDisplayOffset}" /></th>
@@ -40,7 +40,7 @@
 	<kul:htmlAttributeHeaderCell literalLabel="Actions" scope="col"/>
 	<%-- </c:if> --%>
 </tr>
-<%-- KC-1364 End --%>
+<%-- KC-1512 End --%>
 <tr>
 	<td width="9%" valign="middle">
 		<div align="center">
@@ -82,7 +82,6 @@
 			</div>
 		</c:if>
 	</td>
-	<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
 	<td width="10%" valign="middle" rowspan="5">
 		<div align="center">Attachment Actions :</div>
 		<br></br>
@@ -112,14 +111,14 @@
 		</div>
 	</td>
 </tr>
-<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+<%-- KC-1512 Merge our Subaward Transaction Type with Kuali Subaward Modification Type (Add improved headers for fields) --%>
 <tr>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" /></div></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationID}" /></div></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceStartDate}" /></div></th>
 	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.periodofPerformanceEndDate}" /></div></th>
 </tr>
-<%-- KC-1364 End --%>
+<%-- KC-1512 End --%>
 <tr>
 	<td width="9%" valign="middle">
 		<div align="center">
@@ -153,17 +152,18 @@
 		</div>
 	</td>
 </tr>
-<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+<%-- KC-1512 Merge our Subaward Transaction Type with Kuali Subaward Modification Type (Add improved headers for fields) --%>
 <tr>
-	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}" /></div></th>
+	<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationTypeCode}" /></div></th>
 	<th colspan="3"><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.comments}" /></div></th>
 </tr>
+<%-- KC-1512 End --%>
 <tr>
 	<td>
 		<div align="center">
 		    <kul:htmlControlAttribute
-			    property="${amountInfoPath}.transactionTypeCode"
-			    attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}"
+			    property="${amountInfoPath}.modificationTypeCode"
+			    attributeEntry="${subAwardAmountInfoAttributes.modificationTypeCode}"
 			    readOnly="${readOnly}" />
 		</div>
 	</td>
@@ -172,4 +172,3 @@
 			attributeEntry="${subAwardAmountInfoAttributes.comments}"
 			readOnly="${readOnly}" /></td>
 </tr>
-<%-- KC-1364 End --%>

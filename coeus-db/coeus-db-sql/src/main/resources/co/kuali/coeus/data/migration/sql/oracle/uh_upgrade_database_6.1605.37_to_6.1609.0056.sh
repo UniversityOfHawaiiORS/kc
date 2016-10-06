@@ -94,6 +94,7 @@ then
 
     # UH modificaitons for next target release
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1508.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1512.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}

@@ -46,8 +46,6 @@
 		        <ref bean="SubAwardAmountInfo-modificationID" />
 		        <ref bean="SubAwardAmountInfo-periodofPerformanceStartDate" />
 		        <ref bean="SubAwardAmountInfo-periodofPerformanceEndDate" />
-                <!-- KC-1364 Bring in BU contributions - Transaction Type -->
-                <ref bean="SubAwardAmountInfo-transactionTypeCode" />
 		      </list>
 		    </property>
  		 </bean>
@@ -331,16 +329,26 @@
       <!-- KC-1389 Make History of Changes Modification ID a Required Field -->
       <property name="required" value="true" />
   </bean> 
-  
+
+  <!-- KC-1512 Merge our Subaward Transaction Type with Kuali Subaward Modification Type -->
+  <!-- Change Label to "Transaction Type" to match our original naming
+       Change contol to sort by key
+       -->
   <bean id="SubAwardAmountInfo-modificationTypeCode" parent="SubAwardAmountInfo-modificationTypeCode-parentBean" />
   <bean id="SubAwardAmountInfo-modificationTypeCode-parentBean" abstract="true" parent="SubAwardModificationType-code">
     <property name="name" value="modificationTypeCode" />
     <property name="forceUppercase" value="false" />
-    <property name="label" value="Modification Type" />
-    <property name="shortLabel" value="Modification Type" />
-    <property name="required" value="false" />
-     <property name="control" >
-      <bean parent="SelectControlDefinition" p:valuesFinderClass="org.kuali.kra.subaward.fdp.SubAwardModificationTypeValuesFinder"/>
+    <property name="label" value="Transaction Type" />
+    <property name="shortLabel" value="Transaction Type" />
+    <property name="required" value="true" />
+    <property name="control">
+        <bean parent="SelectControlDefinition"
+              p:businessObjectClass="org.kuali.kra.subaward.fdp.SubAwardModificationType"
+              p:valuesFinderClass="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinderNumericKeySort"
+              p:includeKeyInLabel="false"
+              p:includeBlankRow="false"
+              p:keyAttribute="code"
+              p:labelAttribute="description" />
     </property>
     <property name="optionsFinder">
       <bean class="org.kuali.kra.subaward.fdp.SubAwardModificationTypeValuesFinder"/>
@@ -375,34 +383,6 @@
     <property name="summary" value="Period of Performance End Date" />
     <property name="description" value="Period of Performance End Date" />    
   </bean>
-
-  <!-- KC-1364 Bring in BU contributions - Transaction Type -->
-  <bean id="SubAwardAmountInfo-transactionTypeCode" parent="SubAwardAmountInfo-transactionTypeCode-parentBean" />
-
-  <bean id="SubAwardAmountInfo-transactionTypeCode-parentBean" parent="AttributeDefinition">
-    <property name="name" value="transactionTypeCode"/>
-    <property name="forceUppercase" value="false"/>
-    <property name="label" value="Transaction Type"/>
-    <property name="shortLabel" value="Transaction Type"/>
-    <property name="maxLength" value="25"/>
-    <property name="validationPattern">
-      <bean parent="AlphaNumericValidationPattern" p:allowWhitespace="true"/>
-    </property>
-    <property name="control">
-        <bean parent="SelectControlDefinition"
-              p:businessObjectClass="org.kuali.kra.subaward.bo.SubAwardTransactionType"
-              p:valuesFinderClass="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinderNumericKeySort"
-              p:includeKeyInLabel="false"
-              p:includeBlankRow="false"
-              p:keyAttribute="transactionTypeCode"
-              p:labelAttribute="transactionTypeDescription" />
-    </property>
-    <property name="summary" value="Transaction Type"/>
-    <property name="description" value="Transaction Type "/>
-    <property name="required" value="true"/>
-  </bean>
-  <!-- KC-1364 END -->
-
 
   <bean id="SubAwardAmountInfo-versionNumber" parent="SubAwardAmountInfo-versionNumber-parentBean" />
   <bean id="SubAwardAmountInfo-versionNumber-parentBean" abstract="true" parent="AttributeReferenceDummy-versionNumber"/>

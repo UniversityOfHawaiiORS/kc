@@ -88,8 +88,8 @@
         </h3>
          
    <table cellpadding=0 cellspacing=0 summary="">
-       		<tbody class="addline">            
-			<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+       		<tbody class="addline">
+	        <%-- KC-1512 Merge our Subaward Transaction Type with Kuali Subaward Modification Type (Add improved headers for fields) --%>
 			<c:if test="${readOnly!='true'}">
             <tr>
 				<th class="infoline" rowspan="6">
@@ -130,8 +130,7 @@
 					</c:if>
 	                </div>
 	            </td>   				
-   			</tr> 
-			<%-- KC-1364 End --%>
+   			</tr>
    			<tr>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationEffectiveDate}" /></div></th>
             <th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationID}" /></div></th>
@@ -160,20 +159,20 @@
    					</div> 
    				</td> 
    				</tr>
-			<%-- KC-1364 Bring in BU contributions - Transaction Type --%>
+			<%-- KC-1512 Merge our Subaward Transaction Type with Kuali Subaward Modification Type (Add improved headers for fields) --%>
         	<tr>				
-				<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}" /></div></th>
+				<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.modificationTypeCode}" /></div></th>
 				<th><div align="center"><kul:htmlAttributeLabel attributeEntry="${subAwardAmountInfoAttributes.comments}" /></div></th>
 			</tr>
+			<%-- KC-1512 END --%>
 			<tr>
 				<td>
-				     <kul:htmlControlAttribute property="newSubAwardAmountInfo.transactionTypeCode" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.transactionTypeCode}" />
+				     <kul:htmlControlAttribute property="newSubAwardAmountInfo.modificationTypeCode" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.modificationTypeCode}" />
 				</td>
                 <td colspan="3">
                       <kul:htmlControlAttribute property="newSubAwardAmountInfo.comments" readOnly="${readOnly}" attributeEntry="${subAwardAmountInfoAttributes.comments}" />
                 </td>
             </tr>     
-			<%-- KC-1364 End --%>
    			</c:if>
    			</tbody>
    			<c:forEach var="amountInfo" items="${KualiForm.document.subAwardList[0].historicalAmountInfos}" varStatus="status">
