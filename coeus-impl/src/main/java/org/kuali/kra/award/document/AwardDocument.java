@@ -243,10 +243,11 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
                 award.setAwardDocument(this);
             }
 
-            final Project project = getProjectRetrievalService().retrieveProject(getAward().getAwardNumber());
-            if (project != null) {
-                getProjectPublisher().publishProject(project);
-            }
+            // KC-1513 Award COI Project push should initiate on Submit not Save
+            // final Project project = getProjectRetrievalService().retrieveProject(getAward().getAwardNumber());
+            // if (project != null) {
+            //    getProjectPublisher().publishProject(project);
+            // }
 
             return null;
         });
@@ -263,10 +264,13 @@ public class AwardDocument extends BudgetParentDocument<Award> implements  Copya
                     && !getAward().getSyncChanges().isEmpty()) {
                 getAwardSyncService().applyAwardSyncChangesToHierarchy(getAward());
             }
-            final Project project = getProjectRetrievalService().retrieveProject(getAward().getAwardNumber());
-            if (project != null) {
-                getProjectPublisher().publishProject(project);
-            }
+
+            // KC-1513 Award COI Project push should initiate on Submit not Save
+            //final Project project = getProjectRetrievalService().retrieveProject(getAward().getAwardNumber());
+            //if (project != null) {
+            //    getProjectPublisher().publishProject(project);
+            //}
+
             return null;
         });
     }
