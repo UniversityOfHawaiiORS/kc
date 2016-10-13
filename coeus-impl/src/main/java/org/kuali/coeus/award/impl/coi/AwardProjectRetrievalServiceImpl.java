@@ -21,6 +21,7 @@ package org.kuali.coeus.award.impl.coi;
 import org.apache.commons.lang3.StringUtils;
 import org.kuali.coeus.coi.framework.*;
 import org.kuali.kra.infrastructure.Constants;
+import org.kuali.rice.coreservice.framework.CoreFrameworkServiceLocator;
 import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
@@ -57,6 +58,8 @@ public class AwardProjectRetrievalServiceImpl extends AbstractProjectRetrievalSe
 
     // KC-1494 Only disclose on award child records in COI disclosure
     private static final String UH_AWARD_PUSH_FILTER = " and t.award_number not like '%-00001'";
+
+    private String UH_TRANSACTION_LIMIT_QUERY = null;
 
     @Override
     protected Project toProject(ResultSet rs) throws SQLException {
@@ -111,12 +114,25 @@ public class AwardProjectRetrievalServiceImpl extends AbstractProjectRetrievalSe
 
     @Override
     protected String projectQuery() {
-        // KC-1494 Only disclose on award child records in COI disclosure
-        return AWARD_PROJECT_QUERY + UH_AWARD_PUSH_FILTER;
+
+        return AWARD_PROJECT_QUERY
+               // KC-1494 Only disclose on award child records in COI disclosure
+               + UH_AWARD_PUSH_FILTER
+               // KC-1505 Project Link criteria for Transaction Type in Award Child
+               + getUhTransactionLimit();
     }
 
     @Override
     protected String projectPersonQuery() {
         return AWARD_PROJECT_PERSON_QUERY;
+    }
+
+    // KC-1505 Project Link criteria for Transaction Type in Award Child
+    private String getUhTransactionLimit() {
+        String awardProjectPushTransactionTypeCodes = CoreFrameworkServiceLocator.getParameterService().getParameterValueAsString("KC-GEN","All", "uh_award_project_push_transaction_type_codes");
+        if (awardProjectPushTransactionTypeCodes != null) {
+            return " and t.TRANSACTION_TYPE_CODE in (" + awardProjectPushTransactionTypeCodes + ")";
+        }
+        return " ";
     }
 }
