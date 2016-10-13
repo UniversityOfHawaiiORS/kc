@@ -10,6 +10,16 @@ OPTIONS:
 HERE
 }
 
+getAnswer() {
+        answer=''
+        while [ -z "${answer}" ]
+        do
+                printf "$1: " 1>&2
+                read answer
+        done
+        echo "${answer}"
+        echo 1>&2
+        }
 
 PRE_COMPILE=-Pprecompile-jsp-tomcat-7
 REJECT_IF_MODIFIED=N
@@ -37,6 +47,17 @@ then
     echo "************ Building without precompile for faster build"
 else
     echo "************ Building with precompile jsp for tomcat7"
+fi
+
+CHECK_ONDECK_HACK=`git status | grep modified | grep web.xml`
+if [ "${CHECK_ONDECK_HACK}" != "" ]
+then
+    ondeck_ans=`getAnswer 'WARNING : web.xml modified, are you sure you want to build with a modified web.xml'`
+    if [ "${ondeck_ans}" != "y" ]
+    then
+        echo "Aborting"
+        exit 1
+    fi
 fi
 
 git_revision=`git rev-parse HEAD`
