@@ -317,15 +317,6 @@ public class AwardAction extends BudgetParentActionBase {
         ActionForward basicForward = mapping.findForward(KRADConstants.MAPPING_PORTAL);
         ActionRedirect holdingPageForward = new ActionRedirect(mapping.findForward(KcHoldingPageConstants.MAPPING_HOLDING_PAGE));
         holdingPageForward.addParameter(KcHoldingPageConstants.HOLDING_PAGE_DOCUMENT_ID, routeHeaderId);
-
-        // KC-1513 Award COI Project push should initiate on Submit not Save
-        final Project project = getProjectRetrievalService().retrieveProject(awardForm.getAwardDocument().getAward().getAwardNumber());
-
-        if (project != null) {
-            getProjectPublisher().publishProject(project);
-        }
-        // KC-1513 END
-
         return routeToHoldingPage(basicForward, forward, holdingPageForward, returnLocation, routeHeaderId);
     }
     
@@ -449,13 +440,11 @@ public class AwardAction extends BudgetParentActionBase {
          */
         getReportTrackingService().generateReportTrackingAndSave(award, false);
 
-        /* KC-1513 Award COI Project push should initiate on Submit not Save
         final Project project = getProjectRetrievalService().retrieveProject(awardForm.getAwardDocument().getAward().getAwardNumber());
 
         if (project != null) {
             getProjectPublisher().publishProject(project);
         }
-        */
 
         return forward;
     }
