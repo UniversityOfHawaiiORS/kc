@@ -44,6 +44,12 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
 import org.kuali.rice.krad.rules.rule.event.ApproveDocumentEvent;
 
+//KC-1500 Validation rule to stop PD from submitting to workflow
+import org.kuali.coeus.common.questionnaire.framework.answer.Answer;
+import org.kuali.coeus.common.questionnaire.framework.question.Question;
+import java.util.Arrays;
+//KC-1500 END
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -222,11 +228,35 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
         
         for (AnswerHeader head : headers) {
             retval &= head.isCompleted();
+            //KC-1500 Validation rule to stop PD from submitting to workflow
+            retval &= validateSelfCertification(head);
         }
-               
+
         return retval;
     }
-    
+
+    //KC-1500 Validation rule to stop PD from submitting to workflow
+    private boolean validateSelfCertification(AnswerHeader answerHeader) {
+        String mustBeYesQuestionIdsSrc = getParameterService().getParameterValueAsString(
+            Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE,
+            "uh_pd_key_person_certification_must_be_yes_question_ids");
+        if (mustBeYesQuestionIdsSrc == null || mustBeYesQuestionIdsSrc.isEmpty()) return true;
+        List<String> mustBeYesQuestionIds = Arrays.asList(mustBeYesQuestionIdsSrc.split(","));
+
+        List<Answer> answers = answerHeader.getAnswers();
+        for (Answer answer : answers) {
+            Question question = answer.getQuestion();
+            if (mustBeYesQuestionIds.contains(question.getId().toString())) {
+                if (!answer.getAnswer().equals("Y")) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+    //KC-1500 END
+
     protected void generateAuditError(int count, String personFullName, String errorMessage) {
         final String errorStarter = "document.developmentProposal.proposalPersons[";
         final String errorFinish = "].questionnaireHelper.answerHeaders[0].questions";
