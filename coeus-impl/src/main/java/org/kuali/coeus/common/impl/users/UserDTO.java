@@ -21,10 +21,15 @@ package org.kuali.coeus.common.impl.users;
 
 import com.codiform.moo.annotation.Property;
 
+import static com.codiform.moo.annotation.Optionality.OPTIONAL;
+
+
 public class UserDTO {
     private String personId;
     private String userName;
-    @Property(source = "unit.unitNumber")
+    // KC-1521 KC Rest Service v1/research-users/current/ throws exception in log for ever user
+    //         Added optionality since we don't have primary unit assigned to users in our system
+    @Property(optionality=OPTIONAL,source = "unit.unitNumber")
     private String primaryDepartmentCode;
 
     public String getPersonId() {
