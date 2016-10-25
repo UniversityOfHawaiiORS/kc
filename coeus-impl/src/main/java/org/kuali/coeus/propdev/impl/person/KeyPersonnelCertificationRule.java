@@ -277,7 +277,7 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
             for (Answer answer : answers) {
                 Question question = answer.getQuestion();
                 if (questionIdDisplayMap.containsKey(question.getId().toString())) {
-                    if (!answer.getAnswer().equals("Y")) {
+                    if (answer.getAnswer() != null && !answer.getAnswer().equals("Y")) {
                         retVal = false;
                         generateYesRequiredAuditError(answer.getQuestion().getQuestion(),
                                                       questionIdDisplayMap.get(question.getId().toString()),
