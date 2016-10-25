@@ -44,6 +44,13 @@ import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
 import org.kuali.rice.krad.rules.rule.event.ApproveDocumentEvent;
 
+// KC-1500 Validation rule to stop PD from submitting to workflow
+import org.kuali.coeus.common.questionnaire.framework.answer.Answer;
+import org.kuali.coeus.common.questionnaire.framework.question.Question;
+import java.util.Arrays;
+import java.util.HashMap;
+// KC-1500 END
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +59,7 @@ import static org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDat
 import static org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants.PERSONNEL_PAGE_ID;
 import static org.kuali.kra.infrastructure.KeyConstants.ERROR_PROPOSAL_PERSON_CERTIFICATION_INCOMPLETE;
 import static org.kuali.kra.infrastructure.KeyConstants.ERROR_PROPOSAL_PERSON_NONEMPLOYEE_CERTIFICATION_INCOMPLETE;
+import static edu.hawaii.infrastructure.UhKeyConstants.CERTIFICATION_QUESTION_YES_ANSWER_REQUIRED;
 
 public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBase implements DocumentAuditRule {
 
@@ -161,6 +169,8 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
                 generateAuditError(count,person.getFullName(), ERROR_PROPOSAL_PERSON_CERTIFICATION_INCOMPLETE);
                 retval = false;
             }
+            // KC-1500 Validation rule to stop PD from submitting to workflow
+            retval &= validateRequiredYesAnswers(person,count);
             count++;
         }
         return retval;
@@ -179,6 +189,8 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
                 generateAuditError(count,person.getFullName(), ERROR_PROPOSAL_PERSON_CERTIFICATION_INCOMPLETE);
                 return false;
             }
+            // KC-1500 Validation rule to stop PD from submitting to workflow
+            retval &= validateRequiredYesAnswers(person,count);
             count++;
         }
         return retval;
@@ -223,10 +235,79 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
         for (AnswerHeader head : headers) {
             retval &= head.isCompleted();
         }
-               
+
         return retval;
     }
-    
+
+    // KC-1500 Validation rule to stop PD from submitting to workflow
+    private boolean validateRequiredYesAnswers(ProposalPerson person, int personNumber) {
+        String mustBeYesQuestionIdsSrc = getParameterService().getParameterValueAsString(
+            Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE,
+            "uh_pd_key_person_certification_must_be_yes_question_ids");
+
+        if (mustBeYesQuestionIdsSrc == null || mustBeYesQuestionIdsSrc.isEmpty()) {
+            // None configured so simply return true, all clear
+            return true;
+        }
+
+        boolean retVal=true;
+
+        HashMap<String,Integer> questionIdDisplayMap = new HashMap<String,Integer>();
+        for (String yesQuestionConfigPair: Arrays.asList(mustBeYesQuestionIdsSrc.split(","))) {
+            List<String>configPair = Arrays.asList(yesQuestionConfigPair.split(":"));
+            Integer displayLength;
+            if (configPair.size() == 2) {
+                try {
+                    displayLength = Integer.parseInt(configPair.get(1));
+                } catch (NumberFormatException e) {
+                    LOG.warn("uh_pd_key_person_certification_must_be_yes_question_ids mis-configured displayLength threw NumberFormatException, defaulting to 30");
+                    displayLength = 30;
+                }
+                questionIdDisplayMap.put(configPair.get(0),displayLength);
+            } else {
+                LOG.error("uh_pd_key_person_certification_must_be_yes_question_ids mis-configured missing configPair questionId:displayLength");
+            }
+        }
+
+        ProposalPersonModuleQuestionnaireBean bean = new ProposalPersonModuleQuestionnaireBean(person.getDevelopmentProposal(), person);
+
+        List<AnswerHeader> headers = getQuestionnaireAnswerService().getQuestionnaireAnswer(bean);
+        for (AnswerHeader header : headers) {
+            List<Answer> answers = header.getAnswers();
+            for (Answer answer : answers) {
+                Question question = answer.getQuestion();
+                if (questionIdDisplayMap.containsKey(question.getId().toString())) {
+                    if (!answer.getAnswer().equals("Y")) {
+                        retVal = false;
+                        generateYesRequiredAuditError(answer.getQuestion().getQuestion(),
+                                                      questionIdDisplayMap.get(question.getId().toString()),
+                                                      personNumber,person.getFullName(),
+                                                      CERTIFICATION_QUESTION_YES_ANSWER_REQUIRED);
+                    }
+                }
+            }
+        }
+
+        return retVal;
+    }
+
+    protected void generateYesRequiredAuditError(String question, Integer displayLength, int personNumber, String personFullName, String errorMessage) {
+        final String errorStarter = "document.developmentProposal.proposalPersons[";
+        final String errorFinish = "].questionnaireHelper.answerHeaders[0].questions";
+
+        String errorKey = errorStarter + personNumber + errorFinish;
+        int maxLength = (question.length() < displayLength)?question.length():displayLength;
+        String questionPart = question.substring(0,maxLength);
+
+        //Displays the error within the audit log.
+        AuditError error = new AuditError(errorKey, errorMessage,
+                ProposalDevelopmentDataValidationConstants.PERSONNEL_PAGE_ID, new String[]{questionPart,personFullName});
+        getAuditErrors().add(error);
+
+    }
+
+    // KC-1500 END
+
     protected void generateAuditError(int count, String personFullName, String errorMessage) {
         final String errorStarter = "document.developmentProposal.proposalPersons[";
         final String errorFinish = "].questionnaireHelper.answerHeaders[0].questions";

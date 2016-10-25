@@ -29,6 +29,9 @@ public final class UhKeyConstants {
 
     // KC-1281 Add data validation warning for keywords field
     public static final String KEYWORDS_NOT_ENTERED_WARNING = "warning.empty.keywords";
+
+    // KC-1500 Validation rule to stop PD from submitting to workflow
+    public static final String CERTIFICATION_QUESTION_YES_ANSWER_REQUIRED =  "error.proposalperson.certfication.yes.answer.required";
     
     /**
      * private utility class ctor.
