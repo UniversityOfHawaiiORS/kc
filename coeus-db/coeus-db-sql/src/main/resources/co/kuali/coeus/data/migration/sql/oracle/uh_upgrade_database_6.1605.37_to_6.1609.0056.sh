@@ -97,6 +97,7 @@ then
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1512.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1505.sql
     sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1500.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1522.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}

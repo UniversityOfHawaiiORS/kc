@@ -18,6 +18,7 @@
  */
 package org.kuali.coeus.propdev.impl.person;
 
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -243,7 +244,7 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
     private boolean validateRequiredYesAnswers(ProposalPerson person, int personNumber) {
         String mustBeYesQuestionIdsSrc = getParameterService().getParameterValueAsString(
             Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE,
-            "uh_pd_key_person_certification_must_be_yes_question_ids");
+            "uh_pd_certification_questions_require_specific_answer");
 
         if (mustBeYesQuestionIdsSrc == null || mustBeYesQuestionIdsSrc.isEmpty()) {
             // None configured so simply return true, all clear
@@ -252,20 +253,21 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
 
         boolean retVal=true;
 
-        HashMap<String,Integer> questionIdDisplayMap = new HashMap<String,Integer>();
-        for (String yesQuestionConfigPair: Arrays.asList(mustBeYesQuestionIdsSrc.split(","))) {
-            List<String>configPair = Arrays.asList(yesQuestionConfigPair.split(":"));
+        HashMap<String,Pair<String,Integer>> questionIdDisplayMap = new HashMap<String,Pair<String,Integer>>();
+        for (String yesQuestionConfig: Arrays.asList(mustBeYesQuestionIdsSrc.split(","))) {
+            List<String>config = Arrays.asList(yesQuestionConfig.split(":"));
             Integer displayLength;
-            if (configPair.size() == 2) {
+            if (config.size() == 3) {
                 try {
-                    displayLength = Integer.parseInt(configPair.get(1));
+
+                    displayLength = Integer.parseInt(config.get(2));
                 } catch (NumberFormatException e) {
-                    LOG.warn("uh_pd_key_person_certification_must_be_yes_question_ids mis-configured displayLength threw NumberFormatException, defaulting to 30");
+                    LOG.warn("uh_pd_certification_questions_require_specific_answer mis-configured displayLength threw NumberFormatException, defaulting to 30");
                     displayLength = 30;
                 }
-                questionIdDisplayMap.put(configPair.get(0),displayLength);
+                questionIdDisplayMap.put(config.get(0),new Pair<String,Integer>(config.get(1),displayLength));
             } else {
-                LOG.error("uh_pd_key_person_certification_must_be_yes_question_ids mis-configured missing configPair questionId:displayLength");
+                LOG.error("uh_pd_certification_questions_require_specific_answer mis-configured missing config values each comma delimited group should have format questionId:requiredAnswer:displayLength");
             }
         }
 
@@ -276,13 +278,14 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
             List<Answer> answers = header.getAnswers();
             for (Answer answer : answers) {
                 Question question = answer.getQuestion();
-                if (questionIdDisplayMap.containsKey(question.getId().toString())) {
-                    if (answer.getAnswer() != null && !answer.getAnswer().equals("Y")) {
+                String questionId = question.getQuestionSeqId().toString();
+                if (questionIdDisplayMap.containsKey(questionId)) {
+                    String requiredAnswer = questionIdDisplayMap.get(questionId).getKey();
+                    Integer displayLength = questionIdDisplayMap.get(questionId).getValue();
+                    if (answer.getAnswer() != null && !answer.getAnswer().equals(requiredAnswer)) {
                         retVal = false;
-                        generateYesRequiredAuditError(answer.getQuestion().getQuestion(),
-                                                      questionIdDisplayMap.get(question.getId().toString()),
-                                                      personNumber,person.getFullName(),
-                                                      CERTIFICATION_QUESTION_YES_ANSWER_REQUIRED);
+                        generateYesRequiredAuditError(answer.getQuestion().getQuestion(), requiredAnswer,
+                                displayLength, personNumber,person.getFullName(), CERTIFICATION_QUESTION_YES_ANSWER_REQUIRED);
                     }
                 }
             }
@@ -291,17 +294,19 @@ public class KeyPersonnelCertificationRule extends KcTransactionalDocumentRuleBa
         return retVal;
     }
 
-    protected void generateYesRequiredAuditError(String question, Integer displayLength, int personNumber, String personFullName, String errorMessage) {
+    protected void generateYesRequiredAuditError(String question, String requiredAnswer, Integer displayLength,
+                                                 int personNumber, String personFullName, String errorMessage) {
         final String errorStarter = "document.developmentProposal.proposalPersons[";
         final String errorFinish = "].questionnaireHelper.answerHeaders[0].questions";
 
         String errorKey = errorStarter + personNumber + errorFinish;
         int maxLength = (question.length() < displayLength)?question.length():displayLength;
         String questionPart = question.substring(0,maxLength);
-
+        String startingWithPhrase = (maxLength == question.length()) ? "" : "starting with ";
+        String requiredAnswerText= (requiredAnswer.equals("N")) ? "No" : "YES";
         //Displays the error within the audit log.
         AuditError error = new AuditError(errorKey, errorMessage,
-                ProposalDevelopmentDataValidationConstants.PERSONNEL_PAGE_ID, new String[]{questionPart,personFullName});
+                ProposalDevelopmentDataValidationConstants.PERSONNEL_PAGE_ID, new String[]{requiredAnswerText,startingWithPhrase,questionPart,personFullName});
         getAuditErrors().add(error);
 
     }

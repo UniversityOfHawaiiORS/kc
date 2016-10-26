@@ -32,7 +32,10 @@ public final class UhKeyConstants {
 
     // KC-1500 Validation rule to stop PD from submitting to workflow
     public static final String CERTIFICATION_QUESTION_YES_ANSWER_REQUIRED =  "error.proposalperson.certfication.yes.answer.required";
-    
+
+    // KC-1522 Add validation to PD for Questionnaire Question must be answered a certain way
+    public static final String ERROR_QUESTIONNAIRE_QUESTION_SPECIFIC_ANSWER_REQUIRED = "error.questionnaire.specific.answer.required";
+
     /**
      * private utility class ctor.
      * @throws UnsupportedOperationException if called.

@@ -18,30 +18,42 @@
  */
 package org.kuali.coeus.propdev.impl.questionnaire;
 
+import edu.hawaii.infrastructure.UhKeyConstants;
+import javafx.util.Pair;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.kuali.coeus.common.questionnaire.framework.answer.Answer;
 import org.kuali.coeus.common.questionnaire.framework.answer.ModuleQuestionnaireBean;
 import org.kuali.coeus.common.questionnaire.framework.core.QuestionnaireUsage;
+import org.kuali.coeus.common.questionnaire.framework.question.Question;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.rule.KcTransactionalDocumentRuleBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
+import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.KeyConstants;
 import org.kuali.coeus.common.questionnaire.framework.answer.AnswerHeader;
 import org.kuali.coeus.common.questionnaire.framework.answer.QuestionnaireAnswerService;
+import org.kuali.rice.coreservice.framework.parameter.ParameterService;
 import org.kuali.rice.krad.util.AuditCluster;
 import org.kuali.rice.krad.util.AuditError;
 import org.kuali.rice.krad.document.Document;
 import org.kuali.rice.krad.rules.rule.DocumentAuditRule;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
+import static edu.hawaii.infrastructure.UhKeyConstants.CERTIFICATION_QUESTION_YES_ANSWER_REQUIRED;
 import static org.kuali.coeus.propdev.impl.datavalidation.ProposalDevelopmentDataValidationConstants.*;
 
 public class ProposalDevelopmentQuestionnaireAuditRule extends KcTransactionalDocumentRuleBase implements DocumentAuditRule {
 
     private transient QuestionnaireAnswerService questionnaireAnswerService;
     private transient GlobalVariableService globalVariableService;
+    private static final Log LOG = LogFactory.getLog(ProposalDevelopmentQuestionnaireAuditRule.class);
 
     protected QuestionnaireUsage getQuestionnaireUsage(String moduleItemCode, String moduleSubItemCode, List<QuestionnaireUsage> questionnaireUsages) {
         QuestionnaireUsage usage = null;
@@ -70,9 +82,72 @@ public class ProposalDevelopmentQuestionnaireAuditRule extends KcTransactionalDo
                         new AuditError(QUESTIONNAIRE_PAGE_ID + "-" + StringUtils.removePattern(answerHeader.getLabel(),"([^0-9a-zA-Z\\-_])"), KeyConstants.ERROR_QUESTIONNAIRE_NOT_COMPLETE,
                                 QUESTIONNAIRE_PAGE_ID + "." + QUESTIONNAIRE_PAGE_ID + "-" + StringUtils.removePattern(answerHeader.getLabel(),"([^0-9a-zA-Z\\-_])"), new String[]{answerHeader.getLabel()}));
             }
+            // KC-1522 Add validation to PD for Questionnaire Question must be answered a certain way
+            valid &= checkAnswerYesRequired(answerHeader);
+            // KC-1522 End
         }
         return valid;
     }
+    // KC-1522 Add validation to PD for Questionnaire Question must be answered a certain way
+    private boolean checkAnswerYesRequired(AnswerHeader answerHeader) {
+        String mustBeYesQuestionIdsSrc = KcServiceLocator.getService(ParameterService.class).getParameterValueAsString(
+                Constants.KC_GENERIC_PARAMETER_NAMESPACE, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE,
+                "uh_pd_questionnaire_require_specific_answer");
+
+        if (mustBeYesQuestionIdsSrc == null || mustBeYesQuestionIdsSrc.isEmpty()) {
+            // None configured so simply return true, all clear
+            return true;
+        }
+
+        boolean retVal=true;
+
+        HashMap<String,Pair<String,Integer>> questionIdDisplayMap = new HashMap<String,Pair<String,Integer>>();
+        for (String yesQuestionConfig: Arrays.asList(mustBeYesQuestionIdsSrc.split(","))) {
+            List<String>config = Arrays.asList(yesQuestionConfig.split(":"));
+            Integer displayLength;
+            if (config.size() == 3) {
+                try {
+
+                    displayLength = Integer.parseInt(config.get(2));
+                } catch (NumberFormatException e) {
+                    LOG.warn("uh_pd_questionnaire_require_specific_answer mis-configured displayLength threw NumberFormatException, defaulting to 30");
+                    displayLength = 30;
+                }
+                questionIdDisplayMap.put(config.get(0),new Pair<String,Integer>(config.get(1),displayLength));
+            } else {
+                LOG.error("uh_pd_questionnaire_require_specific_answer mis-configured missing config values each comma delimited group should have format questionId:requiredAnswer:displayLength");
+            }
+        }
+
+        List<Answer> answers = answerHeader.getAnswers();
+        for (Answer answer : answers) {
+            Question question = answer.getQuestion();
+            String questionId = question.getQuestionSeqId().toString();
+            if (questionIdDisplayMap.containsKey(questionId)) {
+                Pair<String,Integer> configPair = questionIdDisplayMap.get(questionId);
+                String requiredAnswer = configPair.getKey();
+                if (!requiredAnswer.equals("Y") && !requiredAnswer.equals("N")) {
+                    LOG.warn("uh_pd_questionnaire_require_specific_answer mis-configured requiredAnswer [" + requiredAnswer + "] found.  Value should be Y or N, defaulting to Y");
+                    requiredAnswer="Y";
+                }
+                Integer displayLength = configPair.getValue();
+                if (answer.getAnswer() != null && !answer.getAnswer().equals(requiredAnswer)) {
+                    String questionText = question.getQuestion();
+                    int maxLength = (questionText.length() < displayLength)?questionText.length():displayLength;
+                    String startingWithPhrase = (maxLength == questionText.length()) ? "" : "starting with ";
+                    String questionPart = questionText.substring(0,maxLength);
+                    String requiredAnswerText= (requiredAnswer.equals("N")) ? "No" : "YES";
+                    getAuditErrors(answerHeader.getLabel()).add(
+                            new AuditError(QUESTIONNAIRE_PAGE_ID + "-" + StringUtils.removePattern(answerHeader.getLabel(),"([^0-9a-zA-Z\\-_])"), UhKeyConstants.ERROR_QUESTIONNAIRE_QUESTION_SPECIFIC_ANSWER_REQUIRED,
+                                    QUESTIONNAIRE_PAGE_ID + "." + QUESTIONNAIRE_PAGE_ID + "-" + StringUtils.removePattern(answerHeader.getLabel(),"([^0-9a-zA-Z\\-_])"), new String[]{requiredAnswerText,startingWithPhrase,questionPart}));
+                    retVal = false;
+                }
+            }
+        }
+        return retVal;
+    }
+    // KC-1522 End
+
 
     public QuestionnaireAnswerService getQuestionnaireAnswerService() {
         if (questionnaireAnswerService == null) {
