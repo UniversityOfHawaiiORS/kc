@@ -831,10 +831,41 @@ public class ProposalDevelopmentViewHelperServiceImpl extends KcViewHelperServic
         return state != null ? state.getDescription() : "";
     }
 
-   public String getDisclosureStatusForPerson(ProposalPerson person) {
+    /* KC-1496 Rename COI Disclosure Status for "Disclosure Not Required" */
+    public String getDisclosureStatusForPerson(ProposalPerson person, DevelopmentProposal proposal) {
+
+        String proposalStateTypeCode = proposal.getProposalDocument().getDevelopmentProposal().getProposalStateTypeCode();
+
+        if (proposalStateTypeCode.equals(ProposalState.IN_PROGRESS)) {
+            // If uh_coi_disclosure_in_progress_message Parameter exists return value
+            String inProgressMessage = getParameterService().getParameterValueAsString("KC-GEN","All", "uh_coi_disclosure_in_progress_message");
+            if (inProgressMessage != null && !inProgressMessage.equals("OTB-default")) {
+                return inProgressMessage;
+            }
+        }
+
+        if (proposalStateTypeCode.equals(ProposalState.REVISIONS_REQUESTED)) {
+            // If uh_coi_disclosure_revisions_message Parameter exists return value
+            String uh_coi_disclosure_revisions_message = getParameterService().getParameterValueAsString("KC-GEN","All", "uh_coi_disclosure_revisions_message");
+            if (uh_coi_disclosure_revisions_message != null) {
+                return uh_coi_disclosure_revisions_message;
+            }
+        }
+
+        // When document is approved it can be in several states so check for final document instead
+        if (proposal.getDocument().getDocumentHeader().getWorkflowDocument().isFinal() ||
+            proposal.getDocument().getDocumentHeader().getWorkflowDocument().isCanceled()) {
+            // If uh_coi_disclosure_final_message Parameter exists return value
+            String documentFinalMessage = getParameterService().getParameterValueAsString("KC-GEN","All", "uh_coi_disclosure_final_message");
+            if (documentFinalMessage != null && !documentFinalMessage.equals("OTB-default")) {
+                return documentFinalMessage;
+            }
+        }
+
         DisclosureProjectStatus projectStatus = getCoiStatusForPerson(person);
         return projectStatus.getStatus() == null ? "" : projectStatus.getStatus();
     }
+    /* KC-1496 END */
 
     public String getDispositionStatusForPerson(ProposalPerson person) {
         DisclosureProjectStatus projectStatus = getCoiStatusForPerson(person);

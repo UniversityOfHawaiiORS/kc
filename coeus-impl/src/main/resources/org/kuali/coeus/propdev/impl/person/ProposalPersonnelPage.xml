@@ -378,9 +378,10 @@
                             <bean parent="Uif-HorizontalBoxGroup" p:style="color: gray; background-color:#eeeeee; font-weight: bold;">
                                 <property name="items">
                                     <list>
+                                        <!-- KC-1496 Rename COI Disclosure Status for "Disclosure Not Required" -->
                                         <bean parent="Uif-MessageField"
                                               p:messageText="@{#ViewHelper.isCoiDisclosureStatusEnabled() ? 'Disclosure Status: ' +
-                                              #ViewHelper.getDisclosureStatusForPerson(#line) : ''}"
+                                              #ViewHelper.getDisclosureStatusForPerson(#line, document.developmentProposal) : ''}"
                                               p:readOnly="true" p:order="5"
                                                 />
                                         <bean parent="Uif-MessageField"
