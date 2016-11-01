@@ -33,7 +33,8 @@
     <li><portal:portalLink displayTitle="true" title="Flush UH KC Users Cache" url="${ConfigProperties.application.url}/flushUhKcUsersCache.jsp"/></li>
     <%-- KC-901 Add ability for help desk to run the uhims process on demand --%>
     <br>
-    <li><portal:portalLink displayTitle="true" title="Process UHIMS messages now (Wait for result)" url="${ConfigProperties.application.url}/uh_processUHIMS.jsp"/></li>
+    <li><portal:portalLink displayTitle="true" title="Process UHIMS messages (Wait for result)" url="${ConfigProperties.application.url}/uh_processUHIMS.jsp"/></li>
+    <li><portal:portalLink displayTitle="true" title="Sync KC Users to CORE (Wait for result)" url="${ConfigProperties.application.url}/uh_processCORE.jsp"/></li>
     <%-- KC-901 END --%>
     <li>
       <portal:portalLink displayTitle="true" title="Database Schema Information" url="${ConfigProperties.application.url}/schemaspy/index.html" />

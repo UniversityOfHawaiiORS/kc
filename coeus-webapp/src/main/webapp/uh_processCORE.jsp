@@ -1,8 +1,8 @@
 <%
-    String result = edu.hawaii.rice.kew.web.UhKcAuthServiceUserLoginFilter.executeUHIMSprocess();
+    String result = edu.hawaii.rice.kew.web.UhKcAuthServiceUserLoginFilter.executeCOREsync(); 
 %>
 
-UHIMS has been run.
+CORE has been run.
 <br>
 Response
 <br>

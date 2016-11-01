@@ -41,26 +41,58 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 	// KC-901 Add ability for help desk to run the uhims process on demand
 	private static Boolean uhimsRunning=false;
 
+	// KC-901 Add ability for help desk to run the uhims process on demand
+	private static Boolean coresyncRunning=false;
+
 	private static String appUrl;
 	// KC-1508  Make new "UH COI Users" group for COI only users
 	private static String coiUrl;
 	private static String contextName;
-		
+
+	// KC-1523 Need method for help desk to run CORE sync users process
+	public static synchronized String executeCOREsync() {
+		ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
+		String cmd = configService.getPropertyValueAsString("uh.coresync.cmd");
+
+		if (cmd==null) {
+			return "uh.coresync.cmd not configured";
+		}
+
+		if (coresyncRunning!=true) {
+			coresyncRunning=true;
+		} else {
+			return "Already Running";
+		}
+
+		String result;
+		result = executeShellCommand(cmd);
+		coresyncRunning=false;
+		return result;
+	}
+	// KC-1523 END
+
 	// KC-901 Add ability for help desk to run the uhims process on demand
-	public static synchronized String executeShellCommand() {
+	public static synchronized String executeUHIMSprocess() {
 		ConfigurationService configService = KcServiceLocator.getService(ConfigurationService.class);
 		String cmd = configService.getPropertyValueAsString("uh.uhims.cmd");
-		
+
 		if (cmd==null) {
 			return "uh.uhims.cmd not configured";
 		}
-		
+
 		if (uhimsRunning!=true) {
 			uhimsRunning=true;
 		} else {
 			return "Already Running";
 		}
-			
+
+		String result;
+		result = executeShellCommand(cmd);
+		uhimsRunning=false;
+		return result;
+	}
+		
+	public static synchronized String executeShellCommand(String cmd) {
 		String result;
 					
 		try {
