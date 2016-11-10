@@ -1,0 +1,18 @@
+
+
+schemaspy: schemaspy-1508.0162-branch
+rice: uh-rice-2.5.3.1609.0004-uh
+kc-api: kuali-coeus-api-1609.0002
+kc-s2sgen: uh-modifications-1609.0007
+
+
+
+kc: uh-modifications-1609.0056
+
+
+Then, modify (or get a fresh copy of):
+~/kuali/main/mygrant/kc-config.xml 
+
+
+
+

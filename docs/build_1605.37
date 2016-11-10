@@ -27,6 +27,8 @@ Then, modify (or get a fresh copy of):
 
 # core branch should be uh-modification-16.05.1
 # See README.md in root dir
+# build strong oracle follow instructions
+https://github.com/strongloop/strong-oracle
 
 nvm use 4.3.x
 
@@ -59,7 +61,14 @@ db.institutions.update({},{$set: {"provider":"auth"}})
 # mkdir /etc/apache2/ssl if needed
 sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/apache2/ssl/apache.key -out /etc/apache2/ssl/apache.crt
 
-enable ssl
+# Issuer: C=US, ST=Hawaii, L=Honolulu, O=University of Hawaii, OU=Office of Research Services, CN=128.171.128.155/emailAddress=jlolofie@hawaii.edu
+
+# check that cert looks ok
+openssl x509 -in /etc/apache2/ssl/apache.crt -text -noout
+
+
+
+#enable ssl
 sudo a2enmod ssl
 
 # confirm apache is listening on 443 

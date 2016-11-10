@@ -739,6 +739,9 @@
     </property>
     <property name="resultFields">
       <list>
+        <!-- KC-1310 In Address Book search, results do not name individuals and orgs -->
+        <bean p:attributeName="organization" parent="FieldDefinition" />
+        <!-- KC-1310 -->
         <!-- KC-1375 Make search results display name fields
         <bean p:attributeName="rolodexId" p:forceInquiry="true" parent="FieldDefinition"/>
         -->
