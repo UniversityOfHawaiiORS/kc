@@ -122,7 +122,7 @@
                       p:actionLabel="User Guides"
                       p:actionIconPlacement="TOP"
                       p:iconClass="icon-drawer2"
-                      p:additionalCssClasses="btn-success uh_help_button"
+                      p:additionalCssClasses="btn-primary uh_help_button"
                       p:actionScript="window.open('@{#getParam('KC-GEN','All','uh.helpbutton.user.guides.url')}');">
                 </bean>
                 <bean parent="Uif-PrimaryActionButton" p:colSpan="4"
