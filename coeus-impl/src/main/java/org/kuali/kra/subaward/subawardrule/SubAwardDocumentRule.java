@@ -65,7 +65,6 @@ SubAwardFfataReportingRule {
     private static final String SUBAWARD_START_DATE =".startDate";
     private static final String SITEINVESTIGATOR =".siteInvestigatorId";
     // KC-1448 Validate Period of Performance Start and End Dates in Subaward HoC
-    private static final String NEW_AMOUNT_INFO = "newSubAwardAmountInfo";
     private static final String AMOUNT_INFO_OBLIGATED_AMOUNT = ".obligatedChange";
     private static final String AMOUNT_INFO_ANTICIPATED_AMOUNT = ".anticipatedChange";
     // KC-1448 END
@@ -172,7 +171,14 @@ SubAwardFfataReportingRule {
 
         rulePassed &= processSaveSubAwardAmountInfoBusinessRules(subAward);
 
-        rulePassed &= processSubAwardAmountInfoBusinessRules(amountInfo, subAward, NEW_AMOUNT_INFO);
+        //KC-1533 Adding a new SubAward Amount Info does not update HoC summary
+        rulePassed &= processSubAwardAmountInfoBusinessRules(amountInfo, subAward, NEW_SUB_AWARD_AMOUNT_INFO);
+
+        subAward.updateByAmountInfo(amountInfo);
+        subAward.updateTotalAvailableAmount();
+        amountInfo.setAnticipatedAmount(subAward.getTotalAnticipatedAmount());
+        amountInfo.setObligatedAmount(subAward.getTotalObligatedAmount());
+        //KC-1533 END
 
         return rulePassed;
     }
@@ -213,9 +219,8 @@ SubAwardFfataReportingRule {
         boolean rulePassed = true;
 
         String errorPathPrefix = NEW_SUBAWARD + ".subAwardAmountInfoList[" + String.valueOf(index) + "]";
-        GlobalVariables.getMessageMap().addToErrorPath(errorPathPrefix);
-        rulePassed &= getDictionaryValidationService().isBusinessObjectValid(amountInfo);
-        GlobalVariables.getMessageMap().removeFromErrorPath(errorPathPrefix);
+        //KC-1533 Adding a new SubAward Amount Info does not update HoC summary
+        rulePassed &= getDictionaryValidationService().isBusinessObjectValid(amountInfo, errorPathPrefix);
 
         rulePassed &= processSubAwardAmountInfoBusinessRules(amountInfo, subAward, errorPathPrefix);
 
