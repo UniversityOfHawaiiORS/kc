@@ -338,7 +338,8 @@ public class ProposalDevelopmentDocumentRule extends KcTransactionalDocumentRule
                                         "requestedEndDateInitial"));
             }
         }
-        
+
+        /* KC-1328 Remove validation check on Award ID field
         if (StringUtils.isNotBlank(proposalDevelopmentDocument.getDevelopmentProposal().getCurrentAwardNumber())) {
             if (getSubmissionInfoService().getProposalCurrentAwardSponsorAwardNumber(proposalDevelopmentDocument.getDevelopmentProposal().getCurrentAwardNumber()) == null) {
                 valid = false;
@@ -346,6 +347,7 @@ public class ProposalDevelopmentDocumentRule extends KcTransactionalDocumentRule
                         dataDictionaryService.getAttributeErrorLabel(DevelopmentProposal.class, "currentAwardNumber"));
             }
         }
+        */
         
         if (StringUtils.isNotBlank(proposalDevelopmentDocument.getDevelopmentProposal().getContinuedFrom())) {
             if (getSubmissionInfoService().getProposalContinuedFromVersionProposalId(proposalDevelopmentDocument.getDevelopmentProposal().getContinuedFrom()) == null) {
