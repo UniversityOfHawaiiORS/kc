@@ -221,8 +221,14 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 			// KC-531 End
 		}
 
+		// KC-1540 UH COI Users aren't getting their "Reviewer Role" from monolith
+		// COI service calls not working for people only in "UH COI Users" group
+		// need to allow api calls through for these users.
+		boolean isAPIrequest  = request.getRequestURL() != null && request.getRequestURL().toString().contains("research-sys/api");
+
 		// If still not in either group the user doesn't have either group so don't let them into mygrant
-		if (!kcUsers.contains(principalName) && !coiUsers.contains(principalName)) {
+		// KC-1540 UH COI Users aren't getting their "Reviewer Role" from monolith
+		if (!isAPIrequest && !kcUsers.contains(principalName) && !coiUsers.contains(principalName)) {
 			// User is not in "UH KC Users" group so redirect them to permission denied page.
 			// Check if request is already forwarded to Permission Denied to prevent redirect loop
 			String channelTitle=(String)request.getParameter("channelTitle");
@@ -234,7 +240,8 @@ public class UhKcAuthServiceUserLoginFilter extends AuthServiceUserLoginFilter
 		}
 
 		// If user is in "UH COI Users" but not in "UH KC Users" then redirect them directly to COI module
-		if (!kcUsers.contains(principalName) && coiUsers.contains(principalName)) {
+		// KC-1540 UH COI Users aren't getting their "Reviewer Role" from monolith
+		if (!isAPIrequest && !kcUsers.contains(principalName) && coiUsers.contains(principalName)) {
 			response.sendRedirect(getCoiUrl());
 			return;
 		}
