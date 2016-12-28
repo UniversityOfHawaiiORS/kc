@@ -90,6 +90,8 @@ public class AwardPrintingServiceImplTest {
 			{
 				oneOf(configurationService).getPropertyValueAsBoolean(Constants.PRINT_LOGGING_ENABLE);
 				will(returnValue(false));
+				oneOf(configurationService).getPropertyValueAsBoolean(Constants.PRINT_PDF_LOGGING_ENABLE);
+				will(returnValue(false));
 				oneOf(configurationService).getPropertyValueAsString(KRADConstants.APPLICATION_URL_KEY);
 				will(returnValue("foo"));
 				oneOf(configurationService).getPropertyValueAsString(Constants.KRA_EXTERNALIZABLE_IMAGES_URI_KEY);
@@ -184,10 +186,6 @@ public class AwardPrintingServiceImplTest {
 	}
 	
 	private class TestableAwardNoticePrintStream extends AwardNoticeXmlStream {
-		@Override
-		public String getNSFDescription(String nsfCode) {
-			return "";
-		}
 		
 		@Override
 		protected AwardType getAward() {

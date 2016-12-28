@@ -18,47 +18,10 @@
  */
 package org.kuali.coeus.s2sgen.impl.generate.support;
 
-import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
-import org.kuali.coeus.propdev.impl.attachment.Narrative;
-import org.kuali.coeus.propdev.impl.attachment.NarrativeType;
-import org.kuali.rice.krad.data.DataObjectService;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.kuali.coeus.sys.framework.service.KcServiceLocator.getService;
-/**
- * This class tests the AttachmentsV1_1GeneratorTest
- */
-public class AttachmentsV1_1GeneratorTest extends S2STestBase {
+public class AttachmentsV1_1GeneratorTest extends AttachmentsBaseGeneratorTest {
 
     @Override
     protected String getFormGeneratorName() {
         return AttachmentsV1_1Generator.class.getSimpleName();
-    }
-
-    @Override
-    protected void prepareData(ProposalDevelopmentDocument document) throws Exception {
-
-        Narrative narrative = new Narrative();
-        List<Narrative> naList = new ArrayList<Narrative>();
-        narrative.setDevelopmentProposal(document.getDevelopmentProposal());
-        narrative.setModuleNumber(1);
-        narrative.setModuleSequenceNumber(1);
-        narrative.setModuleStatusCode("C");
-        narrative.setNarrativeTypeCode("52");
-        narrative.setObjectId("12345678890abcd");
-        narrative.setName("exercise1");
-        NarrativeType narrativeType = new NarrativeType();
-        narrativeType.setCode("1");
-        narrativeType.setAllowMultiple(false);
-        narrativeType.setSystemGenerated(false);
-        narrativeType.setDescription("Testing for Attachments Attachment");
-        getService(DataObjectService.class).save(narrativeType);
-        narrative.setNarrativeType(narrativeType);
-        narrative.setNarrativeTypeCode("1");
-        naList.add(narrative);
-        narrative.setNarrativeAttachment(null);
-        document.getDevelopmentProposal().setNarratives(naList);
     }
 }

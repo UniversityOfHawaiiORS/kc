@@ -37,10 +37,10 @@ public class SubAwardAmountInfoTransactionValuesFinder extends FormViewAwareUifK
     public List<KeyValue> getKeyValues() {
         final SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy");
         return Stream.concat(Stream.of(SELECT),
-                ((SubAwardDocument) getDocument()).getSubAward().getSubAwardAmountInfoList()
+                ((SubAwardDocument) getDocument()).getSubAward().getAllSubAwardAmountInfos()
                 .stream()
                 .filter(info -> StringUtils.isNotEmpty(info.getModificationTypeCode()))
-                .filter(info -> info.getModificationEffectiveDate() != null)
+                .filter(info -> info.getEffectiveDate() != null)
                 .peek(info -> {
                     if (info.getModificationType() == null) {
                         info.refreshReferenceObject("modificationType");

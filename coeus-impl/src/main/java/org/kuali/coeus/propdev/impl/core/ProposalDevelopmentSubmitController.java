@@ -100,7 +100,6 @@ public class ProposalDevelopmentSubmitController extends
     public static final String PROPOSAL_NUMBER = "proposalNumber";
     public static final String PROPOSAL_STATE = "proposalState";
     private static final String ENABLE_PD_WORKFLOW_APPROVAL_COMMENTS = "ENABLE_PD_WORKFLOW_APPROVAL_COMMENTS";
-    private static final String PROPOSAL_APPROVAL_ATTACHMENT = "Proposal approval attachment.";
 
     private final Logger LOGGER = Logger.getLogger(ProposalDevelopmentSubmitController.class);
 
@@ -700,37 +699,25 @@ public class ProposalDevelopmentSubmitController extends
                 form.getWorkflowDocument().setDoNotReceiveFutureRequests();
             }
         }
+        
+		if (getValidationState(form).equals(AuditHelper.ValidationState.ERROR)) {
+			getGlobalVariableService().getMessageMap().putError("datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION);
+			return getModelAndViewService().getModelAndView(form);
+		}
 
-        form.setAuditActivated(true);
-
-        if (getValidationState(form).equals(AuditHelper.ValidationState.ERROR)) {
-            getGlobalVariableService().getMessageMap().putError("datavalidation", KeyConstants.ERROR_WORKFLOW_SUBMISSION);
-            return getModelAndViewService().getModelAndView(form);
-        }
+		form.setAuditActivated(false);
+        
+        final boolean approvalComments = getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, ENABLE_PD_WORKFLOW_APPROVAL_COMMENTS);
+		if (approvalComments) {
+			if (form.getMethodToCall().equals("approveCheck")) {
+				return getModelAndViewService().showDialog("PropDev-SubmitPage-ApproveDialog", false, form);
+			}
+		}
 
         List<NotificationTypeRecipient> recipients = getRelatedApproversFromActionRequest(form.getProposalDevelopmentDocument().getDocumentNumber(), getGlobalVariableService().getUserSession().getPrincipalId()).stream()
-    			.map(this::createRecipientFromPerson).collect(toList());
-
-        final boolean approvalComments = getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE, ENABLE_PD_WORKFLOW_APPROVAL_COMMENTS);
-        if (approvalComments) {
-            final DialogResponse approveDialogResponse = form.getDialogResponse("PropDev-SubmitPage-ApproveDialog");
-            if (approveDialogResponse == null) {
-                return getModelAndViewService().showDialog("PropDev-SubmitPage-ApproveDialog", false, form);
-            } else if (!approveDialogResponse.getResponseAsBoolean()) {
-                return getModelAndViewService().getModelAndView(form);
-            } else if (approveDialogResponse.getResponseAsBoolean()) {
-                form.setAnnotation(StringUtils.defaultString(form.getProposalDevelopmentApprovalBean().getActionReason()));
-            }
-        }
+                .map(this::createRecipientFromPerson).collect(toList());
 
         getTransactionalDocumentControllerService().performWorkflowAction(form, UifConstants.WorkflowAction.APPROVE);
-
-        if (approvalComments) {
-            final String narrativeTypeCode = getParameterService().getParameterValueAsString(ProposalDevelopmentDocument.class, Constants.APPROVE_NARRATIVE_TYPE_CODE_PARAM);
-            final DevelopmentProposal pbo = getProposalHierarchyService().getDevelopmentProposal(form.getDevelopmentProposal().getProposalNumber());
-            final ProposalDevelopmentDocument pDoc = (ProposalDevelopmentDocument) getDocumentService().getByDocumentHeaderId(pbo.getProposalDocument().getDocumentNumber());
-            getProposalHierarchyService().createAndSaveActionNarrative(form.getProposalDevelopmentApprovalBean().getActionReason(), PROPOSAL_APPROVAL_ATTACHMENT, form.getProposalDevelopmentApprovalBean().getActionFile(), narrativeTypeCode, pDoc);
-        }
 
         if (recipients.size() != 0) {
             sendAnotherUserApprovedNotification(form, recipients);
@@ -747,6 +734,14 @@ public class ProposalDevelopmentSubmitController extends
         form.setEvaluateFlagsAndModes(true);
         return updateProposalState(form);
     }
+    
+    @Transactional @RequestMapping(value = "/proposalDevelopment", params = "methodToCall=confirmApproval")
+	public ModelAndView confirmApproval(@ModelAttribute("KualiForm") ProposalDevelopmentDocumentForm form) throws Exception {
+		if (form.getProposalDevelopmentApprovalBean().getActionReason() != null) {
+			form.setAnnotation(StringUtils.defaultString(form.getProposalDevelopmentApprovalBean().getActionReason()));
+		}
+		return approve(form);
+	}
 
     protected void sendAnotherUserApprovedNotification(ProposalDevelopmentDocumentForm form, List<NotificationTypeRecipient> recipients) {
         prepareNotification(form.getDevelopmentProposal());

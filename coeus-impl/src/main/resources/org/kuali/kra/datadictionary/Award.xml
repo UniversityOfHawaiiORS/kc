@@ -58,7 +58,7 @@
                 <ref bean="Award-statusDescription"/>
                 <ref bean="Award-sponsorCode"/>
                 <ref bean="Award-primeSponsorCode"/>
-                <ref bean="Award-nsfCode"/>
+                <ref bean="Award-nsfSequenceNumber"/>
                 <ref bean="Award-awardNumber"/>
                 <ref bean="Award-sponsorName"/>
                 <ref bean="Award-awardId"/>
@@ -110,6 +110,7 @@
                 <ref bean="Award-latestAwardAmountInfo.amountObligatedToDate"/>
                 <ref bean="Award-documentStatus" />
                 <ref bean="Award-documentStatusResult" />
+                <ref bean="Award-primeSponsor.sponsorName" />
             </list>
         </property>
       	<property name="relationships">
@@ -648,39 +649,22 @@
         <property name="description" value="Pre-defined Sponsor Template to sync"/>
     </bean>
 
-    <bean id="Award-nsfCode" parent="Award-nsfCode-parentBean"/>
-    <bean id="Award-nsfCode-parentBean" abstract="true" parent="AttributeDefinition">
-        <property name="name" value="nsfCode"/>
-        <property name="forceUppercase" value="false"/>
+    <bean id="Award-nsfSequenceNumber" parent="Award-nsfSequenceNumber-parentBean"/>
+    <bean id="Award-nsfSequenceNumber-parentBean" abstract="true" parent="NsfCode-nsfSequenceNumber">
+        <property name="name" value="nsfSequenceNumber"/>
         <property name="label" value="NSF Science Code"/>
         <property name="shortLabel" value="NSF Science Code"/>
-        <property name="maxLength" value="15"/>
-        <property name="validationPattern">
-            <bean parent="AnyCharacterValidationPattern"/>
-        </property>
-        <property name="validCharactersConstraint">
-            <bean parent="AnyCharacterPatternConstraint"/>
-        </property>
         <property name="required" value="false"/>
         <property name="control">
-            <bean parent="SelectControlDefinition" p:businessObjectClass="org.kuali.kra.bo.NsfCode"
-                  p:valuesFinderClass="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinder"
-                  p:includeKeyInLabel="false" p:includeBlankRow="false" p:keyAttribute="nsfCode"
-                  p:labelAttribute="description"/>
+            <bean parent="SelectControlDefinition" p:valuesFinderClass="org.kuali.kra.lookup.keyvalue.NsfCodeFinder" />
         </property>
         <property name="optionsFinder">
-            <bean class="org.kuali.coeus.sys.framework.keyvalue.ExtendedPersistableBusinessObjectValuesFinder">
-                <property name="businessObjectClass" value="org.kuali.kra.bo.NsfCode"/>
-                <property name="includeKeyInDescription" value="false"/>
-                <property name="includeBlankRow" value="false"/>
-                <property name="keyAttributeName" value="nsfCode"/>
-                <property name="labelAttributeName" value="description"/>
-            </bean>
+            <bean class="org.kuali.kra.lookup.keyvalue.NsfCodeFinder" />
         </property>
         <property name="controlField">
             <bean parent="Uif-DropdownControl"/>
         </property>
-        <property name="summary" value="The NSF Science Code for this Proposal."/>
+        <property name="summary" value="The NSF Science Code for this Award."/>
         <property name="description"
                   value="A number used to indicate the type of research activity as defined by the National Science Foundation. NSF codes are not specific for NSF proposals and/or awards."/>
     </bean>
@@ -1463,6 +1447,12 @@
         <property name="description" value="Document Status" />
     </bean>
 
+    <bean id="Award-primeSponsor.sponsorName" parent="Award-primeSponsor.sponsorName-parentBean"/>
+    <bean abstract="true" id="Award-primeSponsor.sponsorName-parentBean" parent="Sponsor-sponsorName">
+        <property name="name" value="primeSponsor.sponsorName"/>
+        <property name="label" value="Prime Sponsor Name"/>
+        <property name="shortLabel" value="Prime Sponsor Name"/>
+    </bean>
 
     <!-- Business Object Inquiry Definition -->
     <bean id="Award-inquiryDefinition" parent="Award-inquiryDefinition-parentBean"/>

@@ -313,6 +313,10 @@ public class TimeAndMoneyServiceImpl implements TimeAndMoneyService {
     */
     private boolean mustSetFandADistributions(List<AwardDirectFandADistribution> awardFandADistributions, List<AwardDirectFandADistribution> tAndMFandADistributions) {
         boolean needToSave = false;
+        if (awardFandADistributions.size() != tAndMFandADistributions.size()) {
+            needToSave = true;
+            return needToSave;
+        }
         for (AwardDirectFandADistribution awardDistribution: awardFandADistributions) {
             boolean found = false;
             for (AwardDirectFandADistribution tAndMDistribution: tAndMFandADistributions) {
@@ -513,7 +517,6 @@ public class TimeAndMoneyServiceImpl implements TimeAndMoneyService {
         //to the original date, we need to capture that and change the value on the document which is the date value that gets validated
         //in save rules.
         if(awardHierarchyNodeItems.get(index).getCurrentFundEffectiveDate()!=null &&
-                awardHierarchyNodeItems.get(index).getCurrentFundEffectiveDate() != null &&
                 awardHierarchyNodeItems.get(index).getCurrentFundEffectiveDate().equals(aai.getCurrentFundEffectiveDate()) &&
                 !awardHierarchyNodeItems.get(index).getCurrentFundEffectiveDate().equals(awardHierarchyNode.getValue().getCurrentFundEffectiveDate())) {
             awardHierarchyNode.getValue().setCurrentFundEffectiveDate(awardHierarchyNodeItems.get(index).getCurrentFundEffectiveDate());

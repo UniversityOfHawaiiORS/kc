@@ -129,7 +129,10 @@
 	<!-- Kuali parameters -->
 	<param name="encryption.key">7IC64w6kAAAA</param>
 	<param name="print.xml.directory">${java.io.tmpdir}/</param>
+
 	<param name="print.logging.enable">false</param>
+	<param name="print.logging.directory">${java.io.tmpdir}/</param>
+	<param name="print.pdf.logging.enable">false</param>
 
 	<!-- workaround until Rice resolves KULRICE-4065 -->
 	<param name="enable.nonproduction.data.unmasking">true</param>
@@ -265,6 +268,8 @@
 	<param name="mq.redelivery.default.redeliveryDelay">3000</param>
 	<param name="mq.redelivery.default.useExponentialBackOff">true</param>
 	<param name="mq.redelivery.default.backOffMultiplier">2</param>
+	<param name="mq.trusted.packages">java.lang,javax.security,java.util,org.apache.activemq,org.fusesource.hawtbuf,com.thoughtworks.xstream.mapper,org.kuali,co.kuali</param>
+	<param name="org.apache.activemq.SERIALIZABLE_PACKAGES" system="true">${mq.trusted.packages}</param>
 
 	<param name="mq.datasource.uniqueName">activemq</param>
 	<param name="mq.datasource.minPoolSize">1</param>

@@ -22,9 +22,11 @@ package org.kuali.coeus.propdev.impl.person.creditsplit;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.log4j.Logger;
+import org.kuali.coeus.common.framework.type.InvestigatorCreditType;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocumentForm;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentViewHelperServiceImpl;
+import org.kuali.coeus.propdev.impl.person.ProposalPerson;
+import org.kuali.rice.kew.api.WorkflowDocument;
 import org.kuali.rice.krad.uif.component.BindingInfo;
 import org.kuali.rice.krad.uif.component.Component;
 import org.kuali.rice.krad.uif.container.CollectionGroupBase;
@@ -33,12 +35,12 @@ import org.kuali.rice.krad.uif.lifecycle.ViewLifecycleRestriction;
 import org.kuali.rice.krad.uif.util.*;
 
 
-
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CreditSplitCustomColumnsCollection extends CollectionGroupBase {
-    private static final Logger LOG = Logger.getLogger(CreditSplitCustomColumnsCollection.class);
 
     private DataFieldBase columnFieldPrototype;
     private BindingInfo columnBindingInfo;
@@ -50,37 +52,54 @@ public class CreditSplitCustomColumnsCollection extends CollectionGroupBase {
 
         ProposalDevelopmentDocumentForm pdForm = (ProposalDevelopmentDocumentForm) model;
         ((ProposalDevelopmentViewHelperServiceImpl) pdForm.getViewHelperService()).setInvestigatorCreditTypes(pdForm);
-        if (CollectionUtils.isNotEmpty(((ProposalDevelopmentDocumentForm) model).getDevelopmentProposal().getInvestigators())) {
-        List<Object> columnCollection = ObjectPropertyUtils.getPropertyValue(model,
+        List<ProposalPerson> investigators = ((ProposalDevelopmentDocumentForm) model).getDevelopmentProposal().getPersonsSelectedForCreditSplit();
+        if (CollectionUtils.isNotEmpty(investigators)) {
+        List<InvestigatorCreditType> columnCollection = ObjectPropertyUtils.getPropertyValue(model,
                 getColumnBindingInfo().getBindingPath());
 
 
-        List<Component> columns = new ArrayList<Component>();
+        List<Component> columns = new ArrayList<>();
         for (Component component : this.getItems()) {
             if (component.isRender() || component.isHidden()) {
                 columns.add(component);
             }
         }
 
-            int index = 0;
-            for (Object column : columnCollection) {
-                DataFieldBase columnField = ComponentUtils.copy(columnFieldPrototype);
-                String columnLabel = StringUtils.isEmpty(columnLabelPropertyName)?"description":columnLabelPropertyName;
+        WorkflowDocument workflowDocument = pdForm.getProposalDevelopmentDocument().getDocumentHeader().getWorkflowDocument();
+        boolean isSubmitted = !workflowDocument.isInitiated() && !workflowDocument.isSaved();
+        int index = 0;
+        for (Object column : filterColumns(columnCollection, investigators, isSubmitted)) {
+            DataFieldBase columnField = ComponentUtils.copy(columnFieldPrototype);
+            String columnLabel = StringUtils.isEmpty(columnLabelPropertyName)?"description":columnLabelPropertyName;
 
-                try {
-                    columnField.getFieldLabel().setLabelText(PropertyUtils.getNestedProperty(column,columnLabel).toString());
-                    columnField.getBindingInfo().setBindingName("creditSplits[" + index + "].credit");
-                    columnField.setPropertyName("creditSplits.credit");
-                    columnField.setOrder(100 + index);
-                    columns.add(columnField);
-                } catch (Exception e) {
-                    LOG.error("Could not retrieve column label from column collection item",e);
-                }
-            index++;
+            try {
+                columnField.getFieldLabel().setLabelText(PropertyUtils.getNestedProperty(column,columnLabel).toString());
+                columnField.getBindingInfo().setBindingName("creditSplits[" + index + "].credit");
+                columnField.setPropertyName("creditSplits.credit");
+                columnField.setOrder(100 + index);
+                columns.add(columnField);
+            } catch (IllegalAccessException|InvocationTargetException|NoSuchMethodException e) {
+                throw new RuntimeException(e);
             }
-            this.setItems(columns);
+        index++;
+        }
+        this.setItems(columns);
         }
         super.performInitialization(model);
+    }
+
+    protected List<InvestigatorCreditType> filterColumns(List<InvestigatorCreditType> columnCollection, List<ProposalPerson> investigators, boolean isSubmitted) {
+        if (!isSubmitted) {
+            return columnCollection;
+        }
+
+        return columnCollection.stream()
+                .filter(column -> investigators.stream()
+                        .anyMatch(investigator -> investigator.getCreditSplits().stream()
+                                .anyMatch(proposalPersonCreditSplit ->  {
+            return proposalPersonCreditSplit.getInvCreditTypeCode().equals(column.getCode());
+        }))).collect(Collectors.toList());
+
     }
 
     @ViewLifecycleRestriction
