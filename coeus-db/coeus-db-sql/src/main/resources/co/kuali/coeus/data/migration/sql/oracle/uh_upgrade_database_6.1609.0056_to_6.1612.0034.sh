@@ -71,35 +71,23 @@ mkdir -p ${LOGDIR}
 
 while [ "${ans0}" != "y" ] && [ "${ans0}" != "n" ]
 do
-    read -p "Run Step 1 - upgrade to 6.1609.56 ? (y/n)" ans0
+    read -p "Run Step 1 - upgrade to 6.1612.34 ? (y/n)" ans0
 done
 
 if [ "${ans0}" == "y" ]
 then
-    # Update to 1606
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1606_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1606_oracle_kc_upgrade.sql
+    # Update to 1610
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1610_oracle_kc_upgrade.sql
 
-    # Update to 1607
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1607_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1607_oracle_kc_upgrade.sql
+    # Update to 1611
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1611_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1611_oracle_kc_upgrade.sql
 
-    # Update to 1608
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1608_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1608_oracle_kc_upgrade.sql
-
-    # Update to 1609
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1609_oracle_kc_rice_server_upgrade.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1609_oracle_kc_upgrade.sql
+    # Update to 1612
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1612_oracle_kc_rice_server_upgrade.sql
+    sqlplus "${un}"/"${pw}@${DBSvrNm}" < 1612_oracle_kc_upgrade.sql
 
     # UH modificaitons for next target release
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1508.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1512.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1505.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1500.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1522.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1496.sql
-    sqlplus "${un}"/"${pw}@${DBSvrNm}" < KC-1516.sql
 
     echo "Grepping for errors in the logs"
     mv *.log ${LOGDIR}
