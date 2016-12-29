@@ -22,7 +22,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.kuali.coeus</groupId>
     <artifactId>coeus</artifactId>
-    <version>1609.0056</version>
+    <version>1612.0034</version>
     <packaging>pom</packaging>
     <name>Kuali Coeus</name>
     <description>
@@ -61,28 +61,28 @@
 
     <properties>
         <!--dependency versions-->
-        <activemq.version>5.12.1</activemq.version>
+        <activemq.version>5.14.1</activemq.version>
         <aopalliance.version>1.0</aopalliance.version>
         <avalon-framework.version>4.3.1</avalon-framework.version>
-        <bouncycastle.version>1.53</bouncycastle.version>
+        <bouncycastle.version>1.55</bouncycastle.version>
         <cas-client-core.version>3.3.3</cas-client-core.version>
         <cglib.version>3.1</cglib.version>
-        <coeus-api-all.version>1609.0002</coeus-api-all.version>
-        <coeus-s2sgen.version>1609.0007-uh</coeus-s2sgen.version>
-        <commons-beanutils.version>1.8.3-kuali-4</commons-beanutils.version>
+        <coeus-api-all.version>1612.0001</coeus-api-all.version>
+        <coeus-s2sgen.version>1612.0012-uh</coeus-s2sgen.version>
+        <commons-beanutils.version>1.9.3</commons-beanutils.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-collections.version>3.2.2</commons-collections.version>
-        <commons-collections4.version>4.0</commons-collections4.version>
+        <commons-collections4.version>4.1</commons-collections4.version>
         <commons-csv.version>1.4</commons-csv.version>
         <commons-fileupload.version>1.3.2</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
         <commons-io.version>2.4</commons-io.version>
         <commons-lang.version>2.6</commons-lang.version>
-        <commons-lang3.version>3.4</commons-lang3.version>
+        <commons-lang3.version>3.5</commons-lang3.version>
         <commons-net.version>3.3</commons-net.version>
         <commons-pool.version>1.6</commons-pool.version>
         <commons-validator.version>1.4.1</commons-validator.version>
-        <cxf.version>2.7.12</cxf.version>
+        <cxf.version>2.7.18</cxf.version>
         <db-ojb.version>1.0.4-patch9</db-ojb.version>
         <displaytag.version>1.2</displaytag.version>
         <drools.version>6.3.0.Final</drools.version>
@@ -91,16 +91,16 @@
         <ehcache.version>2.6.9</ehcache.version>
         <el.version>2.2.1</el.version>
         <fop.version>1.1</fop.version>
-        <guava.version>18.0</guava.version>
+        <guava.version>20.0</guava.version>
         <hamcrest.version>1.3</hamcrest.version>
         <httpclient.version>4.5.2</httpclient.version>
         <itext.version>2.1.7</itext.version>
         <jackson.version>1.9.13</jackson.version>
-        <javamelody-core.version>1.59.0</javamelody-core.version>
-        <javax.mail.version>1.5.2</javax.mail.version>
+        <javamelody-core.version>1.62.0</javamelody-core.version>
+        <javax.mail.version>1.5.6</javax.mail.version>
         <javax.persistence.version>2.1.0</javax.persistence.version>
         <jaxb-impl.version>2.2.6</jaxb-impl.version>
-        <jmock.version>2.8.1</jmock.version>
+        <jmock.version>2.8.2</jmock.version>
         <joda-time.version>2.9.1</joda-time.version>
         <joda-time-jsptags.version>1.1.1</joda-time-jsptags.version>
         <jsp.version>2.2.1</jsp.version>
@@ -108,12 +108,13 @@
         <junit.version>4.12</junit.version>
         <kuali-cm.version>1.2.8</kuali-cm.version>
         <log4j.version>1.2.17</log4j.version>
-        <mockito.version>2.0.36-beta</mockito.version>
+        <mockito.version>2.2.8</mockito.version>
         <moo-mvel.version>2.0</moo-mvel.version>
         <mysql.groupId>mysql</mysql.groupId>
         <mysql.artifactId>mysql-connector-java</mysql.artifactId>
-        <mysql.version>5.1.38</mysql.version>
+        <mysql.version>5.1.40</mysql.version>
         <mvel.version>2.2.4.Final</mvel.version>
+        <objenesis.version>2.4</objenesis.version>
         <opensaml.version>2.6.1</opensaml.version>
         <oracle.groupId>com.oracle</oracle.groupId>
         <oracle.artifactId>ojdbc7</oracle.artifactId>
@@ -123,13 +124,13 @@
         <pdfbox.version>1.8.6</pdfbox.version>
         <quartz.version>1.8.4</quartz.version>
         <schemaspy.version>1508.0162</schemaspy.version>
-        <rice.version>2.5.3.1609.0004-uh</rice.version>
+        <rice.version>2.5.3.1612.0001-uh</rice.version>
         <servlet.version>3.0.1</servlet.version>
         <slf4j.version>1.7.13</slf4j.version>
         <spring.version>3.2.13.RELEASE</spring.version>
         <spring-security.version>3.2.7.RELEASE</spring-security.version>
         <spring-modules-ojb.version>0.8a</spring-modules-ojb.version>
-        <struts.version>1.3.10</struts.version>
+        <struts.version>1.3.11-kuali-1</struts.version>
         <tomcat.version>7.0.65</tomcat.version>
         <validation-api.version>1.1.0.Final</validation-api.version>
         <velocity.version>1.7</velocity.version>
@@ -147,7 +148,7 @@
         <jspc-maven-plugin.version>2.0.2</jspc-maven-plugin.version>
         <license-maven-plugin.version>1.6.3</license-maven-plugin.version>
         <maven-clean-plugin.version>3.0.0</maven-clean-plugin.version>
-        <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
+        <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
         <maven-dependency-plugin.version>2.10</maven-dependency-plugin.version>
         <maven-deploy-plugin.version>2.8.2</maven-deploy-plugin.version>
         <maven-failsafe-plugin.version>2.19.1</maven-failsafe-plugin.version>
@@ -155,7 +156,7 @@
         <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
         <maven-javadoc-plugin.version>2.10.4</maven-javadoc-plugin.version>
         <maven-release-plugin.version>2.5.3</maven-release-plugin.version>
-        <maven-resources-plugin.version>3.0.1</maven-resources-plugin.version>
+        <maven-resources-plugin.version>3.0.2</maven-resources-plugin.version>
         <maven-scm-provider-gitexe.version>1.9.4</maven-scm-provider-gitexe.version>
         <maven-site-plugin.version>3.5.1</maven-site-plugin.version>
         <maven-source-plugin.version>3.0.1</maven-source-plugin.version>
@@ -608,6 +609,18 @@
             </dependency>
 
             <dependency>
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>${commons-beanutils.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>commons-logging</artifactId>
+                        <groupId>commons-logging</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <dependency>
                 <groupId>commons-codec</groupId>
                 <artifactId>commons-codec</artifactId>
                 <version>${commons-codec.version}</version>
@@ -695,11 +708,6 @@
                         <groupId>commons-digester</groupId>
                         <artifactId>commons-digester</artifactId>
                     </exclusion>
-
-                    <exclusion>
-                        <artifactId>commons-beanutils</artifactId>
-                        <groupId>commons-beanutils</groupId>
-                    </exclusion>
                 </exclusions>
             </dependency>
 
@@ -723,10 +731,6 @@
                     <exclusion>
                         <groupId>itext</groupId>
                         <artifactId>itext</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-beanutils</artifactId>
-                        <groupId>commons-beanutils</groupId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -981,10 +985,6 @@
                     <exclusion>
                         <artifactId>antlr</artifactId>
                         <groupId>antlr</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-beanutils</artifactId>
-                        <groupId>commons-beanutils</groupId>
                     </exclusion>
                     <exclusion>
                         <groupId>commons-digester</groupId>
@@ -1398,19 +1398,6 @@
 
             <dependency>
                 <groupId>org.jmock</groupId>
-                <artifactId>jmock-legacy</artifactId>
-                <version>${jmock.version}</version>
-                <scope>test</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>cglib</groupId>
-                        <artifactId>cglib-nodep</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
-            <dependency>
-                <groupId>org.jmock</groupId>
                 <artifactId>jmock-junit4</artifactId>
                 <version>${jmock.version}</version>
                 <scope>test</scope>
@@ -1422,13 +1409,6 @@
                 </exclusions>
             </dependency>
             
-            <dependency>
-            	<groupId>org.mockito</groupId>
-            	<artifactId>mockito-core</artifactId>
-            	<version>${mockito.version}</version>
-            	<scope>test</scope>
-           	</dependency>
-
             <dependency>
                 <groupId>org.kuali.coeus</groupId>
                 <artifactId>coeus-api-all</artifactId>
@@ -1448,17 +1428,6 @@
                 <scope>runtime</scope>
             </dependency>
 
-            <dependency>
-                <groupId>org.kuali.commons</groupId>
-                <artifactId>commons-beanutils</artifactId>
-                <version>${commons-beanutils.version}</version>
-                <exclusions>
-                    <exclusion>
-                        <artifactId>commons-logging</artifactId>
-                        <groupId>commons-logging</groupId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
 
             <dependency>
                 <groupId>org.kuali.db.ojb</groupId>
@@ -1484,10 +1453,6 @@
                     <exclusion>
                         <artifactId>commons-logging</artifactId>
                         <groupId>commons-logging</groupId>
-                    </exclusion>
-                    <exclusion>
-                        <artifactId>commons-beanutils</artifactId>
-                        <groupId>commons-beanutils</groupId>
                     </exclusion>
                     <exclusion>
                         <artifactId>asm</artifactId>
@@ -1630,10 +1595,6 @@
                         <groupId>commons-logging</groupId>
                     </exclusion>
                     <exclusion>
-                        <groupId>com.thoughtworks.xstream</groupId>
-                        <artifactId>xstream</artifactId>
-                    </exclusion>
-                    <exclusion>
                         <groupId>org.springframework</groupId>
                         <artifactId>spring-expression</artifactId>
                     </exclusion>
@@ -1656,10 +1617,6 @@
                     <exclusion>
                         <groupId>cglib</groupId>
                         <artifactId>cglib-nodep</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.httpcomponents</groupId>
-                        <artifactId>httpclient</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
@@ -1713,9 +1670,23 @@
             </dependency>
 
             <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${mockito.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.mvel</groupId>
                 <artifactId>mvel2</artifactId>
                 <version>${mvel.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.objenesis</groupId>
+                <artifactId>objenesis</artifactId>
+                <version>${objenesis.version}</version>
+                <scope>test</scope>
             </dependency>
 
             <dependency>
@@ -1939,7 +1910,7 @@
                 <build.spring.profiles.active>grm</build.spring.profiles.active>
 
                 <rsmart.cx.token.auth.version>1507.1</rsmart.cx.token.auth.version>
-                <rsmart.hr.rest.version>1609.0005</rsmart.hr.rest.version>
+                <rsmart.hr.rest.version>1612.0006</rsmart.hr.rest.version>
                 <kc-s3.version>1607.0014</kc-s3.version>
                 <kc-sql.version>1601.0002</kc-sql.version>
 
@@ -2125,7 +2096,7 @@
             </activation>
 
             <properties>
-                <extra-enforcer-rules.version>1.0-beta-4</extra-enforcer-rules.version>
+                <extra-enforcer-rules.version>1.0-beta-6</extra-enforcer-rules.version>
                 <maven-enforcer-plugin.version>1.4.1</maven-enforcer-plugin.version>
 
                 <enforcer.require.java.version>${project.java.version}</enforcer.require.java.version>
@@ -2174,6 +2145,9 @@
 
                                             <bannedDependencies>
                                                 <excludes>
+                                                    <exclude>org.kuali.commons</exclude>
+                                                    <exclude>org.apache.struts</exclude>
+
                                                     <!--
                                                        excluding all versions because of https://issues.apache.org/jira/browse/COLLECTIONS-580
                                                        including specific fixed version below
@@ -2293,13 +2267,6 @@
                                                     <exclude>geronimo-spec:geronimo-spec-saaj</exclude>
                                                     <exclude>org.apache.servicemix.specs:org.apache.servicemix.specs.saaj-api-1.3</exclude>
 
-                                                    <!--
-                                                      excluding standard release - we are using a patches kuali version
-                                                      because of
-                                                      http://bugs.sun.com/view_bug.do?bug_id=6528714
-                                                      https://issues.apache.org/jira/browse/BEANUTILS-340
-                                                    -->
-                                                    <exclude>commons-beanutils:commons-beanutils</exclude>
                                                     <exclude>org.apache.commons:commons-beanutils</exclude>
 
                                                     <!-- exclude eh cache in general - only allow at a specific scope -->
@@ -2343,6 +2310,8 @@
                                                     <include>org.apache.ws.security:wss4j:${wss4j.version}</include>
 
                                                     <include>commons-collections:commons-collections:${commons-collections.version}</include>
+
+                                                    <include>org.apache.struts:*:${struts.version}</include>
                                                 </includes>
                                             </bannedDependencies>
                                         </rules>
@@ -2423,9 +2392,9 @@
             </activation>
 
             <properties>
-                <error_prone_core.version>2.0.6</error_prone_core.version>
-                <plexus-compiler-javac.version>2.6</plexus-compiler-javac.version>
-                <plexus-compiler-javac-errorprone.version>2.6</plexus-compiler-javac-errorprone.version>
+                <error_prone_core.version>2.0.15</error_prone_core.version>
+                <plexus-compiler-javac.version>2.8.1</plexus-compiler-javac.version>
+                <plexus-compiler-javac-errorprone.version>2.8.1</plexus-compiler-javac-errorprone.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -2506,7 +2475,7 @@
         <profile>
         	<id>dev</id>
             <properties>
-                <p6spy.version>2.1.4</p6spy.version>
+                <p6spy.version>3.0.0</p6spy.version>
             </properties>
             <dependencyManagement>
                 <dependencies>
@@ -2552,7 +2521,7 @@
         <connection>${scm.connection}</connection>
         <developerConnection>${scm.developerConnection}</developerConnection>
         <url>${scm.url}</url>
-        <tag>coeus-1609.0056</tag>
+        <tag>coeus-1612.0034</tag>
   </scm>
 
     <distributionManagement>

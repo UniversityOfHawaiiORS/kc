@@ -182,7 +182,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     private String costSharingIndicator;
     private String indirectCostIndicator;
     private String modificationNumber;
-    private String nsfCode;
+    private Integer nsfSequenceNumber;
     private String paymentScheduleIndicator;
     private String scienceCodeIndicator;
     private String specialReviewIndicator;
@@ -233,6 +233,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     private AwardTransactionType awardTransactionType;
 
     private ActivityType activityType;
+    private NsfCode nsfCodeBo;
 
     private Sponsor sponsor;
     private Sponsor primeSponsor;
@@ -448,31 +449,16 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     		return indexOfAwardAmountInfoForDisplay;
     	}
         AwardAmountInfo aai = getAwardAmountInfoService().fetchLastAwardAmountInfoForAwardVersionAndFinalizedTandMDocumentNumber(this);
-        int returnVal = 0;
-        int index = 0;
-        if (aai.getAwardAmountInfoId() != null && this.isAwardInMultipleNodeHierarchy()) {
-            this.refreshReferenceObject(AWARD_AMOUNT_INFOS);
-        }
-        if (isAwardInitialCopy()) {
-            // if it's copied, on initialization we want to return index of last AwardAmountInfo in collection.
-            returnVal = getAwardAmountInfos().size() - 1;
-        }else {
-            for (AwardAmountInfo awardAmountInfo : getAwardAmountInfos()) {
-                if (awardAmountInfo.getAwardAmountInfoId() == null && aai.getAwardAmountInfoId() == null) {
-                    returnVal = index;
-                }else if(awardAmountInfo.getAwardAmountInfoId().equals(aai.getAwardAmountInfoId())) {
-                    returnVal = index;
-                }else {
-                    index++;
-                }
-            }
-        }
-        indexOfAwardAmountInfoForDisplay = returnVal;
+        indexOfAwardAmountInfoForDisplay = getIndexOfAwardAmountInfo(aai);
         return indexOfAwardAmountInfoForDisplay;
     }
     
     public int getIndexOfAwardAmountInfoForDisplayFromTimeAndMoneyDocNumber(String docNum) throws WorkflowException {
         AwardAmountInfo aai = getAwardAmountInfoService().fetchLastAwardAmountInfoForDocNum(this, docNum);
+        return getIndexOfAwardAmountInfo(aai);
+    }
+
+    public int getIndexOfAwardAmountInfo(AwardAmountInfo aai) {
         int returnVal = 0;
         int index = 0;
         if (aai.getAwardAmountInfoId() != null && this.isAwardInMultipleNodeHierarchy()) {
@@ -537,11 +523,12 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
 
-
+    @Override
     public String getSponsorCode() {
         return sponsorCode;
     }
 
+    @Override
     public void setSponsorCode(String sponsorCode) {
         this.sponsorCode = sponsorCode;
         this.setSponsorNihMultiplePi(null);
@@ -806,15 +793,13 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.modificationNumber = modificationNumber;
     }
 
-    public String getNsfCode() {
-        return nsfCode;
+    public Integer getNsfSequenceNumber() {
+        return nsfSequenceNumber;
     }
 
-    public void setNsfCode(String nsfCode) {
-        this.nsfCode = nsfCode;
+    public void setNsfSequenceNumber(Integer nsfSequenceNumber) {
+        this.nsfSequenceNumber = nsfSequenceNumber;
     }
-
-
 
     public String getPaymentScheduleIndicator() {
         return paymentScheduleIndicator;
@@ -844,6 +829,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.specialReviewIndicator = specialReviewIndicator;
     }
 
+    @Override
     public String getSponsorAwardNumber() {
         return sponsorAwardNumber;
     }
@@ -863,11 +849,12 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return leadUnit != null ? leadUnit.getUnitName() : null;
     }
 
+    @Override
     public String getUnitNumber() {
         return unitNumber;
     }
 
-
+    @Override
     public String getLeadUnitNumber() {
         return getUnitNumber();
     }
@@ -886,7 +873,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     }
 
 
-
+    @Override
     public String getActivityTypeCode() {
         return activityTypeCode;
     }
@@ -1012,6 +999,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.subPlanFlag = subPlanFlag;
     }
 
+    @Override
     public String getTitle() {
         return title;
     }
@@ -1331,11 +1319,13 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.unitNumber = unitNumber;
     }
 
+    @Override
     public void addKeyword(ScienceKeyword scienceKeyword) {
         AwardScienceKeyword awardScienceKeyword = new AwardScienceKeyword(getAwardId(), scienceKeyword);
         getKeywords().add(awardScienceKeyword);
     }
 
+    @Override
     public AwardScienceKeyword getKeyword(int index) {
         return getKeywords().get(index);
     }
@@ -1391,7 +1381,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
         awardCloseoutItems.removeAll(awardCloseoutNewItems);
         awardCloseoutNewItems.add(awardCloseoutItem);
-        Collections.sort(awardCloseoutNewItems, Comparator.comparing(AwardCloseout::getCloseoutReportName));
+        awardCloseoutNewItems.sort(Comparator.comparing(AwardCloseout::getCloseoutReportName));
         awardCloseoutItems.addAll(awardCloseoutNewItems);
         awardCloseoutItem.setAward(this);
     }
@@ -1630,6 +1620,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.sponsorCode = sponsor != null ? sponsor.getSponsorCode() : null;
     }
 
+    @Override
     public String getSponsorName() {
         Sponsor sponsor = getSponsor();
         return sponsor != null ? sponsor.getSponsorName() : null;
@@ -1839,7 +1830,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
     static class ARTComparator implements Comparator<AwardReportTerm>
     {
-        
+
+        @Override
         public int compare(AwardReportTerm art1, AwardReportTerm art2)
         {
             try
@@ -1870,7 +1862,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
      * @return Returns the awardReportTermItems.
      */
     public List<AwardReportTerm> getAwardReportTermItems() {
-        Collections.sort(awardReportTermItems, new ARTComparator());
+        awardReportTermItems.sort(new ARTComparator());
         return awardReportTermItems;
     }
 
@@ -1959,7 +1951,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
             for (int i = awardCloseoutItems.size();i > TOTAL_STATIC_REPORTS; i--) {
                 awardCloseoutItems.remove(i - 1);
             }
-            Collections.sort(awardCloseoutNewItems, Comparator.comparing(AwardCloseout::getCloseoutReportName));
+            awardCloseoutNewItems.sort(Comparator.comparing(AwardCloseout::getCloseoutReportName));
             awardCloseoutItems.addAll(TOTAL_STATIC_REPORTS, awardCloseoutNewItems);
         }
         this.awardCloseoutItems = awardCloseoutItems;
@@ -1977,6 +1969,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         this.templateCode = templateCode;
     }
 
+    @Override
     public String getPrimeSponsorCode() {
         return primeSponsorCode;
     }
@@ -2060,6 +2053,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return getAwardNumber();
     }
 
+    @Override
     public ActivityType getActivityType() {
         return activityType;
     }
@@ -2113,6 +2107,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return comment;
     }
 
+    @Override
     public String getBudgetStatus() {
         return BUDGET_STATUS;
     }
@@ -2122,6 +2117,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return getProjectPersons();
     }
 
+    @Override
     public PersonRolodex getProposalEmployee(String personId) {
         return getPerson(personId, true);
     }
@@ -2141,6 +2137,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return null;
     }
 
+    @Override
     public ContactRole getProposalEmployeeRole(String personId) {
         if (getProposalEmployee(personId) != null) {
             return (getProposalEmployee(personId)).getContactRole();
@@ -2149,6 +2146,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
     }
 
+    @Override
     public PersonRolodex getProposalNonEmployee(Integer rolodexId) {
         List<AwardPerson> awardPersons = getProjectPersons();
         for (AwardPerson awardPerson : awardPersons) {
@@ -2159,6 +2157,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return null;
     }
 
+    @Override
     public ContactRole getProposalNonEmployeeRole(Integer rolodexId) {
         if (getProposalNonEmployee(rolodexId) != null) {
             return (getProposalNonEmployee(rolodexId)).getContactRole();
@@ -2167,15 +2166,18 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         }
     }
 
+    @Override
     public Date getRequestedEndDateInitial() {
         return getObligationExpirationDate();
     }
 
+    @Override
     public Date getRequestedStartDateInitial() {
         AwardAmountInfo awardAmountInfo = getLastAwardAmountInfo();
         return awardAmountInfo == null ? null : awardAmountInfo.getCurrentFundEffectiveDate();
     }
 
+    @Override
     public Unit getUnit() {
         return getLeadUnit();
     }
@@ -2188,6 +2190,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return sponsorNihMultiplePi;
     }
 
+    @Override
     public void setBudgetStatus(String budgetStatus) {
     }
 
@@ -2220,10 +2223,12 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return getAwardApprovedSubawards().get(index);
     }
 
+    @Override
     public String getNamespace() {
         return Constants.MODULE_NAMESPACE_AWARD;
     }
 
+    @Override
     public String getDocumentRoleTypeCode() {
         return RoleConstants.AWARD_ROLE_TYPE;
     }
@@ -2232,6 +2237,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         leadUnit = getBusinessObjectService().findByPrimaryKey(Unit.class, Collections.singletonMap(UNIT_NUMBER, getUnitNumber()));
     }
 
+    @Override
     public void populateAdditionalQualifiedRoleAttributes(Map<String, String> qualifiedRoleAttributes) {
         /**
          * when we check to see if the logged in user can create an award account, this function is called, but awardDocument is null at that time.
@@ -2240,6 +2246,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         qualifiedRoleAttributes.put(DOCUMENT_NUMBER, documentNumber);
     }
 
+    @Override
     public String getHierarchyStatus() {
         return Constants.NO_FLAG;
     }
@@ -2259,10 +2266,12 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return latestExpDate;
     }
 
+    @Override
     public boolean isParentInHierarchyComplete() {
         return true;
     }
 
+    @Override
     public String getDefaultBudgetStatusParameter() {
         return KeyConstants.AWARD_BUDGET_STATUS_IN_PROGRESS;
     }
@@ -2527,16 +2536,18 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     public List<NegotiationPersonDTO> getProjectPeople() {
         return getProjectPersons().stream().map(person -> new NegotiationPersonDTO(person.getPerson(), person.getContactRoleCode())).collect(Collectors.toList());
     }
-    
+
+    @Override
     public String getNegotiableProposalTypeCode() {
         return EMPTY_STRING;
     }
-    
 
+    @Override
     public String getParentNumber() {
         return this.getAwardNumber();
     }
 
+    @Override
     public String getParentPIName() {
         String investigatorName = null;
         for (AwardPerson aPerson : this.getProjectPersons()) {
@@ -2549,14 +2560,17 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
         return investigatorName;
     }
 
+    @Override
     public String getParentTitle() {
         return this.getTitle();
     }
 
+    @Override
     public String getOwnedByUnitNumber() {
         return this.getLeadUnitName();
     }
 
+    @Override
     public Integer getParentInvestigatorFlag(String personId, Integer flag) {
         for (AwardPerson aPerson : this.getProjectPersons()) {
             if (aPerson.getPersonId() != null
@@ -2588,7 +2602,8 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 
         return currentFandaRate;
     }
-    
+
+    @Override
     public String getParentTypeName(){
         return AWARD;
     }
@@ -2621,6 +2636,14 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
     @Override
     public ProposalType getNegotiableProposalType() {
         return null;
+    }
+
+    public NsfCode getNsfCodeBo() {
+        return nsfCodeBo;
+    }
+
+    public void setNsfCodeBo(NsfCode nsfCodeBo) {
+        this.nsfCodeBo = nsfCodeBo;
     }
 
     @Override
@@ -2781,6 +2804,7 @@ public class Award extends KcPersistableBusinessObjectBase implements KeywordsMa
 		return getAwardDocument().getNextBudgetVersionNumber();
 	}
 
+    @Override
 	public List<AwardBudgetExt> getBudgets() {
 		if (budgets == null || budgets.isEmpty()) {
 			budgets = getAwardBudgetService().getAllBudgetsForAward(this);

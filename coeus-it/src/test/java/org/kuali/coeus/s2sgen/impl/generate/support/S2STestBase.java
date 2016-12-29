@@ -43,7 +43,6 @@ import org.kuali.coeus.s2sgen.impl.generate.S2SFormGenerator;
 import org.kuali.coeus.s2sgen.impl.generate.S2SFormGeneratorRetrievalService;
 import org.kuali.coeus.s2sgen.impl.print.FormPrintServiceImpl;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
-import org.kuali.coeus.s2sgen.api.generate.AttachmentData;
 import org.kuali.coeus.s2sgen.impl.validate.S2SValidatorService;
 import org.kuali.coeus.s2sgen.api.core.AuditError;
 import org.kuali.kra.test.infrastructure.KcIntegrationTestBase;
@@ -91,6 +90,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
         ((FormPrintServiceImpl) formPrintService).setS2SFormGeneratorService(new S2SFormGeneratorRetrievalService() {
             @Override
             public S2SFormGenerator getS2SGenerator(String proposalNumber, String nameSpace) throws S2SException {
+                generatorObject = (S2SBaseFormGenerator) KcServiceLocator.getService(getFormGeneratorName());
                 return generatorObject;
             }
 
@@ -151,7 +151,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
         }
     }
 
-    private void saveProposalDocument(ProposalDevelopmentDocument pd) throws Exception {
+    public void saveProposalDocument(ProposalDevelopmentDocument pd) throws Exception {
         pd.setUpdateUser("quickst");
         pd.setUpdateTimestamp(new java.sql.Timestamp(Calendar.getInstance().getTimeInMillis()));
         DocumentHeader docHeader = pd.getDocumentHeader();
@@ -162,7 +162,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
         KRADServiceLocatorWeb.getDocumentService().saveDocument(pd);
     }
 
-    private ProposalDevelopmentDocument initializeDocument() throws Exception {
+    public ProposalDevelopmentDocument initializeDocument() throws Exception {
         ProposalDevelopmentDocument pd = (ProposalDevelopmentDocument) KRADServiceLocatorWeb.getDocumentService().getNewDocument("ProposalDevelopmentDocument");
         Assert.assertNotNull(pd.getDocumentHeader().getWorkflowDocument());
         ProposalDevelopmentService pdService = getService(ProposalDevelopmentService.class);
@@ -171,7 +171,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
         return pd;
     }
 
-    private DevelopmentProposal initializeDevelopmentProposal(ProposalDevelopmentDocument pd) {
+    public DevelopmentProposal initializeDevelopmentProposal(ProposalDevelopmentDocument pd) {
         DevelopmentProposal developmentProposal = pd.getDevelopmentProposal();
         developmentProposal.setPrimeSponsorCode("000120");
         developmentProposal.setActivityTypeCode("1");
@@ -189,7 +189,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
         developmentProposal.setTitle("Test s2s service title");
         developmentProposal.setDeadlineType("P");
         developmentProposal.setDeadlineDate(new java.sql.Date(Calendar.getInstance().getTimeInMillis()));
-        developmentProposal.setNsfCode("J.05");
+        developmentProposal.setNsfSequenceNumber(1);
         return developmentProposal;
     }
 
@@ -201,7 +201,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
         getService(DataObjectService.class).save(bo);
     }
 
-    private ProposalDevelopmentDocument initializeApp() throws Exception {
+    public ProposalDevelopmentDocument initializeApp() throws Exception {
         generatorObject = KcServiceLocator.getService(getFormGeneratorName());
         ProposalDevelopmentDocument document = initializeDocument();
         initializeDevelopmentProposal(document);
@@ -217,6 +217,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
         opportunity.setDevelopmentProposal(document.getDevelopmentProposal());
         opportunity.setProviderCode("1");
         opportunity.setOpportunity("An opportunity");
+        opportunity.setOpportunityTitle("A title");
 
         List<S2sOppForms> forms = new ArrayList<>();
 
@@ -242,7 +243,7 @@ public abstract class S2STestBase extends KcIntegrationTestBase {
                 return info.getNameSpace();
             }
         }
-        return null;
+        throw new RuntimeException("cannot find binding for : " + getFormGeneratorName() + " from the available bindings: " + ms.getBindings());
     }
 
     protected void selectForm(ProposalDevelopmentDocument document) {

@@ -269,11 +269,20 @@
         <td align="left" valign="middle">
             <kul:htmlControlAttribute property="document.awardList[0].modificationNumber" attributeEntry="${awardAttributes.modificationNumber}" />
         </td>
-        <th align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.nsfCode}" />
+		<th align="right"><div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.nsfSequenceNumber}" /></div>
         </th>
         <td align="left" valign="middle">
-        	<kul:htmlControlAttribute property="document.awardList[0].nsfCode" attributeEntry="${awardAttributes.nsfCode}" styleClass="fixed-size-200-select" />
-        </td>
+			<c:if test="${readOnly}">
+				<kul:htmlControlAttribute property="document.awardList[0].nsfSequenceNumber" attributeEntry="${awardAttributes.nsfSequenceNumber}" styleClass="fixed-size-200-select" readOnly="true"/>
+			</c:if>
+
+			<c:if test="${!readOnly}">
+				<c:set var="finderClass" value="${fn:replace('org.kuali.kra.lookup.keyvalue.NsfCodeYearConstrainedFinder','.','|')}"/>
+				<html:select property="document.awardList[0].nsfSequenceNumber" styleClass="fixed-size-200-select">
+					<html:optionsCollection property="actionFormUtilMap.getOptionsMap${Constants.ACTION_FORM_UTIL_MAP_METHOD_PARM_DELIMITER}${finderClass}" label="value" value="key" />
+				</html:select>
+			</c:if>
+		</td>
     </tr>
 	<tr>
 		<th align="right">
@@ -282,7 +291,7 @@
 		<td align="left" valign="middle">
 			<kul:htmlControlAttribute property="document.awardList[0].fainId" attributeEntry="${awardAttributes.fainId}" />
 		</td>
-		<th align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.fedAwardYear}" />
+		<th align="right"><div align="right"><kul:htmlAttributeLabel attributeEntry="${awardAttributes.fedAwardYear}" /></div>
 		</th>
 		<td align="left" valign="middle">
 			<kul:htmlControlAttribute property="document.awardList[0].fedAwardYear" attributeEntry="${awardAttributes.fedAwardYear}" />

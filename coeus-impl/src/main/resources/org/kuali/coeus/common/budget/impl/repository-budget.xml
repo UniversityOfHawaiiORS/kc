@@ -330,6 +330,10 @@
 		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR"/>
 		<field-descriptor name="hierarchyProposalNumber" column="HIERARCHY_PROPOSAL_NUMBER" jdbc-type="VARCHAR" />
 		<field-descriptor name="hiddenInHierarchy" column="HIDE_IN_HIERARCHY" jdbc-type="CHAR" conversion="org.kuali.rice.core.framework.persistence.ojb.conversion.OjbCharBooleanConversion" />
+		<field-descriptor name="unitNumber" column="UNIT_NUMBER" jdbc-type="VARCHAR" />
+		<reference-descriptor name="unit" class-ref="org.kuali.coeus.common.framework.unit.Unit" auto-retrieve="true" auto-update="none" auto-delete="none">
+			<foreignkey field-ref="unitNumber" />
+		</reference-descriptor>
 	</class-descriptor>
 	
 	<class-descriptor class="org.kuali.coeus.common.budget.framework.income.BudgetProjectIncome" table="BUDGET_PROJECT_INCOME">
@@ -925,7 +929,7 @@
 	<class-descriptor class="org.kuali.coeus.common.budget.framework.personnel.AppointmentType" table="APPOINTMENT_TYPE">
 		<field-descriptor name="appointmentTypeCode" column="APPOINTMENT_TYPE_CODE" jdbc-type="VARCHAR" primarykey="true" />
 		<field-descriptor name="description" column="DESCRIPTION" jdbc-type="VARCHAR" />
-		<field-descriptor name="duration" column="DURATION" jdbc-type="INTEGER" />
+		<field-descriptor name="duration" column="DURATION" jdbc-type="DECIMAL" conversion="org.kuali.coeus.sys.framework.persistence.OjbScaleTwoDecimalFieldConversion" />
 		<field-descriptor name="updateTimestamp" column="UPDATE_TIMESTAMP" jdbc-type="TIMESTAMP" />
 		<field-descriptor name="updateUser" column="UPDATE_USER" jdbc-type="VARCHAR" />
 		<field-descriptor name="objectId" column="OBJ_ID" jdbc-type="VARCHAR" />

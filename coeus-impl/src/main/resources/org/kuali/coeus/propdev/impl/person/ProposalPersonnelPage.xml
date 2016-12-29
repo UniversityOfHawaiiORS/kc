@@ -303,8 +303,7 @@
                         <bean parent="Uif-VerticalRadioControl" />
                     </property>
                     <property name="optionsFinder">
-                        <bean
-                                class="org.kuali.coeus.propdev.impl.person.ProposalPersonRoleValuesFinder" />
+                        <bean class="org.kuali.coeus.propdev.impl.person.ProposalPersonRoleValuesFinder" />
                     </property>
                 </bean>
                 <bean parent="Uif-InputField"
@@ -378,16 +377,22 @@
                             <bean parent="Uif-HorizontalBoxGroup" p:style="color: gray; background-color:#eeeeee; font-weight: bold;">
                                 <property name="items">
                                     <list>
+                                        <bean parent="Uif-MessageField"
+                                              p:messageText="@{#ViewHelper.isCoiDisclosureStatusEnabled() and
+                                              #ViewHelper.isDisplayCoiProjectStatus() ? 'Project Status: ' +
+                                              #ViewHelper.getProjectStatusForPerson(#line) : ''}"
+                                              p:readOnly="true" p:order="5"
+                                              />
                                         <!-- KC-1496 Rename COI Disclosure Status for "Disclosure Not Required" -->
                                         <bean parent="Uif-MessageField"
-                                              p:messageText="@{#ViewHelper.isCoiDisclosureStatusEnabled() ? 'Disclosure Status: ' +
+                                              p:messageText="@{#ViewHelper.isCoiDisclosureStatusEnabled() ? 'Annual Disclosure Status: ' +
                                               #ViewHelper.getDisclosureStatusForPerson(#line, document.developmentProposal) : ''}"
-                                              p:readOnly="true" p:order="5"
+                                              p:readOnly="true" p:order="6"
                                                 />
                                         <bean parent="Uif-MessageField"
                                               p:messageText="@{#ViewHelper.canViewDispositionStatus(#line) ? 'Disposition Status: ' +
                                               #ViewHelper.getDispositionStatusForPerson(#line) : ''}"
-                                              p:readOnly="true" p:order="6"
+                                              p:readOnly="true" p:order="7"
                                                 />
                                     </list>
                                 </property>
@@ -470,6 +475,9 @@
                       p:order="70"/>
                 <bean parent="PropDev-PersonnelPage-EditableInputField" p:propertyName="eraCommonsUserName"
                       p:order="80"/>
+                <bean parent="Uif-CheckboxInputField" p:propertyName="includeInCreditAllocation" p:render="@{#ViewHelper.isPersonnelCreditSplitOptInFeatureEnabled()}"
+                      p:order="90">
+                </bean>
             </list>
         </property>
     </bean>
@@ -878,7 +886,7 @@
 		p:renderAddLine="false" p:layoutManager.renderSequenceField="false"
 		p:renderInactiveToggleButton="false" p:layoutManager.richTable.render="true" p:renderLineActions="false"
                 p:render="@{personnelWhoRequireDisclosure.size() > 0}">
-		
+
 		<property name="layoutManager.richTable.templateOptions">
 			<map>
 				<entry key="sDom" value="tip" />

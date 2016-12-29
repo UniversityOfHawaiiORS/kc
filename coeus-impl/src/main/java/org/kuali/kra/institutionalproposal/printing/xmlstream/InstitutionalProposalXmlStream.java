@@ -35,7 +35,6 @@ import org.kuali.coeus.sys.framework.model.KcPersistableBusinessObjectBase;
 import org.kuali.coeus.sys.framework.service.KcServiceLocator;
 import org.kuali.kra.award.home.AwardType;
 import org.kuali.kra.award.home.ContactRole;
-import org.kuali.kra.bo.*;
 import org.kuali.coeus.common.framework.compliance.core.SpecialReviewType;
 import org.kuali.coeus.common.framework.costshare.CostShareService;
 import org.kuali.kra.infrastructure.Constants;
@@ -46,12 +45,10 @@ import org.kuali.kra.institutionalproposal.contacts.InstitutionalProposalPersonU
 import org.kuali.kra.institutionalproposal.customdata.InstitutionalProposalCustomData;
 import org.kuali.kra.institutionalproposal.home.*;
 import org.kuali.kra.institutionalproposal.printing.InstitutionalProposalPrintType;
-import org.kuali.kra.institutionalproposal.printing.service.InstitutionalProposalPersonService;
 import org.kuali.kra.institutionalproposal.specialreview.InstitutionalProposalSpecialReview;
 import org.kuali.kra.irb.Protocol;
 import org.kuali.kra.printing.schema.*;
 import org.kuali.kra.printing.schema.InstituteProposalDocument.InstituteProposal;
-import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.rice.core.api.datetime.DateTimeService;
 import org.kuali.rice.coreservice.framework.parameter.ParameterConstants;
 import org.kuali.rice.coreservice.framework.parameter.ParameterService;
@@ -68,40 +65,23 @@ import java.util.*;
 public class InstitutionalProposalXmlStream implements XmlStream {
     
 
-	private static final String PROPOSAL_SUMMARY_COMMENT_CODE;
+	private static final String PROPOSAL_SUMMARY_COMMENT_CODE = "21";
 	private static final String PROTOCOL_NUMBER = "protocolNumber";
 	private static final String SPECIAL_REVIEW_APPROVAL_CODE = "5";
 	private static final String SPONSOR_CODE = "sponsorCode";
-	private static final String NSF_CODE = "nsfCode";
 	private static final String NOTICE_OF_OPPORTUNITY_CODE = "code";
 	private static final String PROPOSAL_TYPE_CODE = "code";
 	private static final String PROPOSAL_STATUS_CODE = "proposalStatusCode";
 	private static final String SCHOOL_NAME = "SCHOOL_NAME";
 	private static final String SCHOOL_ACRONYM = "SCHOOL_ACRONYM";
-	private InstitutionalProposalPersonService institutionalProposalPersonService;
+
 	private BusinessObjectService businessObjectService;
 	private DateTimeService dateTimeService;
 
-	static{
-		//FIXME below hardcoded values to be fixed once InstituteProposalComments BO is fully integrated
-		PROPOSAL_SUMMARY_COMMENT_CODE = "21";
-	}
-	
-	
-	/**
-	 * This method generates XML for Institution Proposal Report. It uses data
-	 * passed in {@link org.kuali.coeus.sys.framework.model.KcTransactionalDocumentBase} for populating the XML nodes. The
-	 * XMl once generated is returned as {@link XmlObject}
-	 * 
-	 * @param printableBusinessObject
-	 *            using which XML is generated
-	 * @param reportParameters
-	 *            parameters related to XML generation
-	 * @return {@link XmlObject} representing the XML
-	 */
+	@Override
 	public Map<String, XmlObject> generateXmlStream(
 			KcPersistableBusinessObjectBase printableBusinessObject, Map<String, Object> reportParameters) {
-		Map<String, XmlObject> xmlObjectList = new LinkedHashMap<String, XmlObject>();
+		Map<String, XmlObject> xmlObjectList = new LinkedHashMap<>();
 		InstitutionalProposal institutionalProposal = (InstitutionalProposal) printableBusinessObject;
 		InstituteProposalDocument instituteProposalDocument = InstituteProposalDocument.Factory
 				.newInstance();
@@ -123,9 +103,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 			InstitutionalProposal institutionalProposal) {
 		InstituteProposal instituteProposalXmlObject = InstituteProposal.Factory
 				.newInstance();
-		List<ProposalPerson> proposalPersons = institutionalProposalPersonService
-				.getInvestigatorsFromDevelopmentProposal(institutionalProposal
-						.getProposalNumber());
+
 		instituteProposalXmlObject
 				.setInstProposalMaster(getInstProposalMasterData(institutionalProposal));
 		instituteProposalXmlObject.setInvestigatorsArray(getInvestigatorTypes(
@@ -167,8 +145,8 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	}
 	
 	private String getProjectPeriodFieldDescription() {
-        String retVal =  KcServiceLocator.getService(CostShareService.class).getCostShareLabel();
-        return retVal;
+        return KcServiceLocator.getService(CostShareService.class).getCostShareLabel();
+
     }
 	
 	/*
@@ -180,7 +158,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	    CustomAttributeService customAttributeService = KcServiceLocator.getService(CustomAttributeService.class);
         Map<String, CustomAttributeDocument> customAttributeDocuments = customAttributeService.getDefaultCustomAttributeDocuments(institutionalProposal.getInstitutionalProposalDocument().getDocumentTypeCode(), institutionalProposal.getInstitutionalProposalCustomDataList());
         OtherGroupTypes otherGroup=OtherGroupTypes.Factory.newInstance();        
-        List<OtherGroupDetailsTypes> otherGroupDetailsTypesList = new LinkedList<OtherGroupDetailsTypes>();       
+        List<OtherGroupDetailsTypes> otherGroupDetailsTypesList = new LinkedList<>();
        
         for (Map.Entry<String, CustomAttributeDocument> customAttributeDocumentEntry : customAttributeDocuments.entrySet()) {
             OtherGroupDetailsTypes otherGroupDetails=OtherGroupDetailsTypes.Factory.newInstance();                  
@@ -213,51 +191,52 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private IPKeyPersonType[] getKeyPersons(
 			InstitutionalProposal institutionalProposal) {
-		List<KeyPersonType> keyPersonTypes = new ArrayList<KeyPersonType>();
-		IPKeyPersonType keyPersonType = null;
+		List<IPKeyPersonType> keyPersonTypes = new ArrayList<>();
+
 		for (InstitutionalProposalPerson proposalPerson : institutionalProposal.getProjectPersons()) {
-				keyPersonType = IPKeyPersonType.Factory.newInstance();
-				if (institutionalProposal.getProposalNumber() != null) {
-					keyPersonType.setProposalNumber(institutionalProposal
-							.getProposalNumber());
-				}
-				if (proposalPerson.getPersonId() != null) {
-					keyPersonType.setPersonId(proposalPerson.getPersonId());
-				}
-				KcPerson person = proposalPerson.getPerson();
+			IPKeyPersonType keyPersonType = IPKeyPersonType.Factory.newInstance();
+			if (institutionalProposal.getProposalNumber() != null) {
+				keyPersonType.setProposalNumber(institutionalProposal
+						.getProposalNumber());
+			}
+			if (proposalPerson.getPersonId() != null) {
+				keyPersonType.setPersonId(proposalPerson.getPersonId());
+			}
+			KcPerson person = proposalPerson.getPerson();
 				//BEGIN UH KC-450 rbl added code to fix null pointer error - print notice generation failure for non-employees
 				if (person != null) {
 				    if (person.getFullName() != null) {
-					keyPersonType.setPersonName(person.getFullName());
+				keyPersonType.setPersonName(person.getFullName());
 				    } else if (proposalPerson.getRolodex() != null) {
 					    if (proposalPerson.getRolodex().getFullName() != null) {
 						    keyPersonType.setPersonName(proposalPerson.getRolodex().getFullName());
 					    }
-				}
+			}
 				}
 				//END UH KC-450 
-				ContactRole role = proposalPerson.getContactRole();
-				if (role != null && role.getRoleDescription() != null) {
-					keyPersonType.setRoleName(role.getRoleDescription());
+			ContactRole role = proposalPerson.getContactRole();
+			if (role != null && role.getRoleDescription() != null) {
+				keyPersonType.setRoleName(role.getRoleDescription());
+			}
+			if (proposalPerson.getPerson() != null) {
+				if (proposalPerson.getPerson().getAddressLine1() != null) {
+					keyPersonType.setPersonAddress(proposalPerson.getPerson().getAddressLine1());
 				}
-				if (proposalPerson.getPerson() != null) {
-	                if (proposalPerson.getPerson().getAddressLine1() != null) {
-					    keyPersonType.setPersonAddress(proposalPerson.getPerson().getAddressLine1());
-	                }
-				} else if (proposalPerson.getRolodex() != null) {
-                    if (proposalPerson.getRolodex().getAddressLine1() != null) {
-                        keyPersonType.setPersonAddress(proposalPerson.getRolodex().getAddressLine1());
-                    }
-				}
-				if (proposalPerson.getTotalEffort() != null) {
-					keyPersonType.setPercentEffort(proposalPerson
-							.getTotalEffort().bigDecimalValue());
-				}
-					keyPersonType.setFaculty(proposalPerson.isFaculty());
-				if (proposalPerson.getRolodexId() != null) {
-					keyPersonType.setNonEmployee(true);
+			} else if (proposalPerson.getRolodex() != null) {
+				if (proposalPerson.getRolodex().getAddressLine1() != null) {
+					keyPersonType.setPersonAddress(proposalPerson.getRolodex().getAddressLine1());
 				}
 			}
+			if (proposalPerson.getTotalEffort() != null) {
+				keyPersonType.setPercentEffort(proposalPerson
+						.getTotalEffort().bigDecimalValue());
+			}
+			keyPersonType.setFaculty(proposalPerson.isFaculty());
+			if (proposalPerson.getRolodexId() != null) {
+				keyPersonType.setNonEmployee(true);
+			}
+			keyPersonTypes.add(keyPersonType);
+		}
 		return keyPersonTypes.toArray(new IPKeyPersonType[0]);
 	}
 
@@ -270,83 +249,83 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private InvestigatorType2[] getInvestigatorTypes(
 			InstitutionalProposal institutionalProposal) {
-		List<InvestigatorType2> investigatorTypesList = new ArrayList<InvestigatorType2>();
-		InvestigatorType2 investigatorType = null;
+		List<InvestigatorType2> investigatorTypesList = new ArrayList<>();
+		InvestigatorType2 investigatorType;
 		for (InstitutionalProposalPerson proposalPerson : institutionalProposal.getProjectPersons()) {
-				investigatorType = InvestigatorType2.Factory.newInstance();
-				PersonType personType = PersonType.Factory.newInstance();
-                KcPerson person = proposalPerson.getPerson();
-                if (person != null) {
-                    if (person.getAddressLine1() != null) {
-                        personType.setAddress(person.getAddressLine1());
-                    }
-                    if (person.getCity() != null) {
-                        personType.setCity(person.getCity());
-                    }
-                    if (person.getFirstName() != null) {
-                        personType.setFirstName(person.getFirstName());
-                    }
-                    if (proposalPerson.getFullName() != null) {
-                        personType.setFullName(proposalPerson.getFullName());
-                    }
-                    if (person.getLastName() != null) {
-                        personType.setLastName(person.getLastName());
-                    }
-                    if (person.getMiddleName() != null) {
-                        personType.setMiddleName(person.getMiddleName());
-                    }
-                    if (proposalPerson.getPhoneNumber() != null) {
-                        personType.setPhone(proposalPerson.getPhoneNumber());
-                    }
-                    if (person.getState() != null) {
-                        personType.setState(person.getState());
-                    }
-                    if (person.getPostalCode() != null) {
-                        personType.setZip(person.getPostalCode());
-                    }
-                } else {
-                    NonOrganizationalRolodex rolodex = proposalPerson.getRolodex();
-                    if (rolodex != null) {
-                        if (rolodex.getAddressLine1() != null) {
-                            personType.setAddress(rolodex.getAddressLine1());
-                        }
-                        if (rolodex.getCity() != null) {
-                            personType.setCity(rolodex.getCity());
-                        }
-                        if (rolodex.getFirstName() != null) {
-                            personType.setFirstName(rolodex.getFirstName());
-                        }
-                        if (proposalPerson.getFullName() != null) {
-                            personType.setFullName(proposalPerson.getFullName());
-                        }
-                        if (rolodex.getLastName() != null) {
-                            personType.setLastName(rolodex.getLastName());
-                        }
-                        if (rolodex.getMiddleName() != null) {
-                            personType.setMiddleName(rolodex.getMiddleName());
-                        }
-                        if (proposalPerson.getPhoneNumber() != null) {
-                            personType.setPhone(proposalPerson.getPhoneNumber());
-                        }
-                        if (rolodex.getState() != null) {
-                            personType.setState(rolodex.getState());
-                        }
-                        if (rolodex.getPostalCode() != null) {
-                            personType.setZip(rolodex.getPostalCode());
-                        }
+			investigatorType = InvestigatorType2.Factory.newInstance();
+			PersonType personType = PersonType.Factory.newInstance();
+			KcPerson person = proposalPerson.getPerson();
+			if (person != null) {
+				if (person.getAddressLine1() != null) {
+					personType.setAddress(person.getAddressLine1());
+				}
+				if (person.getCity() != null) {
+					personType.setCity(person.getCity());
+				}
+				if (person.getFirstName() != null) {
+					personType.setFirstName(person.getFirstName());
+				}
+				if (proposalPerson.getFullName() != null) {
+					personType.setFullName(proposalPerson.getFullName());
+				}
+				if (person.getLastName() != null) {
+					personType.setLastName(person.getLastName());
+				}
+				if (person.getMiddleName() != null) {
+					personType.setMiddleName(person.getMiddleName());
+				}
+				if (proposalPerson.getPhoneNumber() != null) {
+					personType.setPhone(proposalPerson.getPhoneNumber());
+				}
+				if (person.getState() != null) {
+					personType.setState(person.getState());
+				}
+				if (person.getPostalCode() != null) {
+					personType.setZip(person.getPostalCode());
+				}
+			} else {
+				NonOrganizationalRolodex rolodex = proposalPerson.getRolodex();
+				if (rolodex != null) {
+					if (rolodex.getAddressLine1() != null) {
+						personType.setAddress(rolodex.getAddressLine1());
+					}
+					if (rolodex.getCity() != null) {
+						personType.setCity(rolodex.getCity());
+					}
+					if (rolodex.getFirstName() != null) {
+						personType.setFirstName(rolodex.getFirstName());
+					}
+					if (proposalPerson.getFullName() != null) {
+						personType.setFullName(proposalPerson.getFullName());
+					}
+					if (rolodex.getLastName() != null) {
+						personType.setLastName(rolodex.getLastName());
+					}
+					if (rolodex.getMiddleName() != null) {
+						personType.setMiddleName(rolodex.getMiddleName());
+					}
+					if (proposalPerson.getPhoneNumber() != null) {
+						personType.setPhone(proposalPerson.getPhoneNumber());
+					}
+					if (rolodex.getState() != null) {
+						personType.setState(rolodex.getState());
+					}
+					if (rolodex.getPostalCode() != null) {
+						personType.setZip(rolodex.getPostalCode());
+					}
 
-                    }
-                }
-				investigatorType.setPIName(personType);
-				investigatorType.setFacultyFlag(proposalPerson
-						.isFaculty());
-				investigatorType.setPrincipalInvFlag(proposalPerson
-						.isPrincipalInvestigator());
-				List<UnitType> unitTypes = getUnitTypes(proposalPerson);
-				investigatorType.setUnitArray(unitTypes
-						.toArray(new UnitType[0]));
-				investigatorTypesList.add(investigatorType);
+				}
 			}
+			investigatorType.setPIName(personType);
+			investigatorType.setFacultyFlag(proposalPerson
+					.isFaculty());
+			investigatorType.setPrincipalInvFlag(proposalPerson
+					.isPrincipalInvestigator());
+			List<UnitType> unitTypes = getUnitTypes(proposalPerson);
+			investigatorType.setUnitArray(unitTypes
+					.toArray(new UnitType[0]));
+			investigatorTypesList.add(investigatorType);
+		}
 		return investigatorTypesList.toArray(new InvestigatorType2[0]);
 	}
 
@@ -355,8 +334,8 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 * basically iterates over the proposal person units.
 	 */
 	private List<UnitType> getUnitTypes(InstitutionalProposalPerson proposalPerson) {
-		List<UnitType> unitTypes = new ArrayList<UnitType>();
-		UnitType unitType = null;
+		List<UnitType> unitTypes = new ArrayList<>();
+		UnitType unitType;
 		for (InstitutionalProposalPersonUnit proposalPersonUnit : proposalPerson.getUnits()) {
 			unitType = UnitType.Factory.newInstance();
 			unitType.setLeadUnitFlag(proposalPersonUnit.isLeadUnit());
@@ -379,8 +358,8 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private IPDisclosureItemType[] getDisclosureItems(
 			InstitutionalProposal institutionalProposal) {
-		// TODO: To be fixed
-		List<IPDisclosureItemType> disclosureItemTypesList = new ArrayList<IPDisclosureItemType>();
+
+		List<IPDisclosureItemType> disclosureItemTypesList = new ArrayList<>();
 		IPDisclosureItemType disclosureItemType = IPDisclosureItemType.Factory
 				.newInstance();
 		disclosureItemTypesList.add(disclosureItemType);
@@ -414,8 +393,8 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private ScienceCodeType[] getScienceCodes(
 			InstitutionalProposal institutionalProposal) {
-		ScienceCodeType scienceCodeType = null;
-		List<ScienceCodeType> scienceCodeTypelist = new ArrayList<ScienceCodeType>();
+		ScienceCodeType scienceCodeType;
+		List<ScienceCodeType> scienceCodeTypelist = new ArrayList<>();
 		for (InstitutionalProposalScienceKeyword institutionalProposalScienceKeyword : institutionalProposal
 				.getInstitutionalProposalScienceKeywords()) {
 			scienceCodeType = ScienceCodeType.Factory.newInstance();
@@ -440,7 +419,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private CostSharingType[] getCostSharingTypes(
 			InstitutionalProposal institutionalProposal) {
-		List<CostSharingType> costSharingTypes = new ArrayList<CostSharingType>();
+		List<CostSharingType> costSharingTypes = new ArrayList<>();
 		for (InstitutionalProposalCostShare institutionalProposalCostShare : institutionalProposal
 				.getInstitutionalProposalCostShares()) {
 		    CostSharingType costSharingType = CostSharingType.Factory.newInstance();		    
@@ -486,12 +465,12 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private SpecialReviewType2[] getSpecialReviewTypes(
 			InstitutionalProposal institutionalProposal) {
-		List<SpecialReviewType2> specialReviewTypes = new ArrayList<SpecialReviewType2>();
-		SpecialReviewType2 specialReviewType = null;
+		List<SpecialReviewType2> specialReviewTypes = new ArrayList<>();
+		SpecialReviewType2 specialReviewType;
 		for (InstitutionalProposalSpecialReview institutionalProposalSpecialReview : institutionalProposal
 				.getSpecialReviews()) {
 			specialReviewType = SpecialReviewType2.Factory.newInstance();
-			Protocol protocol = null;
+			Protocol protocol;
 			String protocolNumber = institutionalProposalSpecialReview
 					.getProtocolNumber();
 			institutionalProposalSpecialReview.refreshNonUpdateableReferences();
@@ -500,7 +479,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 			if (protocolNumber != null
 					&& (protocol = getProtocolInfo(protocolNumber)) != null) {
 				specialReviewType.setProtocolNumber(protocolNumber);
-				if (specialReviewApprovalType.getApprovalTypeCode() != null
+				if (specialReviewApprovalType != null && specialReviewApprovalType.getApprovalTypeCode() != null
 						&& specialReviewApprovalType.getApprovalTypeCode()
 								.equals(SPECIAL_REVIEW_APPROVAL_CODE)) {
 					specialReviewType.setSpecialReviewStatus(protocol
@@ -560,7 +539,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private Protocol getProtocolInfo(String protocolNumber) {
 		Protocol protocol = null;
-		Map<String, String> protocolMap = new HashMap<String, String>();
+		Map<String, String> protocolMap = new HashMap<>();
 		protocolMap.put(PROTOCOL_NUMBER, String.valueOf(protocolNumber));
 		List<Protocol> protocolList = (List<Protocol>) businessObjectService
 				.findMatching(Protocol.class, protocolMap);
@@ -578,8 +557,8 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private IDCRateType[] getIdcRateTypes(
 			InstitutionalProposal institutionalProposal) {
-		List<IDCRateType> idcRateTypes = new ArrayList<IDCRateType>();
-		IDCRateType idcRateType = null;
+		List<IDCRateType> idcRateTypes = new ArrayList<>();
+		IDCRateType idcRateType;
 		for (InstitutionalProposalUnrecoveredFandA institutionalProposalUnrecoveredFandA : institutionalProposal
 				.getInstitutionalProposalUnrecoveredFandAs()) {
 			idcRateType = IDCRateType.Factory.newInstance();
@@ -854,11 +833,11 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 
 	private void setNSFCode(InstitutionalProposal institutionalProposal,
 			InstProposalMasterData instProposalMasterData) {
-		if (institutionalProposal.getNsfCode() != null) {
+		if (institutionalProposal.getSequenceNumber() != null && institutionalProposal.getNsfCodeBo() != null) {
 			NSFcodeType nsfCodeType = NSFcodeType.Factory.newInstance();
-			String nsfCode = institutionalProposal.getNsfCode();
+			String nsfCode = institutionalProposal.getNsfCodeBo().getNsfCode();
 			nsfCodeType.setNSFcode(nsfCode);
-			String nsfDesc = getNsfDesc(nsfCode);
+			String nsfDesc = institutionalProposal.getNsfCodeBo().getDescription();
 			if (nsfDesc != null) {
 				nsfCodeType.setNSFcodeDesc(nsfDesc);
 			}
@@ -906,8 +885,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 			InstProposalMasterData instProposalMasterData) {
 		if (institutionalProposal.getProposalTypeCode() != null) {
 			ProposalType proposalType = ProposalType.Factory.newInstance();
-			int proposalTypeCode = Integer.valueOf(institutionalProposal
-					.getProposalTypeCode());
+			int proposalTypeCode = institutionalProposal.getProposalTypeCode();
 			proposalType.setProposalTypeCode(proposalTypeCode);
 			String proposalTypeDescription = getProposalTypeDescription(proposalTypeCode);
 			if (proposalTypeDescription != null) {
@@ -922,8 +900,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 		if (institutionalProposal.getStatusCode() != null) {
 			ProposalStatusType proposalStatusType = ProposalStatusType.Factory
 					.newInstance();
-			int proposalStatusCode = Integer.valueOf(institutionalProposal
-					.getStatusCode());
+			int proposalStatusCode = institutionalProposal.getStatusCode();
 			proposalStatusType.setStatusCode(proposalStatusCode);
 			String proposalDescription = getProposalDescription(proposalStatusCode);
 			if (proposalDescription != null) {
@@ -938,7 +915,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private String getPrimeSponsorName(String primeSponsorCode) {
 		String primeSponsorName = null;
-		Map<String, String> sponsorMap = new HashMap<String, String>();
+		Map<String, String> sponsorMap = new HashMap<>();
 		sponsorMap.put(SPONSOR_CODE, primeSponsorCode);
 		List<Sponsor> sponsorList = (List<Sponsor>) businessObjectService
 				.findMatching(Sponsor.class, sponsorMap);
@@ -950,28 +927,12 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	}
 
 	/*
-	 * This method will return the nsf description based on nsf code.1
-	 */
-	private String getNsfDesc(String nsfCode) {
-		String nsfDesc = null;
-		Map<String, String> nsfCodeMap = new HashMap<String, String>();
-		nsfCodeMap.put(NSF_CODE, nsfCode);
-		List<NsfCode> nsfCodeTypeList = (List<NsfCode>) businessObjectService
-				.findMatching(NsfCode.class, nsfCodeMap);
-		if (nsfCodeTypeList != null && !nsfCodeTypeList.isEmpty()) {
-			NsfCode noticeOfOpportunity = nsfCodeTypeList.get(0);
-			nsfDesc = noticeOfOpportunity.getDescription();
-		}
-		return nsfDesc;
-	}
-
-	/*
 	 * This method will return the notice of opportunity description based on
 	 * notice of opportunity code.
 	 */
 	private String getNoticeOfOpportunityDesc(String noticeOfOpportunityCode) {
 		String noticeOfOpportunityDesc = null;
-		Map<String, String> noticeOfOppMap = new HashMap<String, String>();
+		Map<String, String> noticeOfOppMap = new HashMap<>();
 		noticeOfOppMap.put(NOTICE_OF_OPPORTUNITY_CODE, noticeOfOpportunityCode);
 		List<NoticeOfOpportunity> noticeOfOppList = (List<NoticeOfOpportunity>) businessObjectService
 				.findMatching(NoticeOfOpportunity.class, noticeOfOppMap);
@@ -988,10 +949,10 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private String getProposalTypeDescription(int proposalTypeCode) {
 		String proposalTypeDescription = null;
-		Map<String, String> proposalTypeDescMap = new HashMap<String, String>();
+		Map<String, String> proposalTypeDescMap = new HashMap<>();
 		proposalTypeDescMap.put(PROPOSAL_TYPE_CODE, String
 				.valueOf(proposalTypeCode));
-		List<org.kuali.coeus.common.framework.type.ProposalType> proposalTypeList = null;
+		List<org.kuali.coeus.common.framework.type.ProposalType> proposalTypeList;
 		proposalTypeList = (List<org.kuali.coeus.common.framework.type.ProposalType>) businessObjectService
 				.findMatching(
 						org.kuali.coeus.common.framework.type.ProposalType.class,
@@ -1010,7 +971,7 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 	 */
 	private String getProposalDescription(int proposalStatusCode) {
 		String proposalDescription = null;
-		Map<String, String> proposalStatusMap = new HashMap<String, String>();
+		Map<String, String> proposalStatusMap = new HashMap<>();
 		proposalStatusMap.put(PROPOSAL_STATUS_CODE, String
 				.valueOf(proposalStatusCode));
 		List<ProposalStatus> proposalStatusList = (List<ProposalStatus>) businessObjectService
@@ -1022,29 +983,8 @@ public class InstitutionalProposalXmlStream implements XmlStream {
 		return proposalDescription;
 	}
 
-	/**
-	 * @return the institutionalProposalPersonService
-	 */
-	public InstitutionalProposalPersonService getInstitutionalProposalPersonService() {
-		return institutionalProposalPersonService;
-	}
-
-	/**
-	 * @param institutionalProposalPersonService
-	 *            the institutionalProposalPersonService to set
-	 */
-	public void setInstitutionalProposalPersonService(
-			InstitutionalProposalPersonService institutionalProposalPersonService) {
-		this.institutionalProposalPersonService = institutionalProposalPersonService;
-	}
 	private String getIPParameterValue(String param) {
-		String value = null;
-		try {
-			value = PrintingUtils.getParameterValue(param);
-		} catch (Exception e) {
-			//TODO Log Exception
-		}
-		return value;
+		return PrintingUtils.getParameterValue(param);
 	}
 
 	public BusinessObjectService getBusinessObjectService() {

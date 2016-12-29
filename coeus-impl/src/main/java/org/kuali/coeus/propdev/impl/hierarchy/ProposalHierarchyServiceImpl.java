@@ -22,39 +22,42 @@ import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.kuali.coeus.common.budget.framework.personnel.*;
+import org.kuali.coeus.common.budget.framework.core.Budget;
+import org.kuali.coeus.common.budget.framework.period.BudgetPeriod;
+import org.kuali.coeus.common.budget.framework.personnel.HierarchyPersonnelSummary;
+import org.kuali.coeus.common.framework.auth.perm.KcAuthorizationService;
 import org.kuali.coeus.common.framework.keyword.ScienceKeyword;
-import org.kuali.coeus.propdev.impl.attachment.*;
+import org.kuali.coeus.propdev.impl.attachment.LegacyNarrativeService;
+import org.kuali.coeus.propdev.impl.attachment.Narrative;
+import org.kuali.coeus.propdev.impl.attachment.NarrativeType;
+import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
+import org.kuali.coeus.propdev.impl.budget.hierarchy.ProposalBudgetHierarchyService;
 import org.kuali.coeus.propdev.impl.core.DevelopmentProposal;
 import org.kuali.coeus.propdev.impl.core.ProposalDevelopmentDocument;
 import org.kuali.coeus.propdev.impl.keyword.PropScienceKeyword;
 import org.kuali.coeus.propdev.impl.location.CongressionalDistrict;
 import org.kuali.coeus.propdev.impl.location.ProposalSite;
+import org.kuali.coeus.propdev.impl.person.KeyPersonnelService;
 import org.kuali.coeus.propdev.impl.person.ProposalPerson;
 import org.kuali.coeus.propdev.impl.person.ProposalPersonDegree;
 import org.kuali.coeus.propdev.impl.person.ProposalPersonUnit;
 import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiography;
-import org.kuali.coeus.common.framework.auth.perm.KcAuthorizationService;
 import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiographyAttachment;
+import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiographyService;
 import org.kuali.coeus.propdev.impl.person.creditsplit.ProposalPersonCreditSplit;
 import org.kuali.coeus.propdev.impl.person.creditsplit.ProposalUnitCreditSplit;
 import org.kuali.coeus.propdev.impl.s2s.S2sOppForms;
 import org.kuali.coeus.propdev.impl.s2s.S2sOpportunity;
+import org.kuali.coeus.propdev.impl.specialreview.ProposalSpecialReview;
 import org.kuali.coeus.propdev.impl.state.ProposalState;
+import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
 import org.kuali.coeus.sys.framework.gv.GlobalVariableService;
 import org.kuali.coeus.sys.framework.model.KcDataObject;
 import org.kuali.coeus.sys.framework.workflow.KcDocumentRejectionService;
-import org.kuali.coeus.sys.api.model.ScaleTwoDecimal;
-import org.kuali.coeus.common.budget.framework.core.Budget;
-import org.kuali.coeus.common.budget.framework.period.BudgetPeriod;
 import org.kuali.kra.bo.DocumentNextvalue;
 import org.kuali.kra.infrastructure.Constants;
 import org.kuali.kra.infrastructure.PermissionConstants;
 import org.kuali.kra.infrastructure.RoleConstants;
-import org.kuali.coeus.propdev.impl.budget.hierarchy.ProposalBudgetHierarchyService;
-import org.kuali.coeus.propdev.impl.budget.ProposalDevelopmentBudgetExt;
-import org.kuali.coeus.propdev.impl.person.attachment.ProposalPersonBiographyService;
-import org.kuali.coeus.propdev.impl.specialreview.ProposalSpecialReview;
 import org.kuali.rice.core.api.config.property.ConfigurationService;
 import org.kuali.rice.core.api.criteria.OrderByField;
 import org.kuali.rice.core.api.criteria.OrderDirection;
@@ -73,13 +76,12 @@ import org.kuali.rice.krad.service.DocumentService;
 import org.kuali.rice.krad.service.PessimisticLockService;
 import org.kuali.rice.krad.util.ObjectUtils;
 import org.kuali.rice.krad.workflow.service.WorkflowDocumentService;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -90,7 +92,7 @@ import static org.kuali.coeus.propdev.impl.hierarchy.ProposalHierarchyKeyConstan
 @Component("proposalHierarchyService")
 @Transactional
 public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
-    
+
     private static final Log LOG = LogFactory.getLog(ProposalHierarchyServiceImpl.class);
     private static final String DOCUMENT_NEXTVALUES = "documentNextvalues";
     private static final String HIERARCHY_STATUS = "hierarchyStatus";
@@ -100,6 +102,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     private static final String NARRATIVE_TYPE = "narrativeType";
     private static final String HIERARCHY_PROPOSAL_NUMBER = "hierarchyProposalNumber";
     private static final String NARRATIVE_TYPE_CODE = "narrativeTypeCode";
+    public static final String HIERARCHY_UNIT_SYNC = "HIERARCHY_UNIT_SYNC";
 
     @Autowired
     @Qualifier("dataObjectService")
@@ -145,6 +148,10 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     @Autowired
     @Qualifier("proposalBudgetHierarchyService")
     private ProposalBudgetHierarchyService proposalBudgetHierarchyService;
+
+    @Autowired
+    @Qualifier("keyPersonnelService")
+    private KeyPersonnelService keyPersonnelService;
 
     //Setters for dependency injection
     public void setDocumentService(DocumentService documentService) {
@@ -391,7 +398,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         return getProposalHierarchyDao().getProposalState(proposalNumber);
     }
 
-    protected void synchronizeAll(DevelopmentProposal hierarchyProposal) throws ProposalHierarchyException {
+    @Override
+    public void synchronizeAll(DevelopmentProposal hierarchyProposal) throws ProposalHierarchyException {
         synchronizeAllChildProposals(hierarchyProposal);
     }
 
@@ -400,7 +408,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         DevelopmentProposal hierarchy = getHierarchy(childProposal.getHierarchyParentProposalNumber());
 
         prepareHierarchySync(hierarchy);
-        synchronizeChildProposal(hierarchy, childProposal, true);
+        synchronizeChildProposal(hierarchy, childProposal, true, getHierarchyChildren(hierarchy.getProposalNumber()));
         finalizeHierarchySync(hierarchy);
     }
     
@@ -409,7 +417,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         return getHierarchy(childProposal.getHierarchyParentProposalNumber());
     }
 
-    protected void linkChild(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal, String hierarchyBudgetTypeCode, boolean syncPersonnelAttachments)
+    @Override
+    public void linkChild(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal, String hierarchyBudgetTypeCode, boolean syncPersonnelAttachments)
             throws ProposalHierarchyException {
         // set child to child status
         childProposal.setHierarchyStatus(HierarchyStatusConstants.Child.code());
@@ -417,7 +426,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         childProposal.setHierarchyBudgetType(hierarchyBudgetTypeCode);
         // call synchronize
 
-        synchronizeChildProposal(hierarchyProposal, childProposal, syncPersonnelAttachments);
+        synchronizeChildProposal(hierarchyProposal, childProposal, syncPersonnelAttachments, getHierarchyChildren(hierarchyProposal.getProposalNumber()));
     }
 
     protected void copyInitialData(DevelopmentProposal hierarchyProposal, DevelopmentProposal srcProposal)
@@ -443,7 +452,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         hierarchyProposal.setNoticeOfOpportunityCode(srcProposal.getNoticeOfOpportunityCode());
         hierarchyProposal.setCfdaNumber(srcProposal.getCfdaNumber());
         hierarchyProposal.setPrimeSponsorCode(srcProposal.getPrimeSponsorCode());
-        hierarchyProposal.setNsfCode(srcProposal.getNsfCode());
+        hierarchyProposal.setNsfSequenceNumber(srcProposal.getNsfSequenceNumber());
         hierarchyProposal.setSponsorProposalNumber(srcProposal.getSponsorProposalNumber());
         hierarchyProposal.setAgencyDivisionCode(srcProposal.getAgencyDivisionCode());
         hierarchyProposal.setAgencyProgramCode(srcProposal.getAgencyProgramCode());
@@ -504,7 +513,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     /**
      * Synchronizes all child proposals to the parent.
      */
-    protected boolean synchronizeAllChildProposals(DevelopmentProposal hierarchyProposal) throws ProposalHierarchyException {
+    @Override
+    public boolean synchronizeAllChildProposals(DevelopmentProposal hierarchyProposal) throws ProposalHierarchyException {
         boolean changed = false;
 
         // delete all multiple inst attachments right at the beginning
@@ -514,7 +524,8 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
 
         finalizeHierarchySync(hierarchyProposal.getProposalDocument());
 
-        for (DevelopmentProposal childProposal : getHierarchyChildren(hierarchyProposal.getProposalNumber())) {
+        final List<DevelopmentProposal> hierarchyChildren = getHierarchyChildren(hierarchyProposal.getProposalNumber());
+        for (DevelopmentProposal childProposal : hierarchyChildren) {
             List<BudgetPeriod> oldBudgetPeriods = getOldBudgetPeriods(budget);
             ProposalPerson principalInvestigator = hierarchyProposal.getPrincipalInvestigator();
             childProposal.setHierarchyLastSyncHashCode(computeHierarchyHashCode(childProposal));
@@ -534,8 +545,39 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             dataObjectService.save(childProposal);
             changed = true;
         }
+
+        synchronizePersonUnits(hierarchyChildren, hierarchyProposal);
+
         return changed;
     }
+
+    protected boolean isUnitSyncEnabled() {
+        return getParameterService().getParameterValueAsBoolean(Constants.MODULE_NAMESPACE_PROPOSAL_DEVELOPMENT, Constants.KC_ALL_PARAMETER_DETAIL_TYPE_CODE,
+                HIERARCHY_UNIT_SYNC);
+    }
+
+    protected void synchronizePersonUnits(List<DevelopmentProposal> hierarchyChildren, DevelopmentProposal parentProposal) {
+        if(isUnitSyncEnabled()) {
+            if (hierarchyChildren != null) {
+                final Map<String, Set<String>> personUnits = hierarchyChildren.stream()
+                        .flatMap(childProposal -> childProposal.getProposalPersons().stream())
+                                .flatMap(proposalPerson -> proposalPerson.getUnits().stream())
+                                .collect(Collectors.groupingBy(proposalPersonUnit -> proposalPersonUnit.getProposalPerson().getPersonId(),
+                                        Collectors.mapping(ProposalPersonUnit::getUnitNumber, Collectors.toSet())));
+
+                if (parentProposal.getProposalPersons() != null) {
+                    parentProposal.getProposalPersons().stream()
+                            .filter(parentPerson -> personUnits.containsKey(parentPerson.getPersonId()))
+                            .forEach(parentPerson -> {
+                                parentPerson.setUnits(new ArrayList<>());
+                                personUnits.get(parentPerson.getPersonId())
+                                        .forEach(unitNumber -> keyPersonnelService.addUnitToPerson(parentPerson, keyPersonnelService.createProposalPersonUnit(unitNumber, parentPerson)));
+                    });
+                }
+            }
+        }
+    }
+
 
     protected void deleteAllMultipleInternal(DevelopmentProposal proposal) {
         List<Narrative> freshList = deleteAllMultipleTypeAttachments(proposal.getInstituteAttachments());
@@ -562,7 +604,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
      * in all of the child proposals are represented in the parent proposal.
      */
     protected boolean synchronizeChildProposal(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal,
-                                                           boolean syncPersonnelAttachments) throws ProposalHierarchyException {
+                                               boolean syncPersonnelAttachments, List<DevelopmentProposal> hierarchyChildren) throws ProposalHierarchyException {
         List<BudgetPeriod> oldBudgetPeriods = getOldBudgetPeriods(proposalBudgetHierarchyService.getHierarchyBudget(hierarchyProposal));
         ProposalPerson principalInvestigator = hierarchyProposal.getPrincipalInvestigator();
         childProposal.setHierarchyLastSyncHashCode(computeHierarchyHashCode(childProposal));
@@ -582,6 +624,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             syncAllPersonnelAttachments(hierarchyProposal, childProposal);
         }
 
+        synchronizePersonUnits(hierarchyChildren, hierarchyProposal);
         dataObjectService.save(childProposal);
 
         return true;
@@ -767,8 +810,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
         return bios.stream()
                 .filter(bio -> (StringUtils.isNotBlank(srcPropPersonBio.getPersonId()) && srcPropPersonBio.getPersonId().equals(bio.getPersonId())
                                                     || srcPropPersonBio.getRolodexId() != null && srcPropPersonBio.getRolodexId().equals(bio.getRolodexId())))
-                .filter(bio -> bio.getDocumentTypeCode().equals(srcPropPersonBio.getDocumentTypeCode()))
-                .findAny().isPresent();
+                .anyMatch(bio -> bio.getDocumentTypeCode().equals(srcPropPersonBio.getDocumentTypeCode()));
     }
 
     protected ProposalPersonBiography getNewPropPersonBio(ProposalPersonBiography srcPropPersonBio, DevelopmentProposal hierarchyProposal) {
@@ -869,9 +911,9 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
             ProposalPerson principalInvestigator) {
         
         synchronizePersons(hierarchyProposal, primaryChildProposal, principalInvestigator);
-        getHierarchyChildren(hierarchyProposal.getProposalNumber()).stream()
-                .filter(childProposal -> !StringUtils.equals(primaryChildProposal.getProposalNumber(), childProposal.getProposalNumber()))
-                .forEach(childProposal -> synchronizePersons(hierarchyProposal, childProposal, principalInvestigator));
+        getHierarchyChildren(hierarchyProposal.getProposalNumber()).
+                forEach(childProposal -> synchronizePersons(hierarchyProposal, childProposal, principalInvestigator));
+
     }
 
     /**
@@ -896,6 +938,9 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
                     for(ProposalUnitCreditSplit creditSplit : unit.getCreditSplits()) {
                         creditSplit.setCredit(new ScaleTwoDecimal(0));
                     }
+                    if (!childProposal.getHierarchyParentProposalNumber().equals(childProposal.getProposalNumber())) {
+                        unit.setLeadUnit(false);
+                    }
                 }
 
                 for (ProposalPersonCreditSplit creditSplit : newPerson.getCreditSplits()) {
@@ -916,6 +961,7 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
 
         }
         removeDeletedPersonnelFromParent(hierarchyProposal, childProposal);
+
     }
 
     protected void syncDegreeInfo(DevelopmentProposal hierarchyProposal, DevelopmentProposal childProposal) {
@@ -988,11 +1034,17 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     
     
     protected void setInitialPi(DevelopmentProposal hierarchy, DevelopmentProposal child) {
-        ProposalPerson pi = child.getPrincipalInvestigator();
-        if (pi != null) {
-            int index = hierarchy.getProposalPersons().indexOf(pi);
+        ProposalPerson childPi = child.getPrincipalInvestigator();
+        final Optional<ProposalPersonUnit> childPiLeadUnit = childPi.getUnits().stream().filter(ProposalPersonUnit::isLeadUnit).findFirst();
+        if (childPi != null) {
+            int index = hierarchy.getProposalPersons().indexOf(childPi);
             if (index > -1) {
-                hierarchy.getProposalPerson(index).setProposalPersonRoleId(Constants.PRINCIPAL_INVESTIGATOR_ROLE);
+                ProposalPerson hierarchyPi = hierarchy.getProposalPerson(index);
+                hierarchyPi.setProposalPersonRoleId(Constants.PRINCIPAL_INVESTIGATOR_ROLE);
+                if (childPiLeadUnit.isPresent()) {
+                    Optional <ProposalPersonUnit> hierarchyPiLeadUnit = hierarchyPi.getUnits().stream().filter(unit -> unit.getUnitNumber().equals(childPiLeadUnit.get().getUnitNumber())).findFirst();
+                    hierarchyPiLeadUnit.ifPresent(proposalPersonUnit -> proposalPersonUnit.setLeadUnit(true));
+                }
             }
         }
     }
@@ -1241,28 +1293,24 @@ public class ProposalHierarchyServiceImpl implements ProposalHierarchyService {
     }
     @Override
     public void createAndSaveActionNarrative(String reason, String title, MultipartFile file, String narrativeTypeCode, ProposalDevelopmentDocument pDoc) {
-        try {
-            if (file != null && file.getBytes().length > 0) {
-                Narrative narrative = new Narrative();
-                narrative.setName(file.getOriginalFilename());
-                narrative.setComments(reason);
-                try {
-                    narrative.init(file);
-                } catch (Exception e) {
-                    throw new RuntimeException("Error Initializing narrative attachment file", e);
-                }
-                narrative.setNarrativeTypeCode(narrativeTypeCode);
-                narrative.setModuleStatusCode(COMPLETE);
-                narrative.setModuleTitle(title);
-                narrative.setContactName(globalVariableService.getUserSession().getPrincipalName());
-                narrative.setPhoneNumber(globalVariableService.getUserSession().getPerson().getPhoneNumber());
-                narrative.setEmailAddress(globalVariableService.getUserSession().getPerson().getEmailAddress());
-                getLegacyNarrativeService().prepareNarrative(pDoc, narrative);
-                pDoc.getDevelopmentProposal().getInstituteAttachments().add(narrative);
-                dataObjectService.save(pDoc);
+        if (file != null && !file.isEmpty()) {
+            Narrative narrative = new Narrative();
+            narrative.setName(file.getOriginalFilename());
+            narrative.setComments(reason);
+            try {
+                narrative.init(file);
+            } catch (Exception e) {
+                throw new RuntimeException("Error Initializing narrative attachment file", e);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Error reading narrative attachment file", e);
+            narrative.setNarrativeTypeCode(narrativeTypeCode);
+            narrative.setModuleStatusCode(COMPLETE);
+            narrative.setModuleTitle(title);
+            narrative.setContactName(globalVariableService.getUserSession().getPrincipalName());
+            narrative.setPhoneNumber(globalVariableService.getUserSession().getPerson().getPhoneNumber());
+            narrative.setEmailAddress(globalVariableService.getUserSession().getPerson().getEmailAddress());
+            getLegacyNarrativeService().prepareNarrative(pDoc, narrative);
+            pDoc.getDevelopmentProposal().getInstituteAttachments().add(narrative);
+            dataObjectService.save(pDoc);
         }
     }
 

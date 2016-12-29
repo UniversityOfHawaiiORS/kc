@@ -215,10 +215,12 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
              if (onFinancialTab(mapping, request) && !rule.processSaveSubAwardAmountInfoBusinessRules(subAward)) {
                  return mapping.findForward(Constants.MAPPING_FINANCIAL_PAGE);
              } else {
-            ActionForward forward = super.save(mapping, form, request, response);
-            getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
-                 getSubAwardService().calculateAmountInfo(subAward);
-            return forward;
+                 ActionForward forward = super.save(mapping, form, request, response);
+                 if (subAward.getSubAwardId() == null) {
+                     getSubAwardService().updateSubAwardSequenceStatus(subAward, VersionStatus.PENDING);
+                     getSubAwardService().calculateAmountInfo(subAward);
+                 }
+                 return forward;
              }
              // KC-1448 END
         } else {
@@ -277,7 +279,7 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
            }
        });
 
-        return mapping.findForward(Constants.MAPPING_TEMPLATE_PAGE);
+       return mapping.findForward(Constants.MAPPING_TEMPLATE_PAGE);
     }
 
 
@@ -294,7 +296,7 @@ public class SubAwardAction extends KcTransactionalDocumentActionBase {
 
       return mapping.findForward(Constants.MAPPING_AMOUNT_RELEASED_PAGE);
   }
-  
+
  public ActionForward contacts(ActionMapping mapping, ActionForm form,
 	HttpServletRequest request, HttpServletResponse response) {
 
@@ -475,25 +477,25 @@ public ActionForward blanketApprove(ActionMapping mapping,
   protected KcNotificationService getNotificationService() {
       return KcServiceLocator.getService(KcNotificationService.class);
   }
- 
- public ActionForward printForms(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
-         SubAwardForm subAwardForm = (SubAwardForm) form;
+
+    public ActionForward printForms(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        SubAwardForm subAwardForm = (SubAwardForm) form;
         streamToResponse(getSubAwardPrintingService().printSubAwardFDPReport(subAwardForm.getSubAwardPrintAgreement(), subAwardForm.getSubAwardDocument().getSubAward()), response);
         return mapping.findForward(Constants.MAPPING_BASIC);
-                      }
+    }
 
     protected SponsorHierarchyService getSponsorHierarchyService() {
         return KcServiceLocator.getService(SponsorHierarchyService.class);
-                  }
+    }
 
     protected SubAwardPrintingService getSubAwardPrintingService() {
         return KcServiceLocator.getService(SubAwardPrintingService.class);
-              }
+    }
 
     protected AuditHelper getAuditHelper() {
         return KcServiceLocator.getService(AuditHelper.class);
-              }                                           
-      
+    }
+
 
     // KC-1350 Allow creating multiple negotiations for SubAwards
     protected NegotiationService getNegotiationService() {
